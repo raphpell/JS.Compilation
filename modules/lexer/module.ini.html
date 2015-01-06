@@ -1,0 +1,58 @@
+<html><head></head><body><pre>
+¤ whitespaces
+
+hspaces	= SPACES|TAB
+
+!@	INI		=	S_INI_SECTION|S_INI_COMMENT|INI_KEYWORD|INI_VAR|S_INI_VALUE|{hspaces}|L_NEW_LINE|INI_TMP
+
+// Aide analyse syntaxique : mot clé interdit en nom de variable
+	INI_KEYWORD		= 	(null|yes|no|true|false|on|off|none)
+		(css:keyword)
+// Liste non exhaustive des caractères non autorisés dans les noms de variable
+	INI_VAR			= 	[^=!;{}"&|^~[\]()\r\n\f \t]+
+		(css:var)
+// Gestion des erreurs...
+	INI_TMP			= 	[^\r\n\f \t;=]
+		(css:undefined)
+
+
+/*---------- COMMENTS ----------*/
+!#@	INI_COMMENT			=	INI_COMMENT_IN|{hspaces}
+		(translation:COMMENT, css:comment)
+	S_INI_COMMENT		=	;
+	INI_COMMENT_IN		=	[^\r\n\f]+
+
+
+/*---------- SECTION ----------*/
+!#@	INI_SECTION			=	INI_SECTION_IN|E_INI_SECTION|{hspaces}
+	S_INI_SECTION		=	\[
+	E_INI_SECTION		=	\]
+	INI_SECTION_IN		=	[^\r\n\f \t\]]+
+		(translation:SECTION, css:section)
+
+
+/*---------- VALUES ----------*/
+!#@	INI_VALUE			=	S_INI_SDQ|S_INI_SSQ|INI_VALUE_IN|{hspaces}
+		(translation:VALUES, css:value)
+	S_INI_VALUE		=	\=
+		(translation:OPERATOR, css:punctuator)
+	INI_VALUE_IN		=	[^\r\n\f \t;"']+
+
+
+/*---------- STRINGS  ----------*/
+
+//---------- DOUBLE QUOTE: SINGLE LINE
+!#@	INI_SDQ				=	INI_SDQ_IN|E_INI_SDQ|{hspaces}
+		(translation:STRING, css:string)
+	S_INI_SDQ			=	"
+	E_INI_SDQ			=	"
+	INI_SDQ_IN			=	([^"\\\r\n\f \t]|\\[^\r\n\f \t])+
+
+//---------- SINGLE QUOTE: MULTI LINE
+!#@	INI_SSQ				=	INI_SSQ_IN|E_INI_SSQ|{hspaces}|L_NEW_LINE
+		(translation:STRING, css:string)
+	S_INI_SSQ			=	'
+	E_INI_SSQ			=	'
+	INI_SSQ_IN			=	[^'\r\n\f \t]+
+
+</pre></body></html>

@@ -1,0 +1,76 @@
+<html><head></head><body><pre>
+¤ superscript, whitespaces, strings&comments, number
+
+!#	PHP			=	S_PHP|BIG_PHP|PHP_ID|NOT_WHITE_SPACES
+		(css:php)
+
+!@	BIG_PHP		=	E_PHP|NUMBER|{whitespaces}|{operators}|{comments}|{strings}|{punctuators}
+		whitespaces		=	L_NEW_LINE|TAB|SPACES
+		operators		=	ARITHMETIC_OPERATOR|ASSIGNMENT_OPERATOR|BITWISE_OPERATOR|COMPARISON_OPERATOR|ERROR_CONTROL_OPERATOR|LOGICAL_OPERATOR|STRING_OPERATOR|TYPE_OPERATOR
+		comments		=	S_SLC|S_MLC
+		strings			=	S_SSQ|S_SDQ
+		punctuators		=	ELISION|LBRACE|RBRACE|LPAREN|RPAREN|LBRACK|RBRACK|DOT|SEMI|QUESTION|COLON
+
+!@	PHP_ID		=	PHP_RESERVED|PHP_LITERAL|PHP_KEYWORD|PHP_SPECIAL_VARS|PHP_FUNCTION|PHP_IDENTIFIER
+
+
+	E_PHP		=	\?\>
+			(css:tag)
+			
+// IDENTIFIERS		
+	PHP_FUNCTION		=	[\_a-zA-Z][\w_]*
+			(css:function)
+	PHP_IDENTIFIER		=	\$[\w_]+
+			(css:identifier)
+	PHP_SPECIAL_VARS	=	(\$(GLOBALS|_(COOKIE|ENV|FILES|GET|(PO|REQUE)ST|SE(RVER|SSION))))
+			(css:special)
+	PHP_KEYWORD			=	break|case|continue|declare|default|do|each|elseif|else|foreach|for|goto|if|include|include_once|require|require_once|return|switch|while
+			(css:keyword)
+	PHP_LITERAL			=	true|TRUE|false|FALSE|null|NULL
+			(css:literal)
+	PHP_RESERVED		=	exception|as|var|class|const|die|echo|empty|eval|exit|extends|function|global|isset|list|new|print|static|unset|use|__FUNCTION__|__CLASS__|__METHOD__|final|interface|implements|extends|public|private|protected|abstract|clone|\$this
+			(css:keyword)
+
+// OPERATORS
+	ARITHMETIC_OPERATOR		=	\+|\-|\*|\%|\/|\+\+|\-\-
+			(css:operator)
+	ASSIGNMENT_OPERATOR		=	=|\+=|\-=|\*=|\/=|\.=|\%=|\&=|\|=|\^=|<<=|>>=|=>
+			(css:operator)
+	BITWISE_OPERATOR		=	&|\||\^|\~|<<|>>
+			(css:operator)
+	COMPARISON_OPERATOR		=	==|===|!=|<>|!==|<|>|<=|>=
+			(css:operator)
+	ERROR_CONTROL_OPERATOR	=	@
+			(css:operator)
+	LOGICAL_OPERATOR		=	and|or|xor|!|&&|\|\|
+			(css:operator)
+	STRING_OPERATOR			=	\.
+			(css:operator)
+	TYPE_OPERATOR			=	\(int\)|\(float\)|\(string\)|\(array\)|\(object\)|\(bool\)
+			(css:operator)
+
+// PUNCTUATORS
+	ELISION		=	\,
+			(css:elision)
+	LBRACE		=	\{
+			(css:punctuator)
+	RBRACE		=	\}
+			(css:punctuator)
+	LPAREN		=	\(
+			(css:punctuator)
+	RPAREN		=	\)
+			(css:punctuator)
+	LBRACK		=	\[
+			(css:punctuator)
+	RBRACK		=	\]
+			(css:punctuator)
+	DOT			=	\.
+			(css:punctuator)
+	SEMI		=	\;
+			(css:punctuator)
+	QUESTION	=	\?
+			(css:punctuator)
+	COLON		=	\:
+			(css:punctuator)
+
+</pre></body></html>

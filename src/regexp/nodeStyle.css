@@ -1,0 +1,46 @@
+.myNode {
+	background: #eee;
+	box-shadow: 2px 2px 2px #999;
+	color: #000;
+	border: 1px solid #CCC;
+	display: inline-block;
+	margin: 2px;
+	padding: 5px 2px;
+	text-align: center;
+	}
+.myNode  .myNode {
+	margin: 1px;
+	}
+.myNode:hover {
+	background: lime !important;
+	border: 1px solid #000;
+	transition: 1s ease;
+	}
+	.myNode:hover>.myNode {
+		background: #FFF;
+		color:#000;
+		}
+	
+.relief .myNode {
+    border: 1px solid #CCCCCC;
+    box-shadow: 2px -2px 2px #999999;
+    display: inline;
+	line-height: 2em;
+    margin: 2px;
+    padding: 1px;
+	position: relative;
+	vertical-align: text-top;
+    white-space: pre;
+	}
+.relief .myNode .myNode {
+	margin: 1px;
+	}
+.relief .myNode:hover {
+	background: lime !important;
+	border: 1px solid #000;
+	transition: 1s ease;
+	}
+	.relief .myNode:hover > .myNode {
+		background: yellow;
+		color:#000;
+		}

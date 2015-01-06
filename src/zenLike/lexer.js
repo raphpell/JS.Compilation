@@ -1,0 +1,9 @@
+AutomatonLexer.insert(function(o,f,g,h){
+	o.addTokens([
+		["ZEN",{A:g("0","1","[234567]","[89]","[Ee]","b","[ABCDFacdf]","-","[Xx]","[$@GHIJKLMNOPQRSTUVWYZ_ghijklmnopqrstuvwyz]",".","+","^"," ","\"","#","'","(",")","*",":","=",">","[","]"),M:[,[2,2,2,2,6,6,6,3,6,6,11,18,26,27,28,10,29,30,31,23,32,33,34,35,36],[2,2,2,2,4,6,6,6,6,6,17],[2,2,2,2,6,6,6,6,6,6,22],h(12,6,10,0,11,21),h(12,7,10,0,11,21),h(10,6),h(10,7),h(10,8),[9,9,9,9,5,7,7,7,7,7],h(10,8),[9,9,9,9,7,7,7,7,7,7],[15,15,15,15,16,25,,,14,,17],h(7,13),h(7,13),[15,15,15,15,16,,,,,,17],[19,19,19,19,,,,21,,,,21],h(5,17,4,16),[12,15,15,15,,,,,,,22],h(4,19),h(4,20),h(4,19),h(4,17),h(4,20),[24,24],[24,24],{12:26}],F:[,,10,10,10,11,10,11,3,11,,,9,9,,9,,9,8,9,7,,,,9,,17,1,2,4,5,6,12,13,14,15,16],R:[[2,f("234567",1)],[3,f("89",1)],[4,f("Ee",1)],[6,f("ABCDFacdf",1)],[8,f("Xx",1)],[9,f("$@GHIJKLMNOPQRSTUVWYZ_ghijklmnopqrstuvwyz",1)]],TokensTable:',SPACES,S_SNIPPET_SDQ,ELTID,S_SNIPPET_SSQ,LPAREN,RPAREN,MULTIPLICATION,PLUS,NUMBER,ELT,ELTCLASS,ARGUMENT_PREFIX,EQUAL,GTHAN,LBRACK,RBRACK,UP'.split(',')}],
+		["SNIPPET_SSQ",{A:g("[^\n\f\r'\\]","\\","'"),M:[,[3,2,4],[3,3,3],[3,2]],F:[,,,2,1],R:[[0,f("\n\f\r'\\")]],TokensTable:[,'E_SNIPPET_SSQ','SNIPPET_SSQ_IN']}],
+		["SNIPPET_SDQ",{A:g("[^\n\f\r\"\\]","\\","\""),M:[,[3,2,4],[3,3,3],[3,2]],F:[,,,2,1],R:[[0,f("\n\f\r\"\\")]],TokensTable:[,'E_SNIPPET_SDQ','SNIPPET_SDQ_IN']}]
+		])
+	o.addCSSClass("elt=ELT&id=ELTID&className=ELTCLASS&multiplication=MULTIPLICATION&punctuator=ARGUMENT_PREFIX|LPAREN|RPAREN|LBRACK|EQUAL|RBRACK&operator=PLUS|GTHAN|UP&space=SPACES|TAB&string=SNIPPET_SSQ|SNIPPET_SSQ_IN|SNIPPET_SDQ|SNIPPET_SDQ_IN")
+	o.setTokensTranslation('SNIPPET_SSQ=STRING&SNIPPET_SSQ_IN=STRING&SNIPPET_SDQ=STRING&SNIPPET_SDQ_IN=STRING')
+	});

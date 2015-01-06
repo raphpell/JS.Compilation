@@ -1,0 +1,384 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>Comparaison de lexers</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+	<link rel="stylesheet" type="text/css" href="css/syntaxes.css">
+	<style>
+.chrono { white-space: normal; }
+.test { float:left; margin:1em 0; position:relative; text-align: center; width:24%; z-index:2; }
+.test H2 { margin:0.5em 0 0; }
+.test .result { background:#FFF; border: 1px solid #CCC; margin:2px; padding:5px; overflow:auto; position:relative; text-align: left; }
+.test:hover {
+	background: lightskyblue;
+	-moz-box-shadow: 0 0 10px #888;
+	-webkit-box-shadow: 0 0 10px #888;
+	box-shadow: 0 0 10px #888;
+	z-index: 3;
+	}
+.test:hover .result {
+	border: 3px solid lightskyblue;
+	left:-75%;
+	margin: -2px;
+	width:175%;
+	-moz-box-shadow: 0 0 10px #888;
+	-webkit-box-shadow: 0 0 10px #888;
+	box-shadow: 0 0 10px #888;
+	z-index: 3;
+	}
+FIELDSET {
+	float: left;
+	margin: 0 1em 1em 0;
+	}
+FIELDSET DL {
+	margin: 0;
+	}
+	</style>
+</head>
+<body spellcheck="false">
+<a href="index.htm">Index</a>
+
+<h1>Comparaison de lexers</h1>
+
+<fieldset><legend>Source</legend>
+<textarea id="eText">
+/* 1 - JavaScript syntax */ aaa */
+	variable n = nInt1/4 + 4/nInt1++ || 10 
+	var oEditor = new EditorSample ( eContent ,{
+		// a single line comment ( a single quote ' )
+		aArray : [ true , false , null , undefined , Infinity , NaN ],
+		sDoubleQuoteString : "/* ' a multi line comment */ // a single line comment " ,
+		sSingleQuoteString : '/* "\
+			a multi line string */ // a single line comment '
+		sBracketsTest1_1 : "{[(",
+		sBracketsTest1_2 : "}])",
+		/*
+		a  multi line comment ( a double quote " )
+		*/
+		})
+	RegExp.extend({
+		escape :function( s ){
+			// Bracket test 2
+			var re1 = /(\.|\?|\*|\+|\\|\(|\)|\[|\]|\}|\{|\$|\^|\|)/g
+			, re2 = /("|')/gm
+			return s.replace( re1 , "\\$1" )
+			}
+		})
+
+/* 2 - PHP */
+	<?php
+	function phpSafe ( $strText ){
+		// a single line comment ( a double quote ")
+		$tmpString = $strText ;
+		$tmpString = str_replace( chr(92) , "" , $tmpString ); 
+		returning rawurldecode( $tmpString );
+		}
+		
+	/*
+	a  multi line comment ( a single quote ' )
+	*/
+	$hiddencontent = phpSafe( $_POST[ 'content' ]);
+	?>
+</textarea>
+</fieldset>
+<fieldset><legend>Affichage</legend>
+	<dl>
+		<dt><input type="checkbox" id="eShowResults" checked><label for="eShowResults">Afficher le résultat</label></dt>
+		<dt><input type="radio" id="eTestCase1" name="TestCase"><label for="eTestCase1">Résultat analyse lexicale (LexerNode lourd).</label></dt>
+		<dt><input type="radio" id="eTestCase2" name="TestCase"><label for="eTestCase2">Texte généré: parcours arbre (LexerNode légé).</label></dt>
+		<dt><input type="radio" id="eTestCase3" name="TestCase"><label for="eTestCase3">Texte généré: ligne/ligne (LexerNode légé).</label></dt>
+	</dl>
+</fieldset>
+<fieldset><legend>LexerNode</legend>
+	<dl>
+		<dt><select id="eLexerNode">
+			<option value="HTMLElement" selected>HTMLElement</option>
+			<option value="ObjectNode">ObjectNode</option>
+		</select></dt>
+		<dt><input type="checkbox" id="eClassName"><label for="eClassName">className</label></dt>
+		<dt><input type="checkbox" id="eTitle"><label for="eTitle">title</label></dt>
+		<dt><input type="checkbox" id="eInnerHTML"><label for="eInnerHTML">innerHTML</label></dt>
+		<dt><input type="checkbox" id="eByLine"><label for="eByLine">getElementsByLine</label></dt>
+	</dl>
+</fieldset>
+<fieldset><legend>Analyse</legend>
+	<dl>
+		<dt>
+			<input type="button" value="Répéter automatiquement" onclick="this.value=this.value=='Arrêter'?'Répéter':'Arrêter'; test()">
+			<input type="button" value="Scanner" onclick="fTest()">
+		</dt>
+		<dt><input type="checkbox" id="eOnKeyUp"><label for="eOnKeyUp">Executer lors du relâchement d'une touche.</label></dt>
+	</dl>
+</fieldset>
+
+<hr style="clear:both;">
+
+<div id="eTest1" class="test"><h2>Char/Char</h2>
+	<input type="checkbox" id="eEnabled1"><label for="eEnabled1">Actif.</label>
+	<pre id="eChrono1" class="chrono">...</pre>
+	<pre id="eTime1" class="chrono">...</pre>
+	<pre id="eResult1" class="result"></pre>
+</div>
+<div id="eTest2" class="test"><h2>&ldquo;1 RegExp&rdquo;</h2>
+	<input type="checkbox" id="eEnabled2"><label for="eEnabled2">Actif.</label>
+	<pre id="eChrono2" class="chrono">...</pre>
+	<pre id="eTime2" class="chrono">...</pre>
+	<pre id="eResult2" class="result"></pre>
+</div>
+<div id="eTest3" class="test"><h2>Multiple RegExp</h2>
+	<input type="checkbox" id="eEnabled3" checked><label for="eEnabled3">Actif.</label>
+	<pre id="eChrono3" class="chrono">...</pre>
+	<pre id="eTime3" class="chrono">...</pre>
+	<pre id="eResult3" class="result"></pre>
+</div>
+<div id="eTest4" class="test"><h2>Automaton</h2>
+	<input type="checkbox" id="eEnabled4" checked><label for="eEnabled4">Actif.</label>
+	<pre id="eChrono4" class="chrono">...</pre>
+	<pre id="eTime4" class="chrono">...</pre>
+	<pre id="eResult4" class="result"></pre>
+</div>
+
+<script src="js/shared.js"></script>
+<!-- PARCOURS CARACTÈRE / CARACTERE -->
+<script>
+var test_1 =function(){
+	var oReplacements = { '&':'&amp;', '<':'&lt;', '>':'&gt;' }
+	, mapCharacters =function( s ){
+		for(var i=0, ni=s.length, a=new Array(ni); i<ni; i++ )
+			a[i] = oReplacements[s[i]] || s[i]
+		return a.join('')
+		}
+	var oChrono = new Chrono ()
+	, nTest = 20, sSource = eText.value , sResult = ''
+	eResult1.innerHTML = ''
+	if( eEnabled1.checked ){
+		for(var i=0; i<nTest; i++ ) sResult = mapCharacters( sSource )
+		Stats.set( 1, oChrono.stop()/nTest)
+		var oChrono = new Chrono ()
+		eResult1.innerHTML = '<b>'+ mapCharacters( sSource ) +'</b>'
+		eTime1.innerHTML = oChrono.stop().toFixed(2) + 'ms'
+		}
+	else {
+		eTime1.innerHTML = ''
+		Stats.init( 1 )
+		}
+	eResult1.style.display = eEnabled1.checked ? '' : 'none'
+	}
+</script>
+
+<!-- LEXER NODE -->
+<script src="js/lexer.node.object.js"></script>
+<script>
+var getElementsByLine =function( nLine ){
+	var a=[]
+	for(var e=this.firstChild; e; e=e.nextSibling )
+		if( e.oValue.lineStart<=nLine && nLine<=e.oValue.lineEnd )
+			a.push(e)
+	return a
+	}
+var getHTMLEnd =function( o ){ return '</b>' }
+var getHTMLStart =function( o, bTitle ){
+	return bTitle && o.value
+		? '<b class="' + o.css + '" title="' + valueToString( o ) + '">'
+		: '<b class="' + o.css + '">'
+	}
+var replaceSpecialHTML =function( s ){
+	return s.str_replace( ['&','<','>'], ['&amp;','&lt;','&gt;'])
+	}
+var setTitle =function(){ this.title = valueToString( this.oValue )}
+var valueToString =function(o){
+	return JSON.stringify( o, 'token,parentToken,css,index,lineStart,lineEnd,rule'.split(','), " " ).str_replace('"', '')
+	}
+
+var LexerNode
+, createLexerNode =function( bClassName, bTitle, bInnerHTML, bByLine ){
+	eClassName.checked = bClassName
+	eTitle.checked = bTitle
+	eInnerHTML.checked = bInnerHTML
+	eByLine.checked = bByLine
+	var s = '{}'
+	switch( eLexerNode.value ){
+		case 'HTMLElement': s='document.createElement(o.token)'; break;
+		case 'ObjectNode': s='new Node(o.token)'; break;
+		}
+	LexerNode = new Function ( 'o', 
+		'var e = '+ s +';'
+		+'e.oValue=o;'
+		+( bByLine ? 'e.getElementsByLine=getElementsByLine;' : '' )
+		+( bClassName ? 'e.className=o.css;' : '' )
+		+( bTitle ? 'e.setTitle=setTitle;e.setTitle();' : '' )
+		+( bInnerHTML ? "if( o.value ) e.innerHTML = o.value.str_replace( ['&','<','>'], ['&amp;','&lt;','&gt;']);" : '' )
+		+'return e;'
+		)
+	}
+</script>
+
+<!-- AFFICHAGE -->
+<script>
+// Creation HTML parcours arbre
+var displayNodes=(function(){
+	return function( eParent ){
+		var s = getHTMLStart( eParent.oValue )
+		for(var i=0, eChild; eChild=eParent.childNodes[i]; i++)
+			s += eChild.hasChildNodes()
+				? displayNodes( eChild )
+				: getHTMLStart( eChild.oValue ) + replaceSpecialHTML( eChild.oValue.value ) + getHTMLEnd()
+		return s + getHTMLEnd()
+		}
+	})()
+// Creation HTML Ligne/Ligne
+var getLine =function( eRoot, nLine ){
+	var s = getHTMLStart( eRoot.oValue )
+	var a = eRoot.getElementsByLine( nLine )
+	for(var i=0, eNode; eNode=a[i]; i++){
+		var o = eNode.oValue
+		s += ( eNode.hasChildNodes()
+				? getLine( eNode, nLine )
+				: getHTMLStart( o ) + replaceSpecialHTML( o.value ) + getHTMLEnd()
+				)
+		}
+	return s + getHTMLEnd()
+	}
+var getLines =function( eRoot, nLineStart, nLineEnd ){
+	var a=[]
+	for(var i=nLineStart; i<=nLineEnd; i++ ) a.push( getLine( eRoot, i ))
+	return a
+	}
+var getContents =function( eRoot ){
+	return getLines( eRoot, 1, eRoot.oValue.lineEnd )
+	}
+</script>
+
+<!-- LEXERS -->
+<script src="js/lexer.regexp.one.js"></script>
+<script src="js/lexer.regexp.multi.js"></script>
+<script src="js/lexer.automaton.js"></script>
+<script src="js/lexer.automaton.modules.js"></script>
+<script>
+var testLexer =function( Lexer, nId ){
+	return function(){
+		var eResult = window['eResult'+nId]
+		var eEnabled = window['eEnabled'+nId]
+		var eTime = window['eTime'+nId]
+		eResult.innerHTML = ''
+		if( eEnabled.checked ){
+			var oChrono = new Chrono ()
+			var eRoot = Lexer( eText.value, 'JS' )
+			Stats.set( nId, oChrono.stop())
+			if( eShowResults.checked ){
+				switch( nDisplayMode ){
+					case 11: eResult.appendChild( eRoot ); break;
+					case 22: eResult.innerHTML = displayNodes( eRoot ); break;
+					case 33: eResult.innerHTML = getContents( eRoot ).join(''); break;
+					default: 
+					}
+				eTime.innerHTML = oChrono.stop().toFixed(3) + 'ms'
+				}
+			}
+		else{
+			eTime.innerHTML = ''
+			Stats.init( nId )
+			}
+		eResult.style.display = eEnabled.checked ? '' : 'none'
+		}
+	}
+, test_2 = testLexer( OneRegExpLexer, 2 )
+, test_3 = testLexer( MultiRegExpLexer, 3 )
+, test_4 = testLexer( AutomatonLexer, 4 )
+</script>
+
+<!-- DISPLAY MODE -->
+<script>
+var nDisplayMode
+</script>
+
+<!-- STATS -->
+<script src="widget/Stats/scripts.js"></script>
+<script>
+_( 'eText,eOnKeyUp,eShowResults' )
+_( 'eResult1,eResult2,eResult3,eResult4' )
+_( 'eTest1,eTest2,eTest3,eTest4' )
+_( 'eTime1,eTime2,eTime3,eTime4' )
+_( 'eEnabled1,eEnabled2,eEnabled3,eEnabled4' )
+_( 'eChrono1,eChrono2,eChrono3,eChrono4' )
+_( 'eTestCase1,eTestCase2,eTestCase3' )
+_( 'eLexerNode,eClassName,eTitle,eInnerHTML,eByLine' )
+
+var initStats =function(){
+	Stats.init( 2 )
+	Stats.init( 3 )
+	Stats.init( 4 )
+	}
+var fTest =function(){
+	test_1(); test_2(); test_3(); test_4()
+	eChrono1.innerHTML = eEnabled1.checked ? Stats.compare( 1 ) : '...'
+	eChrono2.innerHTML = eEnabled2.checked ? Stats.compare( 2, eEnabled3.checked?3:0, eEnabled4.checked?4:0 ) : '...'
+	eChrono3.innerHTML = eEnabled3.checked ? Stats.compare( 3, eEnabled4.checked?4:0, eEnabled2.checked?2:0 ) : '...'
+	eChrono4.innerHTML = eEnabled4.checked ? Stats.compare( 4, eEnabled2.checked?2:0 ,eEnabled3.checked?3:0 ) : '...'
+	}
+var test =benchmark( fTest, 1000 )
+
+Events.add( 
+	'change',
+		eLexerNode, function(){
+			initStats()
+			if( this.value=='ObjectNode' && nDisplayMode==11 ) eShowResults.checked = false
+			createLexerNode( eClassName.checked,eTitle.checked,eInnerHTML.checked,eByLine.checked );
+			},
+	'click',
+		eShowResults, function(){
+			if( eShowResults.checked && nDisplayMode==11 ){
+				eLexerNode.value = 'HTMLElement'
+				eLexerNode.onchange()
+				}
+			},
+		eClassName, function(){
+			createLexerNode( eClassName.checked,eTitle.checked,eInnerHTML.checked,eByLine.checked );
+			},
+		eTitle, function(){
+			createLexerNode( eClassName.checked,eTitle.checked,eInnerHTML.checked,eByLine.checked );
+			},
+		eInnerHTML, function(){
+			if( ! eInnerHTML.checked && nDisplayMode == 11 ) eTestCase2.onclick()
+			if( eInnerHTML.checked && ( nDisplayMode == 22 || nDisplayMode == 33 )) eTestCase1.onclick()
+			else createLexerNode( eClassName.checked,eTitle.checked,eInnerHTML.checked,eByLine.checked );
+			},
+		eByLine, function(){
+			if( ! eByLine.checked && nDisplayMode == 33 ) eTestCase2.onclick()
+			else createLexerNode( eClassName.checked,eTitle.checked,eInnerHTML.checked,eByLine.checked );
+			},
+		eTestCase1, function(){
+			eTestCase1.checked = nDisplayMode = 11; initStats();
+			if( eShowResults.checked && eLexerNode.value=='ObjectNode' ) eShowResults.checked = false
+			createLexerNode( 1,0,1,0 );
+			fTest()
+			},
+		eTestCase2, function(){
+			eTestCase2.checked = nDisplayMode = 22; initStats();
+			createLexerNode( 0,0,0,0 );
+			fTest()
+			},
+		eTestCase3, function(){
+			eTestCase3.checked = nDisplayMode = 33; initStats();
+			createLexerNode( 0,0,0,1 );
+			fTest()
+			},
+		eTest1, function(){ if( eEnabled1.checked ){
+			test_1(); eChrono1.innerHTML = Stats.compare( 1 )
+			}},
+		eTest2, function(){ if( eEnabled2.checked ){
+			test_2(); eChrono2.innerHTML = Stats.compare( 2, eEnabled3.checked?3:0, eEnabled4.checked?4:0 )
+			}},
+		eTest3, function(){ if( eEnabled3.checked ){
+			test_3(); eChrono3.innerHTML = Stats.compare( 3, eEnabled4.checked?4:0, eEnabled2.checked?2:0 )
+			}},
+		eTest4, function(){ if( eEnabled4.checked ){
+			test_4(); eChrono4.innerHTML = Stats.compare( 4, eEnabled2.checked?2:0 ,eEnabled3.checked?3:0 )
+			}},
+	'keyup', eText, function(){ if( eOnKeyUp.checked ) fTest()}
+	)
+eTestCase3.onclick()
+</script>
+
+</body>
+</html>

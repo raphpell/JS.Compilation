@@ -1,0 +1,40 @@
+<html><head></head><body><pre>
+¤ superscript, whitespaces
+
+	BACKSLASH			=	\\
+		( css:undefined )
+	L_NEW_LINE_IN_STRING	=	\r\n|[\n\r\f]
+		( css:linefeed, previousTokens:BACKSLASH, translation:NEW_LINE )
+
+!#@	SSQ		=	{superscript}|{whitespaces_s}|BACKSLASH|SSQ_IN|E_SSQ
+		( css:string, translation:STRING )
+	S_SSQ		=	'
+		( translation:SINGLE_QUOTE )
+	E_SSQ		=	'
+		( translation:SINGLE_QUOTE )
+	SSQ_IN		=	([^'\\\n\r\f \t]|\\[^\n\r\f \t])+
+
+!#@	SDQ		=	{superscript}|{whitespaces_s}|BACKSLASH|SDQ_IN|E_SDQ
+		( css:string, translation:STRING )
+	S_SDQ		=	"
+		( translation:DOUBLE_QUOTE )
+	E_SDQ		=	"
+		( translation:DOUBLE_QUOTE )
+	SDQ_IN		=	([^"\\\n\r\f \t]|\\[^\n\r\f \t])+
+
+!#@	MLC		=	{superscript}|{whitespaces_c}|MLC_IN|E_MLC
+		( css:comment, translation:COMMENT )
+	S_MLC		=	\/\*
+	E_MLC		=	[^\n\r\f \t\*]*\*+\/
+	MLC_IN		=	[^\n\r\f \t\*]+\**|\*+[^\n\r\f \t\/]*
+
+!#@	SLC		=	{superscript}|{hspaces}|SLC_IN
+		( css:comment, translation:COMMENT )
+	S_SLC		=	\/\/
+	SLC_IN		=	[^\n\r\f \t]+
+
+superscript	=	S_PHP
+hspaces		=	TAB|SPACES
+whitespaces_s 	= 	{hspaces}|L_NEW_LINE_IN_STRING
+whitespaces_c	= 	{hspaces}|L_NEW_LINE
+</pre></body></html>

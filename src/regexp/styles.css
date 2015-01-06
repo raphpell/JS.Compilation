@@ -1,0 +1,56 @@
+.reserved {
+	background: #FFF;
+    border: 2px solid lightgreen !important;
+    border-width: 10px 1px !important;
+	color: #000 !important;;
+	}
+.integer {
+	background: #333;
+	color: #CCC;
+	border: 1px solid #eee;
+	}
+.any {
+	background: orange;
+	color: #666;
+	border: 1px solid #eee;
+	}
+.regexp {
+	background: purple;
+	border: 1px solid lime;
+	}
+.block {
+	background: lime;
+	border: 1px solid purple;
+	}
+.concat {
+    background: #EEE;
+    border: 1px solid #FC0;
+    color: #000000;
+	}
+.alternation {
+    background: #FF0000;
+    border: 1px solid #333;
+	}
+.quantifier {
+	background: yellow;
+	border: 1px solid blue;
+	}
+.charclass {
+	background: blue;
+	color: #fff;
+	border: 1px solid yellow;
+	}
+.negated {
+	background: darkblue;
+	}
+.characters_range {
+	background: #A52A2A;
+    border: 1px solid #FFF;
+    color: #FFFFFF;
+	}	
+.charclass .reserved,
+.character {
+	background: green !important;
+	border: 1px solid #BBB;
+	color: white;
+	}

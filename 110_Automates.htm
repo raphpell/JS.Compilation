@@ -1,0 +1,345 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>Transformation ER en AFD</title>
+	<link rel="stylesheet" type="text/css" href="css/styles.css">
+	<style>
+		#eRESyntax {
+			border:1px solid #000;
+			padding: 0.5em;
+			width:100%;
+			}
+		#eExportResult {
+			border:1px solid #000;
+			padding: 0.5em;
+			height:100px;
+			width:90%;
+			}
+		FIELDSET {
+			float: left;
+			margin: 0 1% 1em 0;
+			padding: 1%;
+			}
+		FIELDSET LEGEND {
+			font-weight: bold;
+			}
+		FIELDSET DL {
+			margin: 0;
+			}
+	</style>
+</head>
+<body spellcheck="false">
+<div id="eTITLE">
+	<a href="index.htm">Index</a>
+	<h1>Transformation ER en AFD</h1>
+</div>
+
+<div id="eMenu">
+	<label for="eRegExpList">Exemple de token : </label>
+	<select id="eRegExpList"></select>
+</div>
+<label for="eRE">Expression régulière : </label>
+<textarea id="eRE">[^a-z]a|\db|1c|[^B]d|.e</textarea>
+<input type="button" id="eBtnCreate" value="Générer" title="Créer l'AFN, l'AFD et sa représentation JavaScript.">
+<input type="button" onclick="regexpSyntax()" value="Syntaxe" title="Syntaxe des expressions régulières.">
+<input type="button" value="Visualiser l'analyse" onclick="previewRE()" title="Analyse lexicale et syntaxique de l'expression régulière.">
+
+<hr>
+
+<fieldset><legend>NFA</legend>
+	<dl>
+		<dt>
+			<input type="button" value="Visualiser le NFA" onclick="previewNFA()" title="Matrice et graphe du NFA.">
+			<a href="112_NFA.htm" target="_INFO">info</a>
+		</dt>
+		<dt><input type="button" id="eBtnRenameNFA" value="Renommer ses états" title="Renomme les états."></dt>
+		<dt>
+			<input type="button" id="eBtnValidate" value="Valider son alphabet" title="Rend l'alphabet déterministe !">
+			<a href="113_ValidationAlphabet.htm" target="_INFO">info</a>
+		</dt>
+		<dt>
+			<input type="checkbox" id="eAutoValidation" checked>
+			<label for="eAutoValidation" title="Rend les éléments de l'alphabet unique.">
+				Valider automatiquement.
+			</label>
+		</dt>
+	</dl>
+</fieldset>
+<fieldset><legend>DFA</legend>
+	<dl>
+		<dt>
+			<input type="button" value="Visualiser le DFA" onclick="previewDFA()" title="Matrice et graphe du DFA.">
+			<a href="114_DFA.htm" target="_INFO">info</a>
+		</dt>
+		<dt><input type="button" id="eBtnRenameDFA" value="Renommer ses états" title="Renomme les états."></dt>
+		<dt>
+			<input type="button" id="eBtnMinimize" value="Minimiser sa taille" title="Diminue la taille de l'automate !">
+		</dt>
+		<dt>
+			<input type="checkbox" id="eAutoMinimization" checked>
+			<label for="eAutoMinimization" title="Compresse la matrice.">
+				Minimiser automatiquement.
+			</label>
+		</dt>
+	</dl>
+</fieldset>
+<fieldset><legend>DFA en JavaScript</legend>
+	<dl>
+		<dt>
+			<input type="button" id="eBtnExport" value="Exporter">
+			<input type="checkbox" id="eAutoExport" checked><label for="eAutoExport">Exporter automatiquement.</label>
+		</dt>
+		<dt><input type="checkbox" id="eExportWhiteSpace"><label for="eExportWhiteSpace">Espaces blancs.</label></dt>
+		<dt>
+			<input type="checkbox" id="eExportCompressed"><label for="eExportCompressed">Compressé.</label>
+			<a href="info.compression.html" target="_INFO">info</a>
+		</dt>
+		<dt>
+			<textarea id="eExportResult"></textarea>
+			<div><label>Nombre de caractères : </label><b id="eExportSize"></b></div>
+		</dt>
+	</dl>
+</fieldset>
+<fieldset><legend>Zone teste</legend>
+	<dl>
+		<dt>
+			<label for="eInput">Texte : </label>
+			<textarea id="eInput">1aabbaaab</textarea>
+		</dt>
+		<dt>
+			<input type="button" id="eBtnMatch" value="Analyser">
+			<input type="checkbox" id="eAutoMatch"><label for="eAutoMatch">Analyser automatiquement.</label>
+		</dt>
+		<dt><pre id="eResult"></pre></dt>
+	</dl>
+</fieldset>
+<fieldset><legend>DFA en RE <sup style="color:red;">experimental</sup></legend>
+	<dl>
+		<dt><input type="button" id="eBtnToRE" value="Analyser"></dt>
+		<dt><textarea id="eDFAToRE"></textarea></dt>
+	</dl>
+</fieldset>
+
+<!-- FRAMEWORK... -->
+<script src="js/framework.js"></script>
+<script src="js/lexer.automaton.js"></script>
+<script src="js/lexer.automaton.modules.js"></script>
+<script src="js/parserLR.js"></script>
+<script src="src/regexp/node.js"></script>
+<script src="src/regexp/lexer.js"></script>
+<script src="src/regexp/parser.js"></script>
+<script src="js/automaton.js"></script>
+
+<!-- DIVERS... -->
+<script src="js/regexp.examples.js"></script>
+<script>
+_( 'eTITLE,eMenu' )
+_( 'eRE,eInput,eResult' )
+_( 'eRegExpList' )
+_( 'eBtnCreate' )
+_( 'eBtnRenameNFA,eBtnValidate' )
+_( 'eBtnRenameDFA,eBtnMinimize' )
+_( 'eBtnMatch' )
+_( 'eBtnExport,eExportResult,eExportWhiteSpace,eExportCompressed,eExportSize' )
+_( 'eAutoValidation,eAutoMinimization,eAutoMatch,eAutoExport' )
+_( 'eBtnToRE,eAutoToRE,eDFAToRE' )
+
+previewRE = (function(){
+	var f = function(){ if( ! oNFA.M ) buildTable( oNFA ); previewREScanning({type:'RE',re:eRE.value }) }
+	f.refresh = function(){ if( ! oNFA.M ) buildTable( oNFA ); previewREScanning.refresh({type:'RE',re:eRE.value}) }
+	return f
+	})()
+previewNFA = (function(){
+	var f = function(){ if( ! oNFA.M ) buildTable( oNFA ); previewFA({type:'NFA',re:eRE.value, oFA:oNFA}) }
+	f.refresh = function(){ if( ! oNFA.M ) buildTable( oNFA ); previewFA.refresh({type:'NFA',re:eRE.value, oFA:oNFA}) }
+	return f
+	})()
+previewDFA = (function(){
+	var f = function(){ previewFA({type:'DFA',re:eRE.value, oFA:oDFA}) }
+	f.refresh = function(){ previewFA.refresh({type:'DFA',re:eRE.value, oFA:oDFA}) }
+	return f
+	})()
+refreshWindows =function(){
+	if( previewREScanning.type ) previewRE.refresh()
+	if( previewFA.type ) window[ 'preview' + previewFA.type ].refresh()
+	}
+	
+
+eBtnCreate.onclick =function(){
+	parseRE( eAutoValidation.checked, eAutoMinimization.checked, eAutoMatch.checked, eAutoExport.checked )
+	refreshWindows()
+	}
+eBtnRenameNFA.onclick =function(){
+	oNFA = renameStates( oNFA )
+	oDFA = DFA( oNFA )
+	if( eAutoMinimization.checked ) oDFA = DFAMinimization( oDFA )
+	refreshWindows()
+	}
+eBtnValidate.onclick =function(){
+	parseRE( true, eAutoMinimization.checked, eAutoMatch.checked, eAutoExport.checked )
+	refreshWindows()
+	}
+eBtnRenameDFA.onclick =function(){
+	oDFA = renameStates( oDFA )
+	refreshWindows()
+	}
+eBtnMinimize.onclick =function(){
+	oDFA = DFAMinimization( oDFA )
+	refreshWindows()
+	}
+eBtnMatch.onclick =function(){ match()}
+eBtnToRE.onclick =function(){
+	eDFAToRE.value = DFAToRE( oDFA )
+	}
+
+var exportBasic =function(){ exportDFA( eExportWhiteSpace.checked, !eExportCompressed.checked )}
+eBtnExport.onclick =exportBasic
+eExportWhiteSpace.onchange =exportBasic
+eExportCompressed.onchange =exportBasic
+;( function( mSelected ){
+		var _add =function( a ){
+			var eChild = document.createElement('option')
+			eChild.innerHTML = a[0]
+			eChild.value = a[1].source
+			eRegExpList.appendChild( eChild )
+			}
+		mSelected = mSelected || null
+		for( var i=0, ni=aRegExpList.length; i<ni; i++ ) _add( aRegExpList[i])
+		eRegExpList.value = mSelected
+		return eRegExpList
+	})().onchange =function(){
+		eRE.value = eRegExpList.value
+		eBtnCreate.onclick()
+		}
+
+</script>
+
+<!-- URL QUERY -->
+<script>
+$_GET =(function(){
+	var o = {}
+	if( window.location.search.length > 1 ){
+		for(var m, n=0, aCouples = window.location.search.substr(1).split("&"); m=aCouples[n]; n++ ){
+			m = m.split("=")
+			o[unescape(m[0])] = m.length>1 ? unescape(m[1]) : ''
+			}
+		}
+	return o
+	})()
+	
+if( $_GET[calcul]){
+	eTITLE.innerHTML = '<h1>...</h1>'
+	eMenu.style.display = 'none'
+	}
+	
+var aItemCalcul
+var calcul =function( item ){
+	aItemCalcul = item
+	eTITLE.innerHTML = '<h1>Automate '+ item[0] +'</h1>'
+	eRE.value = item[1]
+	eInput.value = ''
+	parseRE( 1, 1, 0, 0 )
+	exportDFA()
+	}
+</script>
+
+<script>
+var oDFA, oNFA
+
+var parseRE =function( bValidate, bMinimize, bMatch, bExport ){
+	var oTree = RegExp2Tree( eRE.value )
+	oNFA = NFA( oTree )
+	if( bValidate ){
+		NFAValidate( oNFA )
+		oNFA = renameStates( oNFA )
+		}
+	oDFA = DFA( oNFA )
+	if( bMinimize ) oDFA = DFAMinimization( oDFA )
+	if( bMatch ) match()
+		else clearTest()
+	if( bExport ) exportBasic()
+		else clearExport()
+	}
+
+var clearTest =function(){
+	eResult.innerHTML = ''
+	}
+var match =function( s, n ){
+	clearTest()
+	var oChrono = new Chrono()
+	oDFA.M = oDFA.M || buildTable( oDFA.T )
+	
+	var sWordChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_'
+	var isWordChar = function( sChar ){ return sWordChars.indexOf( sChar ) > -1 }
+	
+	var D = oDFA.D[0]
+	, sInput = s || eInput.value
+	, sError = false
+	, nIndex= n || 0
+	, nStart = nIndex
+	, sChar
+	, sState=oDFA.I
+	, LongestMatch = null
+	, bBoundary = isWordChar( sInput[nIndex])
+	Bufferize.init( 'input: <b style="background:yellow;">'+ sInput +'</b>\n' )
+
+	if( sInput.length!=0 )
+		while( true ){
+			/*
+			TODO
+			Save backup states at each choice point
+			Look-ahead in the input before making choice
+			Pursue alternatives in parallel
+			*/
+			
+			sChar = sInput[ nIndex ]
+			nIndex++ 
+			sNextState = oDFA.M.nextState( sState, sChar, D )
+			Bufferize( '('+ sState +') "'+ sChar +'" &rarr; ('+ sNextState +')\n' )
+			sState = sNextState
+			if( nIndex==sInput.length ) break;
+			if( sState<=0 ) break;
+			if( oDFA.F.have( sState )) LongestMatch = { matched: sInput.substring( nStart, nIndex )}
+			}
+	if( oDFA.F.have( sState )) LongestMatch = { matched: sInput.substring( nStart, nIndex )}
+		
+	Bufferize( oChrono.stop()+'ms\n' )
+	switch( sState ){
+		case -1: sError = 'NOT_IN_CHAR_CLASS'; break
+		case -2: sError = 'INVALID_CHARACTER'; break
+		case -3: sError = 'DEAD_NODE'; break
+		default:
+		}
+	if( sError ) Bufferize( '<small style="color:blue;">'+sError+'</small>\n' )
+	eResult.innerHTML = Bufferize(
+					'<b style="color:'+
+					( LongestMatch
+						? 'green;">MATCH <i style="background:yellow;">' + LongestMatch.matched +'</i>'
+						: 'orange;">MATCH_FAILED'
+						)
+					+ '</b>\n'
+			//	+\n+ eResult.innerHTML
+				)
+	}
+var clearExport =function(){
+	eExportResult.value = ''
+	}
+var exportDFA =function( bWhiteSpace, bUnCompressed ){
+	clearExport()
+	var sResult = DFAToJS( oDFA, bWhiteSpace, bUnCompressed )
+	eExportResult.value = sResult
+	eExportSize.innerHTML = sResult.length
+	if( aItemCalcul && window.parent ){
+		window.parent.Calcul.add( aItemCalcul, oDFA, sResult, 'nextToken' )
+		aItemCalcul = false
+		refreshWindows()
+		}
+	}
+
+eBtnCreate.onclick()
+match()
+eExportWhiteSpace.onchange()
+</script>
+
+</body>
+</html>

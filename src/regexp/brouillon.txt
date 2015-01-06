@@ -1,0 +1,43 @@
+
+Pattern -> Disjunction
+Disjunction -> Alternative | Alternative '|' Disjunction
+Alternative -> epsilon | Alternative Term
+Term -> Atom | Atom Quantifier
+			// | Assertion
+			// Assertion -> '^'|'$'|'\b'|'\B'| '(?=' Disjunction ')' | '(?!' Disjunction ')'
+Atom -> PatternCharacter | DOT | AtomEscape | CharacterClass | LParent Disjunction RParent
+CharacterClass -> LCharacterClass ClassRanges RCharacterClass
+ClassRanges -> epsilon | NonemptyClassRanges
+NonemptyClassRanges -> ClassAtom | ClassAtom NonemptyClassRangesNoDash | ClassAtom MINUS ClassAtom ClassRanges
+NonemptyClassRangesNoDash -> ClassAtom | ClassAtomNoDash NonemptyClassRangesNoDash | ClassAtomNoDash MINUS ClassAtom ClassRanges
+ClassAtom -> MINUS | ClassAtomNoDash
+ClassAtomNoDash ->	[^\\\]\-] | BACKSLASH ClassEscape
+
+!#@	Pattern = Quantifier|LParent|RParent|DOT|MINUS|PatternCharacter|AtomEscape|LCharacterClass|RCharacterClass|BACKSLASH|ClassEscape
+Quantifier				=	{quantifierPrefix}
+	//	suffixe possible	\??
+LParent					=	\(\?\:|\(
+RParent					=	\)
+DOT						=	\.
+MINUS					=	\-
+BACKSLASH				=	\\
+PatternCharacter		=	[^\^\$\\\.\*\+\?\(\)\[\]\}\{\|]
+AtomEscape 				=	\\({decimalEscape}|{characterEscape}|{characterClassEscape})
+LCharacterClass			=	\[|\[\^
+RCharacterClass			=	\]
+ClassEscape 			=	{decimalEscape}|b|{characterEscape}|{characterClassEscape}
+
+characterEscape 		=	{controlEscape}|c{controlLetter}|{hexEscapeSequence}|{unicodeEscapeSequence}
+						// | IdentityEscape
+	// IdentityEscape -> SourceCharacter but not IdentifierPart | <ZWJ> | <ZWNJ>
+	// IdentifierPart -> IdentifierStart | UnicodeCombiningMark | UnicodeDigit | UnicodeConnectorPunctuation | <ZWNJ> | <ZWJ>	
+		
+quantifierPrefix		=	[\*\+\?]|\{{decimalDigits}\}|\{{decimalDigits},\}|\{{decimalDigits},{decimalDigits}\}
+unicodeEscapeSequence	=	u{hexDigit}{4}
+hexEscapeSequence		=	x{hexDigit}{2}
+decimalEscape			=	[1-9]\d*|0
+hexDigit				=	[0-9a-fA-F]
+decimalDigits			=	[0-9]+
+controlEscape 			=	[fnrtv]
+characterClassEscape 	=	[dDsSwW]
+controlLetter 			=	[a-zA-Z]

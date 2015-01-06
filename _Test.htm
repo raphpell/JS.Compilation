@@ -1,0 +1,197 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>TESTE</title>
+	<style>
+	</style>
+</head>
+<body spellcheck="false">
+
+<textarea id="eInput" style="height:100px; width:100%;"></textarea>
+<input type="button" value="Test" onclick="test()" style="width:100%;">
+<pre id="eResult"></pre>
+
+<!-- FRAMEWORK... -->
+<script src="js/framework.js"></script>
+
+<script>
+_('eInput,eResult')
+/*
+// TEST BITWISE NOT ~
+// var n = -1
+// alert( ~n) === 0
+var n = -2
+alert( ~n)
+*/
+var oDFA = (function(){
+	return {
+		I: 0,
+		F: [2,4,6,9],
+		A: 'ATGC'.split(''),
+		S: [0,1,2,3,4,5,6,7,8,9],
+		M: {
+			0:{A: [0,1]		,T: 0		,G: [0,3]	,C: 0 },
+			1:{A: null		,T: 2		,G: null	,C: null},
+			2:{A: [5,7]		,T: null	,G: null	,C: null},
+			3:{A: 4			,T: null	,G: null	,C: null},
+			4:{A: [5,7]		,T:	null	,G:	null	,C: null},
+			5:{A: null		,T:	null	,G: 6		,C: null},
+			6:{A: [5,7]		,T:	null	,G:	null	,C: null},
+			7:{A: 8			,T:	null	,G:	null	,C: null},
+			8:{A: 9			,T:	null	,G:	null	,C: null},
+			9:{A: [5,7]		,T:	null	,G:	null	,C: null}
+			}
+		}
+
+	})()
+
+function test(){
+	var a = []
+	var nLength = oDFA.S.length
+	for(var i=0; i<nLength; i++ ) a[i]=0
+	var sZero = parseInt( a.concat([]).join(''), 2 )
+	
+	var aTmp = a.concat([])
+	for(var i=0, nFinalState; nFinalState = oDFA.F[i]; i++ ){
+		aTmp[aTmp.length-nFinalState-1]=1
+		}
+	var sEnd = parseInt( aTmp.join(''), 2 ) // OK 	alert( sEnd.toString( 2 )) == 1001010100 
+
+	// Bn
+	var oSymbols = {} 
+	for(var j=0, sSymb; sSymb = oDFA.A[j]; j++ ){
+		var aTmp = a.concat([])
+		for(var i=0, nStateI; i<nLength ; i++ ){
+			var nStateI = oDFA.S[i]
+			var m =oDFA.M[ nStateI ][ sSymb ]
+			if( m !== null ){
+				if( m.constructor == Array )
+					m.every( function( nStateF ){
+						return aTmp[aTmp.length-nStateF-1]=1
+						})
+				else aTmp[aTmp.length-m-1]=1
+				}
+			}
+		oSymbols[ sSymb ] = parseInt( aTmp.join(''), 2 )
+		}
+	/*
+	alert( JSON.stringify( oSymbols )) // {"A":947,"T":5,"G":73,"C":1}
+	alert(       "A":+ oSymbols.A.toString( 2 ) // "A":1110110011
+		+\n "T":+ oSymbols.T.toString( 2 ) // "T":101
+		+\n "G":+ oSymbols.G.toString( 2 ) //  "G":1001001
+		+\n "C":+ oSymbols.C.toString( 2 ) //  "C":1
+		)
+	*/
+	
+	// 
+	var oStates = {}
+	for(var i=0, nStateI; i<nLength ; i++ ){
+		var aTmp = a.concat([])
+		var nStateI = oDFA.S[i]
+		for(var j=0, sSymb; sSymb = oDFA.A[j]; j++ ){
+			var m = oDFA.M[ nStateI ][ sSymb ]
+			if( m !== null ){
+				if( m.constructor == Array )
+					m.every( function( nStateF ){
+						return aTmp[aTmp.length-nStateF-1]=1
+						})
+				else aTmp[aTmp.length-m-1]=1
+				}
+			}
+		oStates[ nStateI ] = parseInt( aTmp.join(), 2 )
+		}
+	/*
+	alert( JSON.stringify( oStates )) // {"0":11,"1":4,"2":160,"3":16,"4":160,"5":64,"6":160,"7":256,"8":512,"9":160}
+	alert(  "0":+ oStates[0].toString( 2 ) // "0":1011
+		+\n "1":+ oStates[1].toString( 2 ) // "1":100
+		+\n "2":+ oStates[2].toString( 2 ) // "2":10100000
+		+\n "3":+ oStates[3].toString( 2 ) // "3":10000
+		+\n "4":+ oStates[4].toString( 2 ) //  "4":10100000
+		+\n "5":+ oStates[5].toString( 2 ) //  "5":1000000
+		+\n "6":+ oStates[6].toString( 2 ) //  "6":10100000
+		+\n "7":+ oStates[7].toString( 2 ) //  "7":100000000
+		+\n "8":+ oStates[8].toString( 2 ) //  "8":1000000000
+		+\n "9":+ oStates[9].toString( 2 ) //  "9":10100000
+		)
+	*/
+	
+	var aTmp = a.concat([])
+	aTmp[aTmp.length-oDFA.I-1]=1
+	sStart = parseInt( aTmp.join(), 2 ) // OK 	alert( sStart.toString( 2 )) == 1 
+
+	var oTrans = {}
+	oTrans[0]=a.concat([]).join()
+	for(var i=0; i<nLength; i++ ){
+		for(var j=0, nPow=Math.pow(2,i), nj=nPow;j<nj; j++ ){
+			oTrans[nPow+j] = oStates[i] | ( oTrans[j] || sZero )
+			}
+		}
+//	alert( oTrans[ parseInt( sStart, 2 ) ])
+	var f =function( sText ){
+		var D = sStart
+		for(var i=0, ni=sText.length; i<ni; i++ ){
+			if( D & sEnd ){
+				alert( '"'+ sText.substring( 0, i ) +'" trouvé !' )
+				}
+			alert(
+				(i+1) +' .Reading "'+ sText[i] +'"\n'+
+				'D = ' + D + '\n'+
+				'D = ' + D.toString( 2 ) + '\n'+
+				'D = oTrans[D] & oSymbols[sText[i]]\n'+
+				oTrans[D] +' & '+ oSymbols[sText[i]] +' = '+ (oTrans[D] & oSymbols[sText[i]] )+ '\n'+
+				oTrans[D].toString( 2 ) +' & '+ oSymbols[sText[i]].toString( 2 ) +' = '+ (oTrans[D] & oSymbols[sText[i]] ).toString(2)
+				)
+			D = oTrans[D] & oSymbols[sText[i]]
+			if( D==0 ) alert( 'Dead State ? "'+ sText.substring( 0, i+1 ) +'" !' )
+			}
+		if( D & sEnd ){
+			alert( '"'+ sText.substring( 0, i ) +'" trouvé !' )
+			}
+		}
+	f( 'GATA' )
+	}
+// test()
+var s = "aaa"
+alert( s.charAt( 12 ) == true )
+
+/*
+2&10
+10&1010
+= 1000
+= 8
+
+alert( 11100&11111 )
+alert(  00101 | 11100 )
+alert( 00101|11100 )
+*/
+
+/*
+// TEST BASE 36
+var a = [,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,,98,99,100,,,,,,,,,,,,]
+var n = 35
+alert( a[ parseInt( n.toString( 36 ), 36 )])
+*/
+
+/*
+// TEST RETOUR VALEUR PAR DEFAUT
+n1 = 12
+n2 = 24
+n3 = 36
+var b1 = n1 || n2 || n3
+var b2 = n1 && n2 && n3
+alert( b1 + - + b2 )
+*/
+
+function test2 (){
+	var oChrono = new Chrono
+	var a = []
+	eInput.value = eInput.value.replace( /\/\*[^\*]*\*+(?:[^\/][^\*]*(?:$|\*+))*(?:$|\/)|/gim, function( sMatched, i ){
+		a.push([ sMatched, i ])
+		return sMatched
+		})
+	eResult.innerHTML = JSON.stringify( a ) +'\n'+ oChrono.stop() +'ms\n'
+	}
+</script>
+
+</body>
+</html>

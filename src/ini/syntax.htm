@@ -1,0 +1,72 @@
+<html>
+	<head>
+		<title>Syntaxe des fichiers ini</title>
+	</head>
+	<body>
+<h1>Syntaxe des fichiers ini</h1>
+<table id="eRESyntax">
+	<tbody>
+		<tr><th colspan="2">Commentaires</th></tr>
+		<tr>
+			<th>;</th>
+			<td>Les commentaires sont préfixés par le symbole ";".</td>
+		</tr>
+		
+		<tr><th colspan="2">Affectation</th></tr>
+		<tr>
+			<th>variable = value</th>
+			<td>La variable <code>variable</code> prend pour valeur la valeur <code>value</code>.</td>
+		</tr>
+		
+		<tr><th colspan="2">Mots clés et variable</th></tr>
+		<tr>
+			<th>
+				<b>Mots clés</b>
+				<dl>
+					<dt>null</dt>
+					<dt>yes</dt>
+					<dt>no</dt>
+					<dt>true</dt>
+					<dt>false</dt>
+					<dt>on</dt>
+					<dt>off</dt>
+					<dt>none</dt>
+				</dl>
+			</th>
+			<td valign="top">
+				Les mots clés ne doivent pas être utilisés comme nom de variable.
+				<p>Utilisé des nom de variables simples :</p>
+				<ol>
+					<li>Composé avec des caractères de l'alphabet et des nombres.</li>
+					<li>Chaque mot séparé avec le symbole '_'.</li>
+				</ol>
+			</td>
+		</tr>
+		
+		<tr><th colspan="2">Groupement</th></tr>
+		<tr>
+			<th>[section_name]</th>
+			<td>Les variables suivantes sont regrouper dans la section <code>section_name</code>.</td>
+		</tr>
+		
+		<tr><th colspan="2">Valeurs</th></tr>
+		<tr><td colspan="2">Une variable est affectée à une ou plusieurs valeurs à la suite.</td></tr>
+		<tr>
+			<th>mot</th>
+			<td>
+				Attention: Si des caractères sont non autorisé utiliser les chaînes.
+			</td>
+		</tr>
+		<tr>
+			<th>"..."</th>
+			<td>Chaîne simple ligne</td>
+		</tr>
+		<tr>
+			<th>'...<br>...'</th>
+			<td>Chaîne multi lignes</td>
+		</tr>
+
+	</tbody>
+</table>
+</body>
+</html>

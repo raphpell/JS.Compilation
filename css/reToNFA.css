@@ -1,0 +1,10 @@
+.thompson {
+	background-image:url(../img/reToNFA.png);
+	display: inline-block;
+	vertical-align: middle;
+	}
+.thompson.epsilon				{ height: 60px; width: 160px; background-position:    0px    0px; }
+.thompson.character				{ height: 60px; width: 160px; background-position: 	  0px  -60px; }
+.thompson.alternation			{ height:110px; width: 250px; background-position:    0px -120px; }
+.thompson.concatenation			{ height: 40px; width: 190px; background-position:    0px -230px; }
+.thompson.kleeneClosure			{ height: 90px; width: 250px; background-position:    0px -270px; }

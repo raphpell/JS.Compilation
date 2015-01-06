@@ -1,0 +1,118 @@
+<html><head></head><body><pre>
+¤ superscript, whitespaces, strings&comments
+
+!#	CSS		=	BIG_CSS|NOT_WHITE_SPACES
+!@	BIG_CSS		=	S_PHP|{whitespaces}|{comment}|S_ATTRIBUTE_SELECTOR|ELISION|ATKEYWORD|HASH|CLASS|S_PSEUDO|COMBINATOR|IDENT|S_RULE_SET|CSS_ERROR
+	
+	ELISION		=	,
+		(css:punctuator)
+		
+	CSS_ERROR		= 	[^\r\n\f \t\\\[\,\@\#\.\:\+\>\*\~_a-zA-Z\{]+
+		(css:undefined)
+
+	!@# ATTRIBUTE_SELECTOR		=	{strings}|IDENT|ATTRIBUTE_OPERATOR|E_ATTRIBUTE_SELECTOR
+		(css:attribute_selector)
+	S_ATTRIBUTE_SELECTOR	=	\[
+		(translation:LBRACK)
+	E_ATTRIBUTE_SELECTOR		=	\]
+		(translation:RBRACK)
+	ATTRIBUTE_OPERATOR		=	[\^$~|*]?=
+		(css:operator)
+	ATTRIBUTE_SELECTOR_ERROR	=	[^\]\t\n\r\u000b\f          ]
+		(css:undefined)
+
+!@#	RULE_SET	=	{superscript}|{whitespaces}|{comment}|IDENT|S_PROP_VALUE|E_RULE_SET
+		(css:ruleset)
+	S_RULE_SET	=	\{
+		(css:punctuator, translation:LBRACE)
+	E_RULE_SET	=	\}
+		(css:punctuator, translation:RBRACE)
+
+!@#	PROP_VALUE		=	{superscript}|{hspaces}|{comment}|{strings}|NUMBER|ELISION|DIMENSIONS|IDENT|E_PROP_VALUE|S_URL|S_FUNCTION|HASH|S_IMPORTANT|CSS_PHP_BUG
+		(css:value)
+	S_PROP_VALUE	=	:
+		(css:punctuator, translation:COLON)
+	E_PROP_VALUE		=	;
+		(css:punctuator, translation:SEMI)
+	CSS_PHP_BUG			=	[\-+]|{units}
+
+
+	COMBINATOR 	=	[+>*~]
+		(css:combinator)
+
+	ATKEYWORD	=	@{ident}
+		(css:id)
+	IMPORT		=	@import
+	PAGE		=	@page
+	MEDIA		=	@media
+	CHARSET		=	@charset
+
+	NAME		=	{name}
+		(css:name)
+	HASH		=	#{name}
+		(css:id)
+	IDENT		=	{ident}
+		(css:selector)
+	CLASS		=	\.{ident}
+		(css:class)
+@!#	PSEUDO		=	S_FUNCTION|IDENT
+		(css:pseudo)
+	S_PSEUDO	=	::?
+
+
+@!#	IMPORTANT	=	{whitespaces}|{comment}|E_IMPORTANT
+		(css:important)
+	S_IMPORTANT	=	!
+	E_IMPORTANT	=	important
+
+	NUMBER 		=	{num}
+		(css:number)
+	DIMENSIONS 	=	{dimension}(/{dimension})*
+		(css:dimension)
+
+	PATH 		=	([!#$%&\*-\~]|{nonascii}|{escape})*
+
+@!#	URL		=	{whitespaces}|{strings}|E_URL|S_PHP|PATH|{superscript}
+		(css:url)
+	S_URL	=	url\(
+		(css:url_delimiter)
+	E_URL 	=	\)
+		(css:url_delimiter)
+
+	FUNCTION_OLD	=	IDENT
+!@#	FUNCTION	=	{whitespaces}|ELISION|S_PHP|IDENT|NAME|FUNCTION_ARG|E_FUNCTION|{superscript}
+		(css:function)
+	S_FUNCTION	=	{ident}\(
+	E_FUNCTION	=	\)
+	FUNCTION_ARG	=	[^\f\r\n \t,)}{]
+		(css:argument)
+
+// Macros
+	dimension 	=	{num}{units}
+	superscript	=	S_PHP
+	comment		=	S_MLC
+	strings		=	S_SDQ|S_SSQ
+	hspaces		=	TAB|SPACES
+	whitespaces 	=	L_NEW_LINE|{hspaces}
+
+	h		=	[0-9a-fA-F]
+	nonascii	=	é
+		// [^\x00-\xED] cette liste de caractère contient un caractère nouvelle ligne !
+	unicode		=	\\{h}{1,6}
+	escape		=	{unicode}|\\[^\r\n\f0-9a-fA-F]
+	nmstart		=	[_a-zA-Z]|{nonascii}|{escape}
+	nmchar		=	[_a-zA-Z0-9\-]|{nonascii}|{escape}
+
+	ident		=	-?{nmstart}{nmchar}*
+	name		=	{nmchar}+
+
+	num 		=	-?([0-9]+|[0-9]*\.[0-9]+)
+	angle		=	deg|rad|grad
+	length 		=	px|cm|mm|in|pt|pc
+	ems 		=	em
+	exs 		=	ex
+	time 		=	ms|s
+	freq		=	hz|khz
+	percentage 	=	%
+	units		=	{angle}|{length}|{ems}|{exs}|{time}|{freq}|{percentage}
+</pre></body></html>

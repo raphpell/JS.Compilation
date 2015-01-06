@@ -1,0 +1,91 @@
+<html>
+	<head>
+		<title>Analyse lexicale et syntaxique</title>
+		<style>
+			OL {
+				font: normal 1em Verdana;
+				list-style: none outside none;
+				}
+			OL LI {
+				padding: 2px 0;
+				}
+			.warn {
+				background: #FC0;
+				border: 3px solid darkblue;
+				box-shadow: inset 0 0 15px #FF0, 0 2px 10px #660;
+				color: darkblue;
+				font: bold 1em/1.5em Verdana;
+				margin:1em;
+				overflow: hidden;
+				padding: 0.5em 1em;
+				text-align: center;
+				text-shadow: 0 0 2px #FFF, 0 0 4px white;
+				}
+		</style>
+	</head>
+	<body>
+	
+<div class="warn">
+	<big>!! ATTENTION !!</big><br>
+	Les calculs peuvent SURCHAUFFER votre ORDINATEUR. <br>
+<!-- 	Activer ses VENTILATEURS en fonction de sa TEMPÉRATURE si possible.<br>
+	(Logiciel gratuit: SpeedFan, I8kfanGUI, ...)
+ --></div>
+
+<h1>Analyse lexicale et syntaxique</h1>
+
+
+<div style="float:left;">
+<p>Mon objectif est de colorer un texte source.</p>
+<ol>
+	<li>1. <a href="100_AnalyseLexicale.htm">Analyse lexicale</a>
+		<ol>
+			<!-- <li>1.1. <a href="110_ExpressionsRégulière.htm">Les automates</a> -->
+			<li>1.1. <a href="110_Automates.htm">Transformation ER en AFD</a>
+				<ol>
+					<li>Les étapes
+					<li>1.1.1. <a href="111_FA.htm">Les automates finis</a>
+					<li>1.1.2. <a href="112_NFA.htm">AFN</a>
+					<li>1.1.3. <a href="113_ValidationAlphabet.htm">Validation de l'alphabet</a>
+					<li>1.1.4. <a href="114_DFA.htm">AFD</a>
+				</ol>
+			<li>1.2. <a href="120_DFA.aggregation.htm">Aggrégation d'AFD</a>
+			<li>1.3. <a href="130_Performance.htm">Performance du Lexer</a>
+				<ol>
+					<li>1.3.1. <a href="131_Lexer.byStep.htm">Analyse lexicale: readToken</a>
+					<li>1.3.2. <a href="132_Lexer.level.html">Analyse lexicale sur plusieurs niveaux</a>
+					<li>1.3.3. <a href="133_Lexer.comparison.htm">Comparaison de lexers (scan)</a>
+					<li>1.3.4. <a href="134_Lexer.update.htm">Analyse lexicale incrementielle</a> (partielle)
+				</ol>
+			<li>1.4. <a href="140_Lexer.modules.htm">Création de module Lexer</a>
+				<ol>
+					<li>Aperçus
+					<li>1.4.1. <a href="141_Lexer.modules.HTML.htm">Module HTML</a>
+					<li>1.4.2. <a href="142_Lexer.modules.CSS.htm">Module CSS</a>
+					<li>1.4.3. <a href="143_Lexer.modules.JS.htm">Module JavaScript</a>
+					<li>1.4.4. <a href="144_Lexer.modules.Parenthesis.htm">Module Parenthèses</a>
+				</ol>
+		</ol>
+	<li>2. <a href="200_AnalyseSyntaxique.htm">Analyse syntaxique</a>
+		<ol>
+			<li>2.1. <a href="210_Parser.html">Création de module Parser</a>
+			<li>2.2. <a href="220_Parser.byStep.htm">Analyse syntaxique: readToken</a>
+		</ol>
+</ol>
+</div>
+
+<div style="float:right;">
+	<p style="text-align:center;">
+		<img src="img/firefox.png" width="100" title="Firefox">
+		<img src="img/opera.png" width="100" title="Opera">
+		<br>Firefox requis. Pas Firebug !
+	</p>
+	<dl>
+		<dt><b><a href="src/regexp/syntax.htm">ER</a></b>: Expression régulière.</dt>
+		<dt><b><a href="112_NFA.htm">AFN</a> ou NFA</b>: Automate Fini Non déterministe.</dt>
+		<dt><b><a href="114_DFA.htm">AFD</a> ou DFA</b>: Automate Fini Déterministe.</dt>
+	</dl>
+</div>
+	
+	</body>
+</html>

@@ -1,0 +1,760 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>Analyse lexicale sur plusieurs niveaux</title>
+	<link rel="stylesheet" type="text/css" href="css/styles.css">
+	<style>
+	.myNode {
+		box-shadow: 2px 2px 2px #999;
+		border: 1px solid #CCC;
+		display: inline-block;
+		margin: 2px;
+		padding: 2px 0;
+		text-align: center;
+		}
+	.tokens { white-space: normal; }
+	.w50 {
+		float: left;
+		text-align: center; 
+		width: 49.8%;
+		}
+	.w100 {
+		margin: 1em;
+		text-align: center; 
+		}
+	TEXTAREA {
+		width: 100%;
+		}
+	h2, h3 { text-align: center; }
+	h2, h3 { margin:0; padding:0.25em 0 0 0; background: #000; color: #FFF; }
+	h3 { color: #FF0; font:normal 1em Verdana; padding:0 0 0.5em 0; }
+	h4 { margin:0 0 1em 0; }
+	#eRegExp { text-align: center; }
+	</style>
+</head>
+<body spellcheck="false">
+<a href="index.htm">Index</a>
+
+<h1>Analyse lexicale sur plusieurs niveaux</h1>
+
+<p>
+	<label for="eRegExpLexer">RegExp Lexer :</label>
+	<select id="eRegExpLexer">
+		<option value="OneRegExpLexer">“1 RegExp”</option>
+		<option value="MultiRegExpLexer" selected>Multiple RegExp</option>
+	</select>
+</p>
+
+<h2>Expressions régulières</h2>
+<h3>ONE LEVEL LEXER</h3>
+<div class="w100">
+	<label for="eRegExpList">Exemples : </label>
+	<select id="eRegExpList"></select><br>
+	<label for="eRegExp">Source : </label>
+	<textarea id="eRegExp">"[^"\\\r\n]*(\\.[^"\\\r\n]*)*"</textarea>
+	<hr>
+	<label>Benchmark sur <input type="number" id="eRepeatTest1" min="1" max="100" value="100" size="3"> exécution(s).</label><br>
+	<input type="button" value="Répéter automatiquement" onclick="this.value=this.value=='Arrêter'?'Lancer':'Arrêter'; benchmark1()">
+</div>
+<div class="w50"><h4>RegExp Lexer</h4>
+	<input type="button" value="Benchmark" onclick="getTokens1()">
+	<pre id="eChrono1" class="tokens">...</pre>
+	<pre id="eRegExpResult1" class="tokens"></pre>
+</div>
+<div class="w50"><h4>Automaton Lexer</h4> 
+	<input type="button" value="Benchmark" onclick="getTokens2()">
+	<pre id="eChrono2" class="tokens">...</pre>
+	<pre id="eRegExpResult2" class="tokens"></pre>
+</div>
+<div class="w100">
+	<input type="button" value="AST" onclick="getAST1()">
+	<pre id="eAST1">...</pre>
+</div>
+
+<h2>JavaScript + PHP</h2>
+<h3>MULTI LEVEL LEXER</h3>
+<div class="w100">
+	<label for="eText">Source</label>
+	<textarea id="eText">
+/* 1 - JavaScript syntax */ aaa */
+	variable n = nInt1/4 + 4/nInt1++ || 10 
+	var oEditor = new EditorSample ( eContent ,{
+		// a single line comment ( a single quote ' )
+		aArray : [ true , false , null , undefined , Infinity , NaN ],
+		sDoubleQuoteString : "/* ' a multi line comment */ // a single line comment " ,
+		sSingleQuoteString : '/* "\
+			a multi line string */ // a single line comment '
+		sBracketsTest1_1 : "{[(",
+		sBracketsTest1_2 : "}])",
+		/*
+		a  multi line comment ( a double quote " )
+		*/
+		})
+	RegExp.extend({
+		escape :function( s ){
+			// Bracket test 2
+			var re1 = /(\.|\?|\*|\+|\\|\(|\)|\[|\]|\}|\{|\$|\^|\|)/g
+			, re2 = /("|'| |\t)/gm
+			return s.replace( re1 , "\\$1" )
+			}
+		})
+
+/* 2 - PHP */
+	<?php
+	function phpSafe ( $strText ){
+		// a single line comment ( a double quote ")
+		$tmpString = $strText ;
+		$tmpString = str_replace( chr(92) , "" , $tmpString ); 
+		returning rawurldecode( $tmpString );
+		}
+		
+	/*
+	a  multi line comment ( a single quote ' )
+	*/
+	$hiddencontent = phpSafe( $_POST[ 'content' ]);
+	?>
+	</textarea>
+	<hr>
+	<label>Benchmark sur <input type="number" id="eRepeatTest2" min="1" max="10" value="3" size="2"> exécution(s).</label><br>
+	<input type="button" value="Répéter automatiquement" onclick="this.value=this.value=='Arrêter'?'Lancer':'Arrêter'; benchmark2()">
+</div>
+<div class="w50"><h4>RegExp Lexer</h4>
+	<input type="button" value="Benchmark" onclick="getTokens3()">
+	<pre id="eChrono3" class="tokens">...</pre>
+	<pre id="eRegExpResult3" class="tokens"></pre>
+</div>
+<div class="w50"><h4>Automaton Lexer</h4>
+	<input type="button" value="Benchmark" onclick="getTokens4()">
+	<pre id="eChrono4" class="tokens">...</pre>
+	<pre id="eRegExpResult4" class="tokens"></pre>
+</div>
+<!-- 
+<div class="w100">
+	<input type="button" value="AST" onclick="getAST2()" style="width:100%;">
+	<pre id="eAST2">...</pre>
+</div>
+ -->
+
+<!-- FRAMEWORK... -->
+<script src="js/framework.js"></script>
+<script src="js/shared.js"></script>
+<script src="widget/Stats/scripts.js"></script>
+<script>
+var benchmark1 =benchmark( function(){ getTokens1(); getTokens2(); compareResult( eRegExpResult1, eRegExpResult2 ); })
+var benchmark2 =benchmark( function(){ getTokens3(); getTokens4(); compareResult( eRegExpResult3, eRegExpResult4 ); })
+</script>
+
+<!-- LEXERS -->
+<script>
+var TokensBridge ={
+	'MLC':'COMMENT',
+	'SLC':'COMMENT',
+	'SSQ':'STRING',
+	'SDQ':'STRING'
+	}
+var TokensLabel ={
+	'PHP':' ',
+	'MLC':' ',
+	'COMMENT':' ',
+	'STRING':' ',
+	'S_MLC':'/*',
+	'MLC_IN':'\u2026',
+	'E_MLC':'\u2026*/',
+	'SLC':' ',
+	'S_SLC':'//',
+	'SLC_IN':'\u2026',
+	'SDQ':' ',
+	'SDQ_IN':'\u2026',
+	'SSQ':' ',
+	'SSQ_IN':'\u2026',
+	'BACKSLASH':'\\',
+	'ARITHMETIC_OPERATOR': -1, // '\u24C4p',
+	'ASSIGNMENT_OPERATOR': -1,
+	'BOOLEAN_OPERATOR': -1,
+	'COMPARISON_OPERATOR': -1,
+	'EQUALITY_OPERATOR': -1,
+	'LOGICAL_OPERATOR': -1,
+	'RELATIONAL_OPERATOR': -1,
+	'UNARY_OPERATOR': -1,
+	'NEW_LINE':'\u2424',
+	'WHITE_SPACES':'\u2423',
+	'TAB':'\u2423',
+	'SPACES':'\u2420',
+	'NUMBER':'\u24C3',
+	'JS_LITERAL':"\u24C1",
+	'JS_IDENTIFIER':"\u24BE",
+	'JS_KEYWORD':"\u24C0",
+	'REGULAR_EXPRESSION_IN':"\u24C7",
+	'S_PHP':-1,
+	'E_PHP':-1,
+	'PHP_FUNCTION':"\u24BB",
+	'PHP_LITERAL':-1,
+	'PHP_RESERVED':"\u24C0",
+	'PHP_SPECIAL_VARS':"\u24C0",
+	'PHP_IDENTIFIER':"\u24BE",
+	'CSS_COMMENT':"comment",
+	'CSS_S':"w",
+	'CSS_IDENT':"ID",
+	'CSS_NUMBER':"Number",
+	'CSS_HASH':"#ID",
+	'CSS_ATKEYWORD':"@ID",
+	'CSS_DELIM':-1,
+	'NOT_WHITE_SPACES':'\u2620',
+	'UNDEFINED':'\u262F',
+	'DOUBLE_QUOTE':'"',
+	'SINGLE_QUOTE':"'",
+	'LPAREN':'(',
+	'RPAREN':')',
+	'LBRACK':'[',
+	'RBRACK':']',
+	'BRACE':' ',
+	'LBRACE':'{',
+	'RBRACE':'}',
+	'ELISION':',',
+	'DOT':'.',
+	'SEMI':';',
+	'COLON':':'
+	}
+var valueToString =function(o){ // token,css,
+	return JSON.stringify( o, 'parentToken,index,lineStart,lineEnd'.split(','), " " ).str_replace('"', '')
+	}
+var setTitle =function(){
+	var o = this.oValue
+	if( ! o ) console.warn(this)
+	this.title = o.token
+		+ '\n\u25B6'+o.value+'\u25C0'
+		+ valueToString( o )
+	}
+var LexerNode =function( o ){
+	// alert( JSON.stringify( o ))
+	var e = document.createElement('B')
+	, sToken = TokensBridge[o.token] || o.token
+	, sValue = o.value
+	e.oValue = o
+	if( o.parentToken ){
+		if( LexerNode[o.parentToken]) LexerNode[o.parentToken]( e, sToken, sValue )
+			else LexerNode.parent( e, sToken, o )
+			// else e.symbol = e.title = sValue
+		if( e.symbol )
+			e.innerHTML = e.symbol.str_replace( ['&','<','>'], ['&amp;','&lt;','&gt;'])
+		if( o.css ) e.className = o.css + ' myNode'
+		}
+	else{
+		e.className = e.title = sToken.toLowerCase()
+		}
+	return e
+	}
+LexerNode.RegExp =function( e, sTokenName, sMatched ){
+	e.value = sMatched
+	switch( sTokenName ){
+		case 'PIPE':
+			e.symbol = "'|'"
+			e.title = e.value
+			break;
+		case 'ANY':
+			e.symbol = e.value = 'ANY'
+			e.title = 'ANY_CHARACTER'
+			break;
+		case 'CHAR_ESCAPED':
+		case 'CHAR':
+			e.symbol = 'c'
+			e.title = e.value
+			break;
+		case 'QUANTIFIER1':
+			var a = sMatched.split( ',' )
+			if( a.length==1){
+				e.n = sMatched.slice( 1,-1)
+				e.symbol = '{n}'
+				}
+			else {
+				e.n = a[0].slice( 1 )
+				e.m = a[1].slice( 0,-1)
+				e.symbol = e.m ? '{n,m}' : '{n,}'
+				}
+			e.title = 'n:'+ e.n +', m:'+ e.m
+			break;
+		default:
+			e.symbol = sMatched
+			e.title = e.value
+		}
+	}
+LexerNode.parent =function( e, sTokenName, oValue ){
+	e.value = oValue.value
+	e.setTitle = setTitle
+	e.setTitle()
+	var sLabel = TokensLabel[ sTokenName ]
+	e.symbol = ! sLabel ? sTokenName : ( sLabel==-1 ? e.value : sLabel )
+	e.token = sTokenName
+	}
+</script>
+<script src="js/lexer.automaton.js"></script>
+<script src="js/lexer.automaton.modules.js"></script>
+<script src="js/lexer.regexp.one.js"></script>
+<script src="js/lexer.regexp.multi.js"></script>
+<script>
+_( 'eRegExpLexer' )
+var oRELexers={
+	OneRegExpLexer: OneRegExpLexer,
+	MultiRegExpLexer: MultiRegExpLexer
+	}
+eRegExpLexer.onchange =function(){
+	Stats.init( 1 )
+	Stats.init( 3 )
+	benchmark1.fRepeated()
+	benchmark2.fRepeated()
+	}
+</script>
+
+<!-- REGEXP EXAMPLES -->
+<script src="js/regexp.examples.js"></script>
+<script>
+Events.add(
+	( function( mSelected ){
+		var _add =function( a ){
+			var eChild = Tag( 'option' )
+			eChild.innerHTML = a[0]
+			eChild.value = a[1].source
+			eRegExpList.appendChild( eChild )
+			}
+		mSelected = mSelected || null
+		for( var i=0, ni=aRegExpList.length; i<ni; i++ ) _add( aRegExpList[i])
+		eRegExpList.value = mSelected
+		return eRegExpList
+		})(),
+	'change', function(){
+		eRegExp.value = eRegExpList.value
+		getTokens1()
+		getTokens2()
+		getAST1()
+		getTokens1()
+		}
+	)
+</script>
+
+<!-- TESTS -->
+<script>
+_('eRepeatTest1,eRegExp,eRegExpList,eAST1')
+_('eRepeatTest2,eText,eAST2')
+_('eRegExpResult1,eChrono1')
+_('eRegExpResult2,eChrono2')
+_('eRegExpResult3,eChrono3')
+_('eRegExpResult4,eChrono4')
+var getTokens1 =function(){
+	var ni = eRepeatTest1.value
+	var oLexer = oRELexers[ eRegExpLexer.value ]
+	eRegExpResult1.innerHTML = ''
+	eRegExpResult1.appendChild( oLexer( eRegExp.value, 'RegExp' ))
+	var oChrono = new Chrono
+	for(var i=0; i<ni; i++ ) oLexer( eRegExp.value, 'RegExp' )
+	Stats.set( 1, oChrono.stop()/ni )
+	eChrono1.innerHTML = Stats.compare( 1, 2 )
+	eChrono2.innerHTML = Stats.compare( 2, 1 )
+	}
+var getTokens2 =function(){
+	var ni = eRepeatTest1.value
+	eRegExpResult2.innerHTML = ''
+	eRegExpResult2.appendChild( AutomatonLexer( eRegExp.value, 'RegExp' ))
+	var oChrono = new Chrono
+	for(var i=0; i<ni; i++ ) AutomatonLexer( eRegExp.value, 'RegExp' )
+	Stats.set( 2, oChrono.stop()/ni )
+	eChrono1.innerHTML = Stats.compare( 1, 2 )
+	eChrono2.innerHTML = Stats.compare( 2, 1 )
+	}
+var getTokens3 =function(){
+	var ni = eRepeatTest2.value
+	var oLexer = oRELexers[ eRegExpLexer.value ]
+	eRegExpResult3.innerHTML = ''
+	eRegExpResult3.appendChild( oLexer( eText.value, 'JS' ))
+	var oChrono = new Chrono
+	for(var i=0; i<ni; i++ ) oLexer( eText.value, 'JS' )
+	Stats.set( 3, oChrono.stop()/ni )
+	eChrono3.innerHTML = Stats.compare( 3, 4 )
+	eChrono4.innerHTML = Stats.compare( 4, 3 )
+	}
+var getTokens4 =function(){
+	var ni = eRepeatTest2.value
+	eRegExpResult4.innerHTML = ''
+	eRegExpResult4.appendChild( AutomatonLexer( eText.value, 'JS' ))
+	var oChrono = new Chrono
+	for(var i=0; i<ni; i++ ) AutomatonLexer( eText.value, 'JS' )
+	Stats.set( 4, oChrono.stop()/ni )
+	eChrono3.innerHTML = Stats.compare( 3, 4 )
+	eChrono4.innerHTML = Stats.compare( 4, 3 )
+	}
+</script>
+
+<!-- AST -->
+<script>
+EPSILON = '&epsilon;'
+var REParser =Parser =(function(){
+		var ENGINE = {
+			START:"s1",
+			END:"END_TOKENS",
+			SYMBOLS:{
+
+				"'|'":1,
+				"(":2,
+				")":3,
+				"*":4,
+				"+":5,
+				"-":6,
+				"?":7,
+				"ANY":8,
+				"[":9,
+				"[^":10,
+				"\\":11,
+				"]":12,
+				"c":13,
+				"{n,m}":14,
+				"{n,}":15,
+				"{n}":16,
+				"REGEXP":17,
+				"UNION":18,
+				"CONCAT":19,
+				"REPEAT":20,
+				"CHAR_CLASS_EXP":21,
+				"CHAR_CLASSES":22,
+				"CHAR_CLASS":23,
+				"SIMPLE_EXP":24,
+				"CHAR":25,
+				"END_TOKENS":26
+				},
+			PRODUCTIONS:{
+				1:["REGEXP",["UNION"]],
+				2:["REGEXP",["&epsilon;"]],
+				3:["UNION",["CONCAT","'|'","UNION"]],
+				4:["UNION",["CONCAT"]],
+				5:["CONCAT",["REPEAT","CONCAT"]],
+				6:["CONCAT",["REPEAT"]],
+				7:["REPEAT",["REPEAT","?"]],
+				8:["REPEAT",["REPEAT","*"]],
+				9:["REPEAT",["REPEAT","+"]],
+				10:["REPEAT",["REPEAT","{n}"]],
+				11:["REPEAT",["REPEAT","{n,}"]],
+				12:["REPEAT",["REPEAT","{n,m}"]],
+				13:["REPEAT",["CHAR_CLASS_EXP"]],
+				14:["CHAR_CLASS_EXP",["[","CHAR_CLASSES","]"]],
+				15:["CHAR_CLASS_EXP",["[^","CHAR_CLASSES","]"]],
+				16:["CHAR_CLASS_EXP",["SIMPLE_EXP"]],
+				17:["CHAR_CLASSES",["CHAR_CLASS","CHAR_CLASSES"]],
+				18:["CHAR_CLASSES",["CHAR_CLASS"]],
+				19:["CHAR_CLASS",["CHAR","-","CHAR"]],
+				20:["CHAR_CLASS",["CHAR"]],
+				21:["SIMPLE_EXP",["CHAR"]],
+				22:["SIMPLE_EXP",["ANY"]],
+				23:["SIMPLE_EXP",["(",")"]],
+				24:["SIMPLE_EXP",["(","UNION",")"]],
+				25:["SIMPLE_EXP",["-"]],
+				26:["CHAR",["c"]],
+				27:["CHAR",["\\","c"]]
+				},
+			MATRICE:{
+				1:[,,'s12',,,,'s13',,'s11','s7','s8','s15',,'s14',,,,'g2','g3','g4','g5','g6',,,'g9','g10','r2'],
+
+
+
+				2:[,,,,,,,,,,,,,,,,,,,,,,,,,,'a'],
+				3:[,,,,,,,,,,,,,,,,,,,,,,,,,,'r1'],
+				4:[,'s16',,'r4',,,,,,,,,,,,,,,,,,,,,,,'r4'],
+				5:[,'r6','s12','r6','s19','s20','s13','s18','s11','s7','s8','s15',,'s14','s23','s22','s21',,,'g17','g5','g6',,,'g9','g10','r6'],
+				6:[,'r13','r13','r13','r13','r13','r13','r13','r13','r13','r13','r13',,'r13','r13','r13','r13',,,,,,,,,,'r13'],
+
+
+				7:[,,,,,,,,,,,'s15',,'s14',,,,,,,,,'g24','g25',,'g26'],
+				8:[,,,,,,,,,,,'s15',,'s14',,,,,,,,,'g27','g25',,'g26'],
+				9:[,'r16','r16','r16','r16','r16','r16','r16','r16','r16','r16','r16',,'r16','r16','r16','r16',,,,,,,,,,'r16'],
+				10:[,'r21','r21','r21','r21','r21','r21','r21','r21','r21','r21','r21',,'r21','r21','r21','r21',,,,,,,,,,'r21'],
+				11:[,'r22','r22','r22','r22','r22','r22','r22','r22','r22','r22','r22',,'r22','r22','r22','r22',,,,,,,,,,'r22'],
+				12:[,,'s12','s28',,,'s13',,'s11','s7','s8','s15',,'s14',,,,,'g29','g4','g5','g6',,,'g9','g10'],
+				13:[,'r25','r25','r25','r25','r25','r25','r25','r25','r25','r25','r25',,'r25','r25','r25','r25',,,,,,,,,,'r25'],
+				14:[,'r26','r26','r26','r26','r26','r26','r26','r26','r26','r26','r26','r26','r26','r26','r26','r26',,,,,,,,,,'r26'],
+
+				15:[,,,,,,,,,,,,,'s30'],
+				16:[,,'s12',,,,'s13',,'s11','s7','s8','s15',,'s14',,,,,'g31','g4','g5','g6',,,'g9','g10'],
+
+				17:[,'r5',,'r5',,,,,,,,,,,,,,,,,,,,,,,'r5'],
+				18:[,'r7','r7','r7','r7','r7','r7','r7','r7','r7','r7','r7',,'r7','r7','r7','r7',,,,,,,,,,'r7'],
+				19:[,'r8','r8','r8','r8','r8','r8','r8','r8','r8','r8','r8',,'r8','r8','r8','r8',,,,,,,,,,'r8'],
+				20:[,'r9','r9','r9','r9','r9','r9','r9','r9','r9','r9','r9',,'r9','r9','r9','r9',,,,,,,,,,'r9'],
+				21:[,'r10','r10','r10','r10','r10','r10','r10','r10','r10','r10','r10',,'r10','r10','r10','r10',,,,,,,,,,'r10'],
+				22:[,'r11','r11','r11','r11','r11','r11','r11','r11','r11','r11','r11',,'r11','r11','r11','r11',,,,,,,,,,'r11'],
+				23:[,'r12','r12','r12','r12','r12','r12','r12','r12','r12','r12','r12',,'r12','r12','r12','r12',,,,,,,,,,'r12'],
+
+				24:[,,,,,,,,,,,,'s32'],
+				25:[,,,,,,,,,,,'s15','r18','s14',,,,,,,,,'g33','g25',,'g26'],
+				26:[,,,,,,'s34',,,,,'r20','r20','r20'],
+
+				27:[,,,,,,,,,,,,'s35'],
+				28:[,'r23','r23','r23','r23','r23','r23','r23','r23','r23','r23','r23',,'r23','r23','r23','r23',,,,,,,,,,'r23'],
+
+				29:[,,,'s36'],
+				30:[,'r27','r27','r27','r27','r27','r27','r27','r27','r27','r27','r27','r27','r27','r27','r27','r27',,,,,,,,,,'r27'],
+
+				31:[,,,'r3',,,,,,,,,,,,,,,,,,,,,,,'r3'],
+				32:[,'r14','r14','r14','r14','r14','r14','r14','r14','r14','r14','r14',,'r14','r14','r14','r14',,,,,,,,,,'r14'],
+
+
+				33:[,,,,,,,,,,,,'r17'],
+				34:[,,,,,,,,,,,'s15',,'s14',,,,,,,,,,,,'g37'],
+				35:[,'r15','r15','r15','r15','r15','r15','r15','r15','r15','r15','r15',,'r15','r15','r15','r15',,,,,,,,,,'r15'],
+				36:[,'r24','r24','r24','r24','r24','r24','r24','r24','r24','r24','r24',,'r24','r24','r24','r24',,,,,,,,,,'r24'],
+				37:[,,,,,,,,,,,'r19','r19','r19']
+				}
+			}
+		var Parser =function ( aTokens ){
+			aTokens.push( Parser.Node( ENGINE.END ))
+			var aStack = [ ENGINE.START ]
+			, aSymbols = [ ]
+			, TreeBuilder = Parser.AST || Parser.ParseTree
+			, i=0, nState1, nState2, Token, o, action
+			, M = ENGINE.MATRICE
+			, ACTIONS={
+				's':function(){
+					aStack.push( action )
+					aSymbols.push( Token )
+					i++
+					return false
+					},
+				'r':function(){
+					var prodID = action.substring(1)
+					, p = ENGINE.PRODUCTIONS[ prodID ]
+					, LHS = p[0], RHS = p[1]
+					, nPop = RHS.length==1 && RHS[0]==EPSILON ? 0 : RHS.length
+					if( nPop ) aStack = aStack.slice( 0, -nPop )
+					if( aStack.length ){
+						nState2 = aStack[ aStack.length-1 ].substring(1)
+						var goto_ = M[ nState2 ] ? M[ nState2 ][ ENGINE.SYMBOLS[ LHS ]] : null
+						if( goto_ ){
+							aStack.push( goto_.replace( 'g', 's' ))
+							aSymbols.push(
+								TreeBuilder(
+									'('+ prodID +') '+ LHS +' -> '+ RHS.join(' '),
+									LHS,
+									aSymbols.splice( aSymbols.length-nPop, nPop )
+									)
+								)
+							}
+						}
+					return false
+					},
+				'a':function(){
+					return aSymbols.pop()
+					}
+				}
+			do{
+				nState1 = aStack[aStack.length-1].substring(1)
+				Token = aTokens[i]
+				action = M[ nState1 ] ? M[ nState1 ][ ENGINE.SYMBOLS[ Token.symbol ]] : null
+				if( ! action ) throwError( 'Erreur de syntaxe \n index:'+ i +'\n token:'+ Token.symbol )
+				var f = ACTIONS[ action[0]]
+				if( f ){
+					var result = f()
+					if( result ) return result
+					} else throwError( "Erreur parsing ... action "+ action )
+			}while( i<aTokens.length && aStack.length )
+			throwError( 'Phrase incomplète...' )
+			}
+		Parser.Node =function ( X ){
+			var e = document.createElement('B')
+			e.getChildNodes =function(){
+				var a = []
+				for(var eChild=e.firstChild; eChild ;  ){
+					var eSibling = eChild
+					eChild=eChild.nextSibling
+					if( eSibling.nodeName=="B" ) a.push( eSibling )
+					}
+				return a
+				}
+			e.toString =function(){ return 'Node:'+ X }
+			e.className = 'myNode'
+			e.innerHTML = '<DIV class="symbol">' + X + '</DIV>'
+			e.symbol = X
+			return e
+			}
+		Parser.ParseTree =function ( sProd, LHS, RHS ){
+			var o = Parser.Node(LHS)
+			for(var i=0, ni=RHS.length; i<ni; i++) o.appendChild( oNode )
+			return o
+			}
+		return Parser
+		})()
+REParser.AST =function( sProd, LHS, RHS ){
+		var newNode = Parser.Node
+		var o
+		switch( sProd ){
+			case '(1) REGEXP -> UNION': return RHS[0]
+		//	case '(2) REGEXP -> epsilon':
+			case "(3) UNION -> CONCAT '|' UNION":
+				if( RHS[0] && RHS[2] ){
+					o = newNode( '|' ) // RHS[1]
+					o.appendChild( RHS[0])
+					if( RHS[2].symbol == '|' ){
+						for(var e=RHS[2].firstChild; e ;  ){
+							var oNode = e
+							e=e.nextSibling
+							if( oNode.nodeName=="B" ) o.appendChild( oNode )
+							}
+						} else o.appendChild( RHS[2])
+					return o
+					}
+				return RHS[0] || RHS[2]
+			case '(4) UNION -> CONCAT': return RHS[0]
+			case '(5) CONCAT -> REPEAT CONCAT':
+				if( RHS[0] && RHS[1] ){
+					o = newNode( '.' )
+					o.appendChild( RHS[0])
+					if( RHS[1].symbol == '.' ){
+						for(var e=RHS[1].firstChild; e ;  ){
+							var oNode = e
+							e=e.nextSibling
+							if( oNode.nodeName=="B" ) o.appendChild( oNode )
+							}
+						} else o.appendChild( RHS[1])
+					return o
+					}
+				return RHS[0] || RHS[1]
+			case '(6) CONCAT -> REPEAT': return RHS[0]
+			case '(7) REPEAT -> REPEAT ?':
+			case '(8) REPEAT -> REPEAT *':
+			case '(9) REPEAT -> REPEAT +':
+			case '(10) REPEAT -> REPEAT {n}':
+			case '(11) REPEAT -> REPEAT {n,}':
+			case '(12) REPEAT -> REPEAT {n,m}':
+				if( RHS[0]){
+					o = RHS[1]
+					o.appendChild( RHS[0])
+					return o
+					}
+				return null
+			case '(13) REPEAT -> CHAR_CLASS_EXP': return RHS[0]
+			case '(14) CHAR_CLASS_EXP -> [ CHAR_CLASSES ]':
+				o = newNode( 'CHAR_SET' )
+				if( RHS[1].symbol == 'CHAR_CLASSES' ){
+					for(var e=RHS[1].firstChild; e ;  ){
+						var oNode = e
+						e=e.nextSibling
+						if( oNode.nodeName=="B" ) o.appendChild( oNode )
+						}
+					} else o.appendChild( RHS[1])
+				return o
+			case '(15) CHAR_CLASS_EXP -> [^ CHAR_CLASSES ]':
+				o = newNode( 'NEGATED_CHAR_SET' )
+				if( RHS[1].symbol == 'CHAR_CLASSES' ){
+					for(var e=RHS[1].firstChild; e ;  ){
+						var oNode = e
+						e=e.nextSibling
+						if( oNode.nodeName=="B" ) o.appendChild( oNode )
+						}
+					} else o.appendChild( RHS[1])
+				return o
+			case '(16) CHAR_CLASS_EXP -> SIMPLE_EXP': return RHS[0]
+			case '(17) CHAR_CLASSES -> CHAR_CLASS CHAR_CLASSES':
+				o = newNode( LHS )
+				o.appendChild( RHS[0])
+				if( RHS[1].symbol == 'CHAR_CLASSES' ){
+					for(var e=RHS[1].firstChild; e ;  ){
+						var oNode = e
+						e=e.nextSibling
+						if( oNode.nodeName=="B" ) o.appendChild( oNode )
+						}
+					} else o.appendChild( RHS[1])
+				return o
+			case '(18) CHAR_CLASSES -> CHAR_CLASS': return RHS[0]
+			case '(19) CHAR_CLASS -> CHAR - CHAR':
+				o = RHS[1]
+				o.appendChild( RHS[0])
+				o.appendChild( RHS[2])
+				return o
+			case '(20) CHAR_CLASS -> CHAR':
+			case '(21) SIMPLE_EXP -> CHAR':
+			case '(22) SIMPLE_EXP -> ANY': return RHS[0]
+			case '(23) SIMPLE_EXP -> ( )': return null
+			case '(24) SIMPLE_EXP -> ( UNION )': return RHS[1]
+			case "(25) SIMPLE_EXP -> -":
+				o = RHS[0]
+				o.oValue.token = 'CHAR'
+				o.oValue.css = 'character'
+				o.innerHTML = o.symbol = 'c'
+				o.className = o.className.replace( 'charset', 'character' )
+		//	{"oValue":{"token":"CHARSET","value":"-"},"value":"-","symbol":"-"}
+		//		alert( JSON.stringify( ))
+				return RHS[0]
+			case '(26) CHAR -> c':
+		//	{"oValue":{"token":"CHAR","value":">"},"value":">","symbol":"c"}
+		//		alert( JSON.stringify( RHS[0]))
+				return RHS[0]
+			case '(27) CHAR -> \\ c':
+				o = RHS[0]
+				o.appendChild( RHS[1])
+				return o
+			default:
+				o = newNode( LHS )
+				for(var i=0, ni=RHS.length; i<ni; i++ )
+					o.appendChild( RHS[i])
+				return o
+			}
+		}
+
+var getAST1 =function(){
+	getTokens1()
+	getTokens2()
+	eAST1.innerHTML = ''
+	eAST1.appendChild( REParser( to_array( eRegExpResult1.firstChild.childNodes )))
+	}
+var getAST2 =function(){
+	getTokens3()
+	getTokens4()
+	eAST2.innerHTML = ''
+//	eAST2.appendChild( REParser( to_array( eRegExpResult3.firstChild.childNodes )))
+	}
+</script>
+
+<!-- COMPARAISON -->
+<script>
+function compareResult( e1, e2 ){
+	var areEquals =function( e1, e2 ){
+		return e1 && e2 && e1.title == e2.title
+		}
+	var fCompare =function( e1, e2 ){
+		if( ! areEquals( e1, e2 )){
+			if( e1.value===undefined || e2.value===undefined );
+			else if( e1.value.length < e2.value.length ){
+				e2.className += ' difference'
+				while( e1 && e2 && e1.oValue.index + e1.value.length <= e2.oValue.index + e2.value.length ){
+					e1.className += ' difference'
+					e1 = e1.nextSibling
+					}
+				return [ e1, e2.nextSibling ]
+				}
+			else if( e2.value.length < e1.value.length ){
+				e1.className += ' difference'
+				while( e1 && e2 && e2.oValue.index + e2.value.length <= e1.oValue.index + e1.value.length ){
+					e2.className += ' difference'
+					e2 = e2.nextSibling
+					}
+				return [ e1.nextSibling, e2 ]
+				}
+			else {
+				e1.className += ' difference'
+				e2.className += ' difference'
+				}
+			}
+		return [ e1.nextSibling, e2.nextSibling ]
+		}
+	var aNodes = fCompare( e1, e2 ), aResults
+	for(var _e1 = e1.firstChild, _e2 = e2.firstChild; _e1 && _e2 ;){
+		aResults = compareResult( _e1, _e2 )
+		_e1 = aResults[0]
+		_e2 = aResults[1]
+		}
+	return aNodes
+	}
+</script>
+
+<script>
+benchmark1.fRepeated()
+benchmark2.fRepeated()
+</script>
+
+</body>
+</html>

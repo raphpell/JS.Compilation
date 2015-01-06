@@ -1,0 +1,25 @@
+.sets1 {
+	background-image:url(../img/sets1.png);
+	display: inline-block;
+	height:48px;
+	width:48px;
+	vertical-align: inherit;
+	}
+.sets2 {
+	background-image:url(../img/sets2.png);
+	display: inline-block;
+	height:48px;
+	width:48px;
+	vertical-align: inherit;
+	}
+.A						{ background-position:    0px 0; }
+.B						{ background-position:  -48px 0; }
+.NotA					{ background-position:  -96px 0; }
+.NotB					{ background-position: -144px 0; }
+.IntersectionAB			{ background-position: -192px 0; }
+.NotIntersectionAB		{ background-position: -240px 0; }
+.UnionAB				{ background-position: -288px 0; }
+.NotUnionAB				{ background-position: -336px 0; }
+.DifferenceSymetriqueAB	{ background-position: -384px 0; }
+.DifferenceAB			{ background-position: -432px 0; }
+.DifferenceBA			{ background-position: -480px 0; }

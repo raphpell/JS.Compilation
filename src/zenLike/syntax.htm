@@ -1,0 +1,59 @@
+<html>
+	<head>
+		<title>Syntaxe des snippets</title>
+		<link rel="stylesheet" type="text/css" href="styles.css">
+		<style>
+			.group {
+				font-size: 1.2em;
+				text-align: left;
+				padding: 0.25em 1em;
+				}
+			TABLE { width: 100%; }
+			TH { vertical-align: top; }
+		</style>
+	</head>
+	<body>
+<h1>Syntaxe des snippets</h1>
+<table id="eRESyntax">
+	<tbody>
+	<tr><th colspan="2" class="group elt">Eléments</th></tr>
+		<tr><th></th><td>suite de caractère : [$@a-zA-Z\-_0-9]+</td></tr>
+	<tr><th colspan="2" class="group operator">Opérateurs hierarchiques</th></tr>
+		<tr><th>&gt;</th><td>Parent&gt;Enfant</td></tr>
+		<tr><th>+</th><td>Frère+Soeur</td></tr>
+		<tr><th>^ 		</th><td>Parent&gt;Enfant^Oncle+Tante</td></tr>
+	<tr><th colspan="2" class="group punctuator">Délimiteurs</th></tr>
+		<tr><th>()</th><td>((Element&gt;Element)+Element)*2</td></tr>
+	<tr><th colspan="2" class="group arguments">Arguments</th></tr>
+		<tr><th>:</th><td>Element:arg1:arg2</td></tr>
+	<tr><th colspan="2" class="group attributes">Attributs</th></tr>
+		<tr><th class="className">.classname</th><td>à l'attribut <code>class</code> est ajouté la valeur <code>classname</code>.</td></tr>
+		<tr><th class="id">#identifiant</th><td>l'attribut <code>id</code> prend pour valeur <code>identifiant</code>.</td></tr>
+		<tr>
+			<th>[attr1=value]</th>
+			<td>
+				l'attribut <code>attr1</code> prend pour valeur <code>value</code>.<br>
+				<code>value</code> est soit un élément, soit une chaîne.
+			</td>
+		</tr>
+	<tr><th colspan="2" class="group multiplication">Multiplication</th></tr>
+		<tr><th>*</th><td>Element*3<br>Groupe*3</td></tr>
+	<tr><th colspan="2" class="group multiplication">Numérotation des items</th></tr>
+		<tr>
+			<th>$</th>
+			<td>
+				caractère utilisé comme masque pour la numération : $$$ fonctionne aussi.<br>
+				Par défaut la numérotation commence à "1" (ou à "001").<br>
+				Peut-être inséré quasiment partout...
+			</td>
+		</tr>
+		<tr><th>$@n</th><td>numérotation croissante commence au nombre <code>n</code>.</td></tr>
+		<tr><th>$@-</th><td>numérotation décroissante jusqu'à 1.</td></tr>
+		<tr><th>$@-n</th><td>numérotation décroissante jusqu'au nombre <code>n</code>.</td></tr>
+	<tr><th colspan="2" class="group string">Chaîne de caractère</th></tr>
+		<tr><th>'une phrase'</th><td>Caractère entre <code>'</code> ou <code>"</code>.</td></tr>
+</tbody>
+</table>
+
+</body>
+</html>

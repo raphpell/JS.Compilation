@@ -1,0 +1,349 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>Aggrégation de DFA</title>
+	<link rel="stylesheet" type="text/css" href="css/styles.css">
+	<style>
+		#eRETree {
+			margin: 0.5em;
+			padding: 2px;
+			text-align: center;
+			}
+		#eRESyntax {
+			border:1px solid #000;
+			padding: 0.5em;
+			width:100%;
+			}
+		#eExportResult {
+			border:1px solid #000;
+			padding: 0.5em;
+			height:100px;
+			width:90%;
+			}
+		FIELDSET {
+			float: left;
+			margin: 0 1% 1em 0;
+			padding: 1%;
+			}
+		FIELDSET LEGEND {
+			font-weight: bold;
+			}
+		FIELDSET DL {
+			margin: 0;
+			}
+	</style>
+</head>
+<body spellcheck="false">
+<div id="eTITLE">
+	<a href="index.htm">Index</a>
+	<h1>Aggrégation de DFA</h1>
+</div>
+
+<div id="eMenu">
+	<label for="eRegExpList">Tokens : </label>
+	<select id="eRegExpList"></select>
+	<input type="button" id="eBtnAdd" value="Ajouter" title="">
+	<input type="button" id="eBtnClear" value="Initialiser" title="">
+	<hr>
+	<label for="eTokenID" title="">Token : </label>
+	<input type="text" id="eTokenID">
+	<label for="eTokenRE" title="">Expression réguliére : </label>
+	<input type="text" id="eTokenRE">
+	<input type="button" id="eBtnAddToken" value="Ajouter Token" title="">
+</div>
+
+<hr style="clear:both;">
+
+<input type="button" value="Visualiser le DFA" onclick="previewDFA()" title="Matrice et graphe du DFA.">
+<input type="button" id="eBtnExport" value="Exporter">
+<input type="checkbox" id="eExportWhiteSpace"><label for="eExportWhiteSpace">Espaces blancs.</label>
+<input type="checkbox" id="eExportCompressed"><label for="eExportCompressed">Compressé.</label>
+<a href="info.compression.html" target="_INFO">info</a>
+<textarea id="eExportResult"></textarea>
+<div><label>Nombre de caractères : </label><b id="eExportSize"></b></div>
+
+<hr>
+
+<fieldset><legend>Zone teste</legend>
+	<dl>
+		<dt>
+			<label for="eInput">Texte : </label>
+			<textarea id="eInput">1aabbaaab</textarea>
+		</dt>
+		<dt>
+			<input type="button" id="eBtnMatch" value="Analyser">
+			<input type="checkbox" id="eAutoMatch"><label for="eAutoMatch">Analyser automatiquement.</label>
+		</dt>
+		<dt><pre id="eResult"></pre></dt>
+	</dl>
+</fieldset>
+<fieldset><legend>DFA en RE <sup style="color:red;">experimental</sup></legend>
+	<dl>
+		<dt><input type="button" id="eBtnToRE" value="Analyser"></dt>
+		<dt><textarea id="eDFAToRE"></textarea></dt>
+	</dl>
+</fieldset>
+
+<!-- FRAMEWORK... -->
+<script src="js/framework.js"></script>
+<script>
+	var LexerNode =function( o ){
+		var e = document.createElement('B')
+		e.getChildNodes =function(){
+			var a = []
+			for(var eChild=e.firstChild; eChild ;  ){
+				var eSibling = eChild
+				eChild=eChild.nextSibling
+				if( eSibling.nodeName=="B" ) a.push( eSibling )
+				}
+			return a
+			}
+		e.toString =function(){
+			return e.symbol
+			}
+		e.oValue = o
+		e.value = o.value
+		switch( o.token ){
+			case 'PIPE':
+				e.symbol = "|"
+				e.title = e.value
+				break;
+			case 'ANY':
+				e.symbol = e.value = 'ANY'
+				e.title = 'ANY_CHARACTER'
+				break;
+			case 'CHAR_ESCAPED':
+			case 'CHAR':
+				e.symbol = 'c'
+				e.title = e.value
+				break;
+			case 'QUANTIFIER1':
+				var a = o.value.split( ',' )
+				if( a.length==1){
+					e.n = o.value.slice( 1,-1)
+					e.symbol = '{n}'
+					}
+				else {
+					e.n = a[0].slice( 1 )
+					e.m = a[1].slice( 0,-1)
+					e.symbol = e.m ? '{n,m}' : '{n,}'
+					}
+				e.title = 'n:'+ e.n +', m:'+ e.m
+				break;
+			default:
+				e.symbol = o.value
+				e.title = e.value
+			}
+		e.innerHTML = '<DIV class="symbol">' + e.symbol + '</DIV>'
+		//.str_replace( [&,<,>], [&amp;,&lt;,&gt;])
+		e.className = ( o.css||o.token.toLowerCase()) + ' myNode'
+		return e
+		}
+</script>
+<script src="js/lexer.automaton.js"></script>
+<script src="js/lexer.automaton.modules.js"></script>
+<script src="js/parserLR.js"></script>
+<script src="src/regexp/node.js"></script>
+<script src="src/regexp/lexer.js"></script>
+<script src="src/regexp/parser.js"></script>
+<script src="js/automaton.js"></script>
+
+
+<!-- DIVERS... -->
+<script src="js/regexp.examples.js"></script>
+<script>
+_( 'eTITLE,eMenu' )
+_( 'eBtnClear' )
+_( 'eBtnMatch,eInput,eAutoMatch,eResult' )
+_( 'eRegExpList,eBtnAdd' )
+_( 'eTokenID,eTokenRE,eBtnAddToken' )
+_( 'eBtnExport,eExportResult,eExportWhiteSpace,eExportCompressed,eExportSize' )
+_( 'eBtnToRE,eAutoToRE,eDFAToRE' )
+
+eBtnClear.onclick =function(){ init()}
+eBtnMatch.onclick =function(){ match()}
+eBtnAdd.onclick =function(){
+	var sToken = eRegExpList.value
+	parseRE( sToken, oRegExp[ sToken ])
+	}
+eBtnAddToken.onclick =function(){
+	var sNewToken = eTokenID.value
+	oRegExp[ sNewToken ] = eTokenRE.value
+	var eNewOption = document.createElement('OPTION')
+	eNewOption.value = eNewOption.innerHTML = sNewToken
+	eRegExpList.insertBefore( eNewOption, eRegExpList.firstChild )
+	}
+eBtnToRE.onclick =function(){
+	eDFAToRE.value = DFAToRE( oDFA )
+	}
+	
+var exportBasic =function(){ exportDFA( eExportWhiteSpace.checked, !eExportCompressed.checked )}
+eExportWhiteSpace.onchange =exportBasic
+eExportCompressed.onchange =exportBasic
+
+var oRegExp= {}
+;( function( mSelected ){
+		var _add =function( a ){
+			var eChild = document.createElement('OPTION')
+			oRegExp[ a[0]] = a[1].source
+			eChild.innerHTML = eChild.value = a[0]
+			eRegExpList.appendChild( eChild )
+			}
+		mSelected = mSelected || null
+		for( var i=0, ni=aRegExpList.length; i<ni; i++ ) _add( aRegExpList[i])
+		eRegExpList.value = mSelected
+		return eRegExpList
+	})().onchange = function(){
+		var sToken = eRegExpList.value
+		parseRE( sToken, oRegExp[ sToken ])
+		}
+
+</script>
+
+<script>
+var oNFA, oDFA, oDFAAggregated, nStateIDCounter
+
+previewDFA = (function(){
+	var f = function(){ previewFA({type:'DFA', oFA:oDFA}) }
+	f.refresh = function(){ previewFA.refresh({type:'DFA', oFA:oDFA}) }
+	return f
+	})()
+
+var init =function(){
+	oDFA = oDFAAggregated = { D:0, I:1, F:[], A:[], S:[0,1], T:[] }
+	nStateIDCounter = 2
+	clearExport()
+	previewDFA.refresh()
+	}
+var parseRE =function( sToken, sRegExp ){
+	var oTree = RegExp2Tree( sRegExp )
+	oNFA = NFA( oTree )
+	NFAValidate( oNFA )
+	oDFA = DFAMinimization( DFA( oNFA ))
+	renameStates( oDFA, nStateIDCounter, true )
+	Automate.setUniqueID( oDFA.S[ oDFA.S.length-1 ]+1 )
+
+	oDFA.aTokensID = [[ sToken, oDFA.F ]]
+	oDFAAggregated = oDFA = DFAAggregation( oDFAAggregated, oDFA )
+	nStateIDCounter = oDFAAggregated.S[ oDFAAggregated.S.length-1 ]+1
+	exportBasic()
+	previewDFA.refresh()
+	if( eAutoMatch.checked ) match()
+		else clearTest()
+	}
+
+var clearTest =function(){
+	eResult.innerHTML = ''
+	}
+var match =function( s, n ){
+	var oDFA = oDFAAggregated
+	clearTest()
+	var oChrono = new Chrono()
+	oDFA.M = oDFA.M || buildTable( oDFA.T )
+
+	var D = oDFA.D[0]
+	, sInput = s || eInput.value
+	, sError = false
+	, nIndex= n || 0
+	, nStart = nIndex
+	, sChar
+	, sState=oDFA.I
+	, LongestMatch = null
+	Bufferize.init( 'input: "<b>'+ sInput +'</b>"\n' )
+
+	if( sInput.length!=0 )
+		while( true ){
+			
+			sChar = sInput[ nIndex ]
+			nIndex++ 
+			sNextState = oDFA.M.nextState( sState, sChar, D )
+			Bufferize( '('+ sState +') "'+ sChar +'" &rarr; ('+ sNextState +')\n' )
+			sState = sNextState
+			if( nIndex==sInput.length ) break;
+			if( sState<=0 ) break;
+			if( oDFA.F.have( sState )) LongestMatch = { state:sState, matched:sInput.substring( nStart, nIndex )}
+			}
+	if( oDFA.F.have( sState )) LongestMatch = { state:sState, matched:sInput.substring( nStart, nIndex )}
+		
+	Bufferize( oChrono.stop()+'ms\n' )
+	switch( sState ){
+		case -1: sError = 'NOT_IN_CHAR_CLASS'; break
+		case -2: sError = 'INVALID_CHARACTER'; break
+		case -3: sError = 'DEAD_NODE'; break
+		default:
+		}
+	if( LongestMatch )
+		for(var i=0, aToken; aToken=oDFA.aTokensID[i]; i++)
+			if( aToken[1].have( LongestMatch.state )){
+				LongestMatch.token = aToken[0]
+				break;
+				}
+	if( sError ) Bufferize( '<small style="color:blue;">'+sError+'</small>\n' )
+	eResult.innerHTML = Bufferize(
+					'<b style="color:'+
+					( LongestMatch
+						? 'green;">MATCH "' + LongestMatch.matched.str_replace( ['&','<','>'], ['&amp;','&lt;','&gt;']) 
+										+'"  '+ LongestMatch.token
+						: 'orange;">MATCH_FAILED')
+					+ '</b>\n'
+			//	+\n+ eResult.innerHTML
+				)
+	}
+var clearExport =function(){
+	eExportResult.value = ''
+	}
+var exportDFA =function( bWhiteSpace, bUnCompressed ){
+	clearExport()
+	var sResult = DFAToJS( oDFAAggregated, bWhiteSpace, bUnCompressed )
+	eExportResult.value = sResult
+	eExportSize.innerHTML = sResult.length
+	if( aParentItemCalcul && window.parent ){
+		window.parent.Calcul.add( aParentItemCalcul, oDFAAggregated, sResult, 'nextAggregation' )
+		aItemCalcul = false
+		}
+	}
+
+init()
+</script>
+
+
+<!-- URL QUERY -->
+<script>
+$_GET =(function(){
+	var o = {}
+	if( window.location.search.length > 1 ){
+		for(var m, n=0, aCouples = window.location.search.substr(1).split("&"); m=aCouples[n]; n++ ){
+			m = m.split("=")
+			o[unescape(m[0])] = m.length>1 ? unescape(m[1]) : ''
+			}
+		}
+	return o
+	})()
+	
+if( $_GET['calcul']){
+	eTITLE.innerHTML = '<h1>...</h1>'
+	eMenu.style.display = 'none'
+	}
+	
+var addDFA =function( sToken, oDFAAdded ){
+	renameStates( oDFAAdded, nStateIDCounter, true )
+	Automate.setUniqueID( oDFAAdded.S[ oDFAAdded.S.length-1 ]+1 )
+	oDFAAdded.aTokensID = [[ sToken, oDFAAdded.F ]]
+	oDFAAggregated = oDFA = DFAAggregation( oDFAAggregated, oDFAAdded )
+	nStateIDCounter = oDFAAggregated.S[ oDFAAggregated.S.length-1 ]+1
+	exportDFA()
+	previewDFA.refresh()
+	}
+var aItemCalcul
+var aParentItemCalcul
+var calculAggregation =function( parentItem, item ){
+	eMenu.style.display='none'
+	eTITLE.innerHTML = '<h1>Automate composé '+ parentItem[0] + '</h1>'
+	aItemCalcul = item
+	aParentItemCalcul = parentItem
+	addDFA( item.token, item.oFA )
+	}
+</script>
+
+</body>
+</html>

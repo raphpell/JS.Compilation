@@ -1,0 +1,238 @@
+TEXTAREA {
+	height:17px;
+	width:300px;
+	}
+
+.difference {
+	border: 3px solid red !important;
+	}
+.error {
+	color: red;
+	}
+.error:hover {
+	border: 1px solid #000;
+	color: #000;
+	background: red;
+	}
+.center { text-align: center; }
+.left { text-align: left; }
+.right { text-align: right; }
+.bg_red { background: red; }
+.bg_orange { background: orange; }
+.bg_green { background: lightgreen; }
+.bg_skyblue { background: skyblue; }
+
+.nowrap { white-space: nowrap; }
+			
+/* Arbre syntaxique : PARSER */
+.myNode {
+	background: #eee;
+	box-shadow: 2px 2px 2px #999;
+	color: #000;
+	border: 1px solid #CCC;
+	display: inline-block;
+	margin: 2px;
+	padding: 1px;
+	text-align: center;
+	}
+.myNode  .myNode {
+	margin: 1px;
+	}
+.myNode:hover {
+	background: lime !important;
+	border: 1px solid #000;
+	transition: 1s ease;
+	}
+	.myNode:hover>.myNode {
+		background: #FFF;
+		color:#000;
+		}
+
+/* AUTOMATES */
+.graph {
+	border: 1px solid #000;
+	height: 400px;
+	width: 400px;
+	float: left;
+	}
+
+/* MATRICE ET TABLES GRAMMAIRE */
+.transitions {
+	float: right !important;
+	}
+.state {
+	}
+.grammar {
+	clear: both;
+	font: normal 1em Verdana;
+	}
+	.grammar B {
+		color: orange;
+		}
+	.grammar .G {}
+	.grammar .delta {}
+	.grammar .s {}
+	.grammar .T {}
+	.grammar .N {}
+	.grammar DL {
+		border: 1px solid #000;
+		box-shadow: 0 0 10px #000;
+		padding: 2px 2px 0.25em;
+		float: left;
+		margin: 0.5em;
+		}
+	.grammar DT {
+		background: #000;
+		border: 1px solid #CCC;
+		color: #FFF;
+		font-weight: bold;
+		padding: 0.25em;
+		margin: 0 0 0.25em;
+		text-align: center;
+		}
+	.grammar DD {
+		margin: 0;
+		padding: 0 1em;
+		}
+	
+TABLE.FirstFollow {}
+TABLE.LL1 {}
+TABLE.parser {
+	border: 1px solid #000;
+	box-shadow: 0 0 10px #ccc;
+	float: left;
+	margin: 0.5em;
+	padding: 2px;
+	}
+	TABLE.parser TD,
+	TABLE.parser TH {
+		border: 1px solid #CCC;
+		margin: 0;
+		padding: 0 0.5em;
+		}
+	TABLE.parser TH {
+		background: #000;
+		color: #FFF;
+		}
+.graph,
+TABLE.Table {
+	border: 1px solid #000;
+	box-shadow: 0 0 10px #ccc;
+	float: left;
+	font-size: 0.75em;
+	margin: 0.5em;
+	padding: 2px;
+	}
+	TABLE.Table TD,
+	TABLE.Table TH {
+		border: 1px solid #CCC;
+		margin: 0;
+		padding: 0 0.5em;
+		}
+	TABLE.Table TH {
+		background: #000;
+		color: #FFF;
+		}
+		
+/* LEXEMES */
+
+	.undefined {
+		background: red;
+		}
+
+	/* REGEXP LEXEMES */
+	.regexp {
+		border: 1px solid #000;
+		display: inline-block;
+		margin: 2px;
+		padding: 2px;
+		}
+	.charset,
+	.elision,
+	.punctuator,
+	.repetition,
+	.character,
+	.pipe,
+	.escape_char {
+		border: 1px solid #000;
+		display: inline-block;
+		margin: 2px;
+		padding: 2px;
+		position:relative;
+		}
+	.charset 		{ background: brown; 	color: #FFF; }
+	.punctuator		{ background: red; 		}
+	.pipe 			{ background: pink; 	}
+	.repetition 		{ background: yellow; 	}
+	.character 		{ background: green; 	color: #FFF; }
+	.escape_char 	{ background: blue; 	color: #FFF; }
+
+	/* STRING LEXEMES */
+	.ssq,
+	.sdq,
+	.string_single,
+	.string_double {
+		background: green;
+		color: #ccc;
+		border: 1px solid #aaa;
+		display: inline-block;
+		margin: 2px;
+		padding: 2px 0.5em;
+		}
+	/* COMMENTS LEXEMES */
+	.slc,
+	.mlc,
+	.single_line_comment,
+	.multi_lines_comment {
+		background: #eee;
+		color: #ccc;
+		border: 1px solid #aaa;
+		display: inline-block;
+		margin: 2px;
+		padding: 2px 0.5em;
+		}
+	
+	/* JS LEXEMES */
+	.css ,
+	.js {
+		background: lightskyblue;
+		border: 1px solid blue;
+		display: inline-block;
+		margin: 2px;
+		padding: 2px;
+		}
+	.js .regexp {
+		border: 1px solid #CCC;
+		background: #000; 	color: blue;
+		}
+	.css .punctuator,
+	.js .elision ,
+	.js .punctuator 	{ background: lime; 	color: #000; }
+	.keyword		{ background: blue; 	color: #FFF; }
+	.special		{ background: blue; 	color: #FFF; }
+	.function		{ background: green; 	color: #FFF; }
+	.literal  		{ background: #333; 	color: lightskyblue; }
+	.operator 		{ background: #333; 	color: lime; }
+	.identifier 		{ background: #000; 	color: yellow; }
+	.string 			{ background: #000; 	color: green; }
+	.comment 		{ background: #FFF; 	color: #ccc; }
+	.number 			{ background: #000; 	color: #FC0 !important; }
+	.whitespaces 	{ background: #FFF; 	color: #ccc !important; }
+	.linefeed 		{ background: #FFF; 	color: #666 !important; }
+	.escaped 		{ background: #FFF; 	color: red !important; }
+
+	.PHP,
+	.php {
+		background: lightyellow;
+		border: 1px solid Yellow;
+		display: inline-block;
+		margin: 2px;
+		padding: 2px;
+		}
+
+/* TOKENS...hidden */
+	.single_line_comment,
+	.multi_lines_comment,
+	.comment,
+	/*.linefeed,*/
+	.whitespaces { display:; }

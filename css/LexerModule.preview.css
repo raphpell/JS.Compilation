@@ -1,0 +1,39 @@
+#eInput{
+	width: 100%;
+	height: 75px;
+	}
+#eResult{
+    border: 1px solid #000;
+	}
+.undefined {
+    background: red !important;
+	}
+/* Arbre syntaxique */
+.relief .myNode {
+    background: none repeat scroll 0 0 #EEEEEE;
+    border: 1px solid #CCCCCC;
+    box-shadow: 2px -2px 2px #999999;
+    display: inline;
+	line-height: 2em;
+    margin: 2px;
+    padding: 1px;
+	position: relative;
+	vertical-align: text-top;
+    white-space: pre;
+	}
+.relief .myNode .myNode {
+	margin: 1px;
+	}
+.relief .myNode:hover {
+	background: lime !important;
+	border: 1px solid #000;
+	transition: 1s ease;
+	}
+	.relief .myNode:hover > .myNode {
+		background: yellow;
+		color:#000;
+		}
+
+.seeWS .tab	{ background: LIGHTBLUE !important; }
+.seeWS .space	{ background: LIGHTGREEN !important; }
+.seeWS .linefeed	{ background: ORANGE !important; }

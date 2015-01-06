@@ -1,0 +1,65 @@
+﻿<!DOCTYPE HTML>
+<html>
+<head>
+	<title>Module JS</title>
+	<link rel="stylesheet" type="text/css" href="css/syntaxes.css">
+	<link rel="stylesheet" type="text/css" href="css/LexerModule.preview.css">
+</head>
+<body spellcheck="false">
+<a href="index.htm">Index</a>
+
+<h1 id="eH1">Module JS</h1>
+
+<label for="eInput">Texte : </label><br>
+<textarea id="eInput"><![CDATA[/* 1 - JavaScript syntax */
+	var n = nInt1/4 + 4/nInt1 + 10
+	var oEditor = new EditorSample ( eContent ,{
+		// a single line comment ( a single quote ' )
+		aArray : [ true , false , null , undefined , Infinity , NaN ],
+		sDoubleQuoteString : "/* a multi line comment */ // a single line comment " ,
+		sSingleQuoteString : '/* a multi line comment */ // a single line comment '
+		sBracketsTest1_1 : "{[(",
+		sBracketsTest1_2 : "}])",
+		/*
+		a  multi line comment ( a double quote " )
+		*/
+		})
+	RegExp.extend({
+		escape :function( s ){
+			// Bracket test 2
+			var re1 = /(\.|\?|\*|\+|\\|\(|\)|\[|\]|\}|\{|\$|\^|\|)/g
+			, re2 = /("|')/gm
+			return s.replace( re1 , "\\$1" )
+			}
+		})
+
+/* 2 - PHP */
+	<?php
+	function phpSafe ( $strText ){
+		// a single line comment ( a double quote ")
+		$tmpString = $strText ;
+		$tmpString = str_replace( chr(92) , "" , $tmpString ); 
+		return rawurldecode( $tmpString );
+		}
+		
+	/*
+	a  multi line comment ( a single quote ' )
+	*/
+	$hiddencontent = phpSafe( $_POST[ 'content' ]);
+	?>
+]]></textarea>
+<input type="button" id="eBtnMatch" value="Analyser">
+<input type="checkbox" id="eRelief"><label for="eRelief">Relief.</label>
+<input type="checkbox" id="eWhiteSpaces"><label for="eWhiteSpaces">Espaces blancs.</label>
+<pre id="eResult"></pre>
+
+<!-- FRAMEWORK... -->
+<script src="js/framework.js"></script>
+<script src="js/lexer.automaton.js"></script>
+<script src="js/lexer.automaton.modules.js"></script>
+
+<script>var sLexerRule='JS'</script>
+<script src="js/LexerModule.preview.js"></script>
+
+</body>
+</html>

@@ -1,0 +1,486 @@
+
+<html>
+<head>
+	<title>Top Down Parser</title>
+	<link rel="stylesheet" type="text/css" href="css/styles.css">
+	<style>
+	H1, H2, H3, H4, H5, H6 {
+		margin:0 0 0 0;
+		padding:0;
+		}
+	H4 {
+		font: bold 1.2em Verdana;
+		text-align: center;
+		color: green;
+		}
+	H5 {
+		font: italic 0.8em Verdana;
+		text-align: center;
+		}
+	TABLE {
+		border: 1px solid #CCC;
+		font: normal 1em Verdana;
+		padding: 1px;
+		}
+	TD, TH {
+		padding: 1px 1em;
+		}
+	.grammar {
+		border: 1px solid #000;
+		background: #FFF;
+		box-shadow: 0 0 10px #666;
+		opacity: 0.5;
+		padding: 0 1em;
+		}
+		#eGrammar { float:left; }
+		.others,
+		#eProduction {
+			float: left;
+			margin: 1em 0 1em 3em;
+			}
+		#eParsing {
+			float: left;
+			margin: 1em 0 1em 3em;
+			}
+	.algo {
+		border: 1px solid #CCC;
+		float:left;
+		font: normal 0.8em Verdana;
+		margin: 1em 0 1em 2em;
+		padding: 1em;
+		}
+	#eFirstFollow { float:left; }
+	#eLL1 { float:left; }
+	#eParsing TABLE { margin: 0 0 1em; }
+	</style>
+</head>
+<body>
+<h1>Top Down Parser : LL(1) Parser</h1>
+
+
+<div class="grammar">
+	<h1>Grammaire G=(T,N,s,&delta;)</h1>
+	<pre id="eGrammar"></pre>
+	<pre class="others"><h2>T =</h2><h3 id="eT"></h3><h2>N =</h2><h3 id="eN"></h3><h2>s =</h2><h3 id="eStartSymbol"></h3></pre>
+	<pre id="eProduction"></pre>
+	<div style="clear:both;"></div>
+</div>
+<div class="firstfollow">
+	<pre id="eFirstFollow"></pre>
+	<pre class="algo"><h2>Algorithme</h2>
+<b>Pour chaque</b> a &isin; N &cup; T &cup; { &epsilon; }
+	NULLABLE[a] &larr; false
+	<b>Si</b> a &isin; N
+		FIRST[a] &larr; {}
+		FOLLOW[a] &larr; {} // Ensemble vide
+	<b>Si</b> a &isin; T &cup; { &epsilon; }
+		FIRST[a] &larr; { a }
+NULLABLE[&epsilon;] &larr; true
+FOLLOW[s] &larr; { $ }
+<b>Faire</b>
+	<b>Pour chaque</b> production X &rarr; Y<sub>0</sub>Y<sub>1</sub> &hellip; Y<sub>k</sub> // avec Y<sub>i</sub> = symbole
+		<b>Si</b> Y<sub>0</sub> &hellip; Y<sub>k</sub> sont annulables
+			NULLABLE[X] &larr; true
+		<b>Pour chaque</b> i de 0 à k 
+			<b>Si</b> i = 0 <b>ou</b> Y<sub>0</sub> &hellip; Y<sub>i-1</sub> sont annulables
+				FIRST[X] &larr; FIRST[X] &cup; FIRST[Y<sub>i</sub>]
+			<b>Si</b> Y<sub>i</sub> &isin; T
+				<b>Si</b> i = k <b>ou</b> Y<sub>i+1</sub> &hellip; Y<sub>k</sub> sont annulables
+					FOLLOW[Y<sub>i</sub>] &larr; FOLLOW[Y<sub>i</sub>] &cup; FOLLOW[X]
+				<b>Pour chaque</b> j de i + 1 à k
+					<b>Si</b> j = i + 1 <b>ou</b> Y<sub>i+1</sub> &hellip; Y<sub>j-1</sub> sont annulables
+						FOLLOW[Y<sub>i</sub>] &larr; FOLLOW[Y<sub>i</sub>] &cup; FIRST[Y<sub>j</sub>]
+<b>Tant que</b> au moins une des variables FIRST, FOLLOW ou NULLABLE est modifiée
+
+// Note:
+// FOLLOW[symbole terminal] sera toujours égale à un ensemble vide
+// NULLABLE[symbole terminal] sera toujours égale à false
+	</pre>
+	<div style="clear:both;"></div>
+</div>
+<pre id="eResult"></pre>
+<div class="LL1">
+	<pre id="eLL1"></pre>
+	<pre class="algo"><h2>Algorithme</h2>
+<b>Pour chaque</b> production X &rarr; Y<sub>0</sub> &hellip; Y<sub>k</sub>
+	<b>Pour chaque</b> a &isin; <b>FIRST</b>(Y<sub>0</sub>)
+		M[X][a] &larr; Y<sub>0</sub> &hellip; Y<sub>k</sub>
+		<b>Si</b> a = &epsilon;
+			<b>Pour chaque</b> b &isin; <b>FOLLOW</b>(X)
+				M[X][b] &larr; Y<sub>0</sub> &hellip; Y<sub>k</sub>
+		
+	// Note : Avant affectation
+	<b>Si</b> &exist; M[X][c] <b>et</b> M[X][c] &ne;  Y<sub>0</sub> &hellip; Y<sub>k</sub>
+		<i>Erreur plusieurs sorties existent ! il ne sagit pas dune grammaire LL(1)</i>
+	</pre>
+	<div style="clear:both;"></div>
+</div>
+<div class="LL1">
+	<h1>LL(1) Parsing</h1>
+	<pre id="eParsing"></pre>
+	<pre class="algo"><h2>Algorithme</h2>
+	Phrase &larr; Phrase + $
+	Pile &larr; [ $ s ]
+	i &larr; index du premier T de la Phrase
+	bContinue &larr; true
+	<b>Faire</b>
+		X &larr; dépilé un élément de la Pile
+		<b>Si</b> X &ne; &epsilon;
+			a &larr; T de la phrase à la position i
+			<b>Si</b> X = a
+				<b>Si</b> X = $
+					Succès : La phrase est reconnue !
+				<b>Sinon</b>
+					positionnement de i sur le T suivant
+			<b>Sinon</b>
+				<b>Si</b> X &isin; T
+					Erreur: Il manque X dans la Phrase à lindex i
+					bContinue &larr; false
+				<b>Si</b> X &isin; N
+					<b>Si</b> M[X][a] existe
+						On empile M[X][a] en ordre inverse
+					<b>Sinon</b> 
+						Erreur: Lentrée M[X][a] nexiste pas !
+						bContinue &larr; false
+	<b>Tant que</b> i pointe dans la phrase <b>et</b> Pile &ne; vide <b>et</b> bContinue
+	</pre>
+</div>
+
+<!-- FRAMEWORK... -->
+<script src="js/framework.js"></script>
+<script>
+var aGRAMMAR=[
+		[ 'E', 'T X' ],
+		[ 'X', '+ E | &epsilon;' ],
+		[ 'T', 'int Y | ( E )' ],
+		[ 'Y', '* T | &epsilon;' ]
+		
+	/* 
+		[ Z, S ],
+		[ S, A a A b | B b B a ],
+		[ V, id ],
+		[ A, &epsilon; ],
+		[ B, &epsilon; ]
+	*/
+	/*
+		[ S, if C then S X ],
+		[ X, else S | &epsilon; ],
+		[ C, b ]
+	*/
+		]
+
+_( 'eGrammar,eProduction,eStartSymbol,eT,eN,eFirstFollow,eLL1,eResult,eParsing' )
+
+var sStartSymbol = aGRAMMAR[0][0]
+, aPRODUCTIONS = []
+, aSymbols = []
+, aNonTerminalSymbols = []
+, aTerminalSymbols = []
+, oFIRST = { '&epsilon;':['&epsilon;'] }
+, oFOLLOW = {}
+, oNULLABLE = { '&epsilon;':true }
+
+// Initialise les variables
+;(function(){
+	aGRAMMAR.every( function( aRule ){
+		var X = aRule[0]
+		aNonTerminalSymbols.push( X )
+		var a = aRule[1].split('|')
+		a.every( function( s ){
+			if( s ) aSymbols = aSymbols.concat( s.trim().split(' '))
+			return aPRODUCTIONS.push([ X, s.trim()])
+			})
+		return 1
+		})
+	aSymbols = Array.unique( aSymbols )
+	aSymbols.remove( '&epsilon;' )
+	aSymbols.sort()
+	aSymbols.every( function( s ){
+		if( ! aNonTerminalSymbols.have( s )) aTerminalSymbols.push( s )
+		return 1
+		})
+	aSymbols = aTerminalSymbols.concat( aNonTerminalSymbols )
+	
+	// Initialize FIRST and FOLLOW to all empty sets, and NULLABLE to all false.
+	aSymbols.every( function( s ){
+		oFIRST[s] = [] // for each terminal symbol FIRST[Z] <- {Z}
+		oFOLLOW[s] = []
+		oNULLABLE[s] = false
+		return 1
+		})
+	aTerminalSymbols.every( function( s ){
+		oFIRST[s] = [s] // for each terminal symbol FIRST[Z] <- {Z}
+		return 1
+		})
+	oFOLLOW[sStartSymbol]= ['$']
+	})()
+	
+// Affiche la grammaire
+if( 1 )(function(){
+	Bufferize.init('  ')
+	aGRAMMAR.every(function( a ){
+		return Bufferize( '<h3>'+a[0]+' &rarr; '+a[1]+'</h3>' )
+		})
+	eGrammar.innerHTML = Bufferize.init()
+	Bufferize( '<h2>&delta; =\n</h2>' )
+	aPRODUCTIONS.every(function( a ){
+		return Bufferize( '<h3>'+a[0]+' &rarr; '+a[1]+'</h3>' )
+		})
+	eProduction.innerHTML = Bufferize.init()
+	eStartSymbol.innerHTML = sStartSymbol
+	eT.innerHTML = aTerminalSymbols.join(' ')
+	eN.innerHTML = aNonTerminalSymbols.join(' ')
+	})()
+
+function FIRST ( sSymbol ){ return oFIRST[sSymbol] }
+function FOLLOW ( sSymbol ){ return oFOLLOW[sSymbol] }
+function areAllNullable( aY, n1, n2 ){
+	var b = true
+	for(var i=n1; i<=n2; i++ ){
+		b = b && oNULLABLE[ aY[i]]
+		if( ! b ) return false
+		}
+	return b
+	}
+
+Bufferize( '<h4>FOLLOW['+sStartSymbol+'] change to [$]</h4>' )
+
+// do until FIRST, FOLLOW, and NULLABLE did not change in this iteration.
+for( var nCounter=1, bChange=true; bChange ; nCounter++ ){
+	bChange = false  
+	Bufferize( "<h1>LOOP "+nCounter+"</h1>" )
+
+	aPRODUCTIONS.every( function( a, nIndex ){
+		var X = a[0], aY = a[1].split(' '), k = aY.length-1
+		
+		if( ! oNULLABLE[X] && areAllNullable( aY, 0, aY.length-1 )){
+			oNULLABLE[X] = true
+			Bufferize( "<h5>" + a[0] +" &rarr; "+ a[1] + " </h5>" )
+			Bufferize( '<h5>if Y1 … Yk are all nullable (or if k = 0)</h5>' )
+			Bufferize( '<h4>NULLABLE['+X+'] change to ['+oNULLABLE[X]+']</h4>' )
+			bChange = true
+			}
+		
+		Bufferize( "<h2>" + (nIndex+1) +'.  '+ a[0] +" &rarr; "+ a[1] +" <small>(k=="+ (k+1) +")</small></h2>" )
+		Bufferize( "<small> foreach i from 1 to "+ (k+1) + "</small>\n" )
+		Bufferize( "<small>\t foreach j from i+1 to "+ (k+1) + "</small>\n" )
+
+		for( var i=0; i<=k; i++ ){
+			var Yi = aY[i]
+			Bufferize( "\t[<b><small>i:" + (i+1) +"</small></b>]\n" )
+			Bufferize( "\t Y<sub>i</sub>=Y<sub>"+(i+1)+"</sub>="+Yi+" is a "+(aNonTerminalSymbols.have( Yi )?'non ':'')+"terminal symbol \n" )
+			if( aY[i+1]) Bufferize( "\t Y<sub>(i+1)</sub>=Y<sub>"+(i+2)+"</sub>="+aY[i+1]+" is a "+(aNonTerminalSymbols.have( aY[i+1] )?'non ':'')+"terminal symbol \n" )
+
+			Bufferize( "<h5> if Y<sub>1</sub> … Y<sub>(i-1)</sub> are all nullable (or if i = 1) then FIRST[X] = FIRST[X] + FIRST[Y<sub>i</sub>] </h5>" )
+			var b = ( i==0 || areAllNullable( aY, 0, i-1 ))
+			Bufferize( '<center>'
+						+(b?'':'<strike>')
+						+(i==0?i==1:""+aY.slice( 0, i )+" are all nullable ")
+						+(b?'<h3>':'\n')+"FIRST["+X+"] = FIRST["+X+"] + FIRST["+Yi+"]"+(b?'</h3>':'\n')
+						+(b?'':'</strike>')
+						+'</center>' )
+
+			if( i==0 || areAllNullable( aY, 0, i-1 )){
+				var aFirst = Array.unique( oFIRST[X].concat( oFIRST[Yi]))
+				if( oFIRST[X].toString() != aFirst.toString()){
+					oFIRST[X] = aFirst
+					Bufferize( '<h4>FIRST['+X+'] change to ['+aFirst+']</h4>' )
+					bChange = true
+					}
+				}
+									
+			if( ! aNonTerminalSymbols.have( Yi )){
+				Bufferize( '\t[<small>BREAK Yi is a terminal symbol</small>]\n' )
+				continue ;
+				}
+
+			Bufferize( "<h5> if Y<sub>(i+1)</sub> … Y<sub>k</sub> are all nullable (or if i = k) then FOLLOW[Y<sub>i</sub>] = FOLLOW[Y<sub>i</sub>] + FOLLOW[X] </h5>" )
+			var b = ( i==k || areAllNullable( aY, i+1, k ))
+			Bufferize( '<center>'
+						+(b?'':'<strike>')
+						+(i==k?i==k:""+aY.slice( i+1, k+1 )+" are all nullable ")
+						+(b?'<h3>':'\n')+"FOLLOW["+Yi+"] = FOLLOW["+Yi+"] + FOLLOW["+X+"]"+(b?'</h3>':'\n')
+						+(b?'':'</strike>')
+						+'/center>' )
+
+			if( i==k || areAllNullable( aY, i+1, k )){
+				var aFollow = Array.unique( oFOLLOW[Yi].concat( oFOLLOW[X]))
+				aFollow.remove('&epsilon;')
+				if( oFOLLOW[Yi].toString() != aFollow.toString()){
+					oFOLLOW[Yi] = aFollow
+					Bufferize( '<h4>FOLLOW['+Yi+'] change to ['+aFollow+']</h4>' )
+					bChange = true
+					}
+				}
+			
+			for( var j=i+1; j<=k; j++ ){
+				var Yj = aY[j]
+				Bufferize( "\t[<b><small>j:"+ (j+1) + "</small></b>]\n" )
+				Bufferize( "\t X="+X+"\n" )
+				if( Yj ) Bufferize( "\t Y<sub>j</sub>=Y<sub>"+(j+1)+"</sub>="+Yj+" is a "+(aNonTerminalSymbols.have( Yj )?'non ':'')+"terminal symbol \n" )
+				Bufferize( "\t Y<sub>(j-1)</sub>=Y<sub>"+(j)+"</sub>="+aY[j-1]+" is a "+(aNonTerminalSymbols.have( aY[j-1] )?'non ':'')+"terminal symbol \n" )
+					
+				Bufferize( "<h5> if Y<sub>(i+1)</sub> … Y<sub>(j-1)</sub> are all nullable (or if i + 1 = j ) then FOLLOW[Y<sub>i</sub>] = FOLLOW[Y<sub>i</sub>] + FIRST[Y<sub>j</sub>] </h5>" )
+				var b = ( j==i+1 || areAllNullable( aY, i+1, j-1 ))
+				Bufferize( '<center>'
+							+(b?'':'<strike>')
+							+(j==i+1?j==i+1:""+aY.slice( i+1, j )+"  are all nullable ")
+							+(b?'<h3>':'\n')+"FOLLOW["+Yi+"] = FOLLOW["+Yi+"] + FIRST["+Yj+"]"+(b?'</h3>':'\n')
+							+(b?'':'</strike>')
+							+'</center>' )
+
+				if( j==i+1 || areAllNullable( aY, i+1, j-1 )){
+					var aFollowYi = Array.unique( oFOLLOW[Yi].concat( oFIRST[Yj]))
+					aFollowYi.remove('&epsilon;')
+					if( oFOLLOW[Yi].toString() != aFollowYi.toString()){
+						oFOLLOW[Yi] = aFollowYi
+						Bufferize(' <h4>FOLLOW['+Yi+'] change to ['+aFollowYi+']</h4>' )
+						bChange = true
+						}
+					}
+				}
+			}
+		return 1
+		})
+
+	if( ! bChange ) break;
+	}
+
+// Check if grammar is LL(1)
+;( function isLL1 (){
+	aGRAMMAR.every( function( aRule ){
+		var a = aRule[1].split('|')
+		/*
+		G is LL(1) if for a rule A -> alpha | beta
+		a) First(alpha) intersection First(beta) = ensemble vide
+		b) alpha ou beta dérive epsilon
+		c) If beta dérive epsilon,  Follow(alpha) intersection Follow(beta) = ensemble vide
+		*/
+		a.every( function(){
+			return 1
+			})
+		return 1
+		})
+	})()
+	
+// Affiche le calcul
+if( 1 ){
+	eResult.innerHTML += Bufferize.init()
+	eResult.innerHTML += '<h2>'+ nCounter +' loops <h2>'
+	}
+
+// Affiche la table FIRST / FOLLOW
+var showFirstFollowTable =function( aSymbols, oNULLABLE, oFIRST, oFOLLOW ){
+	Bufferize.init( '<h1>Table First/Follow </h1>' )
+	Bufferize( '<table border="1" cellspacing="0"><tr><th>Symbol</th><th>Nullable</th><th>First</th><th>Follow</th></tr>' )
+	Bufferize( '<tr><th>&epsilon;</th><td>'+ oNULLABLE['&epsilon;'] +'</td><td>'+ oFIRST['&epsilon;'] +'</td><td></td></tr>' )
+	aSymbols.every( function( s ){
+		Bufferize( '<tr><th>'+ s +'</th><td>'+ oNULLABLE[s] +'</td><td>'+ oFIRST[s] +'</td><td>'+ ( oFOLLOW[s]) +'</td></tr>' )
+		return 1
+		})
+	return Bufferize('</table>')
+	}
+if( 1 ) eFirstFollow.innerHTML = showFirstFollowTable( aSymbols, oNULLABLE, oFIRST, oFOLLOW )
+	
+// Construit la table LL(1) 
+var setLL1Table =function( aPRODUCTIONS, aNonTerminalSymbols, FIRST, FOLLOW ){
+	var M = {}
+	aNonTerminalSymbols.every( function( s ){ return M[s] = {} })
+	var setEntry =function( X, RHS, s ){
+		if( M[X][s] && M[X][s] != RHS ){
+			var sError = "Grammar isnt LL(1) : there is a multi-rule entry in table."
+				+'\nM[ '+ X +' ][ '+ s +' ]'
+				+'\n\t '+ X +' ->  '+ M[X][s]
+			//	+\n\t + aRule.join(  ->  )
+			alert( sError )
+			throw new Error ( sError )
+			}
+		return M[X][s] = RHS
+		}
+	aPRODUCTIONS.every( function( aRule ){
+		var X=aRule[0], RHS=aRule[1], Y0=RHS.split(' ')[0]
+		FIRST(Y0).every( function( sSymbolA ){
+			if( sSymbolA == '&epsilon;' )
+				FOLLOW(X).every( function( sSymbolB ){
+					return setEntry( X, RHS, sSymbolB )
+					})
+			return setEntry( X, RHS, sSymbolA )
+			})
+		return 1
+		})
+	return M
+	}
+var M = setLL1Table( aPRODUCTIONS, aNonTerminalSymbols, FIRST, FOLLOW )
+
+// Affiche la table LL(1) 
+var showLL1Table =function( M, aTerminalSymbols, aNonTerminalSymbols ){
+	Bufferize.init( '<h1>Table LL(1)</h1>' )
+	var a = aTerminalSymbols.concat(['$'])
+	Bufferize( '<table border="1" cellspacing="0"><tr><td></td>' )
+	a.every( function( S ){
+		return Bufferize( "<th>"+ S +"</th>" )
+		})
+	Bufferize( "</tr>" )
+	aNonTerminalSymbols.every( function( NT ){
+		Bufferize( "<tr><th>"+ NT +"</th>" )
+		a.every( function( S ){
+			return Bufferize( "<td>"+ ( M[NT][S] || '&nbsp;' ) +"</td>" )
+			})
+		return Bufferize( "</tr>" )
+		})
+	return Bufferize( "</table>" )
+	}
+if( 1 ) eLL1.innerHTML = showLL1Table( M, aTerminalSymbols, aNonTerminalSymbols )
+
+// NEEDED : aPhrase, M, sStartSymbol, aTerminalSymbols, aNonTerminalSymbols
+function LL1ParsingAlgo ( aPhrase ){
+	Bufferize.init(  )
+	Bufferize( '<table border="1" cellspacing="0"><tr><th class="right">Stack</th><th class="right">Input</th><th class="left">Action</th></tr>' )
+	var aStack = [ '$', sStartSymbol ]
+	var i=0
+	, sAction
+	, bContinue=true
+	do{
+		var GRR = aStack.join(',').split(',').reverse().join(' ')
+		var X=aStack.pop()
+		if( X=='&epsilon;' ) continue;
+		var a=aPhrase[i]
+		Bufferize( '<tr><td class="right">'+GRR+'</td><td class="right">'+aPhrase.slice( i ).join(' ')+'</td>' )
+		if( X==a ){
+			if( X=='$' ){
+				sAction = '<b style="color:green;">Success</b>'
+				}
+			if( X!='$' ){
+				i++
+				sAction = "<b>terminal</b>"
+				}
+			}
+		if( X!=a ){
+			if( aTerminalSymbols.have( X )){
+				var sAction = '<b style="color:red;">Failed: '+X+' not found in input!</b>'
+				bContinue = false
+				}
+			if( aNonTerminalSymbols.have( X )){
+				if( M[X][a]){
+					sAction = X+" &rarr; "+M[X][a]
+					aStack = aStack.concat( M[X][a].split(' ').reverse())
+					}
+				else{
+					var sAction = '<b style="color:red;">Failed: rule M['+X+']['+a+'] not found !</b>'
+					bContinue = false
+					}
+				}
+			}
+		Bufferize( '<td class="left">'+sAction+'</td></tr>' )
+		}while( i<aPhrase.length && aStack.length && bContinue )
+	eParsing.innerHTML += Bufferize( "</table>" )
+	}
+
+LL1ParsingAlgo( 'int * int $'.split(' '))
+LL1ParsingAlgo( '( E $'.split(' '))
+LL1ParsingAlgo( 'red error $'.split(' '))
+LL1ParsingAlgo( 'int * $'.split(' '))
+</script>
+
+</body>
+</html>

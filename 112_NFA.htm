@@ -1,0 +1,53 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+		<title>AFN</title>
+		<link rel="stylesheet" type="text/css" href="css/reToNFA.css">
+		<style>
+		</style>
+	</head>
+	<body>
+<a href="index.htm">Index</a>
+
+
+<h1>AFN</h1>
+
+<a name="toc1"></a>
+<h2>Préambule</h2>
+<p>
+	AFN = Automate Fini Non déterministe<br>
+	( NFA = Non Finite Automaton )
+</p>
+<ul>
+	<li>peut avoir plusieurs transitions pour un état et un symbole.</li>
+	<li>peut avoir des transitions &epsilon; (transition sans lire de caractère).</li>
+</ul>
+
+<h2>Conversion des expressions régulières en AFN</h2>
+<p>Les <a href="src/regexp/syntax.htm" target="_INFO">expressions régulières</a> sont transformées en AFN à l'aide de l'algorithme de Thompson :</p>
+		
+<table cellspacing="10">
+	<tr>
+		<th>transition &epsilon;</th>
+		<th><div class="thompson epsilon" title=""></div></th>
+	</tr>
+	<tr>
+		<th>transition symbole</th>
+		<th><div class="thompson character" title=""></div></th>
+	</tr>
+	<tr>
+		<th>Alternative N<sub>1</sub>|N<sub>2</sub></th>
+		<th><div class="thompson alternation" title=""></div></th>
+	</tr>
+	<tr>
+		<th>Concatenation N<sub>1</sub>N<sub>2</sub></th>
+		<th><div class="thompson concatenation" title=""></div></th>
+	</tr>
+	<tr>
+		<th>Répétition N<sub>1</sub>*</th>
+		<th><div class="thompson kleeneClosure" title=""></div></th>
+	</tr>
+</table>
+	
+	</body>
+</html>

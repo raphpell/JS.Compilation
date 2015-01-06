@@ -1,0 +1,408 @@
+<html>
+<head>
+	<title>Création de raccourcies</title>
+	<link rel="stylesheet" type="text/css" href="styles.css">
+	<style>
+.used		{ background: yellow; }
+.green		{ color:green; }
+.orange		{ color:orange; }
+.darkorange	{ color:darkorange; font-style:italic; }
+.red		{ color:darkred; text-decoration:line-through; font-style:italic; }
+.suggestion	{ color:green; border: 1px solid green; }
+.notfound	{ color:red; background: yellow; border: 1px solid red; }
+FIELDSET {
+	float: left;
+	margin: 0 1em 1em 0;
+	}
+FIELDSET DL,
+FIELDSET OL {
+	margin: 0;
+	}
+TD DIV {
+	max-height: 4em;
+	overflow: auto;
+	}
+	</style>
+</head>
+<body>
+	<h1>Création de raccourcies</h1>
+
+<fieldset><legend>Source</legend>
+	<dl>
+		<dt><label for="eValues">Mots séparés par '<code>:</code>'</label></dt>
+		<dt><textarea id="eValues">background:background-attachment:background-break:background-clip:background-color:background-image:background-origin:background-position:background-position-x:background-position-y:background-repeat:background-size:border:border-bottom:border-bottom-color:border-bottom-image:border-bottom-left-image:border-bottom-left-radius:border-bottom-right-image:border-bottom-right-radius:border-bottom-style:border-bottom-width:border-break:border-collapse:border-color:border-corner-image:border-fit:border-image:border-left:border-left-color:border-left-image:border-left-style:border-left-width:border-length:border-radius:border-right:border-right-color:border-right-image:border-right-style:border-right-width:border-spacing:border-style:border-top:border-top:border-top-color:border-top-image:border-top-left-image:border-top-left-radius:border-top-right-image:border-top-right-radius:border-top-style:border-top-width:border-width:bottom:box-shadow:box-sizing:caption-side:clear:clip:color:content:counter-increment:counter-reset:cursor:display:empty-cells:float:font:font:font-effect:font-emphasize:font-emphasize-position:font-emphasize-style:font-family:font-size:font-size-adjust:font-smooth:font-stretch:font-style:font-variant:font-weight:height:left:letter-spacing:line-height:list-style:list-style:list-style-image:list-style-position:list-style-type:margin:margin-bottom:margin-left:margin-right:margin-top:max-height:max-width:min-height:min-width:opacity:orphans:outline:outline-color:outline-offset:outline-style:outline-width:overflow:overflow:overflow-style:overflow-x:overflow-y:padding:padding-bottom:padding-left:padding-right:padding-top:page-break-after:page-break-before:page-break-inside:position:quotes:resize:right:table-layout:text-align:text-align-last:text-decoration:text-emphasis:text-height:text-indent:text-justify:text-outline:text-replace:text-shadow:text-transform:text-wrap:top:vertical-align:visibility:white-space:white-space-collapse:widows:width:word-break:word-spacing:word-wrap:z-index:zoom</textarea></dt>
+		<dt><input id="eBtn" type="button" value="Générer"></dt>
+	</dl>
+</fieldset>
+<fieldset><legend>Info</legend>
+	<ol>
+		<li>Raccourcie d'un mot = quelques lettres du mot dans le même ordre d'apparition.</li>
+		<li>La première lettre d'un mot est toujours la première lettre de son raccourcie.
+			<ul>
+				<li>Si on a qu'un mot commençant par cette lettre, son raccourcie est cette lettre.</li>
+				<li>Le mot le plus petit l'emporte (poids supérieur).</li>
+				<li>Si deux mot ont la même taille, le premier mot dans l'ordre alphabétique l'emporte.</li>
+			</ul></li>
+		<li>Les lettres d'un mot précédées par le symbole '<code>-</code>' feront toujours partie de son raccourcie.</li>
+		<li>Les lettres d'un mot n'étant pas présente dans les autres valeurs en conflit servent d'alternative.</li>
+	</ol>
+</fieldset>
+<fieldset><legend>Légende</legend>
+	<dl>
+		<dt><label class="used">bg</label> : choisie </dt>
+		<dt><label class="green"><b>bg</b></label> : sans conflit </dt>
+		<dt><label class="orange"><b>bg</b></label> : suggestion 1 </dt>
+		<dt><label class="darkorange"><b>bg</b></label> : suggestion 2 </dt>
+		<dt><label class="red"><b>bg</b></label> : a exclure </dt>
+		<dt><label class="suggestion"><b>bg</b></label> : idéal </dt>
+		<dt><label class="notfound"><b>bg</b></label> : ? </dt>
+	</dl>
+</fieldset>
+
+<hr style="clear: both;">
+
+<table id="eShortCuts" border="1"></table>
+
+<script src="../../js/shared.js"></script>
+<script src="../../js/framework.js"></script>
+<script>
+_('eValues,eBtn,eShortCuts')
+
+var _searchValue =function( sShortCut, aChoices ){
+	/*
+	Recherche dans aChoices le mot correspondant le mieux à sShortCut
+		(1) Seul les mots ayant comme première lettre celle du raccourcie sont sélectionnées
+			( + 1000 pts )
+		(2) Retourne null si aucune mot n'est trouvé
+		(3) Chaque mot est parcourue qu'une seul fois.
+			( + 50 pts - la longueur du mot ) = Un mot plus petit à plus de points dés le départ
+		(4) Si la lettre raccourcie suivante est présente dans le mot et quelle est précédé par le symbole '-'
+			( + 500 pts pour la lettre )
+				on avance à la position ( index du  '-' + 2 )
+		(5) Sinon si elle est simplement présente dans le mot:  les 12 premières positions sont privilégiées et rapportent des points, le reste en enlève
+			( + 12 pts - son index dans le mot) pour chaque occurence trouvée
+				on avance à la position ( index du caractère + 1 )
+		(6) Sinon si elle n'est pas présente dedans 
+			( - 2000 pts )
+				et la recherche des caractères raccourcies est stoppée pour le mot
+	*/
+	if( ! sShortCut ) return null
+	var aResult = []
+	for(var i=0, ni=aChoices.length; i<ni; i++ )
+		if( aChoices[i].charAt(0)==sShortCut.charAt(0))
+			aResult.push({ n:1000, text:aChoices[i] })
+	if( ! aResult.length ) return null
+	if( aResult.length > 1 ){
+		for(var i=0, ni=aResult.length; i<ni; i++ ){
+			var o = aResult[i]
+			o.n = 50 - o.text.length
+			var nIndex=1
+			for(var j=1, nj=sShortCut.length; j<nj; j++ ){
+				var sPartialValue = o.text.slice( nIndex )
+				, bSpecialChar = false , bChar = false
+				if( sPartialValue ){
+					sPartialValue.replace(
+						new RegExp( '-'+sShortCut.charAt(j)),
+						function( sMatched, nPos ){
+							bSpecialChar = bChar = true
+							o.n += 500
+							nIndex += nPos+2
+							return sMatched
+							}
+						)
+					if( ! bSpecialChar )
+						sPartialValue.replace(
+							new RegExp( sShortCut.charAt(j)),
+							function( sMatched, nPos ){
+								bChar = true
+								o.n += 12-nPos
+								nIndex += nPos+1
+								return sMatched
+								}
+							)
+					}
+				if( ! sPartialValue || ! bChar ){
+					o.n -= 2000
+					break;
+					}
+				}
+			}
+		aResult.sortBy('n','DESC')
+		}
+	return aResult[0].n > 0 ? aResult[0].text : null
+	}
+	
+var aValues
+var getValues =function( sSeparator ){
+	var aValues = eValues.value.trim().split(sSeparator||':')
+	var a = Array.unique( aValues ) // aValues.join('-').split('-').concat( aValues ))
+	a.sort()
+	var a1=[], a2=[]
+	for(var i=0, ni=a.length; i<ni; i++ ){
+		if( specialCharIn( a[i])>-1) a2.push( a[i])
+			else a1.push( a[i])
+		}
+	return a1.concat( a2 )
+	}
+var getValuesWithFirstChar =function( sChar, aValues ){
+	var a = []
+	for(var i=0, ni=aValues.length; i<ni; i++ )
+		if( aValues[i].charAt(0)==sChar )
+			a.push( aValues[i])
+	return a
+	}
+var isSpecialChar =function( sValue, nIndex ){
+	return sValue.charAt( nIndex-1 ) == '-'
+	}
+var specialCharIn =function( sValue, sSpecialChar, nIndex ){
+	nIndex = nIndex || 0
+	return sSpecialChar
+		? sValue.indexOf('-'+sSpecialChar, nIndex )
+		: sValue.indexOf('-', nIndex)
+	}
+var getSpecialChars =function( sValue ){
+	var a = []
+	for(var i=1, ni=sValue.length; i<ni; i++ ){
+		if( isSpecialChar( sValue, i ))
+			a[i] = sValue.charAt( i )
+		}
+	return a
+	}
+var getValuesWithSpecialChars =function( aSpecialChars, aFirstGroup ){
+	var a = []
+	for(var i=1, ni=aFirstGroup.length; i<ni; i++ ){
+		if( isSpecialChar( sValue, i ))
+			a.push( sValue.charAt( i ))
+		}
+	return a
+	}
+var getValuesCharWeight =function( aValues ){
+	var oValues = {}
+	for(var i=0, ni=aValues.length; i<ni; i++ ){
+		var sValue = aValues[i]
+		var aValue = oValues[ sValue ] = []
+		aValue.weight = 50 - sValue.length
+		for(var j=0, nj=sValue.length; j<nj; j++ ){
+			var sChar = sValue.charAt(j), sWeight = 0
+			if( j==0 ) sWeight = 1000
+			else if( isSpecialChar( sValue, j )) sWeight = 500
+			else sWeight = 12-j
+			if( sChar!='-' ) aValue.push([ j, sChar, sWeight ])
+			}
+		}
+	return oValues
+	}
+var isWeightest =function( sValue, aValues, oValues ){
+	for(var j=0, nj=aValues.length; j<nj ; j++ ){
+		if( oValues[ sValue ].weight < oValues[ aValues[j]].weight )
+			return false
+		if( oValues[ sValue ].weight == oValues[ aValues[j]].weight && sValue > aValues[j])
+			return false
+		}
+	return true
+	}
+var getCharOnlyInValue =function( sValue, aValues ){
+	var a = Array.unique( sValue.slice(1).toArray())
+	a.remove('-')
+	a.sort()
+	for(var j=0, nj=aValues.length; j<nj; j++ )
+		a = Array.diff( a, Array.unique( aValues[j].toArray()))
+	return a
+	}
+
+var oManualShortCuts = { 'border':'b', 'border-bottom-left-radius':'bblr', 'border-bottom':'bbm', 'border-bottom-right-radius':'bbrr', 'border-bottom-width':'bbw', 'border-bottom-color':'bbc', 'border-bottom-image':'bbi', 'border-break':'bbk', 'border-bottom-left-image':'bbli', 'border-bottom-right-image':'bbri', 'border-bottom-style':'bbs', 'border-color':'bc', 'border-corner-image':'bci', 'border-collapse':'bcps', 'border-fit':'bf', 'border-image':'bi', 'border-left':'bl', 'border-length':'blg', 'border-left-color':'blc', 'border-left-image':'bli', 'border-left-style':'bls', 'border-right':'br', 'border-right-color':'brc', 'border-right-image':'bri', 'border-right-style':'brs', 'border-style':'bsy', 'border-top':'bt', 'border-top-color':'btc', 'border-top-image':'bti', 'border-top-left-image':'btli', 'border-top-right-image':'btri', 'border-top-style':'bts', 'background':'bg', 'background-attachment':'bga', 'background-break':'bgb', 'background-color':'bgco', 'background-clip':'bgc', 'background-image':'bgi', 'background-origin':'bgo', 'background-position':'bgp', 'background-position-x':'bgpx', 'background-position-y':'bgpy', 'background-repeat':'bgr', 'background-size':'bgs', 'border-left':'bl', 'border-left-width':'blw', 'bottom':'bm', 'border-right':'br', 'border-radius':'bra', 'border-right-width':'brw', 'border-spacing':'bsp', 'border-top':'bt', 'border-top-left-radius':'btlr', 'border-top-right-radius':'btrr', 'border-top-width':'btw', 'border-width':'bw', 'box-shadow':'bsh', 'box-sizing':'bsz', 'clip':'c', 'color':'co', 'counter-increment':'ci', 'counter-reset':'cr', 'caption-side':'cs', 'clear':'ca', 'content':'ct', 'cursor':'cu', 'display':'d', 'empty-cells':'ec', 'font':'f', 'font':'f', 'font-effect':'fe', 'font-emphasize':'fem', 'font-emphasize-position':'fep', 'font-emphasize-style':'fes', 'font-family':'ff', 'float':'fl', 'font-style':'fsy', 'font-smooth':'fsm', 'font-stretch':'fsc', 'font-variant':'fv', 'font-weight':'fw', 'font-size':'fs', 'font-size-adjust':'fsa', 'height':'h', 'left':'l', 'line-height':'lh', 'list-style':'ls', 'list-style':'ls', 'letter-spacing':'lsg', 'list-style-image':'lsi', 'list-style-position':'lsp', 'list-style-type':'lst', 'margin':'m', 'max-height':'mxh', 'max-width':'mxw', 'margin-bottom':'mb', 'min-height':'mnh', 'min-width':'mnw', 'margin-left':'ml', 'margin-right':'mr', 'margin-top':'mt', 'outline-color':'oc', 'overflow':'of', 'overflow':'of', 'overflow-style':'ofs', 'overflow-x':'ofx', 'overflow-y':'ofy', 'outline':'ol', 'outline-offset':'oo', 'opacity':'op', 'orphans':'or', 'outline-style':'os', 'outline-width':'ow', 'padding':'p', 'padding-bottom':'pb', 'page-break-after':'pba', 'page-break-before':'pbb', 'page-break-inside':'pbi', 'padding-left':'pl', 'position':'po', 'padding-right':'pr', 'padding-top':'pt', 'quotes':'q', 'right':'r', 'resize':'rz', 'top':'t', 'text-align':'ta', 'text-align-last':'tal', 'table-layout':'tbl', 'text-decoration':'td', 'text-emphasis':'te', 'text-height':'th', 'text-indent':'ti', 'text-justify':'tj', 'text-outline':'to', 'text-replace':'tr', 'text-shadow':'ts', 'text-transform':'tt', 'text-wrap':'tw', 'visibility':'v', 'vertical-align':'va', 'width':'w', 'word-break':'wb', 'word-spacing':'wos', 'white-space':'ws', 'white-space-collapse':'wsc', 'word-wrap':'ww', 'widows':'wo', 'zoom':'z', 'z-index':'zi' }
+/*
+bcp
+border-collapse
+background-clip
+*/
+
+var createShortcuts =function(){
+	aValues = getValues()
+	eShortCuts.innerHTML = ''
+	if( aValues.length ){
+		var oValues = getValuesCharWeight( aValues )
+		var eFragment = document.createDocumentFragment()
+		var oValuesSC = {}
+		for(var i=0, ni=aValues.length; i<ni; i++ ){
+			var sValue = aValues[i]
+			var ShortCuts = oValuesSC[ sValue ] = (function(){
+				var a=[]
+				var oShortCutsAttr = {}
+				a.add =function( sShortCut, sColor ){
+					if( oShortCutsAttr[ sShortCut ]) return false
+					oShortCutsAttr[ sShortCut ] = sColor
+					if( _searchValue( sShortCut, aValues )==sValue )
+						a.push( sShortCut )
+					}
+				a.get =function(){
+					for(var i=0, ni=this.length; i<ni; i++ ){
+						var sSC = this[i]
+						if( oShortCutsAttr[sSC]!='red' ) return sSC
+						}
+					return null
+					}
+				a.toString =function(){
+					var a = []
+					for(var i=0, ni=this.length; i<ni; i++ ){
+						var sSC = this[i]
+						a.push( '<b class="'+ oShortCutsAttr[sSC] +( oManualShortCuts[sValue]==sSC && oShortCutsAttr[sSC]!='notfound' ? ' used' : '' )+'">'+ this[i] +'</b>' )
+						}
+					return a.join(', ')
+					}
+				return a
+				})()
+			var aSpecialChars = getSpecialChars( sValue )
+			var sFirstChar = sValue.charAt(0)
+			var aSecondGroup = []
+			
+			var aFirstGroup = getValuesWithFirstChar( sFirstChar, aValues )
+			aFirstGroup.remove( sValue )
+			
+			if( ! aFirstGroup.length ){ // Cas il y a qu'une seule valeur commencant par la lettre
+				ShortCuts.add( sFirstChar, 'green' )
+				}
+			else if( isWeightest( sValue, aFirstGroup, oValues )){ // Cas la valeur est la valeur ayant le plus de poids
+				ShortCuts.add( sFirstChar, 'green' )
+				}
+				
+			if( aSpecialChars.length ){
+				// Supprime du premier groupe les valeurs sans la suite de caractères spéciaux de la valeur
+				FirstGroup:
+				for(var k=0; k<aFirstGroup.length; k++ ){
+					var nIndex = 0
+					for(var j=0, nj=aSpecialChars.length; j<nj; j++ ){
+						if( aSpecialChars[j]){
+							nIndex = specialCharIn( aFirstGroup[k], aSpecialChars[j], nIndex ) + 1
+							if( ! nIndex ){
+								aSecondGroup.push( aFirstGroup[k])
+								aFirstGroup = aFirstGroup.slice(0,k).concat( aFirstGroup.slice(k+1))
+								k--
+								continue FirstGroup;
+								}
+							}
+						}
+					}
+				
+				if( aFirstGroup.length==0 ){ // Cas la valeur avec ses caractères spéciaux et la seule existante
+					ShortCuts.add( sFirstChar + aSpecialChars.join(''), 'green' )
+					}
+				else if( isWeightest( sValue, aFirstGroup, oValues )){ // Cas la valeur est la valeur ayant le plus de poids
+					ShortCuts.add( sFirstChar + aSpecialChars.join(''), 'green' )
+					}
+				}
+				
+			if( aFirstGroup.length ){
+				// Enumère tous les caractères uniquement dans la valeur
+				var aCharsOnlyInValue = getCharOnlyInValue( sValue, aFirstGroup )
+				// Ajoute les raccourcies depuis cette liste
+				if( aCharsOnlyInValue.length ){
+					for(var j=0, nj=aCharsOnlyInValue.length; j<nj; j++ ){
+						var sChar = aCharsOnlyInValue[j]
+						var aClone = aSpecialChars.concat([])
+						aClone[ sValue.indexOf( sChar )] = sChar
+						ShortCuts.add( sFirstChar + aClone.join(''), 'orange' )
+						}
+					}
+				}
+
+			// Supprime toutes les valeurs ayant des poids inférieure (ATTENTION caractères spéciaux ayant plus de poids)
+			if( aFirstGroup.length ){
+				for(var k=0; k<aFirstGroup.length; k++ ){
+					if( isWeightest( sValue, [ aFirstGroup[k]], oValues )){
+						aSecondGroup.push( aFirstGroup[k])
+						aFirstGroup = aFirstGroup.slice(0,k).concat( aFirstGroup.slice(k+1))
+						k--
+						}
+					}
+				// Enumère les caractères spéciaux des valeurs de poids inférieures
+				var aExcludedChars = []
+				for(var k=0, nk=aSecondGroup.length; k<nk; k++ ){
+					aExcludedChars = aExcludedChars.concat( getSpecialChars( aSecondGroup[k]))
+					}
+				aExcludedChars = Array.unique( aExcludedChars )
+					
+				// Enumère tous les caractères uniquement dans la valeur
+				var aCharsOnlyInValue = getCharOnlyInValue( sValue, aFirstGroup )
+				// Ajoute les raccourcies depuis cette liste en faisant attention que les lettres ne fassent pas partie des lettres excluses
+				if( aCharsOnlyInValue.length ){
+					for(var j=0, nj=aCharsOnlyInValue.length; j<nj; j++ ){
+						var sChar = aCharsOnlyInValue[j]
+						var aClone = aSpecialChars.concat([])
+						aClone[ sValue.indexOf( sChar )] = sChar
+						if( ! aExcludedChars.have( sChar ))
+							ShortCuts.add( sFirstChar + aClone.join(''), 'darkorange' )
+						else ShortCuts.add( sFirstChar + aClone.join(''), 'red' )
+						}
+					}
+				}
+			// recherche de choix alternatifs
+			if( aSpecialChars.length ){
+				var aWords = sValue.split('-')
+				var sSpecialShortCut = ''
+				for(var j=0, nj=aWords.length; j<nj; j++ ){
+					var sWord = aWords[j]
+					aWords[j] = [ oManualShortCuts[sWord], oValuesSC[sWord] && oValuesSC[sWord].get(), sWord.charAt(0) ]
+					var sTMP = oManualShortCuts[sWord] || ( oValuesSC[sWord] ? oValuesSC[sWord].get() : sWord.charAt(0))
+					if( sTMP ) sSpecialShortCut += sTMP
+					else{
+						sSpecialShortCut = false
+						break;
+						}
+					}
+				var aChoices = []
+				for(var j=0, nj=aWords.length; j<nj; j++ ){ // nombre de mot de l'expression
+					if( ! aChoices.length ){
+						for(var k=0, nk=aWords[j].length; k<nk; k++ ){ // nombre de choix du mot
+							if( aWords[j][k]) aChoices.push( aWords[j][k])
+							}
+						}
+					else{
+						var aTMP = []
+						for(var k=0, nk=aWords[j].length; k<nk; k++ ){ // nombre de choix du mot
+							if( aWords[j][k])
+								for(var l=0, nl=aChoices.length; l<nl; l++ ){
+									aTMP.push( aChoices[l] + aWords[j][k])
+									}
+							}
+						aChoices = aTMP
+						}
+					}
+				for(var j=0, nj=aChoices.length; j<nj; j++ ){ 
+					ShortCuts.add( aChoices[j], 'suggestion' )
+					}
+				}
+			
+			if( ! ShortCuts.length )
+				ShortCuts.add( oManualShortCuts[sValue], 'notfound' )
+			
+			var sShortCuts = ShortCuts.toString()
+		//	if( sShortCuts.indexOf('used')==-1 )
+				eFragment.appendChild(
+					Tag('TR').appendNodes(
+						Tag('TD', { innerHTML:sValue, style:{ whiteSpace:'nowrap'}}),
+						Tag('TD', { innerHTML:sShortCuts }),
+						Tag('TD', { innerHTML:oManualShortCuts[sValue] }),
+						Tag('TD', { innerHTML:aFirstGroup.join(', ') || '&nbsp;' }),
+						Tag('TD', { innerHTML:'<DIV>'+(aSecondGroup.join(', ') || '&nbsp;')+'</DIV>' })
+						)
+					)
+			}
+		
+		eShortCuts.appendChild(
+					Tag('THEAD').appendNodes(
+						Tag('TH', { innerHTML:'valeur' }),
+						Tag('TH', { innerHTML:'propositions' }),
+						Tag('TH', { innerHTML:'utilisées' }),
+						Tag('TH', { innerHTML:'conflit restant' }),
+						Tag('TH', { innerHTML:'"poids inférieure"' })
+						)
+					)
+		eShortCuts.appendChild( eFragment )
+		}
+	}
+
+eBtn.onclick = createShortcuts
+</script>
+</body>
+</html>

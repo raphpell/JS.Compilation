@@ -1,0 +1,653 @@
+<html>
+	<head>
+		<title>Validation de l'alphabet</title>
+		<link rel="stylesheet" type="text/css" href="css/sets.css">
+		<link rel="stylesheet" type="text/css" href="widget/Toc/styles.css">
+		<style>
+			TABLE { width:100%; }
+			IMG { margin: 0 0.5em; }
+			TABLE TD,
+			TABLE TH { padding:0.5em; border: 1px solid #CCC; }
+			.notation TH { padding:0; border: 0px solid #CCC; }
+			#eAlgo DT {
+				cursor: hand; cursor: pointer;
+				}
+			DD {
+				overflow: hidden;
+				transition: 1s ease;
+				}
+			DD.hidden {
+				height: 0px;
+				opacity: 0;
+				}
+			DD.showed {
+				height: auto;
+				opacity: 1;
+				}
+		</style>
+	</head>
+	<body>
+<dl class="menu">
+	<dt><a href="index.htm">Index</a></dt>
+	<dt><h3>Sommaire</h3></dt>
+	<dt><a href="#toc1">Préambule</a></dt>
+	<dt><a href="#toc2">Symboles mathématiques</a></dt>
+	<dt><a href="#toc3">Réduction de NCC</a></dt>
+	<dt><a href="#toc4">NCC vs CC</a></dt>
+	<dt><a href="#toc5">NCC vs Atoms</a></dt>
+	<dt><a href="#toc6">CC</a></dt>
+	<dt><a href="#toc7">CC vs Atoms</a></dt>
+	<dt><a href="#toc8">Le symbole ANY</a></dt>
+	<dt><a href="#toc9">Conclusion</a></dt>
+</dl>
+<p id="back-top"><a href="#"><span></span>Haut de page</a></p>
+
+
+<h1>Validation de l'alphabet.</h1>
+
+
+<a name="toc1"></a>
+<h2>Préambule</h2>
+<p>Un alphabet &sum; est un ensemble de symbole. Il est composé :</p>
+<ul>
+	<li>d'atome &isin; A , A = { a, \n, \t, +, ... } </li>
+	<li>d'ensemble de caractères &isin; CC , CC = { [a-z], \w, \d, ... }</li>
+	<li>d'ensemble négatif de caractère &isin; NCC , NCC = { [^a-z], \W, \D, ... }  ce sont des ensembles infinis.</li>
+	<li>du symbole ANY : n'importe quel caractère.</li>
+</ul>
+
+<p>
+	Pour rendre déterministe un automate, 
+	il est nécessaire qu'un caractère soit présent que dans un et un seul symbole de l'alphabet : 
+	<b>les symboles doivent être distinct</b>. <br>
+	Cette opération s'appelle la validation de l'alphabet (il faut bien que je lui donne un nom!).
+</p>
+<p>Lorsqu'un symbole est remplacé par plusieurs autres :</p>
+<ol>
+	<li>On crée des transitions avec les nouveaux symboles et depuis les transitions de l'ancien symbole.</li>
+	<li>On efface l'ancien symbole ainsi que ses transitions.</li>
+</ol>
+
+
+<a name="toc2"></a>
+<h2>Symboles mathématiques utilisés</h2>
+<table class="notation">
+	<tr>
+		<th> A &cap; B = &empty;  </th>
+		<th> A &cap; B &ne; &empty;  </th>
+	</tr>
+	<tr>
+		<th>
+		<table>
+			<tr>
+				<td><div class="sets1 A" title="A"></div> A </td>
+				<td><div class="sets1 B" title="B"></div> B </td>
+			</tr>
+			<tr><th colspan="2">Négation</th></tr>
+			<tr>
+				<td><div class="sets1 NotA" title="&not;A"></div> &not;A </td>
+				<td><div class="sets1 NotB" title="&not;B"></div> &not;B </td>
+			</tr>
+			<tr><th colspan="2">Intersection</th></tr>
+			<tr>
+				<td><div class="sets1 IntersectionAB" title="A&cap;B"></div> A&cap;B </td>
+				<td><div class="sets1 NotIntersectionAB" title="&not;(A&cap;B)"></div> &not;(A&cap;B) </td>
+			</tr>
+			<tr><th colspan="2">Union</th></tr>
+			<tr>
+				<td><div class="sets1 UnionAB" title="A&cup;B"></div> A&cup;B </td>
+				<td><div class="sets1 NotUnionAB" title="&not;(A&cup;B)"></div> &not;(A&cup;B) </td>
+			</tr>
+			<tr><th colspan="2">Différence</th></tr>
+			<tr>
+				<td><div class="sets1 DifferenceAB" title="A&ndash;B"></div> A&ndash;B </td>
+				<td><div class="sets1 DifferenceBA" title="B&ndash;A"></div> B&ndash;A </td>
+			</tr>
+			<tr>
+				<td colspan="2"><div class="sets1 DifferenceSymetriqueAB" title="A&Delta;B"></div> A&Delta;B </td>
+			</tr>
+		</table>
+		</th>
+		<th>
+		<table>
+			<tr>
+				<td><div class="sets2 A" title="A"></div> A </td>
+				<td><div class="sets2 B" title="B"></div> B </td>
+			</tr>
+			<tr><th colspan="2">Négation</th></tr>
+			<tr>
+				<td><div class="sets2 NotA" title="&not;A"></div> &not;A </td>
+				<td><div class="sets2 NotB" title="&not;B"></div> &not;B </td>
+			</tr>
+			<tr><th colspan="2">Intersection</th></tr>
+			<tr>
+				<td><div class="sets2 IntersectionAB" title="A&cap;B"></div> A&cap;B </td>
+				<td><div class="sets2 NotIntersectionAB" title="&not;(A&cap;B)"></div> &not;(A&cap;B) </td>
+			</tr>
+			<tr><th colspan="2">Union</th></tr>
+			<tr>
+				<td><div class="sets2 UnionAB" title="A&cup;B"></div> A&cup;B </td>
+				<td><div class="sets2 NotUnionAB" title="&not;(A&cup;B)"></div> &not;(A&cup;B) </td>
+			</tr>
+			<tr><th colspan="2">Différence</th></tr>
+			<tr>
+				<td><div class="sets2 DifferenceAB" title="A&ndash;B"></div> A&ndash;B </td>
+				<td><div class="sets2 DifferenceBA" title="B&ndash;A"></div> B&ndash;A </td>
+			</tr>
+			<tr>
+				<td colspan="2"><div class="sets2 DifferenceSymetriqueAB" title="A&Delta;B"></div> A&Delta;B </td>
+			</tr>
+		</table>
+		</th>
+	</tr>
+	<tr>
+		<td colspan="2">
+			<ul>
+				<li>&exist; : il existe</li>
+				<li>&exist;! : il existe un et un seul</li>
+				<li>&isin; : appartient à</li>
+				<li>&notin; : n'appartient pas à</li>
+				<li>&forall; : quelque soit</li>
+				<li>&empty; : ensemble vide</li>
+				<li>&ne; : différent de</li>
+				<li>= : égale à</li>
+				<li>|NCC| : nombre d'élément dans l'ensemble NCC.</li>
+			</ul>
+			</dl>
+		</td>
+	</tr>
+</table>
+<p>
+	Si il n'y a qu'un ensemble négatif de caractère, on peut passer l'étape suivante. 
+	Cependant, il faut ajouter son opposé dans les ensembles de caractères (Au cas où le symbole ANY est utilisé).
+</p>
+
+
+<a name="toc3"></a>
+<h2>Réduction de NCC</h2>
+<p>L'ensemble <abbr title="NegatedCharClasses">NCC</abbr> contient les ensembles de caractère négatif.</p>
+<p>
+	Ces ensembles doivent être distinct: il n'en restera plus qu'un (|NCC|=1). <br>
+	Il restera à le réduire vis à vis des autres éléments de l'alphabet.
+</p>
+<table>
+	<tr>
+		<th colspan="2">
+			&forall; G1, G2 &isin; NCC, G1 &ne; G2
+		</th>
+	</tr>
+	<tr>
+		<th>
+			si &not; G1 &cap; &not; G2 = &empty; alors <br>
+			<div class="sets1 A"></div>
+			<div class="sets1 B"></div>
+			<br>
+			
+			G1 &hArr; G<sub>inter</sub> &cup; &not; G2<br>
+			<div class="sets1 NotA"></div>
+			<div class="sets1 NotUnionAB"></div>
+			<div class="sets1 B"></div>
+			<br>
+			
+			G2 &hArr; G<sub>inter</sub> &cup; &not; G1<br>
+			<div class="sets1 NotB"></div>
+			<div class="sets1 NotUnionAB"></div>
+			<div class="sets1 A"></div>
+			<br>
+				
+			avec G<sub>inter</sub> = G1 &cap; G2 <br>
+			<div class="sets1 NotUnionAB"></div>
+			<div class="sets1 NotA"></div>
+			<div class="sets1 NotB"></div>
+		</th>
+		<th>
+			si &not; G1 &cap; &not; G2 &ne; &empty; alors <br>
+			<div class="sets2 A"></div>
+			<div class="sets2 B"></div>
+			<br>
+			
+			G1 &hArr; G<sub>inter</sub> &cup; ( &not; G2 &ndash; &not; G1 )<br>
+			<div class="sets2 NotA"></div>
+			<div class="sets2 NotUnionAB"></div>
+			<div class="sets2 DifferenceBA"></div>
+			<br>
+			
+			G2 &hArr; G<sub>inter</sub> &cup; ( &not; G1 &ndash; &not; G2 )<br>
+			<div class="sets2 NotB"></div>
+			<div class="sets2 NotUnionAB"></div>
+			<div class="sets2 DifferenceAB"></div>
+			<br>
+			
+			avec G<sub>inter</sub> = G1 &cap; G2 <br>
+			<div class="sets2 NotUnionAB"></div>
+			<div class="sets2 NotA"></div>
+			<div class="sets2 NotB"></div>
+		</th>
+	</tr>
+	<tr>
+		<td>
+			Si G1=[^a-z] et G2=[^A-Z]
+			<dl>
+				<dt>[a-z] &cap; [A-Z] = &empty;  </dt>
+				<dd>[^a-z] &rArr; G<sub>inter</sub> &cup; [A-Z] </dd>
+				<dd>[^A-Z] &rArr; G<sub>inter</sub> &cup; [a-z] </dd>
+				<dd>avec G<sub>inter</sub> = [^a-zA-Z] </dd>
+			</dl>
+			
+			Alors on créé :
+			<ul>
+				<li>un nouvel ensemble de caractère négatif : [^a-zA-Z]</li>
+				<li>deux nouveaux ensembles de caractère : [a-z] et [A-Z]</li>
+			</ul>
+			Les transitions de G1 et G2 sont modifiées.
+			<table>
+				<tr>
+					<td>
+						<dl>
+							<dt>1 <sup>[^a-z]</sup>&rarr; 3</dt>
+							<dd>
+								1 <sup>[^a-zA-Z]</sup>&rarr; 3	<br>
+								1 <sup>[A-Z]</sup>&rarr; 3
+							</dd>
+						</dl>
+					</td>
+					<td>
+						<dl>
+							<dt>2 <sup>[^A-Z]</sup>&rarr; 4</dt>
+							<dd>
+								2 <sup>[^a-zA-Z]</sup>&rarr; 4	<br>
+								2 <sup>[a-z]</sup>&rarr; 4
+							</dd>
+						</dl>
+					</td>
+				</tr>
+			</table>
+			Les symboles G1 et G2 sont effacés.
+		</td>
+		<td>
+			Si G1=[^a-z] et G2=[^xyzAB]
+			<dl>
+				<dt>[a-z] &cap; [xyzAB] &ne; &empty;  </dt>
+				<dd>[^a-z] &rArr; G<sub>inter</sub> &cup; ( [xyzAB] &ndash; [a-z] )</dd>
+				<dd>[^xyzAB] &rArr; G<sub>inter</sub> &cup; ( [a-z] &ndash; [xyzAB] ) </dd>
+				<dd>avec G<sub>inter</sub> = [^a-zAB] </dd>
+			</dl>
+			
+			Alors on créé :
+			<ul>
+				<li>un nouvel ensemble de caractère négatif : [^a-zAB]</li>
+				<li>deux nouveaux ensembles de caractère : [AB] et [a-w]</li>
+			</ul>
+			Les transitions de G1 et G2 sont modifiées.
+			<table>
+				<tr>
+					<td>
+						<dl>
+							<dt>1 <sup>[^a-z]</sup>&rarr; 3</dt>
+							<dd>
+								1 <sup>[^a-zAB]</sup>&rarr; 3	<br>
+								1 <sup>[AB]</sup>&rarr; 3
+							</dd>
+						</dl>
+					</td>
+					<td>
+						<dl>
+							<dt>2 <sup>[^xyzAB]</sup>&rarr; 4</dt>
+							<dd>
+								2 <sup>[^a-zAB]</sup>&rarr; 4	<br>
+								2 <sup>[a-w]</sup>&rarr; 4
+							</dd>
+						</dl>
+					</td>
+				</tr>
+			</table>
+			Les symboles G1 et G2 sont effacés.
+		</td>
+	</tr>
+</table>
+
+
+<a name="toc4"></a>
+<h2>NCC vs CC</h2>
+<table>
+	<tr>
+		<th>
+			&exist;! G &isin; NCC <br>
+			&forall; Gi &isin; CC
+		</th>
+	</tr>
+	<tr>
+		<th>
+			Si G &cap; Gi &ne; &empty; <br>
+			<div class="sets2 A"></div>
+			<div class="sets2 B"></div>
+			<br>
+			
+			G = G &ndash; Gi &cup; G<sub>inter</sub> <br>
+			<div class="sets2 A"></div>
+			<div class="sets2 DifferenceAB"></div>
+			<div class="sets2 IntersectionAB"></div>
+			<br>
+			
+			Gi = Gi &ndash; G &cup; G<sub>inter</sub> <br>
+			<div class="sets2 B"></div>
+			<div class="sets2 DifferenceBA"></div>
+			<div class="sets2 IntersectionAB"></div>
+			<br>
+			
+			avec G<sub>inter</sub> = G &cap; Gi<br>
+			<div class="sets2 IntersectionAB"></div>
+			<div class="sets2 A"></div>
+			<div class="sets2 B"></div>
+		</th>
+	</tr>
+	<tr>
+		<td>
+			Si G=[^a-z] et Gi=[xyz0-9]
+			<dl>
+				<dt>[^a-z] &cap; [xyz0-9] &ne; &empty; = [0-9] </dt>
+				<dd>[^a-z] &rArr; [^a-z0-9] &cup; G<sub>inter</sub> </dd>
+				<dd>[xyz0-9] &rArr; [xyz] &cup; G<sub>inter</sub> </dd>
+				<dd>avec G<sub>inter</sub> = [0-9] </dd>
+			</dl>
+			
+			Alors :
+			<ul>
+				<li>on divise l'ensemble de caractère en deux : [xyz] et [0-9]</li>
+				<li>on remplace l'unique ensemble de caractère négatif par [^a-z0-9] </li>
+			</ul>
+			
+			Les transitions de G et Gi sont modifiées.
+			<table>
+				<tr>
+					<td>
+						<dl>
+							<dt>1 <sup>[^a-z]</sup>&rarr; 3</dt>
+							<dd>
+								1 <sup>[^a-z0-9]</sup>&rarr; 3	<br>
+								1 <sup>[0-9]</sup>&rarr; 3
+							</dd>
+						</dl>
+					</td>
+					<td>
+						<dl>
+							<dt>2 <sup>[xyz0-9]</sup>&rarr; 4</dt>
+							<dd>
+								2 <sup>[xyz]</sup>&rarr; 4	<br>
+								2 <sup>[0-9]</sup>&rarr; 4
+							</dd>
+						</dl>
+					</td>
+				</tr>
+			</table>
+			Les symboles G et Gi sont effacés.
+		</td>
+	</tr>
+</table>
+
+
+<a name="toc5"></a>
+<h2>NCC vs Atoms</h2>
+<p>L'ensemble négatif de caractère sera considéré sous sa forme finale après cette étape.</p>
+<table>
+	<tr>
+		<th>
+			&exist;! G &isin; NCC <br>
+			&forall; a &isin; A
+		</th>
+	</tr>
+	<tr>
+		<th>
+			Si a &isin; G <br>
+			G = G &ndash; {a} &cup; {a} <br>
+			<div class="sets2 A"></div>
+			<div class="sets2 DifferenceAB"></div>
+			<div class="sets2 IntersectionAB"></div>
+			<br>
+		</th>
+	</tr>
+	<tr>
+		<td>
+			Si G=[^a-z] et a=0
+			<dl>
+				<dt>0 &isin; [^a-z]</dt>
+				<dd>[^a-z] &rArr; [^a-z0] &cup; [0] </dd>
+			</dl>
+			
+			<p>On remplace l'unique ensemble de caractère négatif par [^a-z0] </p>
+			
+			Les transitions de G sont modifiées.
+			
+			<dl>
+				<dt>1 <sup>[^a-z]</sup>&rarr; 3</dt>
+				<dd>
+					1 <sup>[^a-z0]</sup>&rarr; 3	<br>
+					1 <sup>0</sup>&rarr; 3
+				</dd>
+			</dl>
+				
+			Le symbole G est effacé.
+		</td>
+	</tr>
+</table>
+
+
+<a name="toc6"></a>
+<h2>Décomposition de CC</h2>
+<p>L'ensemble <abbr title="CharClasses">CC</abbr> contient les ensembles de caractère.</p>
+<table>
+	<tr>
+		<th>
+			&forall; G1, G2 &isin; CC, G1 &ne; G2
+		</th>
+	</tr>
+	<tr>
+		<th>
+			si G1 &cap; G2 &ne; &empty; <br>
+			<div class="sets2 A"></div>
+			<div class="sets2 B"></div>
+			<br>
+			
+			G1 &rArr; G<sub>inter</sub> &cup; ( G1 &ndash; G<sub>inter</sub> )<br>
+			<div class="sets2 A"></div>
+			<div class="sets2 IntersectionAB"></div>
+			<div class="sets2 DifferenceAB"></div>
+			<br>
+			
+			G2 &rArr; G<sub>inter</sub> &cup; ( G2 &ndash; G<sub>inter</sub> )<br>
+			<div class="sets2 B"></div>
+			<div class="sets2 IntersectionAB"></div>
+			<div class="sets2 DifferenceBA"></div>
+			<br>
+			
+			avec G<sub>inter</sub> = G1 &cap; G2   <br>
+			<div class="sets2 IntersectionAB"></div>
+			<div class="sets2 A"></div>
+			<div class="sets2 B"></div>
+		</th>
+	</tr>
+	<tr>
+		<td>
+			Si G1=[xyzAB] et G2=[A-Z]
+			<dl>
+				<dt>[xyzAB] &cap; [A-Z] &ne; &empty;  </dt>
+				<dd>[xyzAB] &rArr; G<sub>inter</sub> &cup; ( [xyzAB] &ndash; G<sub>inter</sub> )</dd>
+				<dd>[A-Z] &rArr; G<sub>inter</sub> &cup; ( [A-Z] &ndash; G<sub>inter</sub> ) </dd>
+				<dd>avec G<sub>inter</sub> = [AB] </dd>
+			</dl>
+			
+			Alors on créé trois nouveaux ensembles de caractère :
+
+			<ol>
+				<li>G<sub>inter</sub> = [AB]</li>
+				<li>( [xyzAB] &ndash; G<sub>inter</sub> ) = [xyz]</li>
+				<li>[A-Z] &ndash; G<sub>inter</sub> ) = [C-Z] </li>
+			</ol>
+			
+			Les transitions de G1 et G2 sont modifiées.
+			<table>
+				<tr>
+					<td>
+						<dl>
+							<dt>1 <sup>[xyzAB]</sup>&rarr; 3</dt>
+							<dd>
+								1 <sup>[xyz]</sup>&rarr; 3	<br>
+								1 <sup>[AB]</sup>&rarr; 3
+							</dd>
+						</dl>
+					</td>
+					<td>
+						<dl>
+							<dt>2 <sup>[A-Z]</sup>&rarr; 4</dt>
+							<dd>
+								2 <sup>[C-Z]</sup>&rarr; 4	<br>
+								2 <sup>[AB]</sup>&rarr; 4
+							</dd>
+						</dl>
+					</td>
+				</tr>
+			</table>
+			Les symboles G1 et G2 sont effacés, car G1 &nsub; G2 et G2 &nsub; G1.
+		</td>
+	</tr>
+	<tr>
+		<td>
+			Si G1=[xyzA-Z] et G2=[A-Z]
+			<dl>
+				<dt>[xyzA-Z] &cap; [A-Z] &ne; &empty;  </dt>
+				<dd>[xyzA-Z] &rArr; G<sub>inter</sub> &cup; ( [xyzA-Z] &ndash; G<sub>inter</sub> )</dd>
+				<dd>[A-Z] &rArr; G<sub>inter</sub> &cup; ( [A-Z] &ndash; G<sub>inter</sub> ) </dd>
+				<dd>avec G<sub>inter</sub> = [A-Z] </dd>
+			</dl>
+			
+			Alors on créé deux nouveaux ensembles de caractère car G2 &sub; G1
+
+			<ol>
+				<li>G<sub>inter</sub> = [A-Z]</li>
+				<li>( [xyzA-Z] &ndash; G<sub>inter</sub> ) = [xyz]</li>
+				<li><strike>[A-Z] &ndash; G<sub>inter</sub> ) = &empty; </strike></li>
+			</ol>
+			
+			Les transitions de G1 et G2 sont modifiées.
+			<table>
+				<tr>
+					<td>
+						<dl>
+							<dt>1 <sup>[xyzA-Z]</sup>&rarr; 3</dt>
+							<dd>
+								1 <sup>[xyz]</sup>&rarr; 3	<br>
+								1 <sup>[A-Z]</sup>&rarr; 3
+							</dd>
+						</dl>
+					</td>
+					<td>
+						<dl>
+							<dt><strike>2 <sup>[A-Z]</sup>&rarr; 4 </strike></dt>
+							<dd>
+								<strike>2 <sup>[A-Z]</sup>&rarr; 4 </strike> <br>
+								<strike>2 <sup>&empty;</sup>&rarr; 4 </strike>
+							</dd>
+						</dl>
+					</td>
+				</tr>
+			</table>
+			Le symbole G1 est effacé car G1 &nsub; G2. <br>
+			Le symbole G2 est conservé car G2 &sub; G1.
+		</td>
+	</tr>
+</table>
+
+
+<a name="toc7"></a>
+<h2>CC vs Atoms</h2>
+<table>
+	<tr>
+		<th>
+			&forall; Gi &isin; CC, a &isin; A
+		</th>
+	</tr>
+	<tr>
+		<th>
+			si a &isin; Gi alors on modifie Gi <br>
+			Gi &rArr; ( Gi &ndash; {a} ) &cup; {a}<br>
+			<div class="sets2 A"></div>
+			<div class="sets2 DifferenceAB"></div>
+			<div class="sets2 IntersectionAB"></div>
+		</th>
+	</tr>
+	<tr>
+		<td>
+			Si Gi=[xyzA] et a=A
+			<dl>
+				<dt>A &isin; [xyzA] </dt>
+				<dd>[xyzA] &rArr; [xyz] &cup; [A]</dd>
+			</dl>
+			
+			Les transitions de Gi sont modifiées.
+			<table>
+				<tr>
+					<td>
+						<dl>
+							<dt>1 <sup>[xyzA]</sup>&rarr; 3</dt>
+							<dd>
+								1 <sup>[xyz]</sup>&rarr; 3	<br>
+								1 <sup>A</sup>&rarr; 3
+							</dd>
+						</dl>
+					</td>
+				</tr>
+			</table>
+			Le symbole Gi est effacé.
+		</td>
+	</tr>
+</table>
+
+
+<a name="toc8"></a>
+<h2>Le symbole ANY</h2>
+<p>
+	Le symbole ANY, représentant n'importe quel caractère, sera définitivement supprimé.<br>
+	Ses transitions seront multipliées au minimum par deux...
+</p>
+<table>
+	<tr><td>
+		Si l'alphabet  &sum; = {&epsilon;,ANY} ou {ANY}.<br>
+		Le symbole ANY est remplacé par <code>[^a]</code> et <code>a</code> (au hasard!).
+	</td></tr>
+	<tr><td>
+		Sinon le symbole ANY est remplacé par tous les autres symboles de l'alphabet &sum;. C'est à dire :
+		<ul>
+			<li>l'ensemble des atomes, </li>
+			<li>des ensembles de caractère, </li>
+			<li>
+				et l'ensemble de caractère négatif.<br>
+				(Si il n'existe pas, il est créé depuis les atomes et les ensembles de caractères)
+			</li>
+		</ul>
+	</td></td>
+</table>
+
+
+<a name="toc9"></a>
+<h2>Conclusion</h2>
+<p> Au final on a :</p>
+<ol>
+	<li>&exist;! G &isin; NCC <br>
+		Il n'existe plus qu'un ensemble négatif de caractère (|NCC|=1).</li>
+	<li>&forall;G &isin; NCC , &forall;G1 &isin; CC , G &cap; G1 = &empty; <br>
+		Il n'y a plus d'intersection entre l'ensemble de caractère négatif et les ensembles de caractères.</li>
+	<li>&forall;G &isin; NCC , &forall;a &isin; A , a &notin; G <br>
+		Il n'y a plus d'intersection entre l'ensemble de caractère négatif et les atomes.</li>
+	<li>&forall;G &isin; CC , &forall;a &isin; A , a &notin; G <br>
+		Il n'y a plus d'intersection entre les ensembles de caractères et les atomes.</li>
+	<li>&forall;G1 &isin; CC , &forall;G2 &isin; CC , si G1 &ne; G2 alors G1 &cap; G2 = &empty;  <br>
+		Il n'y a plus d'intersection entre les ensembles de caractères.</li>
+	<li>Le symbole ANY n'est plus utilisé.</li>
+</ol>
+
+
+	
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
+<script type="text/javascript" src="widget/Toc/jquery.js"></script>
+</body>
+</html>

@@ -1,0 +1,29 @@
+﻿<html><head></head><body><pre>
+¤ white_spaces, comments&strings
+
+!@	GRAMMAR	=	{whitespaces}|S_PRODUCTION|S_SLC|S_MLC|SYMBOL
+
+	SYMBOL	=	[^\r\n\f \t]+
+		( css:symbol )
+	PIPE	=	\|
+		( css:alternation )
+
+!@	PRODUCTION			=	{hspaces}|S_RHS
+		( css:production )
+	S_PRODUCTION	=	\w+
+		( css:lhs,		translation:LHS )
+	E_PRODUCTION	=	\r\n|[\r\n\f]
+		( css:linefeed, translation:NEW_LINE )
+
+!@	RHS			=	{hspaces}|PIPE|EPSILON|E_RHS|SYMBOL
+		( css:rhs )
+	S_RHS		=	->|→
+		( css:rarrow,	translation:RARROW )
+	E_RHS		=	\r\n|[\r\n\f]
+		( css:linefeed,	translation:NEW_LINE )
+	EPSILON		=	epsilon|ε
+		( css:epsilon,	translation:SYMBOL_EPSILON )
+
+whitespaces	=	{hspaces}|L_NEW_LINE
+hspaces		=	TAB|SPACES
+</pre></body></html>

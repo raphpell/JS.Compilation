@@ -1,0 +1,21 @@
+.benchmark {
+	float: left;
+	width: 100%;
+	}
+.benchmark H3 {}
+
+.stats  {
+	float: left;
+	width: 100%;
+	}
+.stats DIV {
+	background: #DDD;
+	border: 1px solid #000;
+	float: left;
+	margin: 1px;
+	padding: 0.25em 0.5em 0;
+	transition: 250ms ease;
+	}
+.stats DIV.highlight {
+	background: #FC0;
+	}

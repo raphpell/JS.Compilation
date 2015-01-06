@@ -1,0 +1,560 @@
+<html>
+<head>
+	<title>Création de module Lexer</title>
+	<link rel="stylesheet" type="text/css" href="css/styles.css">
+	<link rel="stylesheet" type="text/css" href="widget/ProgressBar/css/styles.css">
+	<script src="widget/ProgressBar/js/scripts.js"></script>
+	<style>
+		.result {
+			background: #FFF;
+			color: #111;
+			font-size:.8em;
+			}
+		#eProgressBar {
+			width: 95%;
+			margin: 0.5em 0;
+			}
+		#eSource {
+			height: 100px;
+			}
+		INPUT[type=button],
+		#eBtnScan {
+			padding: 0.25em;
+			width: 25%;
+			}
+		#eIFRAME,
+		#eExport {
+			height: 500px;
+			width: 100%;
+			}
+		.annotation {
+			padding: 0 0 0 3em;
+			}
+		TABLE,
+		TEXTAREA {
+			width: 100%;
+			}
+		H2 {
+			background: lightskyblue;
+			margin:0;
+			padding:0.25em;
+			}
+		.previewLink {
+			cursor: hand; cursor: pointer;
+			text-decoration: underline;
+			}
+		.previewLink:hover {
+			background: yellow;
+			}
+	</style>
+</head>
+<body>
+<a href="index.htm">Index</a>
+
+<h1>Création de module Lexer</h1>
+
+<label for="eSourceFiles">Exemple: </label><select id="eSourceFiles"></select> <a href="#" onclick="wizSyntax()">syntaxe WIZ</a>
+<iframe id="eTextPlain" name="_source" src="" style="display:none;"></iframe><br>
+<label for="eSource">Source: </label><br>
+<table>
+	<tr><td style="width:100%;" valign="top">
+<textarea id="eSource" spellcheck="false" wrap="off"></textarea>
+<br><input type="checkbox" id="eScanResult"><label for="eScanResult">Analyse syntaxique.</label>
+	</td><td>
+<pre id="eTest"></pre>
+	</td></tr>
+</table>
+
+<hr style="clear:both;">
+
+<div style="margin:0.5em 0; padding:0;">
+	<input type="button" value="Lancer" id="eBtnScan">
+	<input type="checkbox" checked id="eSteps"><label for="eSteps">&Eacute;tape/&Eacute;tape.</label>
+	<input type="button" id="eNext" value="&Eacute;tape suivante" disabled>
+	<br>
+	<div id="eProgressBar"></div>
+	<iframe id="eIFRAME" name="_calcul" src="" style="display:none;"></iframe>
+</div>
+
+<hr>
+
+<input type="checkbox" checked id="eDisplayOk"><label for="eDisplayOk">ok.</label>
+<input type="checkbox" id="eDisplaySource"><label for="eDisplaySource">Source.</label>
+<input type="checkbox" checked id="eDisplayResult"><label for="eDisplayResult">Expressions régulières.</label>
+<input type="checkbox" id="eDisplayAnnotation"><label for="eDisplayAnnotation">Annotations.</label>
+<input type="checkbox" checked id="eParentTokens"><label for="eParentTokens">Parent tokens.</label>
+<input type="checkbox" checked id="eTokens"><label for="eTokens">Tokens.</label>
+<input type="checkbox" checked id="eMacros"><label for="eMacros">Macros.</label>
+<pre id="eResult"></pre>
+
+<hr>
+
+<label for="eExport">Résultat: </label>
+<textarea id="eExport" spellcheck="false"></textarea>
+
+<script src="js/shared.js"></script>
+<script src="js/framework.js"></script>
+
+<script><!-- LexerNode -->
+var LexerNode =(function(){
+	var setValue =function( sValue ){
+		this.oValue.value = sValue
+		this.innerHTML = sValue.str_replace( ['&','<','>'], ['&amp;','&lt;','&gt;'])
+		this.title = this.oValue.token
+		return sValue
+		}
+	return function( o ){
+		var e = document.createElement( o.token )
+		e.oValue = o
+		if( o.css.trim()) e.className = o.css
+		e.setValue = setValue
+		e.setValue( o.token=='S_WIZ_VALUE'?'':o.value )
+		return e
+		}
+	})()
+</script>
+<script src="js/lexer.automaton.js"></script>
+<script src="js/lexer.automaton.modules.js"></script>
+<script src="js/parserLR.js"></script>
+<link rel="stylesheet" type="text/css" href="src/wiz/styles.css">
+<script src="src/wiz/lexer.js"></script>
+<script src="src/wiz/parser.js"></script>
+
+<script><!-- Calcul -->
+var oDefinition ={}
+var aAutomates =[]
+var oAutomates ={}
+var oItems = {}
+var oOK={}
+var oKO={}
+
+var oWindowIFRAME, oWindow
+
+throwError =function( s ){
+	alert( s )
+	throw new Error ( s )
+	}
+	
+Calcul =(function(){
+	var aUrl =[
+		'110_Automates.htm',
+		'120_DFA.aggregation.htm'
+		]
+	var waitFor =function( sWinFunction, oOwner, sFunctionName ){
+		if( oWindowIFRAME && ! oWindowIFRAME[sWinFunction] ){
+			clearTimeout( nTimeout )
+			nTimeout = setTimeout( CallBack( oOwner, sFunctionName ), 200 )
+			return true
+			}
+		return false
+		}
+
+	var iframe = document.getElementById( "eIFRAME" )
+	oWindowIFRAME = iframe.contentWindow
+
+	var nToken
+	var nTokenChild
+	var oDef
+	var nTimeout 
+
+	return {
+		bByStep : false,
+		fNext :null,
+		next :function(){
+			var f = this.fNext
+			this.fNext = null
+			if( f ) f()
+			},
+		addNextCalcul :function( f ){
+			this.fNext = f
+			if( ! this.bByStep ) setTimeout( f, 100 )
+			},
+		initialize :function( oDefinition ){
+			oDef = oDefinition
+			nToken = 0
+			iframe.src = aUrl[0] +'?calcul=true'
+			this.nextToken()
+			eNext.disabled = ! ( Calcul.bByStep = eSteps.checked )
+			},
+		nextToken :function(){
+			if( waitFor( 'calcul', this, 'nextToken' )) return ;
+			var item = oDef.tokens[ nToken ]
+			nToken++
+			if( item ){
+				try{
+					this.addNextCalcul(function(){
+						iframe.style.display = eSteps.checked ? '' : 'none'
+						oWindowIFRAME.calcul( item )
+						})
+					}catch(e){ alert( 'Token = '+ item[0] +'\n'+ e.message )}
+				}
+			else{ // Conserve l'affichage du dernier Token (cas Step/Step)
+				this.addNextCalcul( CallBack( this, function(){
+					iframe.style.display = 'none'
+					iframe.src = aUrl[1]+'?calcul=true'
+					oWindowIFRAME = iframe.contentWindow
+					nToken = 0
+					this.nextParentToken()
+					}))
+				}
+			},
+		nextParentToken :function(){
+			if( waitFor( 'calculAggregation', this, 'nextParentToken' )) return ;
+			var item = oDef.parents[ nToken ]
+			if( item ){
+				try{
+					nTokenChild = 0
+					oWindowIFRAME.init()
+					this.nextAggregation()
+					}catch(e){ alert( 'ParentToken = '+ item[0] +'\n'+ e.message )}
+				}
+			else{
+				this.exportAutomates()
+				}
+			},
+		nextAggregation :function(){
+			var item = oDef.parents[ nToken ]
+			, sChildToken = item[1][nTokenChild]
+			nTokenChild++
+			if( sChildToken ){
+				var oAutomata = oAutomates[ sChildToken ]
+				if( ! oAutomata ) throwError( sChildToken +' is undefined.' )
+				try{
+					var f=function(){
+						iframe.style.display = eSteps.checked ? '' : 'none'
+						oWindowIFRAME.calculAggregation( item, oAutomata )
+						}
+					if( nTokenChild==1 ) f()
+					else this.addNextCalcul( f )
+					}catch(e){ alert( 'Token = '+ item[0] +'\n'+ e.message )}
+				}
+			else{
+				this.addNextCalcul( CallBack( this, function(){
+					nToken++
+					this.nextParentToken()
+					}))
+				}
+			},
+		add :function( item, oDFA, sResult, sFunctionName ){
+			aAutomates.push( item[0])
+			oAutomates[item[0]] ={
+				type: 'DFA',
+				token: item[0],
+				re: item[1],
+				oFA: oDFA,
+				automate: sResult
+				}
+			this.onadd()
+			this[ sFunctionName ]()
+			},
+		onadd :function(){
+			oProgressBar.add(1)
+			},
+		exportAutomates :function(){
+			aAutomates = Array.unique( aAutomates )
+			var aResult = []
+			var exportAutomaton =function( sGroupName ){
+				var a = oDefinition[ sGroupName ]
+				if( a.length )
+					for(var i=0, ni=a.length; i<ni; i++ )
+						if( a[i].bExport ){
+							var sToken = a[i][0]
+							aResult.push( "["+ JSON.stringify( sToken ) +","+ oAutomates[ sToken ].automate +"]" )
+							}
+				}
+
+			exportAutomaton( 'tokens' )
+			exportAutomaton( 'parents' )
+			
+			for(var i=0, aPrevious; aPrevious=oDefinition.previousTokensOf[i]; i++ ){
+				oDefinition.previousTokensOf[i] = "o.setPreviousTokenOf("+ JSON.stringify( aPrevious[0]) +","+ JSON.stringify( aPrevious[1]) +")"
+				}
+			
+			eExport.value = "AutomatonLexer.insert(function(o,f,g,h){"
+				+( aResult.length ? "\no.addTokens([\n"+ aResult.join(',\n') +"\n])" : '' )
+				+( oDefinition.rules.length ? "\no.addRules("+ JSON.stringify( oDefinition.rules ) +")" : '' )
+				+( oDefinition.css.length ? "\no.addCSSClass("+ JSON.stringify( oDefinition.css ) +")" : '' )
+				+( oDefinition.previousTokensOf.length ? "\n"+ oDefinition.previousTokensOf.join('\n') : '' )
+				+( oDefinition.translations.length ? "\no.setTokensTranslation('"+ oDefinition.translations.join('&') +"')" : '' )
+				+"\n});"
+			iframe.style.display = 'none'
+			oProgressBar.add(1)
+			eNext.disabled = true
+			eBtnScan.disabled = false
+			}
+		}
+	})()
+
+function previewDFA ( evt ){
+	var e = Events.element( evt )
+	if( e.nodeName=='A' && e.className=='previewLink' ){
+		var m = oAutomates[ e.innerHTML ]
+		if( m ) previewFA( m )
+		}
+	}
+
+function scan (){
+	eIFRAME.style.display = 'none'
+	var eRoot
+	eTest.innerHTML = ''
+	oProgressBar.nTotal = 0
+	oDefinition ={
+		css:[],
+		previousTokensOf:[],
+		translations:[],
+		rules:[],
+		parents:[],
+		tokens:[],
+		macros:[]
+		}
+	var sSource = document.getElementById( 'eSource' ).value
+	if( sSource ){
+		try{
+			eRoot = AutomatonLexer( sSource, 'WIZ' )
+		//	eTest.appendChild( eRoot )
+			eTest.appendChild( ParserLR( to_array( eRoot.childNodes ), WizParserEngine.ITEMS ))
+			}catch( e ){ alert( e.message )}
+	
+		var aItems = eTest.getElementsByTagName('ITEM')
+		var aCSS_Classes = []
+		var oCSS_Classes = {}
+		
+		for(var i=0, ni=aItems.length; i<ni; i++ ){
+			var eItem = aItems[i]
+			
+		//	var eID = eItem.getElementsByTagName( ID )[0]
+			var eID = eItem.getElementsByTagName('IDENTIFIER')[0]
+			var sID = eID.oValue.value
+			
+		//	var eValue = eItem.getElementsByTagName( VALUE )[0]
+			var eValue = eItem.getElementsByTagName('RULE')[0]
+			if( ! eValue ) continue;
+			var sValue = eValue.oValue.value
+			
+			var ePreviousTokens = eItem.getElementsByTagName('PREVIOUSTOKENS')[0]
+			if( ePreviousTokens )
+				oDefinition.previousTokensOf.push([ sID, ePreviousTokens.oValue.value ])	
+				
+			var eTokenTranslation = eItem.getElementsByTagName('TRANSLATION')[0]
+			if( eTokenTranslation )
+				oDefinition.translations.push( sID +'='+ eTokenTranslation.oValue.value )
+			
+		//	var aCSS = eItem.getElementsByTagName( CLASSNAME )
+			var eCSS = eItem.getElementsByTagName('CSS')[0]
+			if( eCSS ){
+				var aCSS = eCSS.oValue.value.split('|')
+				if( aCSS.length ){
+					for(var j=0, sCSS; sCSS=aCSS[j]; j++ ){
+						if( oCSS_Classes[ sCSS ]) oCSS_Classes[ sCSS ].push( sID )
+						else{
+							aCSS_Classes.push( sCSS )
+							oCSS_Classes[ sCSS ] = [ sID ]
+							}
+						}
+					}
+				}
+			var eComp = eItem.getElementsByTagName('COMPIL')[0]
+			var sComp = eComp ? eComp.oValue.value : ''
+			
+			var aTarget = null
+			var bAggregation = sComp.indexOf('@')>-1
+			var bRule = sComp.indexOf('#')>-1
+			var bExport = sComp.indexOf('!')>-1
+			
+			
+			if( bAggregation ) aTarget = oDefinition.parents
+			if( ! bRule && ! bAggregation ){
+				var sC = sID.charAt(0)
+				if( sC==sC.toLowerCase()) aTarget = oDefinition.macros
+				if( sC==sC.toUpperCase()) aTarget = oDefinition.tokens
+				}
+			var aAdded = [ sID, sValue ]
+			if( bRule ){
+				if( bAggregation ); // oDefinition.rules.push([ sID, sID ])
+				else if( sID != sValue ) oDefinition.rules.push([ sID, sValue ])
+				}
+			aAdded.bExport = bExport
+			if( aTarget ) aTarget.push( aAdded )
+			}
+		for(var i=0, sClassName; sClassName=aCSS_Classes[i]; i++){
+			aCSS_Classes[i] = sClassName +'='+ Array.unique( oCSS_Classes[ sClassName ]).join('|')
+			}
+		oDefinition.css = aCSS_Classes.join('&')
+		
+		oItems = {}
+//		oDefinition.parents.sort()
+//		oDefinition.tokens.sort().reverse()
+//		oDefinition.macros.sort()
+		for(var i=0, item; item=oDefinition.macros[i]; i++ ) oItems[item[0]]=item[1]
+		for(var i=0, item; item=oDefinition.tokens[i]; i++ ) oItems[item[0]]=item[1]
+		for(var i=0, item; item=oDefinition.parents[i]; i++ ) oItems[item[0]]=item[1]
+		compileMacros()
+		compileParentsToken()
+		oProgressBar.setTotal( 1 + oProgressBar.nTotal + oDefinition.tokens.length + 1 )
+
+		exportRegExp()
+		oProgressBar.add(1)
+		Calcul.initialize( oDefinition )
+		}
+	}
+function compileMacros (){
+	var fFunction =function( a, bParenthesis ){
+		var re = /\{[^\d,\{\}]+\}/
+		var bChange = true
+		while( bChange ){
+			bChange = false
+			for(var i=0, ni=a.length; i<ni ; i++ ){
+				var item=a[i]
+				while( re.test( item[1]) ){
+					var sMatch
+					item[1] = item[1].replace( re, function( sMatched, nIndex ){
+						sMatch = sMatched.slice(1,-1)
+						oOK[sMatch] = oOK[sMatch] || []
+						oOK[sMatch].push( item[0])
+						return bParenthesis ? '('+oItems[sMatch]+')' : oItems[sMatch]
+						})
+					bChange = true
+					}
+				}
+			}
+		}
+	fFunction( oDefinition.macros, 1 )
+	fFunction( oDefinition.tokens, 1 )
+	fFunction( oDefinition.parents )
+	fFunction( oDefinition.previousTokensOf )
+	}
+function compileParentsToken (){
+	var nLength = 0
+	for(var i=0, item; item=oDefinition.parents[i]; i++ ){
+		var a = item[1].split('|')
+		for(var j=0, token; token=a[j]; j++ ){
+			oOK[token] = oOK[token] || []
+			oOK[token].push( item[0])
+			}
+		item[1] = a
+		nLength += a.length
+		}
+	oProgressBar.setTotal( oProgressBar.nTotal + nLength )
+	}
+function display (){
+	var displayRegExp =function( sText ){
+		return JSON.stringify( sText ).slice(1,-1).replace( /\\\\/g, '\\' )
+			.replace( /</g, '&lt;' )
+			.replace( />/g, '&gt;' )
+			.replace( /\\\"/g, '"' )
+		}
+	var bDisplayOk = eDisplayOk.checked
+	var bDisplaySource = eDisplaySource.checked
+	var bDisplayResult = eDisplayResult.checked
+	var bDisplayAnnotation = eDisplayAnnotation.checked
+	var fFunction =function( e, a, sTitle ){
+		if( e.checked && a.length ){
+			aResult.push( '<tr><th colspan="2"><h2>'+ sTitle +'</h2></th></tr>' )
+			for(var i=0, ni=a.length; i<ni; i++ ){
+				var s = a[i][0]
+				var aOk = oOK[s]||[]
+				var sKo = oKO[s]||''
+				if( ! aOk.length || bDisplayOk || sKo ){
+					aResult.push( '<tr><td style="background-color:'+ (sKo?'orange':(aOk.length?'lime':'')) +';"><b>'+ (sTitle!='Macros'?'<a class="previewLink">'+s+'</a>':s) +'</b></td>' )
+					aResult.push( '<td>' )
+					if( bDisplayResult ) aResult.push( '<b class="result">\t\t'+ displayRegExp( a[i][1]) +'</b><br>' )
+					if( bDisplaySource ) aResult.push( '<i>'+ displayRegExp( oItems[ s ]) +'</i>' )
+					aResult.push( '</td></tr>' )
+					if( bDisplayAnnotation && sKo ) aResult.push( '<tr><td colspan="2" class="annotation"><cite>' + sKo +'</cite></td></tr>' )
+					if( bDisplayAnnotation && aOk.length ) aResult.push( '<tr><td colspan="2" class="annotation"><cite>' + Array.unique( aOk ).join(' ') +'</cite></td></tr>' )
+					}
+				}
+			}
+		}
+	var aResult = ['<table cellspacing="0" cellpadding="0" border="1">']
+	fFunction( eParentTokens, oDefinition.parents, 'Parent tokens' )
+	fFunction( eTokens, oDefinition.tokens, 'Tokens' )
+	fFunction( eMacros, oDefinition.macros, 'Macros' )
+	aResult.push( '</table>' )
+	eResult.innerHTML = aResult.join('')
+	}
+function exportRegExp (){
+	var aResult = []
+	display()
+	for(var i=0, ni=oDefinition.tokens.length; i<ni; i++ ){
+		var sToken = oDefinition.tokens[i][0]
+		aResult.push( "['"+ sToken +"', /"+ oDefinition.tokens[i][1] +"/ ]" )
+		}
+	eExport.value = '// Expressions régulières\n'+ aResult.join( ',\n' ) +","
+	}
+</script>
+
+<script><!-- DHTML -->
+_( 'eIFRAME,eResult,eExport' )
+_( 'eDisplayOk,eDisplaySource,eDisplayResult,eDisplayAnnotation' )
+_( 'eParentTokens,eTokens,eMacros' )
+_( 'eBtnScan,eProgressBar,eSteps,eNext' )
+_( 'eScanResult,eTest' )
+
+var oProgressBar = new ProgressBar ( eProgressBar )
+oProgressBar.bColor = 1
+oProgressBar.bPercentage = 1
+oProgressBar.reset()
+oProgressBar.hide()
+
+eExport.value = ''
+
+eResult.onclick = previewDFA
+
+eDisplayOk.onclick = 
+eDisplaySource.onclick = 
+eDisplayResult.onclick = 
+eDisplayAnnotation.onclick = 
+eParentTokens.onclick = 
+eTokens.onclick = 
+eMacros.onclick = display
+eBtnScan.onclick = scan
+eNext.onclick = CallBack( Calcul, 'next' )
+eSteps.onclick = function(){
+	var bByStep = eSteps.checked
+	if( ! ( Calcul.bByStep = bByStep )) Calcul.next()
+	eNext.disabled = ! bByStep
+	eIFRAME.style.display = bByStep ? '' : 'none'
+	}
+eScanResult.onclick = function(){
+	eTest.style.display = eScanResult.checked ? '' : 'none'
+	}
+eScanResult.onclick()
+eSteps.onclick()
+</script>
+<script><!-- Chargement de fichier -->
+_('eTextPlain,eSourceFiles')
+Tag.addChildNodes( eSourceFiles, 'OPTION', [
+	'',
+	'module.whitespaces',
+	'module.number',
+	'module.superscript',
+	'module.strings&comments',
+	'module.css',
+	'module.html',
+	'module.ini',
+	'module.javascript',
+	'module.php',
+	'module.regexp',
+	'module.wiz',
+	'module.zenLike',
+	'module.grammar',
+	'token.REGULAR_EXPRESSION'
+	], 'regexp' )
+eSourceFiles.onchange =function(){
+	eTextPlain.src = 'modules/lexer/'+ eSourceFiles.value +".html"
+	}
+eTextPlain.onload =function(){
+	var e = eTextPlain.contentWindow.document.firstChild
+	if( e ){
+		while( e && e.nodeType!=3 ) e = e.lastChild 
+		if( e ){
+			eSource.value = e.nodeValue
+			scan()
+			}
+		}
+	}
+</script>
+
+</body>
+</html>

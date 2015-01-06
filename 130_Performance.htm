@@ -1,0 +1,99 @@
+<html>
+	<head>
+		<title>Performance du Lexer</title>
+		<style>
+UL {
+	list-style-position: inside;
+	padding: 0 1em;
+	}
+LI {
+	padding: 0 1em;
+	}
+.automatonLexer {
+	background: #DFD;
+	padding: .5em 1em;
+	}
+.regexpMultipleLexer {
+	background: #FEA;
+	margin: .5em 0;
+	padding: .5em 1em;
+	}
+.regexpOneLexer {
+	background: #FDD;
+	padding: .5em 1em;
+	}
+		</style>
+	</head>
+	<body>
+<a href="index.htm">Index</a>
+
+<h1>Performance du Lexer</h1>
+<p>La difficulté est de trouver où le temps est perdu.</p>
+
+
+<h2>Les lexers</h2>
+<p>
+	Mes Lexer sont puissant au niveau de la <a href="131_Lexer.byStep.htm">lecture des tokens</a> (<1ms). <br>
+	Voici la liste de <a href="133_Lexer.comparison.htm">mes Lexer</a> classés par préférence:
+</p>
+<ul>
+	<li class="automatonLexer"><b>Automaton Lexer</b>
+		<ul>
+			<li>Le texte est parcourue une et une seule fois et voila...</li>
+			<li>Le plus long token trouvé est toujours retourné.</li>
+			<li>Il peut aussi:
+				<ol>
+					<li>parcourir une liste d'automates.</li>
+					<li>rescanner un token trouvé.</li>
+					<li>réaliser une <a href="134_Lexer.update.htm">analyse partielle</a></li>
+				</ol>
+			</li>
+		</ul></li>
+	<li class="regexpMultipleLexer"><b>Multiple RegExp Lexer</b>
+		<ul>
+			<li>Il parcourt une liste d'ER une à une tant que tout le texte n'est pas parcouru.</li>
+			<li>Il vaut mieux quelle soit classée par ordre d'apparition courante.</li>
+			<li>Première arrivée, première servie.</li>
+			<li>Un ordre des ER est requis: mots clés avant identifiant, etc...</li>
+		</ul></li>
+	<li class="regexpOneLexer"><b>"1 RegExp" Lexer</b> <sup style="color:red;">A éviter!</sup>
+		<ul>
+			<li>Une seule grande expression régulière est créée pour parcourir le texte.</li>
+			<li>Le défaut: quand un mot est trouvé il faut déterminé son type.</li>
+			<li>Pour cela il faut parcourir toutes les expressions régulières (celles utilisées pour créer la grande).</li>
+			<li>Les expressions régulières utilisées pour créer la grande ont une organisation spéciale... (voir Multiple RegExp Lexer)</li>
+		</ul></li>
+</ul>
+<p style="margin-bottom:0;">
+	Ils réalisent tous une analyse sur <a href="132_Lexer.level.html">plusieurs niveaux</a>: un <i>arbre lexicale</i> est créé.<br>
+	Normalement:
+</p>
+<ul style="margin-top:0;">
+	<li>seule une liste de token devrait-être générée</li>
+	<li>une <a href="200_AnalyseSyntaxique.htm">analyse syntaxique</a> devrait-être faite en parallèle, depuis une <a href="210_Parser.html">grammaire</a>.</li>
+</ul>
+
+<h2>La fonction LexerNode</h2>
+<p>
+	La performance des lexer dépend surtout de la fonction '<var>LexerNode</var>' utilisée. <br>
+	Elle retourne un objet affecté avec l'attribut <var>oValue</var> (valeurs du token). <br>
+	Cet objet peut-être un nouvel élément HTML, car il doit avoir comme membres minimum (pour le Lexer):
+</p>
+<code><ul>
+	<li>parentNode</li>
+	<li>firstChild</li>
+	<li>lastChild</li>
+	<li>previousSibling</li>
+	<li>nextSibling</li>
+	<li>appendChild( oChild ) return oChild</li>
+	<li>insertBefore( oChild, oChildAfter ) return oChild</li>
+	<li>removeChild( oChild ) return oChild</li>
+</ul></code>
+<p>
+	Pour l'instant l'éditeur créé avec le Lexer Automaton est plus rapide avec...<br>
+	Mais les éléments HTML ralentissent l'analyse car se sont de gros objets.
+</p>
+
+
+	</body>
+</html>

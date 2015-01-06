@@ -1,0 +1,92 @@
+<html>
+	<head>
+		<title>La compression</title>
+	</head>
+	<body>
+<a href="index.htm">index</a>
+
+<h1>La compression</h1>
+<ol>
+		<li><a href="#1">Table de symbole A</a></li>
+		<li><a href="#2">Matrice M</a></li>
+		<li><a href="#3">Les fonctions  spéciales</a></li>
+</ol>
+
+
+<h2><a name="1"></a>Table de symbole A</h2>
+<ul>
+		<li>C'est un objet ayant pour clé les symboles et pour valeur leur index (par exemple: <code>{a:0,b:1}</code> ).
+		</li>
+		<li>On utilise <a href="#g">la fonction g</a> pour le compresser.</li>
+</ul>
+
+
+<h2><a name="2"></a>Matrice M</h2>
+<ul>
+		<li>M est initialement un tableau de tableaux.</li>
+		<li>Chaque index <code>i</code> de M est un nom détat.
+			<ul>
+				<li>0 : état Not Found.</li>
+				<li>1 : état initial.</li>
+			</ul>
+		</li>
+		<li>Chaque index <code>j</code> du tableau M[i] est un index de symbole de l'alphabet.</li>
+		<li>On accède à l'état suivant avec M[i][j] donc M[i] peut-être un objet.<br>
+			<code>{1:10}</code> est plus court que <code>[,10,,,,,,,,,,,,,]</code><br>
+			mais ici <code>[,10]</code> est encore plus court.
+		</li>
+		<li>Si un tableau M[i] est composé principalement d'une certaine valeur, on utilise <a href="#h">la fonction h</a>.<br>
+			Pour l'exemple précédant on a <code>h(15,0,1,10)</code>.
+		</li>
+</ul>
+
+
+<h2><a name="3"></a>Les fonctions spéciales</h2>
+<p>Ces fonctions servent à compresser la taille des automates, c'est pour cela que leur nom est si court !</p>
+
+<h3><a name="f"></a>La fonction  <code>f</code></h3>
+<p> Renvoie une fonction ayant comme arguments <code>symb</code> et <code>state</code>.</p>
+<ul>
+	<li>elle renvoie <code>state</code> si le <code>symb</code> &in; <code>sCharSet</code> et <code>bIn == true</code> sinon -1</li>
+	<li>elle renvoie <code>state</code> si le <code>symb</code> &notin; <code>sCharSet</code> et <code>bIn == false</code> sinon -1</li>
+</ul>
+<pre>
+var f =function( sCharSet, bIn ){
+	var cache = {}
+	for(var i=0, ni=sCharSet.length; i &lt; ni; i++ ) cache[ sCharSet[i]] = -1
+	return bIn
+		? function(symb,state){ return cache[symb] ? state : -1 }
+		: function(symb,state){ return cache[symb] || state }
+	}
+</pre>
+
+<h3><a name="g"></a>La fonction  <code>g</code></h3>
+<p> Renvoie un objet ayant comme clé les symboles et comme valeur un index.</p>
+<pre>
+var g =function( sSymb1 /*,  sSymb2, ... */ ){ 
+	var o = {}
+	for(var i=0, ni=arguments.length; i &lt; ni; i++ ) o[ arguments[i]] = i
+	return o
+	}
+</pre>
+
+<h3><a name="h"></a>La fonction  <code>h</code></h3>
+<p> Renvoie un tableau :</p>
+<ul>
+	<li>de longueur <code>nLength</code></li>
+	<li>ayant comme valeur par défaut <code>nDefaultValue</code></li>
+	<li>la valeur <code>nValue1</code> à l'index <code>nIndex1</code></li>
+	<li>...</li>
+</ul>
+<pre>
+var h =function( nLength, nDefaultValue, nIndex1, nValue1 /*,  nIndex2, nValue2, ...*/ ){
+	var a = []
+	var o = {}
+	for(var i=2, ni=arguments.length; i &lt; ni; i=i+2 ) o[ arguments[i]] = arguments[i+1]
+	for(var i=0; i &lt; nLength; i++ ) a[i] = o[i] || nDefaultValue
+	return a
+	}
+</pre>
+
+</body>
+</html>

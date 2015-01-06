@@ -1,0 +1,370 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>Création de module Parser</title>
+	<link rel="stylesheet" type="text/css" href="css/styles.css">
+	<style>
+		#eResult {
+			clear: both;
+			}
+		#eGrammarInput {
+			height: 100px;
+			width: 250px;
+			}
+		#ePhraseInput {
+			width: 100%;
+			}
+		#eExport {
+			font-size: 0.8em;
+			height: 200px;
+			width: 100%;
+			}
+	</style>
+</head>
+<body spellcheck="false">
+<a href="index.htm">Index</a>
+
+<h1>Création de module Parser</h1>
+
+<label for="eTest">Grammaire : </label>
+<select id="eTest"></select>
+<label for="eParser">Parser : </label>
+<select id="eParser">
+	<option value="LL1">LL(1)</option>
+	<option value="LR0" selected>LR(0)</option>
+	<option value="SLR">SLR</option>
+	<option value="LR1">LR(1)</option>
+</select>
+<a href="#" onclick="grammarSyntax()">syntaxe</a>
+<hr>
+<textarea id="eGrammarInput" style="width:100%;">E -> E + T | T
+T -> T * F | F
+F -> ( E ) | id
+</textarea>
+<input type="button" value="Analyser" onclick="getGrammar( document.getElementById('eGrammarInput').value )">
+
+<hr>
+<input id="eShowGrammar" type="checkbox"><label for="eShowGrammar">Grammaire.</label>
+<input id="eShowDFA" type="checkbox"><label for="eShowDFA">Automate.</label>
+<input id="eShowFFTable" type="checkbox"><label for="eShowFFTable">First / Follow table.</label>
+<input id="eShowParsingTable" type="checkbox" checked><label for="eShowParsingTable">Parsing table.</label>
+<hr>
+
+<div id="eGrammar"></div>
+<div id="eDFA"></div>
+<div id="eFFTable"></div>
+<div id="eParsingTable"></div>
+
+<hr style="clear:both">
+
+<input type="text" id="ePhraseInput" value="id * id + id">
+<input type="button" value="Analyser" onclick="parsePhrase()">
+<hr>
+<input id="eShowResultTable" type="checkbox" checked><label for="eShowResultTable">Analyse.</label>
+<input id="eShowResultTree" type="checkbox"><label for="eShowResultTree">Arbre complet.</label>
+<hr>
+<pre id="eResultTree"></pre>
+<pre id="eResultTable"></pre>
+
+<hr style="clear:both">
+
+<input type="button" value="Exporter" onclick="exportEngine( ENGINE, eWhiteSpaces.checked )">
+<input id="eWhiteSpaces" type="checkbox"><label for="eWhiteSpaces">Espaces blanc.</label>
+<textarea id="eExport"></textarea>
+<PRE id="eExportPreview"></PRE>
+
+<!-- FRAMEWORK... -->
+<script src="js/framework.js"></script>
+<script src="js/lexer.automaton.js"></script>
+<script src="js/lexer.automaton.modules.js"></script>
+<script src="js/parserLR.js"></script>
+<!-- TODO: Rajouter les '
+<script src="src/grammar/node.js"></script>
+<script src="src/grammar/lexer.js"></script>
+<script src="src/grammar/parser.js"></script>
+-->
+<script src="js/grammar.js"></script>
+<script src="js/grammar.examples.js"></script>
+
+<script>
+_( 'eShowGrammar,eShowDFA,eShowFFTable,eShowParsingTable' )
+_( 'eTest,eParser,eGrammar,eDFA,eFFTable,eParsingTable,eGrammarInput,ePhraseInput' )
+_( 'eShowResultTable,eShowResultTree' )
+_( 'eResultTable,eResultTree' )
+_( 'eExport,eWhiteSpaces,eExportPreview' )
+
+showFrom( eShowGrammar, eGrammar )()
+showFrom( eShowDFA, eDFA )()
+showFrom( eShowFFTable, eFFTable )()
+showFrom( eShowParsingTable, eParsingTable )()
+showFrom( eShowResultTree, eResultTree )()
+showFrom( eShowResultTable, eResultTable )()
+
+var ENGINE
+
+var exportEngine =function( ENGINE, bWhiteSpaces ){
+	if( ! ENGINE ) return eExport.innerHTML = 'Pas de machine...'
+	
+	var tmp = []
+	ENGINE.PRODUCTIONS.every( function( P, i ){
+		return tmp.push( i+':['+ JSON.stringify(P.LHS) +','+ JSON.stringify(P.RHS) +']' )
+		})
+	tmp.shift()
+	var sProductions = bWhiteSpaces
+		? '{\n\t\t\t'+ tmp.join(',\n\t\t\t') +'\n\t\t\t}'
+		: '{'+ tmp.join(',') +'}'
+
+	var SYMBOLS = ENGINE.T_and_N.concat( ENGINE.end )
+	var TableSymbols=(function(){
+		var nIndex = 1
+		var oByIndex ={}
+		var oBySymbol ={}
+		return {
+			indexOf :function( symbol ){ return oBySymbol[symbol] },
+			symbolAt :function( index ){ return oByIndex[index] },
+			push :function( symbol ){
+				var n = this.indexOf( symbol )
+				if( n ) return n
+				oBySymbol[symbol] = nIndex
+				oByIndex[nIndex] = symbol
+				nIndex++
+				return nIndex-1
+				},
+			toString :function( bWhiteSpaces ){
+				var a = []
+				var s = bWhiteSpaces ? '\n\t\t\t' : ''
+				for( var i=1; i<nIndex; i++ )
+					a.push( JSON.stringify( oByIndex[i])+':'+i )
+				return '{'+ s + a.join(','+ s ) + s + '}'
+				},
+			}
+		})()
+	SYMBOLS.every( function( TorN ){ return TableSymbols.push( TorN )})
+	
+	var tmp = []
+	var M = []
+	ENGINE.STATES.every( function( S, i ){
+		i = i + 1
+		SYMBOLS.every( function( TorN ){
+			if( ENGINE.M[ i ]){
+				var action = ENGINE.M[ i ][ TorN ]
+				if( action ){
+					M[ i ] = M[ i ] || []
+					action = action.constructor==String ? action : action[0]
+					action = action.constructor==Array ? action[0] : action
+					M[ i ][TableSymbols.indexOf( TorN )]="'"+action+"'"
+					}
+				}
+			return 1
+			})
+		return 1
+		})
+	ENGINE.STATES.every( function( S, i ){
+		i = i + 1
+		if( M[ i ]) tmp.push( i +":["+ M[ i ].join(',') +"]" )
+		return 1
+		})
+	var sMatrice = bWhiteSpaces
+		? '{\n\t\t\t'+ tmp.join(',\n\t\t\t') +'\n\t\t\t}'
+		: '{'+ tmp.join(',') +'}'
+	var fPartialTree = function( esuParent, aeChild ){
+		var e = ! esuParent
+			? document.createDocumentFragment()
+			:( esuParent.appendChild ? esuParent : document.createElement( esuParent ) 
+			)
+		if( ! e.className ) e.className = 'myNode '+ e.nodeName.toLowerCase()
+		if( ! e.title ) e.title = e.nodeName
+		if( aeChild.constructor==Array ){
+			for(var i=0, ni=aeChild.length; i<ni; i++ )
+				if( aeChild[i]) e.appendChild( aeChild[i])
+			}
+		else e.appendChild( aeChild )
+		return e
+		}
+	var sASTFunction = 'function( sProd, LHS, RHS ){\n\
+	var f ='+ fPartialTree.toString() + '\n\
+	switch( sProd ){\n\
+{options}\n\
+		}\n\
+	}'
+	var aOptions = []
+	ENGINE.PRODUCTIONS.every( function( P, prodID ){
+		aOptions.push( '\t\tcase "('+ prodID +') '+ P.LHS +' -> '+ P.RHS.join(' ')+'": return f( LHS, RHS )')
+		return 1
+		})
+	eExportPreview.innerHTML = ''
+	eExport.value =
+		'var ENGINE = {'+
+		'\n\tSTART:'+ JSON.stringify( ENGINE.s ) +','+
+		'\n\tEND:'+ JSON.stringify( ENGINE.end ) +','+
+		'\n\tSYMBOLS:'+ TableSymbols.toString( bWhiteSpaces ) +','+
+		'\n\tPRODUCTIONS:'+ sProductions +','+
+		'\n\tMATRICE:'+ sMatrice +','+
+		'\n\tAST:'+ sASTFunction.replace( '{options}', aOptions.join('\n')).split('\n').join('\n\t') +
+		'\n\t}'
+		
+	}	
+
+var getGrammar =function( sText ){
+	ENGINE = Grammar( sText, eParser.value )
+	if( eParser.value=='SLR' ) exportEngine( ENGINE )
+	eGrammar.innerHTML = showGrammar( ENGINE )
+	eDFA.innerHTML = showDFA( ENGINE )
+	eFFTable.innerHTML = showFFTable( ENGINE )
+	eParsingTable.innerHTML = window[{
+		LL1:'showLLTable',
+		LR0:'showLRTable',
+		SLR:'showLRTable',
+		LR1:'showLRTable'
+		}[ eParser.value ]]( ENGINE )
+	}
+var parsePhrase =function(){
+	var oResultat = parse( ePhraseInput.value )
+	eResultTable.innerHTML = oResultat.table
+	eResultTree.innerHTML = ''
+	if( oResultat.tree ) eResultTree.appendChild( oResultat.tree )
+	}
+var parse =function( sText ){
+	return Grammar[{
+		LL1:'parseLL',
+		LR0:'parseLR',
+		SLR:'parseLR',
+		LR1:'parseLR'
+		}[ eParser.value ]]( sText ? sText.split(' ') : [] , ENGINE )
+	}
+
+function showGrammar ( ENGINE ){
+	Bufferize.init( '<div class="grammar">' )
+	Bufferize( '<dl class="G"><dt>G = ( T, N, s, &delta; )</dt>' )
+	ENGINE.G.every(function( a ){
+		return Bufferize( '<dd>'+a[0]+' &rarr; '+a[1]+'</dd>' )
+		})
+	Bufferize( '</dl>' )
+	Bufferize( '<dl class="delta"><dt>&delta;</dt>' )
+	ENGINE.PRODUCTIONS.every(function( a, i ){
+		return Bufferize( '<dd> <i><small>('+ i +')</small></i> '+ a.toHTML(1) +'</dd>' )
+		})
+	Bufferize( '</dl>' )
+	Bufferize( '<dl class="T"><dt>T</dt><dd>'+ ENGINE.T.join(' ') +'</dd></dl>' )
+	Bufferize( '<dl class="N"><dt>N</dt><dd>'+ ENGINE.N.join(' ') +'</dd></dl>' )
+	return Bufferize( '</div>' )
+	}
+function showDFA ( ENGINE ){
+	Bufferize.init( '<div class="grammar">' )
+	if( ENGINE.E.toString() ){
+		Bufferize( '<dl class="transitions">' )
+		Bufferize( '<dt>Transitions</dt>' )
+		Bufferize( '<dd><pre>'+ ENGINE.E.toString() +'</pre></dd>' )
+		Bufferize(' </dl>' )
+		}
+	ENGINE.STATES.every( function( State ){
+		Bufferize( '<dl class="state">' )
+		Bufferize( '<dt>'+ State.stateID +'</dt>' )
+		Bufferize( '<dd><pre>'+ State.toString() +'</pre></dd>' )
+		return Bufferize( '</dl>' )
+		})
+	return Bufferize( '</div>' )
+	}
+function showFFTable ( ENGINE ){
+	Bufferize.init( '<table cellspacing="0" class="Table FirstFollow">' )
+	Bufferize( '<thead>' )
+	Bufferize( '<tr><th colspan="4">Table First/Follow</th></tr>' )
+	Bufferize( '<tr><th>Symbol</th><th>Nullable</th><th>First</th><th>Follow</th></tr>' )
+	Bufferize( '</thead>' )
+	Bufferize( '<tbody>' )
+	Bufferize(' <tr><th>&epsilon;</th><td>'+ ENGINE.NULLABLE['&epsilon;'] +'</td><td class="nowrap">'+ ENGINE.FIRST['&epsilon;'].join(' ') +'</td><td></td></tr>' )
+	ENGINE.T_and_N.every( function( s ){
+		var sNULLABLE = ENGINE.NULLABLE[s]===undefined ? '?' : ENGINE.NULLABLE[s]
+		var aFIRST = ENGINE.FIRST[s] || []
+		var aFOLLOW = ENGINE.FOLLOW[s] || []
+		return Bufferize( '<tr><th>'+ s +'</th><td>'+ sNULLABLE +'</td><td class="nowrap">'+ aFIRST.join(' ') +'</td><td class="nowrap">'+ aFOLLOW.join(' ') +'</td></tr>' )
+		})
+	Bufferize( '</tbody>' )
+	return Bufferize('</table>')
+	}
+function showLRTable ( ENGINE ){
+	var a = ENGINE.T.concat([ENGINE.end], ENGINE.N )
+	Bufferize.init( '<table cellspacing="0" cellpadding="0" class="Table">' )
+	Bufferize( '<thead>' )
+	Bufferize( '<tr><th colspan="'+(a.length+1)+'">Table</th></tr>' )
+	Bufferize( '<tr><td></td>' )
+	a.every( function( S ){ return Bufferize( "<th>"+ S +"</th>" )})
+	Bufferize( '</tr>' )
+	Bufferize( '</thead>' )
+	Bufferize( '<tbody>' )
+	ENGINE.STATES.every( function( State, i ){
+		var nStateID = State.stateID
+		Bufferize( "<tr><th>"+ nStateID +"</th>" )
+		a.every( function( X ){
+			var aActions = ENGINE.M[nStateID][X] 
+			return Bufferize( '<td class="nowrap '+ (aActions && aActions.length>1 ? 'bg_orange' : '' ) +'">'+ ( aActions || '&nbsp;' ) +"</td>" )
+			})
+		return Bufferize( "</tr>" )
+		})
+	Bufferize( '</tbody>' )
+	return Bufferize( "</table>" )
+	}
+function showLLTable ( ENGINE ){
+	var a = ENGINE.T.concat([ ENGINE.end, ENGINE.epsilon ])
+	Bufferize.init( '<table cellspacing="0" class="Table LL1">' )
+	Bufferize( '<thead>' )
+	Bufferize( '<tr><th colspan="'+(a.length+1)+'">Table LL(1)</th></tr>' )
+	Bufferize( '<tr><td></td>' )
+	a.every( function( S ){
+		return Bufferize( "<th>"+ S +"</th>" )
+		})
+	Bufferize( '</tr>' )
+	Bufferize( '</thead>' )
+	Bufferize( '<tbody>' )
+	ENGINE.N.every( function( sN ){
+		Bufferize( "<tr><th>"+ sN +"</th>" )
+		a.every( function( sS ){
+			return Bufferize( '<td class="nowrap '+ (ENGINE.M[sN][sS] && ENGINE.M[sN][sS].length>1 ? 'bg_orange' : '' ) +'">'+ ( ENGINE.M[sN][sS] || '&nbsp;' ) +"</td>" )
+			})
+		return Bufferize( "</tr>" )
+		})
+	Bufferize( '</tbody>' )
+	return Bufferize( "</table>" )
+	}
+
+eParser.onchange =function(){
+	eGrammar.innerHTML = ''
+	eFFTable.innerHTML = ''
+	eParsingTable.innerHTML = ''
+	eResultTree.innerHTML = ''
+	eResultTable.innerHTML = ''
+	getGrammar( document.getElementById('eGrammarInput').value )
+	parsePhrase()
+	}
+eTest.onchange =function(){
+	var aTest = aExamples[eTest.value]
+	, bMultipleTest = aTest[2].constructor==Array
+	eGrammarInput.value = aTest[1]
+	ePhraseInput.value =  bMultipleTest ? aTest[2][0] : aTest[2]
+	eParser.value = aTest[3]
+	eParser.onchange()
+	if( bMultipleTest ){
+		var sResult = ''
+		aTest[2].every( function( sTest, i ){
+			if( i>0 ){
+				var oResultat = parse( sTest )
+				sResult += oResultat.table
+				eResultTree.appendChild( oResultat.tree )
+				}
+			return 1
+			})
+		eResultTable.innerHTML += sResult
+		}
+	}
+aExamples.every( function( a, i ){
+	var e = document.createElement( 'option' )
+	e.innerHTML = a[0]
+	e.value = i
+	e.selected = a[4]
+	return eTest.appendChild( e )
+	})
+
+</script>
+
+</body>
+</html>

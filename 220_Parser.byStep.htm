@@ -1,0 +1,251 @@
+<html>
+<head>
+	<title>Analyse syntaxique: readToken</title>
+	<link rel="stylesheet" type="text/css" href="src/regexp/nodeStyle.css">
+	<link rel="stylesheet" type="text/css" href="src/regexp/styles.css">
+	<style>
+#eInput {
+	height: 2em;
+	width: 100%;
+	}
+FIELDSET {
+	float: left;
+	margin: 0 1em 1em 0;
+	}
+FIELDSET DL{
+	margin: 0;
+	}
+#eScanResult {
+	clear: both;
+	}
+.symbolsTable, .parsingTable { float: left; }
+TABLE { float: left; }
+TABLE TD {
+	border: 1px solid #000;
+	border-width: 1px 1px 0 0;
+	}
+TABLE TR,
+TABLE COL {
+	transition: 500ms ease;
+	}
+.highlight {
+	background: lightskyblue;
+	}
+</style>
+</head>
+<body spellcheck="false">
+<a href="index.htm">Index</a>
+
+<h1>Analyse syntaxique: readToken</h1>
+
+<label for="eInput">Expression régulière : </label><br>
+<textarea id="eInput">-(([a-z]a+)|\db?)|1{2}c{1,4}|[^B]d{2,}|.e*[^\-^$\\.*+?()[\]}{|]</textarea>
+
+<fieldset><legend>Actions</legend>
+	<dl>
+		<dt><input type="hidden" id="eLexerNode" value="HTMLElement"></dt>
+		<dt><input type="button" id="eBtnScan" value="scan()"></dt>
+		<dt><input type="button" id="eBtnParse" value="parse()"></dt>
+		<dt><input type="button" id="eBtnReadToken" value="parser: readToken()"></dt>
+	</dl>
+</fieldset>
+<fieldset><legend>Parser</legend>
+	<dl>
+		<dt>Etat: <span id="eAction">s1</span></dt>
+		<dt>Symbole: <span id="eToken">...</span></dt>
+		<dt>Piles: <span id="eStack">...</span></dt>
+	</dl>
+</fieldset>
+
+<pre id="eScanResult"></pre>
+<pre id="eParseResult"></pre>
+<pre id="eEngineTable"></pre>
+
+
+<!-- FRAMEWORK... -->
+<script src="js/framework.js"></script>
+<script src="js/shared.js"></script>
+<script src="widget/Stats/scripts.js"></script>
+
+<!-- LEXER NODES -->
+<script src="src/regexp/node.js"></script>
+<!-- <script>
+var getElementsByLine =function( nLine ){
+	var a=[]
+	for(var e=this.firstChild; e; e=e.nextSibling )
+		if( e.oValue.lineStart<=nLine && nLine<=e.oValue.lineEnd )
+			a.push(e)
+	return a
+	}
+var getHTMLEnd =function( o ){ return '</b>' }
+var getHTMLStart =function( o, bTitle ){
+	return bTitle && o.value
+		? '<b class="' + o.css + '" title="' + valueToString( o ) + '">'
+		: '<b class="' + o.css + '">'
+	}
+var replaceSpecialHTML =function( s ){
+	return s.str_replace( ['&','<','>'], ['&amp;','&lt;','&gt;'])
+	}
+var setTitle =function(){ this.title = valueToString( this.oValue )}
+var valueToString =function(o){
+	return JSON.stringify( o, 'token,parentToken,css,index,lineStart,lineEnd'.split(','), " " ).str_replace('"', '')
+	}
+
+// var LexerNode
+var createLexerNode =function( bClassName, bTitle, bInnerHTML, bByLine ){
+	var s = '{}'
+	switch( eLexerNode.value ){
+		case 'HTMLElement': s='document.createElement(o.token)'; break;
+		case 'ObjectNode': s='new Node(o.token)'; break;
+		}
+	LexerNode = new Function ( 'o', 
+		'var e = '+ s +';'
+		+'e.oValue=o;'
+		+( bByLine ? 'e.getElementsByLine=getElementsByLine;' : '' )
+		+( bClassName ? 'e.className=o.css;' : '' )
+		+( bTitle ? 'e.setTitle=setTitle;e.setTitle();' : '' )
+		+( bInnerHTML ? "if( o.value ) e.innerHTML = o.value.str_replace( ['&','<','>'], ['&amp;','&lt;','&gt;']);" : '' )
+		+'return e;'
+		)
+	}
+// createLexerNode(1,1,1,0)
+</script> -->
+
+<!-- LEXERS + PARSER -->
+<script src="js/lexer.automaton.js"></script>
+<script src="js/lexer.automaton.modules.js"></script>
+<script src="src/regexp/lexer.js"></script>
+<script src="src/regexp/futurParser.js"></script>
+<script src="js/futurParser.js"></script>
+<script>
+// ParserLR.Node = LexerNode
+</script>
+
+<!-- CODE -->
+<script>
+Tables=(function(){
+	var aTables, eLastSymbol, eLastState, eLastLastState, eLastCol
+	return {
+		show :function( ENGINE ){
+		// Table des actions
+			Bufferize.init( '<table class="parsingTable">' )
+			Bufferize('<colgroup><col>')
+			var o = ENGINE.SYMBOLS
+			for( sSymbol in o )
+				if( o[sSymbol].constructor==Number ){
+					Bufferize( '<col id="Col'+ sSymbol +'">' )
+					}
+			Bufferize('</colgroup>')
+			Bufferize( '<thead>' )
+			Bufferize( '<tr><td></td>' )
+			var o = ENGINE.SYMBOLS
+			for( sSymbol in o )
+				if( o[sSymbol].constructor==Number ){
+					Bufferize( "<th>"+ o[sSymbol] +"</th>" )
+					}
+			Bufferize( '</tr>' )
+			Bufferize( '</thead>' )
+			Bufferize( '<tbody>' )
+			var o = ENGINE.MATRICE
+			for( sState in o )
+				if( o[sState].constructor==Array ){
+					Bufferize( '<tr id="State'+ sState +'"><th>'+ sState +"</th>" )
+					Bufferize( "<td>"+ o[sState].slice(1).join('</td><td>') +"</td>" )
+					Bufferize( "</tr>" )
+					}
+			Bufferize( '</tbody></table>' )
+		// Table des symboles
+			Bufferize( '<table class="symbolsTable">' )
+			var o = ENGINE.SYMBOLS
+			for( sSymbol in o )
+				if( o[sSymbol].constructor==Number )
+					Bufferize( '<tr id="Symbol'+sSymbol+'"><th>'+ sSymbol +"</th><td>"+ o[sSymbol] +"</td></tr>" )
+			eEngineTable.innerHTML =  Bufferize( "</table>" )
+			aTables = eEngineTable.getElementsByTagName('table')
+			eLastSymbol = eLastState = eLastCol = null
+			Tables.highlightPosition(1)
+			},
+		highlightSymbol :function( sSymbol ){
+			if( eLastSymbol ) eLastSymbol.className = ''
+			if( eLastSymbol = _('Symbol'+ sSymbol ))
+				eLastSymbol.className = 'highlight'
+			},
+		highlightPosition :function( nState, sSymbol ){
+			if( eLastState ) eLastState.className = ''
+			if( nState ){
+				eLastState = _('State'+ nState )
+				eLastState.className = 'highlight'
+				}
+			if( eLastCol ) eLastCol.className = ''
+			if( sSymbol ){
+				if( eLastCol = _('Col'+ sSymbol ))
+					eLastCol.className = 'highlight'
+				}
+			}
+		}
+	})()
+	
+var eLexer, oParser, eParsed 
+var scan =function(){
+	eScanResult.innerHTML = ''
+	try{
+		eLexer = AutomatonLexer( eInput.value, 'RegExp' )
+		eScanResult.appendChild( eLexer )
+		oParser = new ParserLR ( RegExpParser.REGEXP )
+		oParser.getAction = 
+		oParser.getAction.suffix( function( nState, sSymbol ){
+			Tables.highlightPosition( nState, sSymbol )
+			}, oParser )
+		View.resetInfo()
+		Tables.show( RegExpParser.REGEXP )
+	}catch(e){
+		eScanResult.innerHTML = e.message + '<br>'
+		if( e.fileName ) eScanResult.innerHTML += '<br>fichier: '+ e.fileName.split('/').pop()
+		if( e.lineNumber ) eScanResult.innerHTML += '<br>ligne: '+ e.lineNumber
+		}
+	}
+var parse =function(){
+	eParseResult.innerHTML = ''
+	eParseResult.appendChild( ParserLR.parse( to_array( eLexer.childNodes ), RegExpParser.REGEXP ))
+	}
+var readToken =function(){
+	if( eLexer.firstChild ){
+		oParser.readToken( eLexer.removeChild( eLexer.firstChild ))
+		}
+	else if( ! oParser.bEnd ){
+		oParser.bEnd = true
+		eParseResult.innerHTML = ''
+		eParseResult.appendChild( oParser.getResult())
+		}
+	View.setInfo()
+	}
+
+View ={
+	resetInfo :function(){
+		eAction.innerHTML = 's1'
+		eToken.innerHTML = '...'
+		eStack.innerHTML = '...'
+		},
+	setInfo :function(){
+		var sSymbol = oParser.oToken.oValue.token
+		eAction.innerHTML = oParser.action
+		Tables.highlightSymbol( eToken.innerHTML = sSymbol )
+		eStack.innerHTML = oParser.aStack
+		}
+	}
+</script>
+
+<!-- DTHML -->
+<script>
+_( 'eInput,eLexerNode,eBtnScan,eBtnParse,eBtnReadToken,eScanResult,eParseResult' )
+_( 'eAction,eToken,eStack,eEngineTable' )
+
+Events.add(
+	'click',
+		eBtnScan, scan,
+		eBtnParse, parse,
+		eBtnReadToken, readToken
+	)
+</script>
+</body>
+</html>

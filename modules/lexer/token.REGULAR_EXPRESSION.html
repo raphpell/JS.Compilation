@@ -1,0 +1,27 @@
+<html><head></head><body><pre>
+¤ whitespaces
+
+!	R_REGULAR_EXPRESSION	=	\/{reBody}\/{reFlags}
+			(
+			css:regexp,
+			previousTokens:{re_operators}|{re_punctuators}|JS_KEYWORD
+			)
+		re_operators		=	ARITHMETIC_OPERATOR|ASSIGNMENT_OPERATOR|BITWISE_OPERATOR|COMPARISON_OPERATOR|LOGICAL_OPERATOR
+		re_punctuators		=	ELISION|DOT|LPAREN|LBRACE|COLON|SEMI|QUESTION
+		
+		reBody			=	{reFirstChar}{reChars}
+		reFirstChar		=	[^\n\r\f\*\\\/\[]|{reBackslashSequence}|{reClass}
+		reBackslashSequence	=	\\[^\n\r\f]
+		reChars			=	{reChar}*
+		reChar			=	[^\n\r\f\\\/\[]|{reBackslashSequence}|{reClass}
+		reClass			=	\[{reClassChars}\]
+		reClassChars		=	{reClassChar}*
+		reClassChar		=	[^\n\r\f\]\\]|{reBackslashSequence}
+		reFlags			=	{reFlag}*
+		reFlag			=	[a-zA-Z]
+	
+!#@	REGULAR_EXPRESSION			=	{hspaces}|REGULAR_EXPRESSION_IN
+	REGULAR_EXPRESSION_IN		= 	[^ \t]+
+	
+		hspaces = TAB|SPACES
+</pre></body></html>

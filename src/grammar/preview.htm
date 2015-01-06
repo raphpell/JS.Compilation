@@ -1,0 +1,116 @@
+﻿<!DOCTYPE HTML>
+<html>
+<head>
+	<title>Module GRAMMAR</title>
+	<style>
+HTML, BODY {
+    margin: 0;
+    padding: 0 0.5em;
+	}
+H1 {
+    margin: 0 0 0.25em;
+    padding: 0;
+	}
+#eInput{
+	width: 100%;
+	height: 300px;
+	}
+	</style>
+</head>
+<body spellcheck="false">
+
+<h1 id="eH1">Module GRAMMAR</h1>
+<p><a href="syntax.htm">Syntaxe</a></p>
+
+<div id="eRE"></div>
+
+
+<label for="eInput">Texte : </label><br>
+<textarea id="eInput">
+ E -> T X 
+ X -> + E | epsilon 
+ T -> int Y | ( E ) Y 
+ Y →  * T | ε
+</textarea>
+<input type="button" id="eBtnScan" value="Analyse lexicale">
+<input type="button" id="eBtnParse" value="Analyse syntaxique">
+<input type="checkbox" id="eRelief"><label for="eRelief">Relief.</label>
+<input type="checkbox" id="eWhiteSpaces"><label for="eWhiteSpaces">Espaces blancs.</label>
+<pre id="eResult"></pre>
+
+<!-- FRAMEWORK... -->
+<script src="../../js/framework.js"></script>
+
+<script src="../../js/lexer.automaton.js"></script>
+<script src="../../js/lexer.automaton.modules.js"></script>
+<script src="../../js/parserLR.js"></script>
+<link rel="stylesheet" type="text/css" href="styles.css">
+<script src="lexer.js"></script>
+<script src="parser.js"></script>
+
+<!-- ... -->
+<script>
+var valueToString =function(o){
+	/*,parentToken,index,lineStart,lineEnd*/
+	return JSON.stringify( o, 'token,css'.split(','), " " ).str_replace('"', '')
+	}
+var LexerNode =function( o ){
+	var sToken = o.token
+	, e = document.createElement( sToken )
+	, sValue = o.value
+	e.oValue = o
+	e.title = valueToString( o )
+		// sToken +'\n\u25B6'+ sValue +'\u25C0'
+	if( sValue ) e.innerHTML = sValue.str_replace( ['&','<','>'], ['&amp;','&lt;','&gt;'])
+	e.className = 'myNode'
+	if( o.css ) e.className += ' '+ o.css
+	return e
+	}
+
+var scan =function(){
+	eResult.innerHTML = ''
+	try{
+		var eLexer = AutomatonLexer( eInput.value, 'GRAMMAR' )
+		eResult.appendChild( eLexer )
+	}catch(e){
+		eResult.innerHTML = e.message + '<br>'
+		if( e.fileName ) eResult.innerHTML += '<br>fichier: '+ e.fileName.split('/').pop()
+		if( e.lineNumber ) eResult.innerHTML += '<br>ligne: '+ e.lineNumber
+		}
+	}
+var parse =function(){
+	eResult.innerHTML = ''
+	try{
+		var eLexer = AutomatonLexer( eInput.value, 'GRAMMAR' )
+		var aTokens = to_array( eLexer.childNodes )
+		eResult.appendChild( ParserLR( aTokens, GrammarParserEngine.GRAMMAR ))
+	}catch(e){
+		eResult.innerHTML = e.message + '<br>'
+		if( e.fileName ) eResult.innerHTML += '<br>fichier: '+ e.fileName.split('/').pop()
+		if( e.lineNumber ) eResult.innerHTML += '<br>ligne: '+ e.lineNumber
+		}
+	}
+
+var setInput =function( o ){
+	oLoaded = o
+	eInput.value = o.text
+	parse()
+	}
+
+_( 'eInput,eBtnScan,eBtnParse,eRelief,eWhiteSpaces,eResult' )
+var changeClassList =function( b, sClass ){
+	if( eResult.classList ) eResult.classList[ b?'add':'remove']( sClass )
+		else eResult.className = (eRelief.checked?'relief':'')+' '+(eWhiteSpaces.checked?'seeWS':'')
+	}
+eBtnScan.onclick = scan
+eBtnParse.onclick = parse
+eRelief.onclick = function(){ changeClassList( eRelief.checked, 'relief' )}
+eRelief.onclick()
+eWhiteSpaces.onclick = function(){ changeClassList( eWhiteSpaces.checked, 'seeWS' )}
+eWhiteSpaces.onclick()
+
+parse()
+</script>
+
+</body>
+</html>

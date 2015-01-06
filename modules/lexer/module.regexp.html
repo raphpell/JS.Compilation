@@ -1,0 +1,94 @@
+<html><head></head><body><pre>
+#	RegExp	=	REGEXP
+!@	REGEXP	=	DOT|PIPE|MINUS|{charsets}|{parenthesis}|{quantifiers}|{chars}
+		( css:regexp )
+
+	DOT		=	\.
+		( css:reserved|any )
+	PIPE	=	\|
+		( css:reserved|alternation )
+	MINUS	=	\-
+		( css:reserved )
+		
+// Char classes
+charsets = S_CHARSET|S_NEGATED_CHARSET
+@!	CHARSET_IN	=	LBRACK|DOT|PIPE|MINUS|LPAREN|RPAREN|STAR|PLUS|QUESTION|LBRACE|RBRACE|{chars}
+	LBRACK	=	\[
+		( css:character|reserved )
+
+#!	CHARSET				=	CHARSET_IN|E_CHARSET
+		( css:charclass )
+	S_CHARSET		=	\[
+		( css:block, translation:LBRACK )
+!	E_CHARSET		=	\]
+		( css:block, translation:RBRACK )
+	
+#!	NEGATED_CHARSET			=	CHARSET_IN|E_NEGATED_CHARSET
+		( css:charclass|negated )
+	S_NEGATED_CHARSET	=	\[\^
+		( css:block, translation:NLBRACK )
+!	E_NEGATED_CHARSET	=	\]
+		( css:block, translation:NRBRACK )
+
+// Parenthesis
+parenthesis = S_SUB_REGEXP|E_SUB_REGEXP
+!#	SUB_REGEXP			=	REGEXP
+		( css:regexp )
+	S_SUB_REGEXP	=	\(
+		( css:block, translation:LPAREN )
+	E_SUB_REGEXP	=	\)
+		( css:block, translation:RPAREN )
+	LPAREN	=	\(
+		( css:character|reserved )
+	RPAREN	=	\)
+		( css:character|reserved )
+
+// Quantifiers
+quantifiers = S_QUANTIFIER|STAR|PLUS|QUESTION
+@!	QUANTIFIER			=	E_QUANTIFIER|ELISION|INTEGER
+		( css:quantifier )
+	S_QUANTIFIER	=	\{
+		( css:block, translation:LBRACE )
+	E_QUANTIFIER	=	\}
+		( css:block, translation:RBRACE )
+	STAR			=	\*
+		( css:quantifier|reserved )
+	PLUS			=	\+
+		( css:quantifier|reserved )
+	QUESTION		=	\?
+		( css:quantifier|reserved )
+	INTEGER		= \d+
+		( css:integer )
+	ELISION		=	\,
+		( css:elision )
+	LBRACE		=	\{
+		( css:reserved )
+	RBRACE		=	\}
+		( css:reserved )
+
+// Characters
+chars = CHAR|CHAR_ESCAPED
+	CHAR_ESCAPED	=	\\.|\\c[a-zA-Z]|\\x[0-9a-fA-F]{2}|\\u[0-9a-fA-F]{4}
+		( css:character )
+	CHAR			=	[^\(\)\\\|\.\[\]\*\+\?\{\-]
+		( css:character )
+
+/*
+//	Regular Expression Grammar
+REGEXP		-> UNION | epsilon 
+UNION		-> CONCAT PIPE UNION | CONCAT 
+CONCAT		-> REPEAT CONCAT | REPEAT 
+REPEAT		-> REPEAT QUANTIFIERS | CHAR_CLASS_EXP 
+QUANTIFIERS 	-> QUESTION | STAR | PLUS | QUANTIFIER
+CHAR_CLASS_EXP	-> CHARSET | NEGATED_CHARSET | SIMPLE_EXP 
+SIMPLE_EXP	-> CHAR | CHAR_ESCAPED | DOT | SUB_REGEXP
+
+//	Characters Class Grammar
+CHAR_CLASSES	-> CHAR_CLASS CHAR_CLASSES | CHAR_CLASS 
+CHAR_CLASS	-> SIMPLE_CHAR MINUS SIMPLE_CHAR | SIMPLE_CHAR
+SIMPLE_CHAR	-> CHAR | CHAR_ESCAPED | LBRACK | DOT | PIPE | LPAREN | RPAREN | STAR | PLUS | QUESTION | LBRACE | RBRACE
+
+//	Quantifier Grammar
+QUANTIFIER	-> INTEGER | INTEGER ELISION | INTEGER ELISION INTEGER
+*/
+</pre></body></html>

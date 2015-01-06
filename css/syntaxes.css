@@ -1,0 +1,93 @@
+.tab								{}
+.space								{}
+.linefeed							{}
+
+.undefined			{ background: red !important; }
+
+/* -----------------           PHP                       ----------------- */
+.php					{ color: #000; }
+.php .comment			{ color: #AAA; }
+.php .extension			{ color: RoyalBlue; }
+.php .function			{ color: #060; }
+.php .keyword,
+.php .reserved			{ color: #069; }
+.php .identifier			{ color: #336; }
+.php .number				{ color: #F00; }
+.php .special			{ color: #633; }
+.php .string				{ color: #333; }
+.php .tag				{ color: #F00; }
+
+/* -----------------           HTML                      ----------------- */
+/* Doctype */
+.html .doctype			{ color: #663; }
+.html .comment			{ color: #663; }
+.html .cdata				{ color: #663; }
+/* Element */
+.html .elt				{ color: #036; }
+.html .elt .attr			{ color: #390; }
+.html .elt .equal		{ color: #000; }
+.html .elt .value		{ color: #690; }
+/* Others syntaxes */
+.html .css				{ color: Silver; }
+.html .css .ruleset		{}
+.html .php				{ color: #000; }
+.html .js 				{ color: Silver; }
+
+/* -----------------           INI                      ----------------- */
+.ini .comment			{ color: #AAA; }
+.ini .punctuator,
+.ini .section			{ color: #000; }
+.ini .var	 			{ color: #660; }
+.ini .keyword,
+.ini .string				{ color: #F00; }
+.ini .value			 	{ color: #069; }
+.ini .value .string		{ color: #006; }
+
+/* -----------------           JAVASCRIPT           ----------------- */
+.js 						{ color: #000; }
+.js .comment				{ color: #AAA; }
+.js .futureReservedWord	{ color: #C03; }
+.js .identifier			{ color: #000; }
+.js .keyword 			{ color: #006; }
+.js .literal 			{ color: #069; }
+.js .punctuator ,
+.js .operator			{ color: #003; }
+.js .number				{ color: #F00; }
+.js .regexp 				{ color: #906; }
+.js .string				{ color: #660; }
+
+/* -----------------           CSS                       ----------------- */
+.css								{ color: #000; }
+.css .punctuator						{ color: #000; }
+.css .comment						{ color: #888; }
+/* Rule set :Selectors */
+.css .selector						{ color: #036; }
+.css .id								{ color: #050; }
+.css .class							{ color: #C03; }
+.css .pseudo,
+.css .pseudo .selector				{ color: #069; }
+.css .pseudo .name,
+.css .pseudo .argument				{ color: #066; }
+.css .pseudo .function				{}
+.css .pseudo .function .selector		{ color: #066; }
+.css .universal ,
+.css .combinator						{ color: #303; }
+.css .attribute_selector,
+.css .attribute_selector .operator	{ color: #C03; }
+.css .attribute_selector .string,
+.css .attribute_selector .selector	{ color: #606; }
+/* Rule set :Blocks */
+.css .ruleset						{ color: #000; }
+/* attribute */
+.css .ruleset .selector				{ color: #663; }
+.css .ruleset .id,
+.css .ruleset .value .selector		{ color: #330; }
+.css .ruleset .dimension,
+.css .ruleset .number				{ color: #630; }
+.css .ruleset .url,
+.css .ruleset .function				{ color: #006; }
+/* values */
+.css .value							{ color: Lime; }
+.css .value .string					{ color: #633; }
+.css .important						{ color: #F00; }
+

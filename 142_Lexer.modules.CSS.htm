@@ -1,0 +1,171 @@
+﻿<!DOCTYPE HTML>
+<html>
+<head>
+	<title>Module CSS</title>
+	<link rel="stylesheet" type="text/css" href="css/syntaxes.css">
+	<link rel="stylesheet" type="text/css" href="css/LexerModule.preview.css">
+</head>
+<body spellcheck="false">
+<a href="index.htm">Index</a>
+
+<h1 id="eH1">Module CSS</h1>
+
+<label for="eInput">Texte : </label><br>
+<textarea id="eInput"><![CDATA[/* I - COMMENTS */
+	/* Comments in a block */
+	body {
+		/*background: #ffe;*/
+		margin: 1/*em;  margin... */
+		padding: 1em; /* padding... */
+		}
+
+	/* A comment error... */
+	html {
+		mar/*gin: 0;
+		}
+		*/
+
+
+/* II - RULES SET */
+	/* ";" omissions in a declaration */
+	body {
+		font: normal 1em 'Times new roman';
+		padding: 1em
+		backgound: transparent url(images/bg.png) no-repeat 0 0;
+		}
+	body {
+		margin: 0;
+		padding: 1em /* ; ? */
+		border: none;
+		}
+
+
+/* 
+III - SELECTORS 
+http://www.w3.org/TR/css3-selectors/
+*/
+	/* 6. Simple selectors */
+		/* 6.1. Type selectors */
+		body {}
+		
+		/* 6.2. Universal selector */
+		body * {}
+		
+		/* 6.3. Attribute selectors */
+			/* 6.3.1. Attribute presence and value selectors */
+			h1[title] {}
+			span[class="example"] {}
+			span[hello="Cleveland"][goodbye="Columbus"] {}
+			a[rel~="copyright"] {}
+			a[hreflang|="en"] {}
+			
+			/* 6.3.2. Substring matching attribute selectors */
+			object[type^="image/"] {} /* HTML object, referencing an image: */
+			a[href$=".html"] {} /* HTML anchor with an href attribute whose value ends with ".html". */
+			p[title*="hello"] {} /* HTML paragraph with a title attribute whose value contains the substring "hello" */
+			
+			/* 6.3.3. Attribute selectors and namespaces */
+			/* 6.3.4. Default attribute values in DTDs */
+		
+		/* 6.4. Class selectors */
+		ul.menu li { margin: 4px 0 0; } 
+
+		/* 6.5. ID selectors */
+		#eMenu li { margin: 2px; } 
+
+		/* 6.6. Pseudo-classes */
+			/* 6.6.1. Dynamic pseudo-classes */
+			a:link { /* unvisited links */ }
+			a:visited { /* visited links */ }
+			a:hover { /* user hovers */ }
+			a:active { /* active links */ }
+			a:focus:hover { /* An example of combining dynamic pseudo-classes */ }
+
+			/* 6.6.2. The target pseudo-class :target */
+			*:target { color : red; }
+			*:target::before { content : url(target.png); }
+
+			/* 6.6.3. The language pseudo-class :lang */
+			html:lang(fr-be),
+			html:lang(de),
+			:lang(fr-be) > q,
+			:lang(de) > q {}
+
+			/* 6.6.4. The UI element states pseudo-classes */
+			:enabled ,
+			:disabled ,
+			:checked ,
+			:indeterminate {}
+
+			/* 6.6.5. Structural pseudo-classes */
+				/* Valid Examples with white space */
+				:nth-child( 3n + 1 ) {}
+				:nth-child( +3n - 2 ) {}
+				:nth-child( -n+ 6) {}
+				:nth-child( +6 ) {}
+			
+				/* Invalid Examples */
+					:nth-child(3 n) {}
+					:nth-child(+ 2n) {}
+					:nth-child(+ 2) {}
+					:nth-child(10n+-1) {}
+				
+				/**/
+				tr:nth-child(2n+1) {} /* represents every odd row of an HTML table */
+				tr:nth-child(odd) {} /* same */
+				tr:nth-child(2n) {} /* represents every even row of an HTML table */
+				tr:nth-child(even) {} /* same */
+
+			/* 6.6.6. Blank */
+			/* 6.6.7. The negation pseudo-class */
+	
+	/* 7. Pseudo-elements */
+		/* 7.1. The ::first-line pseudo-element */
+		p::first-line { text-transform: uppercase; }
+		
+		/* 7.2. The ::first-letter pseudo-element */
+		p::first-letter { font-size: 3em; font-weight: normal; }
+
+		/* 7.3. Blank */
+		/* 7.4. The ::before and ::after pseudo-elements */
+		
+	/* 8. Combinators */
+		/* 8.1. Descendant combinators... */
+		ul li { margin: 4px 0 0; } 
+		div p *[href] { margin: 0; } 
+
+		/* 8.2. Child combinators */
+		ul > li { display: inline; }
+		div ol>li p { white-space: nowrap; }
+		
+		/* 8.3. Sibling combinators */
+		ul + li { display: inline; }
+		ul ~ li { display: inline; }
+
+	
+/* IV - PHP */
+	/* One line */
+	div { background: <?php echo $darkblue ?> !important; }
+		
+	/* More than one line */	
+	.item div {
+		<?php 
+			echo "background: darkblue ;" ; /* Php string */
+		?> 
+		}
+]]></textarea>
+<input type="button" id="eBtnMatch" value="Analyser">
+<input type="checkbox" id="eRelief"><label for="eRelief">Relief.</label>
+<input type="checkbox" id="eWhiteSpaces"><label for="eWhiteSpaces">Espaces blancs.</label>
+<pre id="eResult"></pre>
+
+<!-- FRAMEWORK... -->
+<script src="js/framework.js"></script>
+<script src="js/lexer.automaton.js"></script>
+<script src="js/lexer.automaton.modules.js"></script>
+
+<script>var sLexerRule='CSS'</script>
+<script src="js/LexerModule.preview.js"></script>
+
+</body>
+</html>

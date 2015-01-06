@@ -1,0 +1,368 @@
+﻿<!DOCTYPE HTML>
+<html>
+<head>
+	<title>Prévisualisation d'un Automate</title>
+	<link rel="stylesheet" type="text/css" href="css/styles.css">
+	<style>
+HTML, BODY {
+    margin: 0;
+    padding: 0 0.5em;
+	}
+H1 {
+    margin: 0 0 0.25em;
+    padding: 0;
+	}
+#eRE {
+	background: #FFFFFF;
+    border: 1px solid #CCCCCC;
+    box-shadow: 0 0 10px #CCCCCC inset;
+    color: #000000;
+    font: bold 1em Courier New;
+    padding: 4px 1em;
+	}	
+TABLE.Table {
+    margin: 0em;
+	}
+#eSectionGraph {
+	float:left;
+	}
+	</style>
+</head>
+<body spellcheck="false">
+
+<h1 id="eH1">Prévisualisation d'un Automate</h1>
+<pre id="eRE"></pre>
+<div>
+	<input type="checkbox" id="eShowFA" checked><label for="eShowFA">Table. </label>
+	<input type="checkbox" id="eShowFAGraph"><label for="eShowFAGraph">Graphe. </label>
+</div>
+
+<div id="eFA"></div>
+
+<div id="eSectionGraph">
+	<input type="button" value="+" onclick="augmentGraph('FA')" title="">
+	<input type="button" value="-" onclick="reduceGraph('FA')" title="">
+	<!-- <input type="button" value="Réorganiser" onclick="layoutGraph('FA')" title="Change le placement des états."> -->
+	<br>
+	<div id="eFAGraph" class="graph"></div>
+</div>
+
+<hr style="clear:both;">
+
+<div id="eSectionMatch">
+	<label for="eInput">Texte : </label>
+	<textarea id="eInput"></textarea>
+	<input type="button" id="eBtnMatch" value="Analyser">
+	<pre id="eResult"></pre>
+</div>
+
+<!-- FRAMEWORK... -->
+<script src="js/framework.js"></script>
+<script src="js/lexer.automaton.js"></script>
+<script src="js/lexer.automaton.modules.js"></script>
+<script src="js/automaton.js"></script>
+
+<!-- GRAPH... -->
+<script src="widget/cytoscape2.0.1/jquery.min.js"></script>
+<script src="widget/cytoscape2.0.1/cytoscape.js"></script>
+<script src="widget/cytoscape2.0.1/arbor.js"></script>
+<script>
+var oFA, EPSILON = '&epsilon;'
+var buildGraph =function( sType, nodes, edges ){
+	return window[ sType+'Graph'] = $('#e'+sType+'Graph').cytoscape({
+	//	container: document.getElementById('e'+sType+'Graph'),
+		style: cytoscape.stylesheet()
+			.selector('node').css({
+				'content': 'data(name)',
+				'width': 'mapData(weight, 40, 80, 20, 60)',
+				'text-valign': 'center',
+				'color': 'white',
+				'text-outline-width': 2,
+				'text-outline-color': 'data(faveColor)',
+				'background-color': 'data(faveColor)'
+				})
+			.selector('edge').css({
+				'width': 'mapData(strength, 70, 100, 2, 6)',
+				'content': 'data(name)',
+				'target-arrow-shape': 'triangle',
+				'line-color': '#6FB1FC',
+				'source-arrow-color': '#6FB1FC',
+				'target-arrow-color': '#6FB1FC'
+				})
+			.selector('edge.epsilon').css({
+				'line-style': 'dashed',
+				'target-arrow-shape': 'triangle'
+				})
+			.selector('edge.charclass').css({
+				'color': '#060',
+				'line-color': '#0F0',
+				'source-arrow-color': '#0F0',
+				'target-arrow-color': '#0F0'
+				})
+			.selector(':selected').css({
+				'background-color': 'black',
+				'line-color': 'black',
+				'target-arrow-color': 'black',
+				'source-arrow-color': 'black'
+				})
+			.selector('.faded').css({
+				'opacity': 0.25,
+				'text-opacity': 0
+				}),
+		elements:{
+			nodes: nodes,
+			edges: edges
+			},
+		ready: function(){
+			var Graph = this
+			Graph.elements().unselectify()
+			Graph.on('tap', 'node', function(e){
+				var node = e.cyTarget 
+				var neighborhood = node.neighborhood().add(node)
+				Graph.elements().addClass('faded')
+				neighborhood.removeClass('faded')
+				});
+			Graph.on('tap', function(e){
+				if( e.cyTarget === Graph )
+					Graph.elements().removeClass('faded')
+				});
+			}
+		})
+	}
+var showGraph =function( sType ){
+	oFA = window[ 'o' + sType ]
+	var o = window[ sType+'Graph'] = buildGraph(
+			sType,
+	/*NODES*/	( function(){ 
+				var a = []
+				oFA.S.every( function( S ){
+					if( S == 0 ) return 1
+					if( oFA.D && oFA.D.have( S )) return 1
+					var bI = S==oFA.I, bF = oFA.F.have( S )
+					var sBgColor = bI && bF ? '#0C0'
+						: ( bI ? '#6FB1FC'
+							: ( bF ? '#FC0'
+								: ( S==0 ? '#F00'
+									: '#CCC'
+									)))
+					a.push({ data: { id:''+S, name:''+S, faveColor:sBgColor }})
+					return 1
+					})
+				return a
+				})(),
+	/*EDGES*/	( function(){
+				var a = []
+				oFA.T.every( function( T ){
+					if( T[2] == 0 ) return 1
+					if( oFA.D && oFA.D.have( T[2] )) return 1
+					var sSymbol = T[1]==EPSILON ? '' : T[1]
+					var bCharClass = sSymbol.length > 1
+					var sSymbolLabel = JSON.stringify( bCharClass ? sSymbol.substring(0,5)+(sSymbol.length>5?'...':'') : sSymbol ).slice(1,-1)
+					a.push({
+						data: { source:''+T[0], name:sSymbolLabel, target:''+T[2] },
+						classes: T[1]==EPSILON ? 'epsilon' : ( bCharClass ? 'charclass' : '' )
+						})
+					return 1
+					})
+				return a
+				})()
+			)
+	}
+var layoutGraph =function( sType ){
+	var o = window[ sType+'Graph']
+	if( o ){
+		var options = {
+			name: 'arbor',
+			liveUpdate: true, // whether to show the layout as it's running
+			ready: undefined, // callback on layoutready 
+			stop: undefined, // callback on layoutstop
+			maxSimulationTime: 10000, // max length in ms to run the layout
+			fit: false, // fit to viewport
+			padding: [ 25, 25, 25, 25 ], // top, right, bottom, left
+			ungrabifyWhileSimulating: true, // so you can't drag nodes during layout
+
+			// forces used by arbor (use arbor default on undefined)
+			repulsion: undefined,
+			stiffness: undefined,
+			friction: undefined,
+			gravity: true,
+			fps: undefined,
+			precision: undefined,
+
+			// static numbers or functions that dynamically return what these
+			// values should be for each element
+			nodeMass: undefined, 
+			edgeLength: undefined,
+
+			stepSize: 1, // size of timestep in simulation
+
+			// function that returns true if the system is stable to indicate
+			// that the layout can be stopped
+			stableEnergy: function( e ){
+				return ( e.max <= 0.5 ) || ( e.mean <= 0.3 )
+				}
+			}
+		o.cytoscape("get").layout( options )
+		}
+	}
+var augmentGraph =function( sType ){
+	var e = window[ 'e'+sType+'Graph']
+	var n = parseInt( e.offsetWidth )
+	e.style.height = e.style.width = n + 100 + 'px'
+	showGraph( sType )
+	}
+var reduceGraph =function( sType ){
+	var e = window[ 'e'+sType+'Graph']
+	var n = parseInt( e.offsetWidth )
+	e.style.height = e.style.width = n - 100 + 'px'
+	showGraph( sType )
+	}
+</script>
+
+<!-- ... -->
+<script>
+var oLoaded
+var oFA
+var sToken
+
+var LexerNode =function( o ){
+	// alert( JSON.stringify( o ))
+	var e = document.createElement('B')
+	, sToken = o.token
+	, sValue = o.value
+	e.oValue = o
+	e.title = sToken +'\n\u25B6'+ sValue +'\u25C0'
+	if( sValue ) e.innerHTML = sValue.str_replace( ['&','<','>'], ['&amp;','&lt;','&gt;'])
+	e.className = 'myNode'
+	if( o.css ) e.className += ' '+ o.css
+	return e
+	}
+
+var setFA =function( o ){
+	oLoaded = o
+	document.title = eH1.innerHTML = sToken = o.token || ''
+	eRE.innerHTML = o.re
+		? ( o.re.charAt
+			? o.re.str_replace( ['&','<','>'], ['&amp;','&lt;','&gt;'])
+			: o.re.join('|')
+			) : ''
+	oFA = o.oFA
+	if( o.test ) eInput.value = o.test
+	if( sToken ){
+		AutomatonLexer.addTokenFromString( sToken, o.automate )
+		AutomatonLexer.addRule( 'ROOT', [ sToken ])
+		}
+	refreshFAHTML('FA')
+	if( eShowFAGraph.checked ) showGraph( 'FA' )
+	eSectionMatch.style.display = o.automate ? '' : 'none'
+//	match()
+	}
+var refreshFAHTML =function( sType ){	
+	var getHTMLTable =function( sTitle, oAutomaton ){
+		var D = oAutomaton.D && oAutomaton.D.length ? oAutomaton.D[0] : ''
+		var A = []
+		for(var i=0, ni=oAutomaton.A.length; i<ni; i++ )
+			A[i] = '<b style="background:lime; color:purple; padding:1px;">'+ JSON.stringify(oAutomaton.A[i]).slice(1,-1).replace( /\\"/g, '"' ) +'</b>'
+		Bufferize.init( '<table border="1" class="Table">' )
+		Bufferize( '<tr><th colspan="2">'+ sTitle +'</th></tr>' )
+		Bufferize( '<tr><th>S ('+oAutomaton.S.length+')</th><td>'+ oAutomaton.S.join(' ') +'</td></tr>' )
+		Bufferize( '<tr><th>&sum; ('+oAutomaton.A.length+')</th><td>'+ A.join(' ') +'</td></tr>' )
+		Bufferize( '<tr><th style="background:#6FB1FC;">I</th><td>'+ oAutomaton.I +'</td></tr>' )
+		Bufferize( '<tr><th style="background:#FC0;">F ('+oAutomaton.F.length+')</th><td>'+ oAutomaton.F.join(' ') +'</td></tr>' )
+		var a = oAutomaton.aTokensID 
+		if( a && a.length ){
+			Bufferize( '<tr><th valign="top">Tokens</th><td>' )
+			Bufferize( '<table>' )
+			for(var i=0, ni=a.length; i<ni; i++){
+				Bufferize( '<tr><th style="background:blue;">'+ a[i][0] +'</th><td style="text-align:center;">'+ a[i][1].join(' ') +'</td></tr>' )
+				}
+			Bufferize( '</table>' )
+			Bufferize( '</td></tr>' )
+			}
+		if( D===0 ) Bufferize( '<tr><th style="background:red;">D</th><td>0</td></tr>' )
+	//	Bufferize( '<tr><th style="background:red;">D</th><td>0</td></tr>' )
+		Bufferize( '<tr><th valign="top">&delta; ('+oAutomaton.T.length+')</th><td>' )
+		
+		var M = oAutomaton.M || buildTable( oAutomaton )
+		
+		var aSpecialSymbol = []
+		oAutomaton.A.every( function( symbol ){
+			if( symbol.length>1 ) aSpecialSymbol.push( symbol )
+			return 1
+			})
+		var nextState =function( sState, sChar ){
+			var o = M[sState]
+			var displayState =function( mState ){
+				if( mState.join ) return mState[1] || ''
+				return mState || ''
+				}
+			if( o && o[ sChar ]){
+				if( o[ sChar ].join ){
+					var a = []
+					o[ sChar ].every( function( mState ){
+						return a.push( displayState( mState ))
+						})
+					return a.join(' , ')
+					}
+				return displayState( o[ sChar ])
+				}
+			return 0
+			}
+		Bufferize( '<table>' )
+		Bufferize( '<tr><td></td>' )
+		A.every( function( symbol ){
+			return Bufferize( '<th>'+ symbol  +'</th>' ) //  || symbol.charCodeAt(0))
+			})
+		Bufferize( '</tr>' )
+		oAutomaton.S.every( function( state ){
+			var sBg = state==oAutomaton.I
+				? '#6FB1FC'
+				: ( oAutomaton.F.have( state )
+					? '#FC0'
+					: ( state === 0 ? 'red' : '' ))
+	//				: ( ! state ? 'red' : '' ))
+			Bufferize( '<tr><th style="background:'+sBg+';">'+ state +'</th>' )
+			oAutomaton.A.every( function( symbol ){
+				var stateEnd = nextState( state, symbol )
+				return Bufferize( '<td style="text-align:center;'+( stateEnd==D ? 'background:red; opacity:0.25;' : '')+'">'+ stateEnd +'</td>' )
+				})
+			return Bufferize( '</tr>' )
+			})
+		Bufferize( '</table>' )
+		Bufferize( '</td></tr>' )
+		return Bufferize( '</table>' )
+		}
+	window['e'+sType].innerHTML = getHTMLTable( oLoaded.type || sType, window['o'+sType])
+//	if( window['eShow'+sType+'Graph'].checked ) showGraph( sType )
+	}
+var match =function(){
+	eResult.innerHTML = ''
+	try{
+		eResult.appendChild( AutomatonLexer( eInput.value, 'ROOT' ))
+	}catch(e){
+		eResult.innerHTML = e.message + '<br>'
+		if( e.fileName ) eResult.innerHTML += '<br>fichier: '+ e.fileName.split('/').pop()
+		if( e.lineNumber ) eResult.innerHTML += '<br>ligne: '+ e.lineNumber
+		}
+	}
+</script>
+<script>
+_( 'eH1,eRE' )
+_( 'eShowFA,eSectionGraph,eShowFAGraph' )
+_( 'eSectionMatch,eInput,eBtnMatch,eResult' )
+eBtnMatch.onclick = match
+
+eShowFA.onchange =function(){
+	eFA.style.display= eShowFA.checked?'':'none'
+	}
+eShowFAGraph.onchange =function(){
+	var b = eShowFAGraph.checked
+	eSectionGraph.style.display= b?'':'none'
+	if( b ) showGraph( 'FA' )
+	}
+eShowFA.onchange()
+eShowFAGraph.onchange()
+</script>
+
+</body>
+</html>

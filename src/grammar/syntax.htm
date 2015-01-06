@@ -1,0 +1,172 @@
+<html>
+	<head>
+		<title>Syntaxe des grammaires</title>
+		<style>
+			BODY {
+				margin-left: 250px;
+				transition: 250ms ease;
+				}
+			.menu {
+				background: #eee;
+				height: 100%;
+				margin-left: -250px;
+				padding: 20px;
+				position: fixed;
+				top: 0;
+				}
+			.menu DD {
+				margin-left: 20px;
+				}
+			.menu A {
+				display: block;
+				margin: 7px 4px;
+				}
+				
+			#back-top {
+				position: fixed;
+				bottom: 10px;
+				margin-left: -150px;
+				}
+
+			#back-top a {
+				width: 108px;
+				display: block;
+				text-align: center;
+				font: 11px/100% Arial, Helvetica, sans-serif;
+				text-transform: uppercase;
+				text-decoration: none;
+				color: #bbb;
+
+				/* transition */
+				-webkit-transition: 1s;
+				-moz-transition: 1s;
+				transition: 1s;
+				}
+			#back-top a:hover {
+				color: #000;
+				}
+
+			/* arrow icon (span tag)
+			#back-top span {
+				width: 108px;
+				height: 108px;
+				display: block;
+				margin-bottom: 7px;
+				background: #ddd url(up-arrow.png) no-repeat center center;
+
+				/* rounded corners */
+				-webkit-border-radius: 15px;
+				-moz-border-radius: 15px;
+				border-radius: 15px;
+
+				/* transition */
+				-webkit-transition: 1s;
+				-moz-transition: 1s;
+				transition: 1s;
+				}
+			#back-top a:hover span {
+				background-color: #777;
+				}
+			 */
+		</style>
+	</head>
+	<body>
+	
+<dl class="menu">
+	<dt><h3>Sommaire</h3></dt>
+	<dt><a href="#toc1">Préambule</a></dt>
+	<dt><a href="#toc2">Syntaxe</a>
+		<dd><dl>
+			<dt><a href="#toc21">Les règles grammaticales</a></dt>
+			<dt><a href="#toc22">Caractères spéciaux</a></dt>
+		</dl></dd>
+	</dt>
+	<dt><a href="#toc3">Exemple</a>
+</dl>
+	
+<p id="back-top"><a href="#"><span></span>Haut de page</a></p>
+
+
+<h1>Syntaxe des grammaires</h1>
+
+
+<a name="toc1"></a>
+<h2>Préambule</h2>
+<p>Les modules de l'analyseur syntaxique contiennent :</p>
+<ul>
+	<li>Etat initial</li>
+	<li>Etat final</li>
+	<li>Liste des symboles terminaux ou non</li>
+	<li>Les règles de production</li>
+	<li>Une matrice (changement d'état)</li>
+	<li>Une fonction pour transformer l'arbre syntaxique</li>
+</ul>
+
+
+<a name="toc2"></a>
+<h2>Syntaxe</h2>
+<ul>
+	<li>Une règle grammaticale par ligne.</li>
+	<li>Les symboles terminaux sont normalement les noms des tokens.</li>
+</ul>
+
+
+<a name="toc21"></a>
+<h3>Les règles grammaticales</h3>
+<p>Ce sont des paires formées</p>
+<ul>
+	<li>d'un non-terminal</li>
+	<li>d'une suite de terminaux et de non-terminaux</li>
+	<li>séparés par le symbole &rarr; (ou -&gt;).</li>
+</ul>
+
+<a name="toc22"></a>
+<h3>Caractères spéciaux</h3>
+
+<p>Caractères et chaines réservés :</p>
+<ul>
+	<li>"&rarr;" (ou "-&gt;"): sépare la paire d'une règle.</li>
+	<li>"|": spécifie une alternative.</li>
+	<li>"&epsilon;" (ou "epsilon"):</li>
+</ul>
+
+
+<a name="toc3"></a>
+<h2>Exemple</h2>
+<ul>
+	<li><a href="preview.htm">Visualiser l'analyse de cette syntaxe</a></li>
+	<li><a href="../../210_Parser.html">Créer un module pour le parser</a></li>
+</ul>
+
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
+<script>
+$(document).ready(function(){
+	$("a[href^=#]").click( function(e){
+		var sAnchorName = $(this).attr('href').slice(1)
+		if( sAnchorName ){
+			e.preventDefault()
+			var eAnchor = $("a[name='"+ sAnchorName +"']")
+			$('html,body').animate({ scrollTop:eAnchor.offset().top }, 'slow' )
+			}
+		})
+		
+	// hide #back-top first
+	$("#back-top").hide()
+	
+	// fade in #back-top
+	$( function(){
+		$(window).scroll( function(){
+			if( $(this).scrollTop() > 100 ) $('#back-top').fadeIn()
+			else $('#back-top').fadeOut()
+			})
+		// scroll body to 0px on click
+		$('#back-top a').click( function(){
+			$('body,html').animate({ scrollTop: 0 }, 500 )
+			return false
+			})
+		})
+	})
+</script>
+</body>
+</html>

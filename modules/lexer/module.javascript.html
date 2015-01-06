@@ -1,0 +1,113 @@
+<html><head></head><body><pre>
+¤ superscript, whitespaces, strings&comments, number
+
+!#	JS	=	BIG_JS|NOT_WHITE_SPACES	
+		(css:js)
+
+!@	BIG_JS	=	S_PHP|E_HTMLScript|NUMBER|{whitespaces}|{operators}|{comments}|R_REGULAR_EXPRESSION|{strings}|{punctuators}|{words}
+		hspaces		=	TAB|SPACES
+		whitespaces	=	{hspaces}|L_NEW_LINE
+		operators	=	ARITHMETIC_OPERATOR|ASSIGNMENT_OPERATOR|COMPARISON_OPERATOR|LOGICAL_OPERATOR|UNARY_OPERATOR
+		comments	=	S_SLC|S_MLC
+		strings		=	S_SSQ|S_SDQ
+		punctuators	=	ELISION|LBRACE|RBRACE|LPAREN|RPAREN|LBRACK|RBRACK|DOT|SEMI|QUESTION|COLON
+		words		=	JS_KEYWORD|JS_LITERAL|JS_IDENTIFIER
+
+// REGULAR EXPRESSION
+	R_REGULAR_EXPRESSION	=	\/{reBody}\/{reFlags}
+			(
+			css:regexp,
+			previousTokens:{re_operators}|{re_punctuators}|JS_KEYWORD,
+			translation:REGULAR_EXPRESSION
+			)
+		re_operators		=	ARITHMETIC_OPERATOR|ASSIGNMENT_OPERATOR|BITWISE_OPERATOR|COMPARISON_OPERATOR|LOGICAL_OPERATOR
+		re_punctuators		=	ELISION|DOT|LPAREN|LBRACE|LBRACK|COLON|SEMI|QUESTION
+		
+		reBody			=	{reFirstChar}{reChars}
+		reFirstChar		=	[^\n\r\f\*\\\/\[]|{reBackslashSequence}|{reClass}
+		reBackslashSequence	=	\\[^\n\r\f]
+		reChars			=	{reChar}*
+		reChar			=	[^\n\r\f\\\/\[]|{reBackslashSequence}|{reClass}
+		reClass			=	\[{reClassChars}\]
+		reClassChars		=	{reClassChar}*
+		reClassChar		=	[^\n\r\f\]\\]|{reBackslashSequence}
+		reFlags			=	{reFlag}*
+		reFlag			=	[a-zA-Z]
+!#@	REGULAR_EXPRESSION		=	{hspaces}|REGULAR_EXPRESSION_IN
+	REGULAR_EXPRESSION_IN		= 	[^ \t]+
+
+// IDENTIFIERS
+	JS_KEYWORD	=	break|c(ase|atch|ontinue)|d(efault|elete|o)|else|f(inally|or|unction)|i(f|n|nstanceof)|new|return|switch|t(his|hrow|ry|ypeof)|v(ar|oid)|w(hile|ith)
+		(css:keyword)
+	JS_LITERAL	=	true|false|null|undefined|Infinity|NaN
+		(css:literal)
+	JS_IDENTIFIER	=	[$_a-zA-Z]+[$_\w]*
+		(css:identifier)
+
+// OPERATORS
+	ARITHMETIC_OPERATOR	=	\+|-|\*|%|/
+		(css:operator)
+	ASSIGNMENT_OPERATOR	=	=|\*=|\/=|\%=|\+=|\-=|<<=|>>=|>>>=|\&=|\^=|\|=
+		(css:operator)
+	COMPARISON_OPERATOR	=	([<>]|[=!]=)=?
+		(css:operator)
+	LOGICAL_OPERATOR	=	&&|\|\|
+		(css:operator)
+	UNARY_OPERATOR		=	\+\+|--|~|!
+		(css:operator)
+
+// PUNCTUATORS
+	ELISION		=	\,
+		(css:elision)
+	LBRACE		=	\{
+		(css:punctuator)
+	RBRACE		=	\}
+		(css:punctuator)
+	LPAREN		=	\(
+		(css:punctuator)
+	RPAREN		=	\)
+		(css:punctuator)
+	LBRACK		=	\[
+		(css:punctuator)
+	RBRACK		=	\]
+		(css:punctuator)
+	DOT		=	\.
+		(css:punctuator)
+	SEMI		=	\;
+		(css:punctuator)
+	QUESTION	=	\?
+		(css:punctuator)
+	COLON		=	\:
+		(css:punctuator)
+		
+/*
+To support error recovery,
+JavaScript 2.0s lexical grammar must be made independent of its syntactic grammar.
+To make the lexical grammar independent of the syntactic grammar,
+JavaScript 2.0 determines whether a / starts a regular expression or
+is a division (or /=) operator solely based on the previous token:
+
+/ interpretation 
+
+Previous token
+
+/ or /= 
+  	Identifier   Number   RegularExpression   String
+	!   )   ++   --   ..   ...   ]   }   ~
+	false   null   super   this   true
+	constructor   getter   method   override   setter   traditional   version
+	Any other punctuation
+
+RegularExpression
+	!=   !==   #   %   %=   &   &&   &&=   &=   (   *   *=   +   +=   ,   -   -=   ->   .   /   /=   :   ::   ;   
+	<   <<   <<=   <=   =   ==   ===   >   >=   >>   >>=   >>>   >>>=   ?   @   [   ^   ^=   ^^   ^^=   {   |   |=   ||   ||=
+	abstract   break   case   catch   class   const   continue   debugger   default   delete   do   else   
+	enum   export   extends   field   final   finally   for   function   goto   if   implements   
+	import   in   instanceof   native   new   package   private   protected   public   return   
+	static   switch   synchronized   throw   throws   transient   try   typeof   var   volatile   while   with
+
+à transférer RegularExpression
+	!	voir ! /\s+/.test('ok')
+	
+*/
+</pre></body></html>

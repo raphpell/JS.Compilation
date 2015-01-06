@@ -1,0 +1,77 @@
+<html><head></head><body><pre>
+¤ number
+
+!@	ZEN		=	ELT|ELTID|ELTCLASS|{punctuators}|MULTIPLICATION|NUMBER|SPACES|ARGUMENT_PREFIX|{operators}|{strings}
+					punctuators = LPAREN|RPAREN|LBRACK|RBRACK|EQUAL
+					operators = PLUS|GTHAN|UP
+					strings = S_SNIPPET_SSQ|S_SNIPPET_SDQ
+
+	id		= [$@a-zA-Z\-_0-9]+
+	
+	ELT			= {id}
+		(css:elt)
+	ELTID		= \#{id}
+		(css:id)
+	ELTCLASS	= \.{id}
+		(css:className)
+	MULTIPLICATION	= \*\d+
+		(css:multiplication)
+	SPACES	 = [ \t]+
+
+
+/*---------- PUNCTUATORS ----------*/
+
+// ---------- argument ----------
+	ARGUMENT_PREFIX		=	\:
+		(css:punctuator)
+
+// ---------- Grouping ----------
+	LPAREN		=	\(
+		(css:punctuator)
+	RPAREN		=	\)
+		(css:punctuator)
+		
+// ---------- Customs attributes ----------
+	LBRACK		=	\[
+		(css:punctuator)
+	EQUAL		= \=
+		(css:punctuator)
+	RBRACK		=	\]
+		(css:punctuator)
+
+
+/*---------- OPERATORS ----------*/
+	PLUS		= \+
+		(css:operator)
+	GTHAN		= \>
+		(css:operator)
+	UP		= \^+
+		(css:operator)
+
+
+/*---------- HSPACE ----------*/
+	SPACES		=	\ 
+		(css:space)
+	TAB			=	\t
+		(css:space)
+
+
+/*---------- STRINGS ----------*/
+
+// ---------- STRING SINGLE QUOTE ----------
+!#@	SNIPPET_SSQ			=	SNIPPET_SSQ_IN|E_SNIPPET_SSQ
+		(translation:STRING, css:string)
+	S_SNIPPET_SSQ		=	'
+	E_SNIPPET_SSQ		=	'
+	SNIPPET_SSQ_IN		=	([^'\\\n\r\f]|\\[^\n\r\f])+
+		(translation:STRING, css:string)
+
+// ---------- STRING DOUBLE QUOTE ----------
+!#@	SNIPPET_SDQ			=	SNIPPET_SDQ_IN|E_SNIPPET_SDQ
+		(translation:STRING, css:string)
+	S_SNIPPET_SDQ		=	"
+	E_SNIPPET_SDQ		=	"
+	SNIPPET_SDQ_IN		=	([^"\\\n\r\f]|\\[^\n\r\f])+
+		(translation:STRING, css:string)
+
+</pre></body></html>

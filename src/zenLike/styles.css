@@ -1,0 +1,15 @@
+
+.number			{	color: #000;	background: red;			border: 1px solid #eee;}
+.elt			{	color: #FFF;	background: blue;			border: 1px solid #eee;}
+.operator		{	color: #000;	background: brown;			border: 1px solid #eee;}
+.multiplication	{	color: #000;	background: orange;			border: 1px solid #eee;}
+.punctuator		{	color: #000;	background: lightskyblue;	border: 1px solid #eee;}
+.space			{	color: #FFF;	background: black;			border: 1px solid #eee;}
+.string			{	color: #000;	background: yellow;			border: 1px solid #eee;}
+
+.attributes 		{	color: #000;	background: darkviolet;		border: 1px solid #eee;}
+.id				{	color: #000;	background: violet;			border: 1px solid #eee;}
+.className		{	color: #000;	background: pink;			border: 1px solid #eee;}
+
+.arguments	 	{	color: #000;	background: lime; 			border: 1px solid #eee;}
+

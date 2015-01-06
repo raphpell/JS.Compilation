@@ -1,0 +1,191 @@
+<html>
+	<head>
+		<title>Syntaxe des modules</title>
+		<link rel="stylesheet" type="text/css" href="../../widget/Toc/styles.css">
+	</head>
+	<body>
+
+<dl class="menu">
+	<dt><h3>Sommaire</h3></dt>
+	<dt><a href="#toc1">Préambule</a></dt>
+	<dt><a href="#toc2">Syntaxe</a>
+		<dd><dl>
+			<dt><a href="#toc21">Les modules requis</a></dt>
+			<dt><a href="#toc22">Les définitions</a>
+				<dd><dl>
+					<dt><a href="#toc221">Export du résultat</a></dt>
+					<dt><a href="#toc222">Notation identifiants</a></dt>
+					<dt><a href="#toc223">Préfixes d'identifiants</a></dt>
+					<dt><a href="#toc224">Affectation de valeur</a></dt>
+					<dt><a href="#toc225">Affectation d'attributs</a></dt>
+				</dl></dd>
+			</dt>
+			<dt><a href="#toc23">Les commentaires</a></dt>
+		</dl></dd>
+	</dt>
+	<dt><a href="#toc3">Exemple</a></dt>
+</dl>
+<p id="back-top"><a href="#"><span></span>Haut de page</a></p>
+
+
+<h1>Syntaxe des modules</h1>
+
+
+<a name="toc1"></a>
+<h2>Préambule</h2>
+
+<p>Les modules de l'analyseur lexical contiennent :</p>
+<ul>
+	<li>des automates finis déterministes</li>
+	<li>des règles d'analyse (liste d'automates à tester)</li>
+	<li>les noms des classes css à associer au token</li>
+	<li>des noms de token destinés à renommer certains token</li>
+	<li>des noms de token devant précéder certain token pour qu'il soit véritablement reconnu</li>
+</ul>
+
+<p>Lors de la <a href="../../140_Lexer.modules.htm">création de module pour le lexer</a></p>
+<ul>
+	<li>les valeurs résultantes sont stockées même si elles ne sont pas exportées.</li>
+	<li>elles sont réutilisables pour le calcul des modules suivant.</li>
+</ul>
+
+
+<a name="toc2"></a>
+<h2>Syntaxe</h2>
+
+
+<a name="toc21"></a>
+<h3>Les modules requis</h3>
+
+<p>
+	Ils ne seront pas calculés automatiquement. <cite>Cela permet aux ordinateurs de refroidir un peu...</cite><br>
+	La notation ci-dessous est utilisée uniquement pour connaître les modules qu'il nous faut avant de lancer le calcul. <br>
+	
+</p>
+<ul>
+	<li> leur déclaration se fait en tête de fichier</li>
+	<li> le symbole '¤' préfixe la suite de nom de module</li>
+	<li> ils sont séparés avec le symbole ','</li>
+</ul>
+<p>Exemple: <code>	¤ superscript, whitespaces, strings&amp;comments</code></p>
+
+
+<a name="toc22"></a>
+<h3>Les définitions</h3>
+
+<p>Nous identifions :</p>
+<ul>
+	<li>Les <b>tokens</b> : expression régulière (à transformer en AFD)</li>
+	<dd><code>!	REGULAR_EXPRESSION	=	\/<i>{reBody}</i>\/<i>{reFlags}</i></code></dd>
+	<li>Les <b>règles d'analyse</b> (liste de tokens à tester lors de l'analyse)</li>
+	<dd><code>!#@	R_REGULAR_EXPRESSION		=	<i>{hspaces}</i>|REGULAR_EXPRESSION_IN</code></dd>
+	<li>Les <b>aggrégations</b> de token : assemblage de plusieurs automates en un seul</li>
+	<dd><code>!#@	INI_VALUE			=	S_INI_SDQ|S_INI_SSQ|INI_VALUE_IN|<i>{hspaces}</i></code></dd>
+	<li>Les <b>macros</b> :
+		<ul>
+			<li>expression régulière intégrée dans d'autres.</li>
+			<li>portion d'une aggrégation, d'une règle d'analyse ou de l'attribut <i>previousTokens</i>: liste de noms de token.</li>
+		</ul>
+		Elles sont intégrées dans les valeurs en étant encadrées par les symboles '{}'
+	</li>
+</ul>
+
+
+<a name="toc221"></a>
+<h4>Export du résultat</h4>
+<p>Pour que les tokens, les règles et les aggrégations soit dans le résultat, il faut que leur identifant soit précédé du caractère <b>'!'</b>.</p>
+
+
+<a name="toc222"></a>
+<h4>Notation identifiants</h4>
+<ul>
+	<li>ceux commençant par une lettre <b>majuscule</b> sont :
+		<ul>
+			<li>Les noms des tokens</li>
+			<li>Les règles d'analyse : Ils doivent-être aussi précédés du caractère <b>'#'</b></li>
+			<li>Les aggrégations de token : Ils doivent-être aussi précédés du caractère <b>'@'</b></li>
+		</ul>
+	</li>
+	<li>ceux commençant par une lettre <b>minuscule</b> sont les macros.</li>
+</ul>
+
+
+<a name="toc223"></a>
+<h4>Préfixes d'identifiants</h4>
+<ul>
+	<li>'S_<i>TokenName</i>' : 
+		<dl>
+			<dd>Détecte le début d'un token parent
+				<ul>
+					<li>créé le token parent '<i>TokenName</i>'</li>
+					<li>ajoute le token 'S_<i>TokenName</i>' au parent</li>
+					<li>continue l'analyse avec la définition '<i>TokenName</i>'</li>
+					<li>l'analyse du parent se stoppe si aucun token est trouvé ou si le token 'E_<i>TokenName</i>' est trouvé.</li>
+				</ul>
+			</dd>
+		</dl>
+	</li>
+	<li>'E_<i>TokenName</i>' :
+		<dl>
+			<dd>Détecte la fin d'un token parent</dd>
+		</dl>
+	</li>
+	<li>'R_<i>TokenName</i>' :
+		<dl>
+			<dd>Ce type de token permet de refaire une analyse sur la valeur d'un token trouvé nommé '<i>TokenName</i>'.</dd>
+			<dd>Si le token '<i>TokenName</i>' est trouvé,
+				<ol>
+					<li>le token parent 'TokenName' est créé</li>
+					<li>l'analyse lexicale est relancée avec la définition  '<i>TokenName</i>' sur la valeur précédemment trouvé</li>
+				</ol>
+			</dd>
+			<dd>Ce type de token est à éviter si possible.</dd>
+		</dl>
+	</li>
+</ul>
+
+
+<a name="toc224"></a>
+<h4>Affectation de valeur</h4>
+<p>Les valeurs commencent après l'identifiant suite aux espaces après le symbole '=' et se termine au saut de ligne.</p>
+
+
+<a name="toc225"></a>
+<h4>Affectation d'attributs</h4>
+<p>
+	Les attributs sont définis la ligne suivant l'affectation, entre des parenthèses '()' et sont séparés par une virgule ','. <br>
+	Nom d'attributs implémentés :
+</p>
+<ul>
+	<li><b>css</b> : classe css.</li>
+	<li><b>previousTokens</b> : Liste des tokens pouvant le précéder, séparés par le symbole '|'.</li>
+	<li><b>translation</b> : nom final du token.</li>
+</ul>
+<p>La valeur de ces attributs est présente après le caractère ':' suivant le nom.</p>
+<p>Les aggrégations ne possède pas d'attribut puisqu'elles ne sont pas un token.</p>
+
+
+<a name="toc23"></a>
+<h3>Les commentaires</h3>
+<p>Il est possible d'ajouter des commentaires, mais ils doivent être seules sur les lignes où ils sont ajoutés. </p>
+<ul>
+	<li>Commentaire simple ligne</li>
+	<dd><code>// ...</code></dd>
+	<li>Commentaire multiligne</li>
+	<dd><code>/* ... */</code></dd>
+</ul>
+
+
+<a name="toc3"></a>
+<h2>Exemple</h2>
+<p>Je vous propose de :</p>
+<ul>
+	<li><a href="preview.htm">visualiser l'analyse de cette syntaxe</a></li>
+	<li><a href="../../140_Lexer.modules.htm">créer un module pour le lexer</a></li>
+</ul>
+
+
+<script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>
+<script type="text/javascript" src="../../widget/Toc/jquery.js"></script>
+</body>
+</html>

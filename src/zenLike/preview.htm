@@ -1,0 +1,634 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>Module ZenLike</title>
+	<style>
+HTML, BODY {
+    margin: 0;
+    padding: 0 0.5em;
+	}
+H1 {
+    margin: 0 0 0.25em;
+    padding: 0;
+	}
+#eInput{
+	width: 100%;
+	height: 20px;
+	}
+#eCompil{
+    float: left;
+	width: 65%;
+	height: 264px;
+	}
+
+/* LEGEND */
+.legend {
+	background: #000;
+    float: right;
+	margin: 0;
+	padding: 0.25em;
+	text-align: center;
+	width: 30%;
+	}
+	.legend I {
+		color: #FFF;
+		}
+	.legend DT {
+		margin: 2px;
+		}
+	</style>
+	<link rel="stylesheet" type="text/css" href="nodeStyle.css">
+	<link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+<body spellcheck="false">
+
+<h1>Module ZenLike</h1>
+
+<label for="eInput">Expression : </label><br>
+
+<select id="eChoices">
+	<option></option>
+	<optgroup label="JS"></optgroup>
+	<optgroup label="CSS"></optgroup>
+	<optgroup label="HTML"></optgroup>
+	<optgroup label="PHP"></optgroup>
+</select>
+<select id="eContext">
+	<option value="HTML">HTML</option>
+	<option value="CSS">CSS</option>
+	<option value="JS">JS</option>
+	<option value="PHP">PHP</option>
+</select>
+<textarea id="eInput">(div>dl>(dt+dd)*3)+footer>p</textarea>
+<input type="button" id="eBtnScan" value="Analyse lexicale">
+<input type="button" id="eBtnParse" value="Analyse syntaxique">
+<input type="button" id="eBtnCompile" value="Générer la source">
+<input type="checkbox" id="eRelief" checked><label for="eRelief">Relief.</label>
+<input type="button" onclick="fSyntaxWindow()" value="Syntaxe">
+<input type="button" id="eCheatsheet" value="Cheatsheet">
+
+<pre id="eResult"></pre>
+<div id="eCompare"></div>
+<textarea id="eCompil" wrap="off"></textarea>
+<dl class="legend">
+	<dt><i>Légende</i></dt>
+	<dt class="elt">Elément, attribut ou valeur.</dt>
+	<dt class="punctuator">Ponctuation</dt>
+	<dt class="operator">Opérateur</dt>
+	<dt class="multiplication">Multiplication</dt>
+	<dt class="string">Chaîne de caractère</dt>
+	<dt class="space">Espace blanc</dt>
+	<dt class="arguments">Arguments</dt>
+	<dt class="attributes">Attributs</dt>
+	<dt class="id">Identifiant élément</dt>
+	<dt class="className">Classe css élément</dt>
+</dl>
+
+
+<!-- FRAMEWORK... -->
+<script src="../../js/framework.js"></script>
+<script src="../../js/lexer.automaton.js"></script>
+<script src="../../js/lexer.automaton.modules.js"></script>
+<script src="../../js/parserLR.js"></script>
+<script src="node.js"></script>
+<script src="lexer.js"></script>
+<script src="parser.js"></script>
+<script src="compiler.js"></script>
+
+<script>
+_( 'eChoices,eContext,eInput,eBtnScan,eBtnParse,eBtnCompile,eRelief,eResult,eCompare,eCompil' )
+var oChoices ={
+	JS:[
+		'c:null+(cb*3>r+fu)+d>r+fu',
+		'dw:"n<5"',
+		'dw:"n<5">wh',
+		'fu',
+		'fu:getElementById',
+		'fu:v:getElementById',
+		'fi',
+		'fi:s:oObject',
+		'f',
+		'f:"var i=0">wh',
+		'f:@i',
+		'f:@-j:aArray',
+		'i:true',
+		'i+ei*2+e',
+		'i:4>fu:v:get',
+		'sw:s:4>fu:v:get',
+		'wh:"n<5"',
+		'wh:"n<5">wh'
+		],
+	CSS:[
+		'pos:r+fl:l+ovs:s+@bxsh:a',
+		'".ok">pos:r+fl:l+ovs:s+bxsh:a^".ko,\\n#id\\t">pos:r+fl:l+ovs:s+@bxsh:"1px 1px 0 #000"'
+		],
+	HTML:[
+		'input:c',
+		'input:c[id="ok" name="ok"]',
+		'input:c[id class name="ok"]#ko.ok',
+		'abbr',
+		'abbr[id="eTest" title="ok"]',
+		'a"Click me"',
+		"a'click'+b'here'",
+		'a>"click"+b"here"',
+		'dl:4>div',
+		'dl>(dt+dd)*4>div',
+		'p>"Click "+a"here"+" to continue"',
+		'p"Click "+a"here"+" to continue"',
+		'div#header+div.page+div#footer.class1.class2.class3',
+		'sel:2:3',
+		'sel>(og[label=$]>o*3)*2',
+		'sel:3',
+		'sel>o*3',
+		'td[title="Hello world!" colspan=3]',
+		'ul>li*5>a',
+		'ul:5>a',
+		'ul>li.item$*5',
+		'ul>li.item$$$*5',
+		'ul>li.item$@-*5',
+		'ul>li.item$@-3*5',
+		'dl:3>div*2',
+		'dl>(dt+dd)*3>div*2',
+		'(div>dl>(dt+dd)*3)+footer>p',
+		'div>(header>ul>li*2>a)+footer>p',
+		'div+div>p>span+em^^^bq',
+		'div+div>p>span+em^bq',
+		'div+(div>p>(span+em)^bq)',
+		'div+div>p>span+em',
+		'div+(div>p>(span+em))',
+		'div+p+bq',
+		'div>ul>li'
+		],
+	PHP:[
+		]
+	}
+
+for(var a=eChoices.getElementsByTagName('OPTGROUP'), i=0, ni=a.length; i<ni; i++ ){
+	for(var aChoices = oChoices[ a[i].label ],  j=0, nj=aChoices.length; j<nj; j++ ){
+		var e = document.createElement('OPTION')
+		e.value = e.innerHTML = aChoices[j]
+		a[i].appendChild( e )
+		}
+	}
+
+eChoices.onchange =function(){
+	eContext.value = eChoices.selectedOptions[0].parentNode.label
+	setInput( eChoices )
+	}
+eContext.onchange =function(){
+	compile( eInput.value )
+	}
+
+var displayResult =function( f ){
+	try{
+		var eNode = f()
+		eResult.innerHTML = ''
+		eResult.appendChild( eNode )
+		return eNode
+	}catch( e ){
+		eResult.innerHTML = e.message + '<br>'
+		if( e.fileName ) eResult.innerHTML += '<br>fichier: '+ e.fileName.split('/').pop()
+		if( e.lineNumber ) eResult.innerHTML += '<br>ligne: '+ e.lineNumber
+		}
+	}
+
+var fSyntaxWindow = SubWindow( "syntax.htm" )
+
+var scan =function( bDisplay, sText ){
+	sText = ! sText || ! sText.charAt ? eInput.value : sText
+	if( ! sText ) return
+	var _scan =function(){ return AutomatonLexer( sText, 'ZEN' )}
+	if( bDisplay ) displayResult( _scan )
+	return to_array( _scan().childNodes )
+	}
+var parse =function( bDisplay, sText ){
+	var _parse =function(){ return ParserLR( scan( false, sText ), ENGINE )}
+	if( bDisplay ) displayResult( _parse )
+	return _parse()
+	}
+var compile =function( sText ){
+	var o = Compiler( parse( true, sText ), eContext.value )
+	eCompil.value = o ? o.sText : ''
+	var n1=eInput.value.length, n2=eCompil.value.length
+	var o = getCompression( n1, n2 )
+	eCompare.innerHTML = 'Taille snippet : '+
+					'<b>'+ n1 +'</b> <code>('+ o.percent +'%)</code> &rarr; '+
+					'<b>'+ n2 +'</b> <code>(x'+ o.star +')</code>'
+	return eCompil.value
+	}
+var getCompression =function( n1, n2 ){
+	return { percent:(n1*100/n2).toFixed( 2 ), star:(n2/n1).toFixed( 2 ) }
+	}
+
+var oLoaded
+var setInput =function( o ){
+	oLoaded = o
+	eInput.value = o.value
+	compile()
+	}
+	
+eBtnScan.onclick = function(){ scan(true)}
+eBtnParse.onclick = function(){ parse(true)}
+eBtnCompile.onclick = function(){ compile()}
+eRelief.onclick = function(){ eResult.className = eRelief.checked ? 'relief' : '' }
+eRelief.onclick()
+
+compile()
+</script>
+<script><!-- CHEATSHEETS -->
+var oCheatSheet={
+	JS :{
+		fu: '|v|v:get|get'.split('|'),
+		fi: '|s|s:o'.split('|'),
+		fo: '|true|@i:aArray|@-j'.split('|'),
+		i: '|3|true|true:3'.split('|'),
+		sw: '|3|mVar:3'.split('|'),
+		wh: '|true'.split('|')
+		},
+	CSS :{
+		b:'|n|1'.split('|'),
+		bb:'|c'.split('|'),
+		bcps:'|c|s'.split('|'),
+		bf:'|c|r|sc|st|sp|ow|of'.split('|'),
+		bds:'|n|h|dt|ds|s|db|dd|ddd|w|g|r|i|o'.split('|'),
+		bga:'|f|s'.split('|'),
+		bgr:'|n|x|y'.split('|'),
+		bgz:'|a|ct|cv'.split('|'),
+		ca:'|n|b|l|r'.split('|'),
+		cp:'|a|r'.split('|'),
+		cs:'|t|b'.split('|'),
+		ct:'|n|oq|noq|cq|ncq|a|cn|cns'.split('|'),
+		cu:'|a|d|c|ha|he|i|m|p|pr|t|w|er|ner|nwr|nr|ser|swr|sr|wr'.split('|'),
+		d:'|n|b|i|ib|li|ri|c|t|it|tcp|tcm|tcg|thg|tfg|tr|trg|tc|r|rb|rbg|rt|rtg'.split('|'),
+		ec:'|s|h'.split('|'),
+		fe:'|n|en|em|o'.split('|'),
+		fep:'|a|b'.split('|'),
+		fes:'|a|dt|c|ds'.split('|'),
+		ff:'|s|ss|c|f|m'.split('|'),
+		fl:'|n|l|r'.split('|'),
+		fsy:'|n|i|o'.split('|'),
+		fsm:'|au|n|aw'.split('|'),
+		fst:'|n|uc|ec|c|sc|se|e|ee|ue'.split('|'),
+		fv:'|n|s'.split('|'),
+		fw:'|n|b|br|l'.split('|'),
+		lsp:'|i|o'.split('|'),
+		lst:'|a|c|ds|dm|dlz|g|la|ll|lr|lg|s|ua|ul|ur'.split('|'),
+		oc:'|i|0'.split('|'),
+		of:'|v|h|s|c|a'.split('|'),
+		ofx:'|v|h|s|c|a'.split('|'),
+		ofy:'|v|h|s|c|a'.split('|'),
+		ofs:'|s|p|mo|ma'.split('|'),
+		pba:'|au|al|av|l|r'.split('|'),
+		pbb:'|au|al|av|l|r'.split('|'),
+		pbi:'|au|av'.split('|'),
+		po:'|s|a|r|f'.split('|'),
+		q:'|n|ru|en'.split('|'),
+		rz:'|n|b|h|v'.split('|'),
+		ta:'|s|e|l|r|c|j'.split('|'),
+		tal:'|s|e|l|r|c|j'.split('|'),
+		tbl:'|a|f'.split('|'),
+		td:'|n|o|u|l'.split('|'),
+		th:'|a|f|t|m'.split('|'),
+		ti:'|-'.split('|'),
+		tj:'|a|iw|ii|ic|d|k|t'.split('|'),
+		to:'|0'.split('|'),
+		ts:'|0'.split('|'),
+		tt:'|n|c|u|l'.split('|'),
+		// tw:'|nm|nn|u|s'.split('|'),
+		v:'|v|h|c'.split('|'),
+		va:'|sup|t|tt|m|bl|b|tb|sub'.split('|'),
+		ww:'|n|b'.split('|'),
+		ws:'|n|p|nw|pw|pl'.split('|')
+		},
+	HTML :{
+		a: '|l|m'.split('|'),
+		ar: '|d|c|r|p'.split('|'),
+		bdo: '|l|r'.split('|'),
+		cog: '|2'.split('|'),
+		dl: '|2'.split('|'),
+		fm: '|g|p|f'.split('|'),
+		ht: '|4t|4s|5'.split('|'),
+		inp: '|button|checkbox|color|date|datetime|email|file|hidden|image|month|number|password|radio|range|reset|search|submit|text|time|url|week'.split('|'),
+		la: '|eElementId'.split('|'),
+		li: '|2'.split('|'),
+		lk: '|css|print|favicon|touch|rss|atom'.split('|'),
+		mn: '|c|t'.split('|'),
+		mt: '|iso|utf|win|title'.split('|'),
+		ol: '|2'.split('|'),
+		ul: '|2'.split('|'),
+		og: '|2'.split('|'),
+		sc: '|"script.js"'.split('|'),
+		sel: '|2|1:3'.split('|'),
+		ta: '|2|1:3'.split('|'),
+		tr: '|2'.split('|')
+		}
+	,PHP :{}
+	}
+
+var oResult = {}, sLanguage
+var pushResult =function( sSnippet ){
+//	try{
+		var oCode = Compiler( parse( false, sSnippet ), sLanguage )
+		if( ! oResult[ sLanguage ].oDone[ sSnippet ] && sSnippet ){
+			oResult[ sLanguage ].oDone[ sSnippet ] = true
+			oResult[ sLanguage ].push([ sSnippet, oCode, getCompression( sSnippet.length, oCode.sText.length )])
+			}
+//		}catch( e ){ throw Error ( sLanguage +': '+ sSnippet +'\n'+ e.message )}
+	}
+
+for(var i=0, aLanguages=['JS','CSS','HTML','PHP'], ni=aLanguages.length; i<ni; i++){
+	sLanguage = aLanguages[i]
+	oResult[ sLanguage ] = []
+	oResult[ sLanguage ].oDone = {}
+	
+	var aShortCuts = oSnippets[ sLanguage ].shortcuts
+	if( aShortCuts )
+		for(var k=0, nk=aShortCuts.length; k<nk; k++){
+			var sSnippet = aShortCuts[k]
+			var aj = oCheatSheet[ sLanguage ][ sSnippet ]
+			if( ! aj ) pushResult( sSnippet )
+			else for(var j=0, nj=aj.length; j<nj; j++ ) pushResult( sSnippet + ( aj[j] ? ':'+ aj[j] : '' ))
+			}
+	else {
+		var oLanguage = oSnippets[ sLanguage ].abbreviations
+		if( oLanguage.constructor == Array ){
+			for(var k=0, nk=oLanguage.length; k<nk; k++){
+				var sSnippet = oLanguage[k]
+				var aj = oCheatSheet[ sLanguage ][ sSnippet ]
+				if( ! aj ) pushResult( sSnippet )
+				else for(var j=0, nj=aj.length; j<nj; j++ ) pushResult( sSnippet + ( aj[j] ? ':'+ aj[j] : '' ))
+				}
+			}
+		else {
+			for( sSnippet in oLanguage ){
+				var aj = oCheatSheet[ sLanguage ][sSnippet]
+				if( ! aj ) pushResult( sSnippet )
+				else for(var j=0, nj=aj.length; j<nj; j++ ) pushResult( sSnippet + ( aj[j] ? ':'+ aj[j] : '' ))
+				}
+			}
+		}
+	}
+	
+_( 'eCheatsheet' ).onclick =function(){
+	var fCheatWindow = SubWindow( "cheat-sheet.htm", '_CheatSheet', 600, 600, 'createCheat' )
+	oResult.date = 'courante'
+	fCheatWindow( oResult )
+//	fCheatWindow.refresh( oResult )
+	}
+	
+oResult.date = ( new Date()).toLocaleString()
+// if( window.console ) console.info( JSON.stringify( oResult ))
+</script>
+
+<script><!-- UNIT TEST -->
+var _searchValue =function( sShortCut, aChoices ){
+	/*
+	Recherche dans aChoices la valeur correspondant le mieux à sShortCut
+		(1) Seul les valeurs ayant comme première lettre celle du raccourcie seront sélectionnées
+			( + 1000 pts )
+		(2) Retourne null si aucune valeur n'est déjà sélectionné
+		(3) Chaque valeur est parcourue qu'une seul fois.
+			( + 50 pts - la longueur de la valeur ) = Une valeur plus petite à plus de points dés le départ
+		(4) Si la lettre raccourcie suivante est présente dans la valeur et quelle est précédé par le symbole '-'
+			( + 500 pts pour la lettre )
+				on avance à la position ( index du  '-' + 2 )
+		(5) Sinon si elle est simplement présente dans la valeur :  les 12 premières positions sont privilégiées et rapportent des points, le reste en enlève
+			( + 12 pts - son index dans la valeur ) pour chaque occurence trouvée
+				on avance à la position ( index du caractère + 1 )
+		(6) Sinon si elle n'est pas présente dedans 
+			( - 2000 pts )
+				la recherche des caractères raccourcie est stoppée pour la valeur
+	*/
+	var aResult = []
+	for(var i=0, ni=aChoices.length; i<ni; i++ )
+		if( aChoices[i].charAt(0)==sShortCut.charAt(0))
+			aResult.push({ n:1000, text:aChoices[i] })
+	if( ! aResult.length ) return null
+	for(var i=0, ni=aResult.length; i<ni; i++ ){
+		var o = aResult[i]
+		o.n = 50 - o.text.length
+		var nIndex=1
+		for(var j=1, nj=sShortCut.length; j<nj; j++ ){
+			var sPartialValue = o.text.slice( nIndex )
+			, bSpecialChar = false , bChar = false
+			if( sPartialValue ){
+				sPartialValue.replace(
+					new RegExp( '-'+sShortCut.charAt(j)),
+					function( sMatched, nPos ){
+						bSpecialChar = bChar = true
+						o.n += 500
+						nIndex += nPos+2
+						return sMatched
+						}
+					)
+				if( ! bSpecialChar )
+					sPartialValue.replace(
+						new RegExp( sShortCut.charAt(j)),
+						function( sMatched, nPos ){
+							bChar = true
+							o.n += 12-nPos
+							nIndex += nPos+1
+							return sMatched
+							}
+						)
+				}
+			if( ! sPartialValue || ! bChar ){
+				o.n -= 2000
+				break;
+				}
+			}
+		}
+	aResult.sortBy('n','DESC')
+	if( aResult[0].n <= 0 && console ) console.warn( aResult )
+	return aResult[0].n > 0 ? aResult[0].text : null
+	}
+
+var aUnitTestResult = []
+
+function testResult ( s1, sExpected, m2, sSep ){
+	var sResult = _searchValue( s1, m2.constructor == String ? m2.split(sSep||':') : m2 )
+	if( sResult != sExpected )
+		console.warn( s1 +"="+ sResult + "\nAttendu "+ sExpected )
+	else aUnitTestResult.push( s1 +" : "+ sResult )
+	}
+
+/*VALEURS POSSIBLES DES ATTRIBUTS CSS
+testResult( 'ow', 'overwrite', 'clip:repeat:scale:stretch:overwrite:overflow:space' );
+testResult( 'of', 'overflow', 'clip:repeat:scale:stretch:overwrite:overflow:space' );
+testResult( 'dt', 'dotted', 'none:hidden:dotted:dashed:solid:double:dot-dash:dot-dot-dash:wave:groove:ridge:inset:outset' );
+testResult( 'ds', 'dashed', 'none:hidden:dotted:dashed:solid:double:dot-dash:dot-dot-dash:wave:groove:ridge:inset:outset' );
+testResult( 'dd', 'dot-dash', 'none:hidden:dotted:dashed:solid:double:dot-dash:dot-dot-dash:wave:groove:ridge:inset:outset' );
+testResult( 'ddd', 'dot-dot-dash', 'none:hidden:dotted:dashed:solid:double:dot-dash:dot-dot-dash:wave:groove:ridge:inset:outset' );
+testResult( 'se', 'semi-expanded', 'normal:ultra-condensed:extra-condensed:condensed:semi-condensed:semi-expanded:expanded:extra-expanded:ultra-expanded' );
+testResult( 'r', 'ruby', 'none:block:inline:inline-block:list-item:run-in:compact:table:inline-table:table-caption:table-column:table-column-group:table-header-group:table-footer-group:table-row:table-row-group:table-cell:ruby:ruby-base:ruby-base-group:ruby-text:ruby-text-group' );
+testResult( 'rb', 'ruby-base', 'none:block:inline:inline-block:list-item:run-in:compact:table:inline-table:table-caption:table-column:table-column-group:table-header-group:table-footer-group:table-row:table-row-group:table-cell:ruby:ruby-base:ruby-base-group:ruby-text:ruby-text-group' );
+testResult( 'tcm', 'table-column', 'none:block:inline:inline-block:list-item:run-in:compact:table:inline-table:table-caption:table-column:table-column-group:table-header-group:table-footer-group:table-row:table-row-group:table-cell:ruby:ruby-base:ruby-base-group:ruby-text:ruby-text-group' );
+testResult( 'tr', 'table-row', 'none:block:inline:inline-block:list-item:run-in:compact:table:inline-table:table-caption:table-column:table-column-group:table-header-group:table-footer-group:table-row:table-row-group:table-cell:ruby:ruby-base:ruby-base-group:ruby-text:ruby-text-group' );
+testResult( 'trg', 'table-row-group', 'none:block:inline:inline-block:list-item:run-in:compact:table:inline-table:table-caption:table-column:table-column-group:table-header-group:table-footer-group:table-row:table-row-group:table-cell:ruby:ruby-base:ruby-base-group:ruby-text:ruby-text-group' );
+testResult( 'cns', 'counters(|)', 'normal:open-quote:no-open-quote:close-quote:no-close-quote:attr(|):counter(|):counters(|)' );
+*/
+var aChoices = 'none:block:inline:inline-block:list-item:run-in:compact:table:inline-table:table-caption:table-column:table-column-group:table-header-group:table-footer-group:table-row:table-row-group:table-cell:ruby:ruby-base:ruby-base-group:ruby-text:ruby-text-group'
+testResult( 'li','list-item', aChoices )
+
+/* CSS ATTRIBUTES NAME
+aUnitTestResult.push( "]> CSS Attributes Name <[" )
+var aChoices = "background:background:background-attachment:background-break:background-clip:background-color:background-image:background-origin:background-position:background-position-x:background-position-y:background-repeat:background-size:border:border-bottom:border-bottom:border-bottom-color:border-bottom-image:border-bottom-left-image:border-bottom-left-radius:border-bottom-right-image:border-bottom-right-radius:border-bottom-style:border-bottom-width:border-break:border-collapse:border-color:border-corner-image:border-fit:border-image:border-left:border-left:border-left-color:border-left-image:border-left-style:border-left-width:border-length:border-radius:border-right:border-right:border-right-color:border-right-image:border-right-style:border-right-width:border-spacing:border-style:border-top:border-top:border-top-color:border-top-image:border-top-left-image:border-top-left-radius:border-top-right-image:border-top-right-radius:border-top-style:border-top-width:border-width:bottom:box-shadow:box-sizing:caption-side:clear:clip:color:content:counter-increment:counter-reset:cursor:display:empty-cells:float:font:font:font-effect:font-emphasize:font-emphasize-position:font-emphasize-style:font-family:font-size:font-size-adjust:font-smooth:font-stretch:font-style:font-variant:font-weight:height:left:letter-spacing:line-height:list-style:list-style:list-style-image:list-style-position:list-style-type:margin:margin-bottom:margin-left:margin-right:margin-top:max-height:max-width:min-height:min-width:opacity:orphans:outline:outline-color:outline-offset:outline-style:outline-width:overflow:overflow:overflow-style:overflow-x:overflow-y:padding:padding-bottom:padding-left:padding-right:padding-top:page-break-after:page-break-before:page-break-inside:position:quotes:resize:right:table-layout:text-align:text-align-last:text-decoration:text-emphasis:text-height:text-indent:text-justify:text-outline:text-replace:text-shadow:text-transform:text-wrap:top:vertical-align:visibility:white-space:white-space-collapse:widows:width:word-break:word-spacing:word-wrap:z-index:zoom"
+testResult( 'b', 'border', aChoices )
+testResult( 'bblr', 'border-bottom-left-radius', aChoices )
+testResult( 'bbm', 'border-bottom', aChoices )
+testResult( 'bbrr', 'border-bottom-right-radius', aChoices )
+testResult( 'bbw', 'border-bottom-width', aChoices )
+testResult( 'bbc', 'border-bottom-color', aChoices )
+testResult( 'bbi', 'border-bottom-image', aChoices )
+testResult( 'bbk', 'border-break', aChoices )
+testResult( 'bbli', 'border-bottom-left-image', aChoices )
+testResult( 'bbri', 'border-bottom-right-image', aChoices )
+testResult( 'bbs', 'border-bottom-style', aChoices )
+testResult( 'bc', 'border-color', aChoices )
+testResult( 'bci', 'border-corner-image', aChoices )
+testResult( 'bcps', 'border-collapse', aChoices ) // bcps
+testResult( 'bf', 'border-fit', aChoices )
+testResult( 'bi', 'border-image', aChoices )
+testResult( 'bl', 'border-left', aChoices )
+testResult( 'blg', 'border-length', aChoices )
+testResult( 'blc', 'border-left-color', aChoices )
+testResult( 'bli', 'border-left-image', aChoices )
+testResult( 'bls', 'border-left-style', aChoices )
+testResult( 'br', 'border-right', aChoices )
+testResult( 'brc', 'border-right-color', aChoices )
+testResult( 'bri', 'border-right-image', aChoices )
+testResult( 'brs', 'border-right-style', aChoices )
+testResult( 'bsy', 'border-style', aChoices )
+testResult( 'bt', 'border-top', aChoices )
+testResult( 'btc', 'border-top-color', aChoices )
+testResult( 'bti', 'border-top-image', aChoices )
+testResult( 'btli', 'border-top-left-image', aChoices )
+testResult( 'btri', 'border-top-right-image', aChoices )
+testResult( 'bts', 'border-top-style', aChoices )
+testResult( 'bg', 'background', aChoices )
+testResult( 'bga', 'background-attachment', aChoices )
+testResult( 'bgb', 'background-break', aChoices )
+testResult( 'bgco', 'background-color', aChoices )
+testResult( 'bgc', 'background-clip', aChoices ) // bgcl
+testResult( 'bgi', 'background-image', aChoices )
+testResult( 'bgo', 'background-origin', aChoices )
+testResult( 'bgp', 'background-position', aChoices )
+testResult( 'bgpx', 'background-position-x', aChoices )
+testResult( 'bgpy', 'background-position-y', aChoices )
+testResult( 'bgr', 'background-repeat', aChoices )
+testResult( 'bgs', 'background-size', aChoices )
+testResult( 'bl', 'border-left', aChoices )
+testResult( 'blw', 'border-left-width', aChoices ) 
+testResult( 'bm', 'bottom', aChoices )
+testResult( 'br', 'border-right', aChoices )
+testResult( 'bra', 'border-radius', aChoices )
+testResult( 'brw', 'border-right-width', aChoices )
+testResult( 'bsp', 'border-spacing', aChoices )
+testResult( 'bt', 'border-top', aChoices )
+testResult( 'btlr', 'border-top-left-radius', aChoices )
+testResult( 'btrr', 'border-top-right-radius', aChoices )
+testResult( 'btw', 'border-top-width', aChoices )
+testResult( 'bw', 'border-width', aChoices )
+testResult( 'bsh', 'box-shadow', aChoices )
+testResult( 'bsz', 'box-sizing', aChoices )
+testResult( 'c', 'clip', aChoices )
+testResult( 'co', 'color', aChoices )
+testResult( 'ci', 'counter-increment', aChoices )
+testResult( 'cr', 'counter-reset', aChoices )
+testResult( 'cs', 'caption-side', aChoices )
+testResult( 'ca', 'clear', aChoices )
+testResult( 'ct', 'content', aChoices )
+testResult( 'cu', 'cursor', aChoices )
+testResult( 'd', 'display', aChoices )
+testResult( 'ec', 'empty-cells', aChoices )
+testResult( 'f', 'font', aChoices )
+testResult( 'fe', 'font-effect', aChoices )
+testResult( 'fem', 'font-emphasize', aChoices )
+testResult( 'fep', 'font-emphasize-position', aChoices )
+testResult( 'fes', 'font-emphasize-style', aChoices )
+testResult( 'ff', 'font-family', aChoices )
+testResult( 'fl', 'float', aChoices )
+testResult( 'fsy', 'font-style', aChoices )
+testResult( 'fsm', 'font-smooth', aChoices )
+testResult( 'fsc', 'font-stretch', aChoices )
+testResult( 'fv', 'font-variant', aChoices )
+testResult( 'fw', 'font-weight', aChoices )
+testResult( 'fs', 'font-size', aChoices )
+testResult( 'fsa', 'font-size-adjust', aChoices )
+testResult( 'h', 'height', aChoices )
+testResult( 'l', 'left', aChoices )
+testResult( 'lh', 'line-height', aChoices )
+testResult( 'ls', 'list-style', aChoices )
+testResult( 'ls', 'list-style', aChoices )
+testResult( 'lsg', 'letter-spacing', aChoices )
+testResult( 'lsi', 'list-style-image', aChoices )
+testResult( 'lsp', 'list-style-position', aChoices )
+testResult( 'lst', 'list-style-type', aChoices )
+testResult( 'm', 'margin', aChoices )
+testResult( 'mxh', 'max-height', aChoices )
+testResult( 'mxw', 'max-width', aChoices )
+testResult( 'mb', 'margin-bottom', aChoices )
+testResult( 'mnh', 'min-height', aChoices )
+testResult( 'mnw', 'min-width', aChoices )
+testResult( 'ml', 'margin-left', aChoices )
+testResult( 'mr', 'margin-right', aChoices )
+testResult( 'mt', 'margin-top', aChoices )
+testResult( 'oc', 'outline-color', aChoices )
+testResult( 'of', 'overflow', aChoices )
+testResult( 'of', 'overflow', aChoices )
+testResult( 'ofs', 'overflow-style', aChoices )
+testResult( 'ofx', 'overflow-x', aChoices )
+testResult( 'ofy', 'overflow-y', aChoices )
+testResult( 'ol', 'outline', aChoices )
+testResult( 'oo', 'outline-offset', aChoices )
+testResult( 'op', 'opacity', aChoices )
+testResult( 'or', 'orphans', aChoices )
+testResult( 'os', 'outline-style', aChoices )
+testResult( 'ow', 'outline-width', aChoices )
+testResult( 'p', 'padding', aChoices )
+testResult( 'pb', 'padding-bottom', aChoices )
+testResult( 'pba', 'page-break-after', aChoices )
+testResult( 'pbb', 'page-break-before', aChoices )
+testResult( 'pbi', 'page-break-inside', aChoices )
+testResult( 'pl', 'padding-left', aChoices )
+testResult( 'po', 'position', aChoices )
+testResult( 'pr', 'padding-right', aChoices )
+testResult( 'pt', 'padding-top', aChoices )
+testResult( 'q', 'quotes', aChoices )
+testResult( 'r', 'right', aChoices )
+testResult( 'rz', 'resize', aChoices )
+testResult( 't', 'top', aChoices )
+testResult( 'ta', 'text-align', aChoices )
+testResult( 'tal', 'text-align-last', aChoices )
+testResult( 'tbl', 'table-layout', aChoices )
+testResult( 'td', 'text-decoration', aChoices )
+testResult( 'te', 'text-emphasis', aChoices )
+testResult( 'th', 'text-height', aChoices )
+testResult( 'ti', 'text-indent', aChoices )
+testResult( 'tj', 'text-justify', aChoices )
+testResult( 'to', 'text-outline', aChoices )
+testResult( 'tr', 'text-replace', aChoices )
+testResult( 'ts', 'text-shadow', aChoices )
+testResult( 'tt', 'text-transform', aChoices )
+testResult( 'tw', 'text-wrap', aChoices )
+testResult( 'v', 'visibility', aChoices )
+testResult( 'va', 'vertical-align', aChoices )
+testResult( 'w', 'width', aChoices )
+testResult( 'wb', 'word-break', aChoices )
+testResult( 'wos', 'word-spacing', aChoices )
+testResult( 'ws', 'white-space', aChoices )
+testResult( 'wsc', 'white-space-collapse', aChoices )
+testResult( 'ww', 'word-wrap', aChoices )
+testResult( 'wo', 'widows', aChoices )
+testResult( 'z', 'zoom', aChoices )
+testResult( 'zi', 'z-index', aChoices )
+console.info( aUnitTestResult.join( "\n" ))
+*/
+/* VALEURS POSSIBLES TAG HTML
+var aChoices = 'a:abbr:acronym:address:applet:area:article:aside:audio:b:base:basefont:bdo:bdi:big:blockquote:body:br:button:canvas:caption:center:cite:code:col:colgroup:command:datagrid:datalist:dd:del:details:dfn:dialog:dir:div:dl:dt:em:embed:fieldset:figcaption:figure:font:footer:form:frame:frameset:h1:h6:head:header:hgroup:hr:html:i:iframe:img:input:ins:keygen:kbd:label:legend:li:link:map:mark:menu:meta:meter:nav:noframes:noscript:object:ol:optgroup:option:output:p:param:pre:progress:q:rp:rt:ruby:s:samp:script:section:select:small:source:span:strike:strong:style:sub:summary:sup:table:tbody:td:textarea:tfoot:th:thead:time:title:tr:track:tt:u:ul:var:video:wbr:xmp'.split(':')
+testResult( 'ad','address', aChoices )
+*/
+</script>
+
+</body>
+</html>

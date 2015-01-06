@@ -1,0 +1,109 @@
+<html>
+	<head>
+		<title>Analyse lexicale</title>
+		<style>
+.myNode {
+	border:1px solid #CCC;
+	display:inline-block;
+	margin: 2px;
+	padding: 2px;
+	white-space: pre;
+	}
+.brut
+	{ background: blue; }
+.undefined
+	{ background: yellow; }
+
+.tab		{ background: LIGHTBLUE !important; }
+.space		{ background: LIGHTGREEN !important; }
+.linefeed	{ background: ORANGE !important; }
+#eResult {
+	display: inline;
+	vertical-align: top;
+	}
+		</style>
+	</head>
+	<body>
+<a href="index.htm">Index</a>
+
+<h1>Analyse lexicale</h1>
+
+<p>La machine réalisant cette tâche se nomme 
+<i>scanneur</i>, <i>lexeur</i> ou <i>analyseur lexical</i>.
+</p>
+
+<p>L'analyse lexicale parcours un texte source caractère/caractère et le transforme en <a href="131_Lexer.byStep.htm">liste de lexème</a> (attributs: texte, index, type, ...) :</p>
+
+<textarea id="eTextScanned" type="text">Le texte source.
+	
+FIN.</textarea>
+<div id="eResult">...</div>
+
+<p>
+	Chaque type de lexème est défini à l'aide d'une <a href="src/regexp/syntax.htm">expression régulière</a>. <br>
+	<a href="110_Automates.htm">Cette ER est transformée en <abbr title="Automate Fini Déterministe">AFD</abbr></a> 
+	et le résultat est stocké car le coût en calcul est important.
+</p>
+<p>
+	La <a href="133_Lexer.comparison.htm">performance</a> des AFDs est sensiblement équivalente à celles des expressions régulières. <br>
+	Mais ils nous laissent plus de possibilités en programmation. 
+	L'<a href="134_Lexer.update.htm">analyse partielle</a> n'est pas forcement un exemple...
+</p>
+
+<p>Les <a href="120_DFA.aggregation.htm">AFDs sont aggrégés</a> entre eux par la suite.</p>
+
+<p>
+	L'analyse lexicale se fait ensuite avec un ou plusieurs AFD. 
+	Le choix se fait selon :
+</p>
+<ul>
+	<li>Performance (calcul) = 1 AFD.</li>
+	<li>Maintenance / Evolution = Plusieurs AFDs.</li>
+	<li>Performance téléchargement = Fonction de la taille des AFDs.</li>
+</ul>
+
+<h4>Note</h4>
+<p>  L'analyse lexicale peut se faire sur <a href="144_Lexer.modules.Parenthesis.htm">plusieurs niveaux</a>.</p>
+<ul>
+	<li>L'analyseur syntaxique détecte le début d'un token parent.</li>
+	<li>Le token 'début' est ajouté au nouveau token parent.</li>
+	<li>L'analyse continue avec les règles du parent jusqu'à ce que sa fin soit trouvée ou qu'aucun token ne soit trouvé.</li>
+	<li>Puis l'analyse continue avec les régles précédant la rencontre du token parent.</li>
+</ul>
+<p>... et ceci à une répercution sur l'analyse syntaxique...</p>
+
+
+<script src="js/framework.js"></script>
+<script src="js/lexer.automaton.js"></script>
+<script src="js/lexer.automaton.modules.js"></script>
+<script>
+_('eTextScanned,eResult')
+var setElementTitle =function(o){
+	return  ' value:\u25B6'+o.value+'\u25C0\n'
+		+ JSON.stringify( o, 'token,parentToken,css,index,lineStart,lineEnd'.split(','), " " )
+			.str_replace('"', '')
+			.slice(2,-1)
+			.split(',')
+			.join('')
+	}
+var LexerNode =function( o ){
+	var sToken = o.token
+	, e = document.createElement( sToken )
+	, sValue = o.value
+	e.oValue = o
+	e.title = setElementTitle( o )
+		// sToken +\n\u25B6+ sValue +\u25C0
+	if( sValue ) e.innerHTML = sValue.str_replace( ['&','<','>'], ['&amp;','&lt;','&gt;'])
+	e.className = 'myNode'
+	if( o.css ) e.className += ' '+ o.css
+	return e
+	}
+var scan =function(){
+	eResult.innerHTML = ''
+	eResult.appendChild( AutomatonLexer( eTextScanned.value, 'TXT' ))
+	}
+scan()
+eTextScanned.onkeyup = scan
+</script>
+	</body>
+</html>

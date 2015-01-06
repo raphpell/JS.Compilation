@@ -1,0 +1,12 @@
+.undefined				{ color: #000; background: red; }
+
+.ini .comment			{ color: #AAA; }
+.ini .punctuator,
+.ini .section			{ color: #000; }
+.ini .var	 			{ color: #660; }
+
+.ini .keyword ,
+.ini .string				{ color: #F00; }
+
+.ini .value			 	{ color: #069; }
+.ini .value .string		{ color: #006; }

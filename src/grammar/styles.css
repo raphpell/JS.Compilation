@@ -1,0 +1,76 @@
+WIZ {
+	float:right;
+	}
+	
+/* Arbre syntaxique */
+.myNode {
+	display: inline-block;
+	margin: 2px;
+	padding: 2px;
+	}
+.relief .myNode {
+    box-shadow: 2px -2px 2px #999999;
+    display: inline;
+	line-height: 2em;
+	position: relative;
+	vertical-align: text-top;
+    white-space: pre;
+	}
+.relief .myNode:hover {
+	background: lime !important;
+	border: 1px solid #000;
+	transition: 1s ease;
+	}
+	.relief .myNode:hover > .myNode {
+		background: yellow;
+		color:#000;
+		}
+.seeWS .tab		{ background: LIGHTBLUE !important; }
+.seeWS .space	{ background: LIGHTGREEN !important; }
+.seeWS .linefeed	{ background: ORANGE !important; }
+
+/* Tokens */
+.linefeed 
+	{ float: left; }
+.comment .linefeed ,
+.rhs .linefeed 
+	{ float: none; }
+.comment,
+.production {
+	background: white;
+	border: 1px solid #CCC;
+	float: left;
+	clear: left;
+	}
+.lhs {
+	background: #FFFF00;
+	border: 1px solid #000;
+	}
+.rhs {
+    background: #87CEFA;
+    border: 1px solid #00F;
+	}
+.concat {
+	background: blue;
+	border: 2px solid #000;
+	}
+.alternation {
+	background: red;
+    color: #000;
+	border: 2px solid #000;
+	}
+.epsilon {
+	background: green;
+    color: #FFF;
+	border: 2px solid #FFF;
+	}
+.rarrow {
+    background: blue;
+    color: #FFF;
+	border: 2px solid #FFF;
+	}
+.symbol {
+	background: #000;
+	color: #FFF;
+	border: 1px solid green;
+	}

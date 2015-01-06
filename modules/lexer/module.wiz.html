@@ -1,0 +1,50 @@
+<html><head></head><body><pre>
+¤ strings&comments
+
+!@	WIZ		=	WHITE_SPACES|{comments}|COMPIL|IDENTIFIER|S_WIZ_IMPORT|S_RULE|S_BLOCK
+
+	WHITE_SPACES	=	{hs}+|{nl}
+			( css:whitespaces )
+	COMPIL		=	[\!\@\#]+
+			( css:compil )
+	IDENTIFIER	=	{id}
+			( css:identifier )
+
+// Fichier requis
+!@	WIZ_IMPORT		=	WIZ_FILE|ELISION
+			( translation:REQUIRED )
+	S_WIZ_IMPORT	=	¤
+			( css:compil )
+	WIZ_FILE		=	[^\r\n\f,]+
+			( css:value )
+	ELISION			=	,
+
+// Valeur de l'identifiant
+@!	RULE		=	RULE_IN
+	S_RULE	=	={hs}+
+			( previousTokens:IDENTIFIER )
+	RULE_IN		=	[^\r\n\f]+
+			( css:value )
+
+// Attribut d'un token	
+!@ BLOCK		=	WHITE_SPACES|ATTRIBUTE|S_VALUE|E_BLOCK
+	S_BLOCK	=	{nl}+{hs}+\(
+	E_BLOCK	=	\)
+	ATTRIBUTE	=	{id}
+			( css:identifier )
+
+// Valeur d'un attribut
+!@	VALUE		=	VALUE_IN|E_VALUE
+	S_VALUE	=	\:
+	E_VALUE	=	\,
+	VALUE_IN	=	[^,\)]+
+	
+// Macros
+	// partie d'une aggrégation
+	comments	= S_MLC|S_SLC
+	
+	// partie d'expressions régulières
+	id		=	\w+
+	hs		=	[ \t]
+	nl		=	\r\n|[\n\r\f]
+</pre></body></html>

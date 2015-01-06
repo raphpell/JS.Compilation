@@ -1,0 +1,131 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+	<title>Module RegExp</title>
+	<style>
+HTML, BODY {
+    margin: 0;
+    padding: 0 0.5em;
+	}
+H1 {
+    margin: 0 0 0.25em;
+    padding: 0;
+	}
+#eInput{
+	width: 100%;
+	height: 20px;
+	}
+
+/* LEGEND */
+.legend {
+	background: #000;
+    float: left;
+	margin: 1em 1em 1em 0;
+	padding: 0.25em;
+	text-align: center;
+	width: 250px;
+	}
+	.legend I {
+		color: #FFF;
+		}
+	.legend DT {
+		margin: 2px;
+		}
+	</style>
+	<link rel="stylesheet" type="text/css" href="nodeStyle.css">
+	<link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+<body spellcheck="false">
+
+<h1>Module RegExp</h1>
+
+<label for="eInput">Expression régulière : </label><br>
+<textarea id="eInput">-(([a-z]a+)|\db?)|1{2}c{1,4}|[^B]d{2,}|.e*[^\-^$\\.*+?()[\]}{|]</textarea>
+<input type="radio" name="selected" id="eRadioScan"><label for="eRadioScan">Analyse lexicale</label>
+<input type="radio" name="selected" id="eRadioParse" checked><label for="eRadioParse">Analyse syntaxique</label>
+<input type="checkbox" id="eRelief"><label for="eRelief">Relief.</label>
+<input type="button" onclick="regexpSyntax()" value="Syntaxe">
+<pre id="eResult"></pre>
+
+<dl class="legend">
+	<dt><i>Légende analyse lexicale</i></dt>
+	<dt class="regexp">regexp</dt>
+	<dt class="block">blocks delimiters</dt>
+	<dt class="charclass">charclass</dt>
+	<dt class="charclass negated">negated charclass</dt>
+	<dt class="quantifier">quantifier</dt>
+	<dt class="character">character</dt>
+	<dt class="integer">integer</dt>
+	<dt class="character reserved">character (reserved)</dt>
+	<dt class="reserved quantifier">Quantifier symbols '+' '*' '?'</dt>
+	<dt class="reserved any">Symbol any characters '.'</dt>
+	<dt class="reserved alternation">Symbol alternation '|'</dt>
+</dl>
+<dl class="legend">
+	<dt><i>Légende analyse syntaxique</i></dt>
+	<dt class="concat">concat</dt>
+	<dt class="alternation">alternation</dt>
+	<dt class="charclass">charclass</dt>
+	<dt class="charclass negated">negated charclass</dt>
+	<dt class="quantifier">quantifier</dt>
+	<dt class="character">character</dt>
+	<dt class="characters_range">characters range</dt>
+</dl>
+
+<!-- FRAMEWORK... -->
+<script src="../../js/framework.js"></script>
+
+<script src="../../js/lexer.automaton.js"></script>
+<script src="../../js/lexer.automaton.modules.js"></script>
+<script src="../../js/parserLR.js"></script>
+<script src="node.js"></script>
+<script src="lexer.js"></script>
+<script src="parser.js"></script>
+
+<script>
+regexpSyntax.url = '../../'+regexpSyntax.url
+
+_( 'eInput,eRadioScan,eRadioParse,eRelief,eResult' )
+var oLoaded
+var scan =function(){
+	eRadioScan.checked = true
+	eResult.innerHTML = ''
+	try{
+		var eLexer = AutomatonLexer( eInput.value, 'RegExp' )
+		eResult.appendChild( eLexer )
+	}catch(e){
+		eResult.innerHTML = e.message + '<br>'
+		if( e.fileName ) eResult.innerHTML += '<br>fichier: '+ e.fileName.split('/').pop()
+		if( e.lineNumber ) eResult.innerHTML += '<br>ligne: '+ e.lineNumber
+		}
+	}
+var parse =function(){
+	eRadioParse.checked = true
+	eResult.innerHTML = ''
+	try{
+		var eLexer = AutomatonLexer( eInput.value, 'RegExp' )
+		var aTokens = to_array( eLexer.childNodes )
+		eResult.appendChild( ParserLR( aTokens, RegExpParser.REGEXP ))
+	}catch(e){
+		eResult.innerHTML = e.message + '<br>'
+		if( e.fileName ) eResult.innerHTML += '<br>fichier: '+ e.fileName.split('/').pop()
+		if( e.lineNumber ) eResult.innerHTML += '<br>ligne: '+ e.lineNumber
+		}
+	}
+
+var setInput =function( o ){
+	oLoaded = o
+	eInput.value = o.re
+	parse()
+	}
+	
+eRadioScan.onclick = scan
+eRadioParse.onclick = parse
+eRelief.onclick = function(){ eResult.className = eRelief.checked ? 'relief' : '' }
+eRelief.onclick()
+
+parse()
+</script>
+
+</body>
+</html>

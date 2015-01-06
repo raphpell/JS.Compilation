@@ -1,0 +1,77 @@
+.cheatsheet {
+	background: #2C2D32;
+	width: 100%;
+	}
+.cheatsheet SMALL {
+	color: #BBB;
+	}
+.cheatsheet LABEL {
+	background: -moz-linear-gradient(center top , #333 1%, #1B1C20 100%) repeat scroll 0 0 rgba(0, 0, 0, 0);
+	border: 1px solid #000;
+	text-shadow: 0 0 5px #000, 0 0 10px #000;
+	box-shadow: 0 0 5px #000;
+	border-radius: 1.5em;
+	color: #eee;
+	cursor: pointer;
+	display: block;
+	font: bold 1.25em Verdana;
+	padding: 5px 20px;
+	margin: 0.5em 0 0;
+	position: relative;
+	z-index: 20;
+	}
+.cheatsheet INPUT {
+	display: none;
+	}
+.cheatsheet INPUT:checked ~ ARTICLE {
+	height: inherit;
+	transition: height 0.5s ease-in-out;
+	}
+.cheatsheet ARTICLE {
+	height: 0;
+	overflow: hidden;
+	position: relative;
+	padding: 0 2em 0;
+	transition: height 0.3s ease-in-out;
+	z-index: 10;
+	-moz-column-count: 3;
+	-moz-column-gap: 2%;
+	}
+.cheatsheet DL {
+	margin: 0.25em;
+	overflow: hidden;
+	}
+.cheatsheet DT {
+	color: #FFF;
+	text-shadow: 0 0 2px #000;
+	font: bold 1em Georgia;
+	margin: 0 0 0.1em;
+	padding: 0 0.25em;
+	}
+.cheatsheet DD {
+	margin: 0;
+	padding: 0 0 0 1em;
+	}
+.cheatsheet DD PRE {
+	color: #999;
+	margin: 0;
+	overflow: auto;
+	font-size: 0.9em;
+	padding: 2px;
+	white-space: pre-wrap;
+	}
+.cheatsheet .caret {
+	background: lightskyblue;
+	display: inline-block;
+	width: 2px;
+	}
+.cheatsheet .tab {
+	background: #2C2D32;
+	border-radius: 1em;
+	box-shadow: inset 0 0 2px #999;
+	color: #FFF;
+	display: inline-block;
+	overflow: hidden;
+	vertical-align: middle;
+	width: 3em;
+	}

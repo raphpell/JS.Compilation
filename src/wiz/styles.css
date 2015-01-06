@@ -1,0 +1,35 @@
+WIZ {
+	float:right;
+	}
+import,
+ITEM {
+	clear:left;
+	float:left;
+	}
+.identifier {
+	display: inline-block;
+	margin: 2px;
+	padding: 2px 4px;
+	}
+.value,
+.rule {
+	background: white;
+	border: 1px solid #CCC;
+	padding: 2px;
+	}
+.compil {
+	background: #FFFF00;
+	border: 1px solid #000;
+	}
+.css {
+    background: #87CEFA;
+    border: 1px solid #00F;
+	}
+.previoustokens {
+	background: orange;
+	border: 1px solid red;
+	}
+.translation {
+	background: lightgreen;
+	border: 1px solid green;
+	}
