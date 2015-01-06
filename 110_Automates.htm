@@ -1,4 +1,4 @@
-<!DOCTYPE HTML>
+ï»¿<!DOCTYPE HTML>
 <html>
 <head>
 	<title>Transformation ER en AFD</title>
@@ -38,11 +38,11 @@
 	<label for="eRegExpList">Exemple de token : </label>
 	<select id="eRegExpList"></select>
 </div>
-<label for="eRE">Expression régulière : </label>
+<label for="eRE">Expression rÃ©guliÃ¨re : </label>
 <textarea id="eRE">[^a-z]a|\db|1c|[^B]d|.e</textarea>
-<input type="button" id="eBtnCreate" value="Générer" title="Créer l'AFN, l'AFD et sa représentation JavaScript.">
-<input type="button" onclick="regexpSyntax()" value="Syntaxe" title="Syntaxe des expressions régulières.">
-<input type="button" value="Visualiser l'analyse" onclick="previewRE()" title="Analyse lexicale et syntaxique de l'expression régulière.">
+<input type="button" id="eBtnCreate" value="GÃ©nÃ©rer" title="CrÃ©er l'AFN, l'AFD et sa reprÃ©sentation JavaScript.">
+<input type="button" onclick="regexpSyntax()" value="Syntaxe" title="Syntaxe des expressions rÃ©guliÃ¨res.">
+<input type="button" value="Visualiser l'analyse" onclick="previewRE()" title="Analyse lexicale et syntaxique de l'expression rÃ©guliÃ¨re.">
 
 <hr>
 
@@ -52,14 +52,14 @@
 			<input type="button" value="Visualiser le NFA" onclick="previewNFA()" title="Matrice et graphe du NFA.">
 			<a href="112_NFA.htm" target="_INFO">info</a>
 		</dt>
-		<dt><input type="button" id="eBtnRenameNFA" value="Renommer ses états" title="Renomme les états."></dt>
+		<dt><input type="button" id="eBtnRenameNFA" value="Renommer ses Ã©tats" title="Renomme les Ã©tats."></dt>
 		<dt>
-			<input type="button" id="eBtnValidate" value="Valider son alphabet" title="Rend l'alphabet déterministe !">
+			<input type="button" id="eBtnValidate" value="Valider son alphabet" title="Rend l'alphabet dÃ©terministe !">
 			<a href="113_ValidationAlphabet.htm" target="_INFO">info</a>
 		</dt>
 		<dt>
 			<input type="checkbox" id="eAutoValidation" checked>
-			<label for="eAutoValidation" title="Rend les éléments de l'alphabet unique.">
+			<label for="eAutoValidation" title="Rend les Ã©lÃ©ments de l'alphabet unique.">
 				Valider automatiquement.
 			</label>
 		</dt>
@@ -71,7 +71,7 @@
 			<input type="button" value="Visualiser le DFA" onclick="previewDFA()" title="Matrice et graphe du DFA.">
 			<a href="114_DFA.htm" target="_INFO">info</a>
 		</dt>
-		<dt><input type="button" id="eBtnRenameDFA" value="Renommer ses états" title="Renomme les états."></dt>
+		<dt><input type="button" id="eBtnRenameDFA" value="Renommer ses Ã©tats" title="Renomme les Ã©tats."></dt>
 		<dt>
 			<input type="button" id="eBtnMinimize" value="Minimiser sa taille" title="Diminue la taille de l'automate !">
 		</dt>
@@ -91,12 +91,12 @@
 		</dt>
 		<dt><input type="checkbox" id="eExportWhiteSpace"><label for="eExportWhiteSpace">Espaces blancs.</label></dt>
 		<dt>
-			<input type="checkbox" id="eExportCompressed"><label for="eExportCompressed">Compressé.</label>
+			<input type="checkbox" id="eExportCompressed"><label for="eExportCompressed">CompressÃ©.</label>
 			<a href="info.compression.html" target="_INFO">info</a>
 		</dt>
 		<dt>
 			<textarea id="eExportResult"></textarea>
-			<div><label>Nombre de caractères : </label><b id="eExportSize"></b></div>
+			<div><label>Nombre de caractÃ¨res : </label><b id="eExportSize"></b></div>
 		</dt>
 	</dl>
 </fieldset>

@@ -1,4 +1,4 @@
-<html>
+ï»¿<html>
 	<head>
 		<title>Syntaxe des modules</title>
 		<link rel="stylesheet" type="text/css" href="../../widget/Toc/styles.css">
@@ -7,15 +7,15 @@
 
 <dl class="menu">
 	<dt><h3>Sommaire</h3></dt>
-	<dt><a href="#toc1">Préambule</a></dt>
+	<dt><a href="#toc1">PrÃ©ambule</a></dt>
 	<dt><a href="#toc2">Syntaxe</a>
 		<dd><dl>
 			<dt><a href="#toc21">Les modules requis</a></dt>
-			<dt><a href="#toc22">Les définitions</a>
+			<dt><a href="#toc22">Les dÃ©finitions</a>
 				<dd><dl>
-					<dt><a href="#toc221">Export du résultat</a></dt>
+					<dt><a href="#toc221">Export du rÃ©sultat</a></dt>
 					<dt><a href="#toc222">Notation identifiants</a></dt>
-					<dt><a href="#toc223">Préfixes d'identifiants</a></dt>
+					<dt><a href="#toc223">PrÃ©fixes d'identifiants</a></dt>
 					<dt><a href="#toc224">Affectation de valeur</a></dt>
 					<dt><a href="#toc225">Affectation d'attributs</a></dt>
 				</dl></dd>
@@ -32,21 +32,21 @@
 
 
 <a name="toc1"></a>
-<h2>Préambule</h2>
+<h2>PrÃ©ambule</h2>
 
 <p>Les modules de l'analyseur lexical contiennent :</p>
 <ul>
-	<li>des automates finis déterministes</li>
-	<li>des règles d'analyse (liste d'automates à tester)</li>
-	<li>les noms des classes css à associer au token</li>
-	<li>des noms de token destinés à renommer certains token</li>
-	<li>des noms de token devant précéder certain token pour qu'il soit véritablement reconnu</li>
+	<li>des automates finis dÃ©terministes</li>
+	<li>des rÃ¨gles d'analyse (liste d'automates Ã  tester)</li>
+	<li>les noms des classes css Ã  associer au token</li>
+	<li>des noms de token destinÃ©s Ã  renommer certains token</li>
+	<li>des noms de token devant prÃ©cÃ©der certain token pour qu'il soit vÃ©ritablement reconnu</li>
 </ul>
 
-<p>Lors de la <a href="../../140_Lexer.modules.htm">création de module pour le lexer</a></p>
+<p>Lors de la <a href="../../140_Lexer.modules.htm">crÃ©ation de module pour le lexer</a></p>
 <ul>
-	<li>les valeurs résultantes sont stockées même si elles ne sont pas exportées.</li>
-	<li>elles sont réutilisables pour le calcul des modules suivant.</li>
+	<li>les valeurs rÃ©sultantes sont stockÃ©es mÃªme si elles ne sont pas exportÃ©es.</li>
+	<li>elles sont rÃ©utilisables pour le calcul des modules suivant.</li>
 </ul>
 
 
@@ -58,88 +58,88 @@
 <h3>Les modules requis</h3>
 
 <p>
-	Ils ne seront pas calculés automatiquement. <cite>Cela permet aux ordinateurs de refroidir un peu...</cite><br>
-	La notation ci-dessous est utilisée uniquement pour connaître les modules qu'il nous faut avant de lancer le calcul. <br>
+	Ils ne seront pas calculÃ©s automatiquement. <cite>Cela permet aux ordinateurs de refroidir un peu...</cite><br>
+	La notation ci-dessous est utilisÃ©e uniquement pour connaÃ®tre les modules qu'il nous faut avant de lancer le calcul. <br>
 	
 </p>
 <ul>
-	<li> leur déclaration se fait en tête de fichier</li>
-	<li> le symbole '¤' préfixe la suite de nom de module</li>
-	<li> ils sont séparés avec le symbole ','</li>
+	<li> leur dÃ©claration se fait en tÃªte de fichier</li>
+	<li> le symbole 'Â¤' prÃ©fixe la suite de nom de module</li>
+	<li> ils sont sÃ©parÃ©s avec le symbole ','</li>
 </ul>
-<p>Exemple: <code>	¤ superscript, whitespaces, strings&amp;comments</code></p>
+<p>Exemple: <code>	Â¤ superscript, whitespaces, strings&amp;comments</code></p>
 
 
 <a name="toc22"></a>
-<h3>Les définitions</h3>
+<h3>Les dÃ©finitions</h3>
 
 <p>Nous identifions :</p>
 <ul>
-	<li>Les <b>tokens</b> : expression régulière (à transformer en AFD)</li>
+	<li>Les <b>tokens</b> : expression rÃ©guliÃ¨re (Ã  transformer en AFD)</li>
 	<dd><code>!	REGULAR_EXPRESSION	=	\/<i>{reBody}</i>\/<i>{reFlags}</i></code></dd>
-	<li>Les <b>règles d'analyse</b> (liste de tokens à tester lors de l'analyse)</li>
+	<li>Les <b>rÃ¨gles d'analyse</b> (liste de tokens Ã  tester lors de l'analyse)</li>
 	<dd><code>!#@	R_REGULAR_EXPRESSION		=	<i>{hspaces}</i>|REGULAR_EXPRESSION_IN</code></dd>
-	<li>Les <b>aggrégations</b> de token : assemblage de plusieurs automates en un seul</li>
+	<li>Les <b>aggrÃ©gations</b> de token : assemblage de plusieurs automates en un seul</li>
 	<dd><code>!#@	INI_VALUE			=	S_INI_SDQ|S_INI_SSQ|INI_VALUE_IN|<i>{hspaces}</i></code></dd>
 	<li>Les <b>macros</b> :
 		<ul>
-			<li>expression régulière intégrée dans d'autres.</li>
-			<li>portion d'une aggrégation, d'une règle d'analyse ou de l'attribut <i>previousTokens</i>: liste de noms de token.</li>
+			<li>expression rÃ©guliÃ¨re intÃ©grÃ©e dans d'autres.</li>
+			<li>portion d'une aggrÃ©gation, d'une rÃ¨gle d'analyse ou de l'attribut <i>previousTokens</i>: liste de noms de token.</li>
 		</ul>
-		Elles sont intégrées dans les valeurs en étant encadrées par les symboles '{}'
+		Elles sont intÃ©grÃ©es dans les valeurs en Ã©tant encadrÃ©es par les symboles '{}'
 	</li>
 </ul>
 
 
 <a name="toc221"></a>
-<h4>Export du résultat</h4>
-<p>Pour que les tokens, les règles et les aggrégations soit dans le résultat, il faut que leur identifant soit précédé du caractère <b>'!'</b>.</p>
+<h4>Export du rÃ©sultat</h4>
+<p>Pour que les tokens, les rÃ¨gles et les aggrÃ©gations soit dans le rÃ©sultat, il faut que leur identifant soit prÃ©cÃ©dÃ© du caractÃ¨re <b>'!'</b>.</p>
 
 
 <a name="toc222"></a>
 <h4>Notation identifiants</h4>
 <ul>
-	<li>ceux commençant par une lettre <b>majuscule</b> sont :
+	<li>ceux commenÃ§ant par une lettre <b>majuscule</b> sont :
 		<ul>
 			<li>Les noms des tokens</li>
-			<li>Les règles d'analyse : Ils doivent-être aussi précédés du caractère <b>'#'</b></li>
-			<li>Les aggrégations de token : Ils doivent-être aussi précédés du caractère <b>'@'</b></li>
+			<li>Les rÃ¨gles d'analyse : Ils doivent-Ãªtre aussi prÃ©cÃ©dÃ©s du caractÃ¨re <b>'#'</b></li>
+			<li>Les aggrÃ©gations de token : Ils doivent-Ãªtre aussi prÃ©cÃ©dÃ©s du caractÃ¨re <b>'@'</b></li>
 		</ul>
 	</li>
-	<li>ceux commençant par une lettre <b>minuscule</b> sont les macros.</li>
+	<li>ceux commenÃ§ant par une lettre <b>minuscule</b> sont les macros.</li>
 </ul>
 
 
 <a name="toc223"></a>
-<h4>Préfixes d'identifiants</h4>
+<h4>PrÃ©fixes d'identifiants</h4>
 <ul>
 	<li>'S_<i>TokenName</i>' : 
 		<dl>
-			<dd>Détecte le début d'un token parent
+			<dd>DÃ©tecte le dÃ©but d'un token parent
 				<ul>
-					<li>créé le token parent '<i>TokenName</i>'</li>
+					<li>crÃ©Ã© le token parent '<i>TokenName</i>'</li>
 					<li>ajoute le token 'S_<i>TokenName</i>' au parent</li>
-					<li>continue l'analyse avec la définition '<i>TokenName</i>'</li>
-					<li>l'analyse du parent se stoppe si aucun token est trouvé ou si le token 'E_<i>TokenName</i>' est trouvé.</li>
+					<li>continue l'analyse avec la dÃ©finition '<i>TokenName</i>'</li>
+					<li>l'analyse du parent se stoppe si aucun token est trouvÃ© ou si le token 'E_<i>TokenName</i>' est trouvÃ©.</li>
 				</ul>
 			</dd>
 		</dl>
 	</li>
 	<li>'E_<i>TokenName</i>' :
 		<dl>
-			<dd>Détecte la fin d'un token parent</dd>
+			<dd>DÃ©tecte la fin d'un token parent</dd>
 		</dl>
 	</li>
 	<li>'R_<i>TokenName</i>' :
 		<dl>
-			<dd>Ce type de token permet de refaire une analyse sur la valeur d'un token trouvé nommé '<i>TokenName</i>'.</dd>
-			<dd>Si le token '<i>TokenName</i>' est trouvé,
+			<dd>Ce type de token permet de refaire une analyse sur la valeur d'un token trouvÃ© nommÃ© '<i>TokenName</i>'.</dd>
+			<dd>Si le token '<i>TokenName</i>' est trouvÃ©,
 				<ol>
-					<li>le token parent 'TokenName' est créé</li>
-					<li>l'analyse lexicale est relancée avec la définition  '<i>TokenName</i>' sur la valeur précédemment trouvé</li>
+					<li>le token parent 'TokenName' est crÃ©Ã©</li>
+					<li>l'analyse lexicale est relancÃ©e avec la dÃ©finition  '<i>TokenName</i>' sur la valeur prÃ©cÃ©demment trouvÃ©</li>
 				</ol>
 			</dd>
-			<dd>Ce type de token est à éviter si possible.</dd>
+			<dd>Ce type de token est Ã  Ã©viter si possible.</dd>
 		</dl>
 	</li>
 </ul>
@@ -147,27 +147,27 @@
 
 <a name="toc224"></a>
 <h4>Affectation de valeur</h4>
-<p>Les valeurs commencent après l'identifiant suite aux espaces après le symbole '=' et se termine au saut de ligne.</p>
+<p>Les valeurs commencent aprÃ¨s l'identifiant suite aux espaces aprÃ¨s le symbole '=' et se termine au saut de ligne.</p>
 
 
 <a name="toc225"></a>
 <h4>Affectation d'attributs</h4>
 <p>
-	Les attributs sont définis la ligne suivant l'affectation, entre des parenthèses '()' et sont séparés par une virgule ','. <br>
-	Nom d'attributs implémentés :
+	Les attributs sont dÃ©finis la ligne suivant l'affectation, entre des parenthÃ¨ses '()' et sont sÃ©parÃ©s par une virgule ','. <br>
+	Nom d'attributs implÃ©mentÃ©s :
 </p>
 <ul>
 	<li><b>css</b> : classe css.</li>
-	<li><b>previousTokens</b> : Liste des tokens pouvant le précéder, séparés par le symbole '|'.</li>
+	<li><b>previousTokens</b> : Liste des tokens pouvant le prÃ©cÃ©der, sÃ©parÃ©s par le symbole '|'.</li>
 	<li><b>translation</b> : nom final du token.</li>
 </ul>
-<p>La valeur de ces attributs est présente après le caractère ':' suivant le nom.</p>
-<p>Les aggrégations ne possède pas d'attribut puisqu'elles ne sont pas un token.</p>
+<p>La valeur de ces attributs est prÃ©sente aprÃ¨s le caractÃ¨re ':' suivant le nom.</p>
+<p>Les aggrÃ©gations ne possÃ¨de pas d'attribut puisqu'elles ne sont pas un token.</p>
 
 
 <a name="toc23"></a>
 <h3>Les commentaires</h3>
-<p>Il est possible d'ajouter des commentaires, mais ils doivent être seules sur les lignes où ils sont ajoutés. </p>
+<p>Il est possible d'ajouter des commentaires, mais ils doivent Ãªtre seules sur les lignes oÃ¹ ils sont ajoutÃ©s. </p>
 <ul>
 	<li>Commentaire simple ligne</li>
 	<dd><code>// ...</code></dd>
@@ -181,7 +181,7 @@
 <p>Je vous propose de :</p>
 <ul>
 	<li><a href="preview.htm">visualiser l'analyse de cette syntaxe</a></li>
-	<li><a href="../../140_Lexer.modules.htm">créer un module pour le lexer</a></li>
+	<li><a href="../../140_Lexer.modules.htm">crÃ©er un module pour le lexer</a></li>
 </ul>
 
 

@@ -1,4 +1,4 @@
-<!DOCTYPE HTML>
+Ôªø<!DOCTYPE HTML>
 <html>
 <head>
 	<title>Analyse lexicale sur plusieurs niveaux</title>
@@ -40,12 +40,12 @@
 <p>
 	<label for="eRegExpLexer">RegExp Lexer :</label>
 	<select id="eRegExpLexer">
-		<option value="OneRegExpLexer">ì1 RegExpî</option>
+		<option value="OneRegExpLexer">‚Äú1 RegExp‚Äù</option>
 		<option value="MultiRegExpLexer" selected>Multiple RegExp</option>
 	</select>
 </p>
 
-<h2>Expressions rÈguliËres</h2>
+<h2>Expressions r√©guli√®res</h2>
 <h3>ONE LEVEL LEXER</h3>
 <div class="w100">
 	<label for="eRegExpList">Exemples : </label>
@@ -53,8 +53,8 @@
 	<label for="eRegExp">Source : </label>
 	<textarea id="eRegExp">"[^"\\\r\n]*(\\.[^"\\\r\n]*)*"</textarea>
 	<hr>
-	<label>Benchmark sur <input type="number" id="eRepeatTest1" min="1" max="100" value="100" size="3"> exÈcution(s).</label><br>
-	<input type="button" value="RÈpÈter automatiquement" onclick="this.value=this.value=='ArrÍter'?'Lancer':'ArrÍter'; benchmark1()">
+	<label>Benchmark sur <input type="number" id="eRepeatTest1" min="1" max="100" value="100" size="3"> ex√©cution(s).</label><br>
+	<input type="button" value="R√©p√©ter automatiquement" onclick="this.value=this.value=='Arr√™ter'?'Lancer':'Arr√™ter'; benchmark1()">
 </div>
 <div class="w50"><h4>RegExp Lexer</h4>
 	<input type="button" value="Benchmark" onclick="getTokens1()">
@@ -115,8 +115,8 @@
 	?>
 	</textarea>
 	<hr>
-	<label>Benchmark sur <input type="number" id="eRepeatTest2" min="1" max="10" value="3" size="2"> exÈcution(s).</label><br>
-	<input type="button" value="RÈpÈter automatiquement" onclick="this.value=this.value=='ArrÍter'?'Lancer':'ArrÍter'; benchmark2()">
+	<label>Benchmark sur <input type="number" id="eRepeatTest2" min="1" max="10" value="3" size="2"> ex√©cution(s).</label><br>
+	<input type="button" value="R√©p√©ter automatiquement" onclick="this.value=this.value=='Arr√™ter'?'Lancer':'Arr√™ter'; benchmark2()">
 </div>
 <div class="w50"><h4>RegExp Lexer</h4>
 	<input type="button" value="Benchmark" onclick="getTokens3()">
@@ -552,7 +552,7 @@ var REParser =Parser =(function(){
 					if( result ) return result
 					} else throwError( "Erreur parsing ... action "+ action )
 			}while( i<aTokens.length && aStack.length )
-			throwError( 'Phrase incomplËte...' )
+			throwError( 'Phrase incompl√®te...' )
 			}
 		Parser.Node =function ( X ){
 			var e = document.createElement('B')

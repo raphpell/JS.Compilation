@@ -1,4 +1,4 @@
-<html>
+ï»¿<html>
 	<head>
 		<title>Performance du Lexer</title>
 		<style>
@@ -28,56 +28,56 @@ LI {
 <a href="index.htm">Index</a>
 
 <h1>Performance du Lexer</h1>
-<p>La difficulté est de trouver où le temps est perdu.</p>
+<p>La difficultÃ© est de trouver oÃ¹ le temps est perdu.</p>
 
 
 <h2>Les lexers</h2>
 <p>
 	Mes Lexer sont puissant au niveau de la <a href="131_Lexer.byStep.htm">lecture des tokens</a> (<1ms). <br>
-	Voici la liste de <a href="133_Lexer.comparison.htm">mes Lexer</a> classés par préférence:
+	Voici la liste de <a href="133_Lexer.comparison.htm">mes Lexer</a> classÃ©s par prÃ©fÃ©rence:
 </p>
 <ul>
 	<li class="automatonLexer"><b>Automaton Lexer</b>
 		<ul>
 			<li>Le texte est parcourue une et une seule fois et voila...</li>
-			<li>Le plus long token trouvé est toujours retourné.</li>
+			<li>Le plus long token trouvÃ© est toujours retournÃ©.</li>
 			<li>Il peut aussi:
 				<ol>
 					<li>parcourir une liste d'automates.</li>
-					<li>rescanner un token trouvé.</li>
-					<li>réaliser une <a href="134_Lexer.update.htm">analyse partielle</a></li>
+					<li>rescanner un token trouvÃ©.</li>
+					<li>rÃ©aliser une <a href="134_Lexer.update.htm">analyse partielle</a></li>
 				</ol>
 			</li>
 		</ul></li>
 	<li class="regexpMultipleLexer"><b>Multiple RegExp Lexer</b>
 		<ul>
-			<li>Il parcourt une liste d'ER une à une tant que tout le texte n'est pas parcouru.</li>
-			<li>Il vaut mieux quelle soit classée par ordre d'apparition courante.</li>
-			<li>Première arrivée, première servie.</li>
-			<li>Un ordre des ER est requis: mots clés avant identifiant, etc...</li>
+			<li>Il parcourt une liste d'ER une Ã  une tant que tout le texte n'est pas parcouru.</li>
+			<li>Il vaut mieux quelle soit classÃ©e par ordre d'apparition courante.</li>
+			<li>PremiÃ¨re arrivÃ©e, premiÃ¨re servie.</li>
+			<li>Un ordre des ER est requis: mots clÃ©s avant identifiant, etc...</li>
 		</ul></li>
-	<li class="regexpOneLexer"><b>"1 RegExp" Lexer</b> <sup style="color:red;">A éviter!</sup>
+	<li class="regexpOneLexer"><b>"1 RegExp" Lexer</b> <sup style="color:red;">A Ã©viter!</sup>
 		<ul>
-			<li>Une seule grande expression régulière est créée pour parcourir le texte.</li>
-			<li>Le défaut: quand un mot est trouvé il faut déterminé son type.</li>
-			<li>Pour cela il faut parcourir toutes les expressions régulières (celles utilisées pour créer la grande).</li>
-			<li>Les expressions régulières utilisées pour créer la grande ont une organisation spéciale... (voir Multiple RegExp Lexer)</li>
+			<li>Une seule grande expression rÃ©guliÃ¨re est crÃ©Ã©e pour parcourir le texte.</li>
+			<li>Le dÃ©faut: quand un mot est trouvÃ© il faut dÃ©terminÃ© son type.</li>
+			<li>Pour cela il faut parcourir toutes les expressions rÃ©guliÃ¨res (celles utilisÃ©es pour crÃ©er la grande).</li>
+			<li>Les expressions rÃ©guliÃ¨res utilisÃ©es pour crÃ©er la grande ont une organisation spÃ©ciale... (voir Multiple RegExp Lexer)</li>
 		</ul></li>
 </ul>
 <p style="margin-bottom:0;">
-	Ils réalisent tous une analyse sur <a href="132_Lexer.level.html">plusieurs niveaux</a>: un <i>arbre lexicale</i> est créé.<br>
+	Ils rÃ©alisent tous une analyse sur <a href="132_Lexer.level.html">plusieurs niveaux</a>: un <i>arbre lexicale</i> est crÃ©Ã©.<br>
 	Normalement:
 </p>
 <ul style="margin-top:0;">
-	<li>seule une liste de token devrait-être générée</li>
-	<li>une <a href="200_AnalyseSyntaxique.htm">analyse syntaxique</a> devrait-être faite en parallèle, depuis une <a href="210_Parser.html">grammaire</a>.</li>
+	<li>seule une liste de token devrait-Ãªtre gÃ©nÃ©rÃ©e</li>
+	<li>une <a href="200_AnalyseSyntaxique.htm">analyse syntaxique</a> devrait-Ãªtre faite en parallÃ¨le, depuis une <a href="210_Parser.html">grammaire</a>.</li>
 </ul>
 
 <h2>La fonction LexerNode</h2>
 <p>
-	La performance des lexer dépend surtout de la fonction '<var>LexerNode</var>' utilisée. <br>
-	Elle retourne un objet affecté avec l'attribut <var>oValue</var> (valeurs du token). <br>
-	Cet objet peut-être un nouvel élément HTML, car il doit avoir comme membres minimum (pour le Lexer):
+	La performance des lexer dÃ©pend surtout de la fonction '<var>LexerNode</var>' utilisÃ©e. <br>
+	Elle retourne un objet affectÃ© avec l'attribut <var>oValue</var> (valeurs du token). <br>
+	Cet objet peut-Ãªtre un nouvel Ã©lÃ©ment HTML, car il doit avoir comme membres minimum (pour le Lexer):
 </p>
 <code><ul>
 	<li>parentNode</li>
@@ -90,8 +90,8 @@ LI {
 	<li>removeChild( oChild ) return oChild</li>
 </ul></code>
 <p>
-	Pour l'instant l'éditeur créé avec le Lexer Automaton est plus rapide avec...<br>
-	Mais les éléments HTML ralentissent l'analyse car se sont de gros objets.
+	Pour l'instant l'Ã©diteur crÃ©Ã© avec le Lexer Automaton est plus rapide avec...<br>
+	Mais les Ã©lÃ©ments HTML ralentissent l'analyse car se sont de gros objets.
 </p>
 
 

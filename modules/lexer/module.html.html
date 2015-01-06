@@ -1,5 +1,5 @@
-<html><head></head><body><pre>
-¤ superscript, whitespaces
+ï»¿<html><head></head><body><pre>
+Â¤ superscript, whitespaces
 		
 !#@	HTML	=	{superscript}|{whitespaces}|S_HTML_COMMENT|S_CDATA|S_DOCTYPE|S_END_TAG|S_TAG|HTML_TEXT
 		(css:html)
@@ -9,20 +9,20 @@
 	S_TAG 		=	<
 	E_TAG		=	>
 	
-// macros partagées
+// macros partagÃ©es
 	superscript 	= 	S_PHP
 	whitespaces 	= 	L_NEW_LINE|TAB|SPACES
 	htmlattribute	=	TAG_ATTR|S_TAG_ATTR_VALUE
 	strings			=	S_HTML_SDQ|S_HTML_SSQ
 	
-// élément DOCTYPE
+// Ã©lÃ©ment DOCTYPE
 !@	DOCTYPE			= 	{whitespaces}|{strings}|DOCTYPE_IN|E_DOCTYPE
 		(css:doctype)
 	S_DOCTYPE		= 	<\!DOCTYPE
 	E_DOCTYPE		= 	>
 	DOCTYPE_IN		= 	[^\n\r\f \t"'>]+
 		
-// élément CDATA
+// Ã©lÃ©ment CDATA
 !#@	CDATA			=	{superscript}|{whitespaces}|E_CDATA|CDATA_IN|RBRACK
 		(css:cdata)
 	CDATA_IN		=	([^\n\r\f \t\]]+|\]([^\n\r\f \t\]]+|\][^\n\r\f \t\>]+))+

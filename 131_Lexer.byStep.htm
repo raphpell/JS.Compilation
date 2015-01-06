@@ -1,4 +1,4 @@
-<!DOCTYPE HTML>
+ï»¿<!DOCTYPE HTML>
 <html>
 <head>
 	<title>Analyse lexicale: readToken</title>
@@ -62,8 +62,8 @@ TH {
 	<dl>
 		<dt>Index: <span id="eIndex">0</span></dt>
 		<dt>Ligne: <span id="eLine">1</span></dt>
-		<dt>Régle: <span id="eRule">JS</span></dt>
-		<dt>Précédant: <span id="ePrevious"></span></dt>
+		<dt>RÃ©gle: <span id="eRule">JS</span></dt>
+		<dt>PrÃ©cÃ©dant: <span id="ePrevious"></span></dt>
 	</dl>
 </fieldset>
 <fieldset><legend>Lexer</legend>
@@ -73,7 +73,7 @@ TH {
 			<option value="MultiRegExpLexer">MultiRegExpLexer</option>
 		</select></dt>
 		<dt><input type="checkbox" id="eBSkip"><label for="eBSkip">Skip.</label></dt>
-		<dt><input type="checkbox" id="eShowResult" checked><label for="eShowResult">Afficher le résultat.</label></dt>
+		<dt><input type="checkbox" id="eShowResult" checked><label for="eShowResult">Afficher le rÃ©sultat.</label></dt>
 		<dt><input type="checkbox" id="eShowStats" checked><label for="eShowStats">Afficher les stats.</label></dt>
 	</dl>
 </fieldset>
@@ -138,30 +138,30 @@ TH {
 <div style="float: left;">
 	<p>La performance est moindre lorsque:</p>
 	<ol>
-		<li>Une fois un token détecté le <i>lexer revient en arrière</i><br>
-			et le <b>rescanne</b> pour détecter ses enfants (pour les espaces blancs...)
+		<li>Une fois un token dÃ©tectÃ© le <i>lexer revient en arriÃ¨re</i><br>
+			et le <b>rescanne</b> pour dÃ©tecter ses enfants (pour les espaces blancs...)
 			<ul>
-				<li>REGULAR_EXPRESSION: Expression régulière.</li>
+				<li>REGULAR_EXPRESSION: Expression rÃ©guliÃ¨re.</li>
 			</ul></li>
-		<li>Il créé 2 tokens: Un parent et son premier enfant
+		<li>Il crÃ©Ã© 2 tokens: Un parent et son premier enfant
 			<ul><!-- 
 				<li><abbr title="Multi Line Comment">MLC</abbr>: Commentaire multi ligne.</li>
 				<li><abbr title="Multi Line Comment">SLC</abbr>: Commentaire simple ligne.</li>
-				<li><abbr title="String Double Quote">SDQ</abbr> ou DOUBLE_QUOTE: Chaine de caractère.</li>
-				<li><abbr title="String Single Quote">SSQ</abbr> ou SINGLE_QUOTE:. Chaine de caractère.</li> -->
+				<li><abbr title="String Double Quote">SDQ</abbr> ou DOUBLE_QUOTE: Chaine de caractÃ¨re.</li>
+				<li><abbr title="String Single Quote">SSQ</abbr> ou SINGLE_QUOTE:. Chaine de caractÃ¨re.</li> -->
 				<li>PHP: Code PHP....</li>
 			</ul></li>
-		<li>Il créé un token composé
+		<li>Il crÃ©Ã© un token composÃ©
 			<ul>
 				<li>COMMENT: Commentaire simple ou multi ligne.</li>
-				<li>STRING: Chaine de caractère.</li>
+				<li>STRING: Chaine de caractÃ¨re.</li>
 			</ul></li>
 	</ol>
-	<p>A noter que lorsque lexer utilise une règle d'un token parent et ne trouve plus de token , il:</p>
+	<p>A noter que lorsque lexer utilise une rÃ¨gle d'un token parent et ne trouve plus de token , il:</p>
 	<ol>
 		<li>stoppe l'analyse du parent </li>
-		<li>retourne <code>true</code> à la place d'un token</li>
-		<li>continue l'analyse avec la règle utilisée avant la rencontre du parent</li>
+		<li>retourne <code>true</code> Ã  la place d'un token</li>
+		<li>continue l'analyse avec la rÃ¨gle utilisÃ©e avant la rencontre du parent</li>
 	</ol>
 </div>
 
@@ -241,7 +241,7 @@ View ={
 		if( eToken = oLexer.readToken()){
 			var o = eToken.oValue
 			if( eShowStats.checked )
-				Stats.set( o ? o.token : "Pas d'token trouvé: fin parent", oChrono.stop())
+				Stats.set( o ? o.token : "Pas d'token trouvÃ©: fin parent", oChrono.stop())
 			}
 		if( ! View.bScanning ){
 			View.setInfo( eToken )

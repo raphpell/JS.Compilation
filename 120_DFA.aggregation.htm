@@ -1,7 +1,7 @@
-<!DOCTYPE HTML>
+ï»¿<!DOCTYPE HTML>
 <html>
 <head>
-	<title>Aggrégation de DFA</title>
+	<title>AggrÃ©gation de DFA</title>
 	<link rel="stylesheet" type="text/css" href="css/styles.css">
 	<style>
 		#eRETree {
@@ -36,7 +36,7 @@
 <body spellcheck="false">
 <div id="eTITLE">
 	<a href="index.htm">Index</a>
-	<h1>Aggrégation de DFA</h1>
+	<h1>AggrÃ©gation de DFA</h1>
 </div>
 
 <div id="eMenu">
@@ -47,7 +47,7 @@
 	<hr>
 	<label for="eTokenID" title="">Token : </label>
 	<input type="text" id="eTokenID">
-	<label for="eTokenRE" title="">Expression réguliére : </label>
+	<label for="eTokenRE" title="">Expression rÃ©guliÃ©re : </label>
 	<input type="text" id="eTokenRE">
 	<input type="button" id="eBtnAddToken" value="Ajouter Token" title="">
 </div>
@@ -57,10 +57,10 @@
 <input type="button" value="Visualiser le DFA" onclick="previewDFA()" title="Matrice et graphe du DFA.">
 <input type="button" id="eBtnExport" value="Exporter">
 <input type="checkbox" id="eExportWhiteSpace"><label for="eExportWhiteSpace">Espaces blancs.</label>
-<input type="checkbox" id="eExportCompressed"><label for="eExportCompressed">Compressé.</label>
+<input type="checkbox" id="eExportCompressed"><label for="eExportCompressed">CompressÃ©.</label>
 <a href="info.compression.html" target="_INFO">info</a>
 <textarea id="eExportResult"></textarea>
-<div><label>Nombre de caractères : </label><b id="eExportSize"></b></div>
+<div><label>Nombre de caractÃ¨res : </label><b id="eExportSize"></b></div>
 
 <hr>
 
@@ -338,7 +338,7 @@ var aItemCalcul
 var aParentItemCalcul
 var calculAggregation =function( parentItem, item ){
 	eMenu.style.display='none'
-	eTITLE.innerHTML = '<h1>Automate composé '+ parentItem[0] + '</h1>'
+	eTITLE.innerHTML = '<h1>Automate composÃ© '+ parentItem[0] + '</h1>'
 	aItemCalcul = item
 	aParentItemCalcul = parentItem
 	addDFA( item.token, item.oFA )

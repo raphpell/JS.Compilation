@@ -1,4 +1,4 @@
-<!DOCTYPE HTML>
+ï»¿<!DOCTYPE HTML>
 <html>
 	<head>
 		<title>AFD</title>
@@ -11,17 +11,17 @@
 <dl class="menu">
 	<dt><a href="index.htm">Index</a></dt>
 	<dt><h3>Sommaire</h3></dt>
-	<dt><a href="#toc1">Préambule</a></dt>
+	<dt><a href="#toc1">PrÃ©ambule</a></dt>
 	<dt><a href="#toc2">Conversion AFN en AFD</a></dt>
 		<dd><dl>
 			<dt><a href="#toc21">&epsilon;-Closure</a></dt>
 		</dl></dd>
 	<dt><a href="#toc3">Minimisation</a></dt>
 		<dd><dl>
-			<dt><a href="#toc31">Nombre d'états</a></dt>
+			<dt><a href="#toc31">Nombre d'Ã©tats</a></dt>
 			<dt><a href="#toc32">Alphabet</a></dt>
 		</dl></dd>
-	<dt><a href="#toc4">Résolution des ambiguïtés</a></dt>
+	<dt><a href="#toc4">RÃ©solution des ambiguÃ¯tÃ©s</a></dt>
 </dl>
 <p id="back-top"><a href="#"><span></span>Haut de page</a></p>
 
@@ -30,13 +30,13 @@
 
 
 <a name="toc1"></a>
-<h2>Préambule</h2>
+<h2>PrÃ©ambule</h2>
 <p>
-	AFD = Automate Fini Déterministe<br>
+	AFD = Automate Fini DÃ©terministe<br>
 	( DFA = Determinist Finite Automaton )
 </p>
 <ul>
-	<li>a au maximum une transition pour un état et un symbole.</li>
+	<li>a au maximum une transition pour un Ã©tat et un symbole.</li>
 	<li>n'a pas de transition &epsilon;.</li>
 </ul>
 
@@ -44,26 +44,26 @@
 <a name="toc2"></a>
 <h2>Conversion AFN en AFD</h2>
 <ul>
-	<li>Un état du AFD correspond à des groupes d'états du AFN.</li>
+	<li>Un Ã©tat du AFD correspond Ã  des groupes d'Ã©tats du AFN.</li>
 	<li>	
-		L'<b>état initial</b> du AFD est égale à l'&epsilon;-Closure de l'état initial du AFN.
+		L'<b>Ã©tat initial</b> du AFD est Ã©gale Ã  l'&epsilon;-Closure de l'Ã©tat initial du AFN.
 	</li>
 	<li>
-		Pour chaque nouvel état du AFD et chaque symbole de l'alphabet : <br>
-		Une transition (s<sub>dfa1</sub>,c)&rarr;s<sub>dfa2</sub> est ajouté si s<sub>dfa2</sub> &ne; &empty; <br>
-		s<sub>dfa2</sub> est l'ensemble d'état du AFN accessible depuis s<sub>dfa1</sub> après avoir lu le symbole c, en considérant aussi les transitions &epsilon;.
+		Pour chaque nouvel Ã©tat du AFD et chaque symbole de l'alphabet : <br>
+		Une transition (s<sub>dfa1</sub>,c)&rarr;s<sub>dfa2</sub> est ajoutÃ© si s<sub>dfa2</sub> &ne; &empty; <br>
+		s<sub>dfa2</sub> est l'ensemble d'Ã©tat du AFN accessible depuis s<sub>dfa1</sub> aprÃ¨s avoir lu le symbole c, en considÃ©rant aussi les transitions &epsilon;.
 	</li>
 	<li>
-		Un état du AFD est un <b>état final</b> si il contient un état final du AFN.
+		Un Ã©tat du AFD est un <b>Ã©tat final</b> si il contient un Ã©tat final du AFN.
 	</li>
 </ul>
 
 <a name="toc21"></a>
 <h3>&epsilon;-Closure </h3>
-<p>l'&epsilon;-Closure d'un état du AFN contient :</p>
+<p>l'&epsilon;-Closure d'un Ã©tat du AFN contient :</p>
 <ul>
-	<li>cet état.</li>
-	<li>tous les états accessibles par des transitions &epsilon; depuis cet état.</li>
+	<li>cet Ã©tat.</li>
+	<li>tous les Ã©tats accessibles par des transitions &epsilon; depuis cet Ã©tat.</li>
 </ul>
 
 
@@ -71,36 +71,36 @@
 <h2>Minimisation</h2>
 
 <a name="toc31"></a>
-<h3>Nombre d'états</h3>
+<h3>Nombre d'Ã©tats</h3>
 <ol>
-		<li>On commence avec une partition initiale <code>&Pi;</code> composé d'au moins deux groupes :
+		<li>On commence avec une partition initiale <code>&Pi;</code> composÃ© d'au moins deux groupes :
 			<ul>
-				<li>Les états finaux F reconnaissant un type de token (plusieurs groupes possibles).</li>
-				<li>Le reste des états S&ndash;F.</li>
+				<li>Les Ã©tats finaux F reconnaissant un type de token (plusieurs groupes possibles).</li>
+				<li>Le reste des Ã©tats S&ndash;F.</li>
 			</ul>
 		</li>
-		<li>Appliqué la procédure suivante pour créer une nouvelle partition :
+		<li>AppliquÃ© la procÃ©dure suivante pour crÃ©er une nouvelle partition :
 <pre>
 &Pi;<sub>new</sub> = &Pi;
 PourChaque( groupe G de &Pi;<sub>new</sub> )
-	partagé groupe G en sous-groupe de façon à ce que
-		deux états sont dans le même sous-groupe si et seulement si
-		pour tous les symboles, ces états pointent vers le même groupe de &Pi;
-	replacé G dans &Pi;<sub>new</sub> par l'ensemble des sous-groupes formé
+	partagÃ© groupe G en sous-groupe de faÃ§on Ã  ce que
+		deux Ã©tats sont dans le mÃªme sous-groupe si et seulement si
+		pour tous les symboles, ces Ã©tats pointent vers le mÃªme groupe de &Pi;
+	replacÃ© G dans &Pi;<sub>new</sub> par l'ensemble des sous-groupes formÃ©
 </pre>
 		</li>
-		<li>Répété tant que quand <code>&Pi;<sub>new</sub></code> est différent de <code>&Pi;</code>  </li>
+		<li>RÃ©pÃ©tÃ© tant que quand <code>&Pi;<sub>new</sub></code> est diffÃ©rent de <code>&Pi;</code>  </li>
 		<li>
-			Créé un nouveau DFA avec comme états la partition obtenue.
+			CrÃ©Ã© un nouveau DFA avec comme Ã©tats la partition obtenue.
 		</li>
 </ol>
 
 <a name="toc32"></a>
 <h3>Alphabet</h3>
 
-<p>Les symboles ayant des colonnes identiques dans la matrice sont regroupés dans un ensemble de caractères.</p>
+<p>Les symboles ayant des colonnes identiques dans la matrice sont regroupÃ©s dans un ensemble de caractÃ¨res.</p>
 
-<p>DFA avant et après réduction de l'alphabet:</p>
+<p>DFA avant et aprÃ¨s rÃ©duction de l'alphabet:</p>
 <table border="1" style="float:left;">
 <tr><td><pre>   \Symbole<br>Etat\</pre></td><th>a</th><th>b</th><th>c</th><th>d</th></tr>
 <tr><th style="background:#6FB1FC;">1</th>	<td>2</td><td>2</td><td>2</td><td>4</td></tr>
@@ -119,13 +119,13 @@ PourChaque( groupe G de &Pi;<sub>new</sub> )
 <div style="clear:both;"></div>
 
 <a name="toc4"></a>
-<h2>Résolution des ambiguïtés</h2>
+<h2>RÃ©solution des ambiguÃ¯tÃ©s</h2>
 <ol>
-	<li>La chaîne trouvée sera toujours la plus longue possible.</li>
-	<li>Priorité des régles : Si la chaîne trouvée reconnaît deux tokens. Premier arrivé, premier servi !</li>
+	<li>La chaÃ®ne trouvÃ©e sera toujours la plus longue possible.</li>
+	<li>PrioritÃ© des rÃ©gles : Si la chaÃ®ne trouvÃ©e reconnaÃ®t deux tokens. Premier arrivÃ©, premier servi !</li>
 </ol>
 
-<p>Exemple d'implémentation recherchant la plus grande chaîne pouvant être trouvée:</p>
+<p>Exemple d'implÃ©mentation recherchant la plus grande chaÃ®ne pouvant Ãªtre trouvÃ©e:</p>
 <pre>
 function match( oDFA, sText, nIndex ){
 	var nState = oDFA.I, nStartIndex, nCurrentIndex, oMatched
@@ -139,7 +139,7 @@ function match( oDFA, sText, nIndex ){
 	}
 </pre>
 
-<p>Premier arrivé...</p>
+<p>Premier arrivÃ©...</p>
 <pre>
 function searchToken( aTokens, sText, nIndex ){
 	var oMatched

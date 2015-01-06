@@ -1,4 +1,4 @@
-<html>
+ï»¿<html>
 	<head>
 		<title>Syntaxe des ER</title>
 		<link rel="stylesheet" type="text/css" href="../../widget/Toc/styles.css">
@@ -18,15 +18,15 @@
 
 <dl class="menu">
 	<dt><h3>Sommaire</h3></dt>
-	<dt><a href="#toc1">Préambule</a></dt>
+	<dt><a href="#toc1">PrÃ©ambule</a></dt>
 	<dt><a href="#toc2">Syntaxe</a>
 		<dd><dl>
 			<dt><a href="#toc21">Echappement</a></dt>
 			<dt><a href="#toc22">Quantificateurs</a></dt>
-			<dt><a href="#toc23">Délimiteurs</a></dt>
+			<dt><a href="#toc23">DÃ©limiteurs</a></dt>
 			<dt><a href="#toc24">Alternative</a></dt>
-			<dt><a href="#toc25">Ensemble de caractères</a></dt>
-			<dt><a href="#toc26">Caractères spéciaux</a></dt>
+			<dt><a href="#toc25">Ensemble de caractÃ¨res</a></dt>
+			<dt><a href="#toc26">CaractÃ¨res spÃ©ciaux</a></dt>
 		</dl></dd>
 	</dt>
 	<dt><a href="#toc3">Exemple</a></dt>
@@ -38,8 +38,8 @@
 
 
 <a name="toc1"></a>
-<h2>Préambule</h2>
-<p>Les <b>expressions régulières</b> (ER) sont utilisées pour rechercher des chaînes de caractères dans un texte.</p>
+<h2>PrÃ©ambule</h2>
+<p>Les <b>expressions rÃ©guliÃ¨res</b> (ER) sont utilisÃ©es pour rechercher des chaÃ®nes de caractÃ¨res dans un texte.</p>
 
 
 <a name="toc2"></a>
@@ -49,7 +49,7 @@
 <h3>Echappement</h3>
 <table>
 	<tr></tr>
-	<tr><th>\	</th><td>Le caractère antislash échappe le caractère suivant ou sinon fait partie d'un caractère spécial.</td></tr>
+	<tr><th>\	</th><td>Le caractÃ¨re antislash Ã©chappe le caractÃ¨re suivant ou sinon fait partie d'un caractÃ¨re spÃ©cial.</td></tr>
 </table>
 
 <a name="toc22"></a>
@@ -57,14 +57,14 @@
 <table>
 	<tr><th>{n} 	</th><td>n occurence			</td></tr>
 	<tr><th>{n,} 	</th><td>n occurence ou plus	</td></tr>
-	<tr><th>{n,m} 	</th><td>n à m occurences 		</td></tr>
+	<tr><th>{n,m} 	</th><td>n Ã  m occurences 		</td></tr>
 	<tr><th>*  		</th><td>0 occurence ou plus 	</td></tr>
 	<tr><th>+  		</th><td>1 occurence ou plus 	</td></tr>
-	<tr><th>?  		</th><td>0 à 1 occurence 		</td></tr> 
+	<tr><th>?  		</th><td>0 Ã  1 occurence 		</td></tr> 
 </table>
 
 <a name="toc23"></a>
-<h3>Délimiteurs</h3>
+<h3>DÃ©limiteurs</h3>
 <table>
 	<tr>
 		<th> ( Modele )</th>
@@ -81,48 +81,48 @@
 <table>
 	<tr>
 		<th>|	</th>
-		<td>Unification avec une et une seule expression régulière de part et d'autre des symboles "|" </td>
+		<td>Unification avec une et une seule expression rÃ©guliÃ¨re de part et d'autre des symboles "|" </td>
 	</tr>
 </table>
 
 <a name="toc25"></a>
-<h3>Ensemble de caractères</h3>
+<h3>Ensemble de caractÃ¨res</h3>
 <table>
 	<tr>
-		<th>[caractères]	</th><td> Unification avec un et un seul caractère parmis ceux entre "[]" </td>
+		<th>[caractÃ¨res]	</th><td> Unification avec un et un seul caractÃ¨re parmis ceux entre "[]" </td>
 	</tr>
 	<tr>
-		<th>[^caractères]	</th><td> Unification avec un et un seul caractère hormis ceux entre "[]" </td>
+		<th>[^caractÃ¨res]	</th><td> Unification avec un et un seul caractÃ¨re hormis ceux entre "[]" </td>
 	</tr>
 </table>
 
 <a name="toc26"></a>
-<h3>Caractères spéciaux</h3>
+<h3>CaractÃ¨res spÃ©ciaux</h3>
 <table>
 <!-- 
 	<tr>
 		<td> ^ </td>
 		<td>
-			Placé en début dexpression, unification avec le début de la chaîne ou le début des lignes avec l'option <code>m</code>.
+			PlacÃ© en dÃ©but dexpression, unification avec le dÃ©but de la chaÃ®ne ou le dÃ©but des lignes avec l'option <code>m</code>.
 		</td>
 	</tr>
 	<tr>
 		<td> $ </td>
 		<td>
-			Placé en fin dexpression, unification avec la fin de la chaîne ou la fin des lignes avec l'option <code>m</code>.
+			PlacÃ© en fin dexpression, unification avec la fin de la chaÃ®ne ou la fin des lignes avec l'option <code>m</code>.
 		</td>
 	</tr>
  -->
 	<tr>
-		<th>.	</th><td> Unification avec un caractère quelconque <strike>hormis le saut de ligne: [^\n]</strike>. </td>
+		<th>.	</th><td> Unification avec un caractÃ¨re quelconque <strike>hormis le saut de ligne: [^\n]</strike>. </td>
 	</tr>
 <!-- 
-	<tr><th colspan="2">Références précédentes</th></tr>	
+	<tr><th colspan="2">RÃ©fÃ©rences prÃ©cÃ©dentes</th></tr>	
 	<tr>
 		<td> \1 <br> \2 <br> ... </td>
 		<td>
-			Références aux dernières unifications.
-			Le numéro est un entier indiquant au navigateur quelle référence utiliser.
+			RÃ©fÃ©rences aux derniÃ¨res unifications.
+			Le numÃ©ro est un entier indiquant au navigateur quelle rÃ©fÃ©rence utiliser.
 		</td>
 	</tr>
  -->
@@ -132,30 +132,30 @@
 	<tr><th>\t </th><td> Tabulation horizontale.</td></tr>
 	<tr><th>\v </th><td> Tabulation verticale.</td></tr>
 <!-- 	
-	<tr><td>\0 </td><td> Caractère NUL.</td></tr>
+	<tr><td>\0 </td><td> CaractÃ¨re NUL.</td></tr>
 	<tr><td>[\b] </td><td> ...backspace.</td></tr>
 	 -->
 	<tr><th>\s </th><td> Espace blanc ( <code>[ \f\n\r\t\v\u00A0\u2028\u2029]</code> ).</td></tr>
 	<tr><th>\S </th><td> Tous sauf un espace blanc ( <code>[^ \f\n\r\t\v\u00A0\u2028\u2029]</code> ).</td></tr>
-	<tr><th>\w </th><td> Caractère alphanumérique ( <code>[a-zA-Z0-9_]</code> ).</td></tr>
-	<tr><th>\W </th><td> Tous sauf un caractère alphanumérique ( <code>[^a-zA-Z0-9_]</code> ).</td></tr>
-	<tr><th>\d </th><td> Caractère numérique ( <code>[0-9]</code> ).</td></tr>
-	<tr><th>\D </th><td> Tous sauf un caractère numérique ( <code>[^0-9]</code> ).</td></tr>
+	<tr><th>\w </th><td> CaractÃ¨re alphanumÃ©rique ( <code>[a-zA-Z0-9_]</code> ).</td></tr>
+	<tr><th>\W </th><td> Tous sauf un caractÃ¨re alphanumÃ©rique ( <code>[^a-zA-Z0-9_]</code> ).</td></tr>
+	<tr><th>\d </th><td> CaractÃ¨re numÃ©rique ( <code>[0-9]</code> ).</td></tr>
+	<tr><th>\D </th><td> Tous sauf un caractÃ¨re numÃ©rique ( <code>[^0-9]</code> ).</td></tr>
 <!-- 	
 	<tr><td>\b </td><td> Limite d'un mot ( position entre un mot et un espace ). </td></tr>
 	<tr><td>\B </td><td> Tous sauf la limite d'un mot.</td></tr>
 -->
-	<tr><th>\c<i>X</i> </th><td> Caractère contrôle ( <code>\cm</code> sunifie avec Ctrl+M ).</td></tr>
-	<tr><th>\x<i>hh</i> </th><td> Caractère codé <i>hh</i> avec 2 caractères hexadécimaux.</td></tr>
-	<tr><th>\u<i>hhhh</i> </th><td> Caractère Unicode codé <i>hhhh</i> avec 4 caractères hexadécimaux.</td></tr>
+	<tr><th>\c<i>X</i> </th><td> CaractÃ¨re contrÃ´le ( <code>\cm</code> sunifie avec Ctrl+M ).</td></tr>
+	<tr><th>\x<i>hh</i> </th><td> CaractÃ¨re codÃ© <i>hh</i> avec 2 caractÃ¨res hexadÃ©cimaux.</td></tr>
+	<tr><th>\u<i>hhhh</i> </th><td> CaractÃ¨re Unicode codÃ© <i>hhhh</i> avec 4 caractÃ¨res hexadÃ©cimaux.</td></tr>
 </table>
 
 <a name="toc3"></a>
 <h2>Exemple</h2>
 <p>Je vous propose de :</p>
 <ul>
-	<li><a href="preview.htm">Visualiser l'analyse lexicale et syntaxique d'une expression régulière</a></li>
-	<li><a href="../../110_Automates.htm">Créer un automate depuis une ER</a></li>
+	<li><a href="preview.htm">Visualiser l'analyse lexicale et syntaxique d'une expression rÃ©guliÃ¨re</a></li>
+	<li><a href="../../110_Automates.htm">CrÃ©er un automate depuis une ER</a></li>
 </ul>
 
 <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.3/jquery.min.js"></script>

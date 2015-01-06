@@ -1,4 +1,4 @@
-<html>
+ï»¿<html>
 	<head>
 		<title>Validation de l'alphabet</title>
 		<link rel="stylesheet" type="text/css" href="css/sets.css">
@@ -30,9 +30,9 @@
 <dl class="menu">
 	<dt><a href="index.htm">Index</a></dt>
 	<dt><h3>Sommaire</h3></dt>
-	<dt><a href="#toc1">Préambule</a></dt>
-	<dt><a href="#toc2">Symboles mathématiques</a></dt>
-	<dt><a href="#toc3">Réduction de NCC</a></dt>
+	<dt><a href="#toc1">PrÃ©ambule</a></dt>
+	<dt><a href="#toc2">Symboles mathÃ©matiques</a></dt>
+	<dt><a href="#toc3">RÃ©duction de NCC</a></dt>
 	<dt><a href="#toc4">NCC vs CC</a></dt>
 	<dt><a href="#toc5">NCC vs Atoms</a></dt>
 	<dt><a href="#toc6">CC</a></dt>
@@ -47,30 +47,30 @@
 
 
 <a name="toc1"></a>
-<h2>Préambule</h2>
-<p>Un alphabet &sum; est un ensemble de symbole. Il est composé :</p>
+<h2>PrÃ©ambule</h2>
+<p>Un alphabet &sum; est un ensemble de symbole. Il est composÃ© :</p>
 <ul>
 	<li>d'atome &isin; A , A = { a, \n, \t, +, ... } </li>
-	<li>d'ensemble de caractères &isin; CC , CC = { [a-z], \w, \d, ... }</li>
-	<li>d'ensemble négatif de caractère &isin; NCC , NCC = { [^a-z], \W, \D, ... }  ce sont des ensembles infinis.</li>
-	<li>du symbole ANY : n'importe quel caractère.</li>
+	<li>d'ensemble de caractÃ¨res &isin; CC , CC = { [a-z], \w, \d, ... }</li>
+	<li>d'ensemble nÃ©gatif de caractÃ¨re &isin; NCC , NCC = { [^a-z], \W, \D, ... }  ce sont des ensembles infinis.</li>
+	<li>du symbole ANY : n'importe quel caractÃ¨re.</li>
 </ul>
 
 <p>
-	Pour rendre déterministe un automate, 
-	il est nécessaire qu'un caractère soit présent que dans un et un seul symbole de l'alphabet : 
-	<b>les symboles doivent être distinct</b>. <br>
-	Cette opération s'appelle la validation de l'alphabet (il faut bien que je lui donne un nom!).
+	Pour rendre dÃ©terministe un automate, 
+	il est nÃ©cessaire qu'un caractÃ¨re soit prÃ©sent que dans un et un seul symbole de l'alphabet : 
+	<b>les symboles doivent Ãªtre distinct</b>. <br>
+	Cette opÃ©ration s'appelle la validation de l'alphabet (il faut bien que je lui donne un nom!).
 </p>
-<p>Lorsqu'un symbole est remplacé par plusieurs autres :</p>
+<p>Lorsqu'un symbole est remplacÃ© par plusieurs autres :</p>
 <ol>
-	<li>On crée des transitions avec les nouveaux symboles et depuis les transitions de l'ancien symbole.</li>
+	<li>On crÃ©e des transitions avec les nouveaux symboles et depuis les transitions de l'ancien symbole.</li>
 	<li>On efface l'ancien symbole ainsi que ses transitions.</li>
 </ol>
 
 
 <a name="toc2"></a>
-<h2>Symboles mathématiques utilisés</h2>
+<h2>Symboles mathÃ©matiques utilisÃ©s</h2>
 <table class="notation">
 	<tr>
 		<th> A &cap; B = &empty;  </th>
@@ -83,7 +83,7 @@
 				<td><div class="sets1 A" title="A"></div> A </td>
 				<td><div class="sets1 B" title="B"></div> B </td>
 			</tr>
-			<tr><th colspan="2">Négation</th></tr>
+			<tr><th colspan="2">NÃ©gation</th></tr>
 			<tr>
 				<td><div class="sets1 NotA" title="&not;A"></div> &not;A </td>
 				<td><div class="sets1 NotB" title="&not;B"></div> &not;B </td>
@@ -98,7 +98,7 @@
 				<td><div class="sets1 UnionAB" title="A&cup;B"></div> A&cup;B </td>
 				<td><div class="sets1 NotUnionAB" title="&not;(A&cup;B)"></div> &not;(A&cup;B) </td>
 			</tr>
-			<tr><th colspan="2">Différence</th></tr>
+			<tr><th colspan="2">DiffÃ©rence</th></tr>
 			<tr>
 				<td><div class="sets1 DifferenceAB" title="A&ndash;B"></div> A&ndash;B </td>
 				<td><div class="sets1 DifferenceBA" title="B&ndash;A"></div> B&ndash;A </td>
@@ -114,7 +114,7 @@
 				<td><div class="sets2 A" title="A"></div> A </td>
 				<td><div class="sets2 B" title="B"></div> B </td>
 			</tr>
-			<tr><th colspan="2">Négation</th></tr>
+			<tr><th colspan="2">NÃ©gation</th></tr>
 			<tr>
 				<td><div class="sets2 NotA" title="&not;A"></div> &not;A </td>
 				<td><div class="sets2 NotB" title="&not;B"></div> &not;B </td>
@@ -129,7 +129,7 @@
 				<td><div class="sets2 UnionAB" title="A&cup;B"></div> A&cup;B </td>
 				<td><div class="sets2 NotUnionAB" title="&not;(A&cup;B)"></div> &not;(A&cup;B) </td>
 			</tr>
-			<tr><th colspan="2">Différence</th></tr>
+			<tr><th colspan="2">DiffÃ©rence</th></tr>
 			<tr>
 				<td><div class="sets2 DifferenceAB" title="A&ndash;B"></div> A&ndash;B </td>
 				<td><div class="sets2 DifferenceBA" title="B&ndash;A"></div> B&ndash;A </td>
@@ -145,30 +145,30 @@
 			<ul>
 				<li>&exist; : il existe</li>
 				<li>&exist;! : il existe un et un seul</li>
-				<li>&isin; : appartient à</li>
-				<li>&notin; : n'appartient pas à</li>
+				<li>&isin; : appartient Ã </li>
+				<li>&notin; : n'appartient pas Ã </li>
 				<li>&forall; : quelque soit</li>
 				<li>&empty; : ensemble vide</li>
-				<li>&ne; : différent de</li>
-				<li>= : égale à</li>
-				<li>|NCC| : nombre d'élément dans l'ensemble NCC.</li>
+				<li>&ne; : diffÃ©rent de</li>
+				<li>= : Ã©gale Ã </li>
+				<li>|NCC| : nombre d'Ã©lÃ©ment dans l'ensemble NCC.</li>
 			</ul>
 			</dl>
 		</td>
 	</tr>
 </table>
 <p>
-	Si il n'y a qu'un ensemble négatif de caractère, on peut passer l'étape suivante. 
-	Cependant, il faut ajouter son opposé dans les ensembles de caractères (Au cas où le symbole ANY est utilisé).
+	Si il n'y a qu'un ensemble nÃ©gatif de caractÃ¨re, on peut passer l'Ã©tape suivante. 
+	Cependant, il faut ajouter son opposÃ© dans les ensembles de caractÃ¨res (Au cas oÃ¹ le symbole ANY est utilisÃ©).
 </p>
 
 
 <a name="toc3"></a>
-<h2>Réduction de NCC</h2>
-<p>L'ensemble <abbr title="NegatedCharClasses">NCC</abbr> contient les ensembles de caractère négatif.</p>
+<h2>RÃ©duction de NCC</h2>
+<p>L'ensemble <abbr title="NegatedCharClasses">NCC</abbr> contient les ensembles de caractÃ¨re nÃ©gatif.</p>
 <p>
-	Ces ensembles doivent être distinct: il n'en restera plus qu'un (|NCC|=1). <br>
-	Il restera à le réduire vis à vis des autres éléments de l'alphabet.
+	Ces ensembles doivent Ãªtre distinct: il n'en restera plus qu'un (|NCC|=1). <br>
+	Il restera Ã  le rÃ©duire vis Ã  vis des autres Ã©lÃ©ments de l'alphabet.
 </p>
 <table>
 	<tr>
@@ -234,12 +234,12 @@
 				<dd>avec G<sub>inter</sub> = [^a-zA-Z] </dd>
 			</dl>
 			
-			Alors on créé :
+			Alors on crÃ©Ã© :
 			<ul>
-				<li>un nouvel ensemble de caractère négatif : [^a-zA-Z]</li>
-				<li>deux nouveaux ensembles de caractère : [a-z] et [A-Z]</li>
+				<li>un nouvel ensemble de caractÃ¨re nÃ©gatif : [^a-zA-Z]</li>
+				<li>deux nouveaux ensembles de caractÃ¨re : [a-z] et [A-Z]</li>
 			</ul>
-			Les transitions de G1 et G2 sont modifiées.
+			Les transitions de G1 et G2 sont modifiÃ©es.
 			<table>
 				<tr>
 					<td>
@@ -262,7 +262,7 @@
 					</td>
 				</tr>
 			</table>
-			Les symboles G1 et G2 sont effacés.
+			Les symboles G1 et G2 sont effacÃ©s.
 		</td>
 		<td>
 			Si G1=[^a-z] et G2=[^xyzAB]
@@ -273,12 +273,12 @@
 				<dd>avec G<sub>inter</sub> = [^a-zAB] </dd>
 			</dl>
 			
-			Alors on créé :
+			Alors on crÃ©Ã© :
 			<ul>
-				<li>un nouvel ensemble de caractère négatif : [^a-zAB]</li>
-				<li>deux nouveaux ensembles de caractère : [AB] et [a-w]</li>
+				<li>un nouvel ensemble de caractÃ¨re nÃ©gatif : [^a-zAB]</li>
+				<li>deux nouveaux ensembles de caractÃ¨re : [AB] et [a-w]</li>
 			</ul>
-			Les transitions de G1 et G2 sont modifiées.
+			Les transitions de G1 et G2 sont modifiÃ©es.
 			<table>
 				<tr>
 					<td>
@@ -301,7 +301,7 @@
 					</td>
 				</tr>
 			</table>
-			Les symboles G1 et G2 sont effacés.
+			Les symboles G1 et G2 sont effacÃ©s.
 		</td>
 	</tr>
 </table>
@@ -353,11 +353,11 @@
 			
 			Alors :
 			<ul>
-				<li>on divise l'ensemble de caractère en deux : [xyz] et [0-9]</li>
-				<li>on remplace l'unique ensemble de caractère négatif par [^a-z0-9] </li>
+				<li>on divise l'ensemble de caractÃ¨re en deux : [xyz] et [0-9]</li>
+				<li>on remplace l'unique ensemble de caractÃ¨re nÃ©gatif par [^a-z0-9] </li>
 			</ul>
 			
-			Les transitions de G et Gi sont modifiées.
+			Les transitions de G et Gi sont modifiÃ©es.
 			<table>
 				<tr>
 					<td>
@@ -380,7 +380,7 @@
 					</td>
 				</tr>
 			</table>
-			Les symboles G et Gi sont effacés.
+			Les symboles G et Gi sont effacÃ©s.
 		</td>
 	</tr>
 </table>
@@ -388,7 +388,7 @@
 
 <a name="toc5"></a>
 <h2>NCC vs Atoms</h2>
-<p>L'ensemble négatif de caractère sera considéré sous sa forme finale après cette étape.</p>
+<p>L'ensemble nÃ©gatif de caractÃ¨re sera considÃ©rÃ© sous sa forme finale aprÃ¨s cette Ã©tape.</p>
 <table>
 	<tr>
 		<th>
@@ -414,9 +414,9 @@
 				<dd>[^a-z] &rArr; [^a-z0] &cup; [0] </dd>
 			</dl>
 			
-			<p>On remplace l'unique ensemble de caractère négatif par [^a-z0] </p>
+			<p>On remplace l'unique ensemble de caractÃ¨re nÃ©gatif par [^a-z0] </p>
 			
-			Les transitions de G sont modifiées.
+			Les transitions de G sont modifiÃ©es.
 			
 			<dl>
 				<dt>1 <sup>[^a-z]</sup>&rarr; 3</dt>
@@ -426,15 +426,15 @@
 				</dd>
 			</dl>
 				
-			Le symbole G est effacé.
+			Le symbole G est effacÃ©.
 		</td>
 	</tr>
 </table>
 
 
 <a name="toc6"></a>
-<h2>Décomposition de CC</h2>
-<p>L'ensemble <abbr title="CharClasses">CC</abbr> contient les ensembles de caractère.</p>
+<h2>DÃ©composition de CC</h2>
+<p>L'ensemble <abbr title="CharClasses">CC</abbr> contient les ensembles de caractÃ¨re.</p>
 <table>
 	<tr>
 		<th>
@@ -476,7 +476,7 @@
 				<dd>avec G<sub>inter</sub> = [AB] </dd>
 			</dl>
 			
-			Alors on créé trois nouveaux ensembles de caractère :
+			Alors on crÃ©Ã© trois nouveaux ensembles de caractÃ¨re :
 
 			<ol>
 				<li>G<sub>inter</sub> = [AB]</li>
@@ -484,7 +484,7 @@
 				<li>[A-Z] &ndash; G<sub>inter</sub> ) = [C-Z] </li>
 			</ol>
 			
-			Les transitions de G1 et G2 sont modifiées.
+			Les transitions de G1 et G2 sont modifiÃ©es.
 			<table>
 				<tr>
 					<td>
@@ -507,7 +507,7 @@
 					</td>
 				</tr>
 			</table>
-			Les symboles G1 et G2 sont effacés, car G1 &nsub; G2 et G2 &nsub; G1.
+			Les symboles G1 et G2 sont effacÃ©s, car G1 &nsub; G2 et G2 &nsub; G1.
 		</td>
 	</tr>
 	<tr>
@@ -520,7 +520,7 @@
 				<dd>avec G<sub>inter</sub> = [A-Z] </dd>
 			</dl>
 			
-			Alors on créé deux nouveaux ensembles de caractère car G2 &sub; G1
+			Alors on crÃ©Ã© deux nouveaux ensembles de caractÃ¨re car G2 &sub; G1
 
 			<ol>
 				<li>G<sub>inter</sub> = [A-Z]</li>
@@ -528,7 +528,7 @@
 				<li><strike>[A-Z] &ndash; G<sub>inter</sub> ) = &empty; </strike></li>
 			</ol>
 			
-			Les transitions de G1 et G2 sont modifiées.
+			Les transitions de G1 et G2 sont modifiÃ©es.
 			<table>
 				<tr>
 					<td>
@@ -551,8 +551,8 @@
 					</td>
 				</tr>
 			</table>
-			Le symbole G1 est effacé car G1 &nsub; G2. <br>
-			Le symbole G2 est conservé car G2 &sub; G1.
+			Le symbole G1 est effacÃ© car G1 &nsub; G2. <br>
+			Le symbole G2 est conservÃ© car G2 &sub; G1.
 		</td>
 	</tr>
 </table>
@@ -583,7 +583,7 @@
 				<dd>[xyzA] &rArr; [xyz] &cup; [A]</dd>
 			</dl>
 			
-			Les transitions de Gi sont modifiées.
+			Les transitions de Gi sont modifiÃ©es.
 			<table>
 				<tr>
 					<td>
@@ -597,7 +597,7 @@
 					</td>
 				</tr>
 			</table>
-			Le symbole Gi est effacé.
+			Le symbole Gi est effacÃ©.
 		</td>
 	</tr>
 </table>
@@ -606,22 +606,22 @@
 <a name="toc8"></a>
 <h2>Le symbole ANY</h2>
 <p>
-	Le symbole ANY, représentant n'importe quel caractère, sera définitivement supprimé.<br>
-	Ses transitions seront multipliées au minimum par deux...
+	Le symbole ANY, reprÃ©sentant n'importe quel caractÃ¨re, sera dÃ©finitivement supprimÃ©.<br>
+	Ses transitions seront multipliÃ©es au minimum par deux...
 </p>
 <table>
 	<tr><td>
 		Si l'alphabet  &sum; = {&epsilon;,ANY} ou {ANY}.<br>
-		Le symbole ANY est remplacé par <code>[^a]</code> et <code>a</code> (au hasard!).
+		Le symbole ANY est remplacÃ© par <code>[^a]</code> et <code>a</code> (au hasard!).
 	</td></tr>
 	<tr><td>
-		Sinon le symbole ANY est remplacé par tous les autres symboles de l'alphabet &sum;. C'est à dire :
+		Sinon le symbole ANY est remplacÃ© par tous les autres symboles de l'alphabet &sum;. C'est Ã  dire :
 		<ul>
 			<li>l'ensemble des atomes, </li>
-			<li>des ensembles de caractère, </li>
+			<li>des ensembles de caractÃ¨re, </li>
 			<li>
-				et l'ensemble de caractère négatif.<br>
-				(Si il n'existe pas, il est créé depuis les atomes et les ensembles de caractères)
+				et l'ensemble de caractÃ¨re nÃ©gatif.<br>
+				(Si il n'existe pas, il est crÃ©Ã© depuis les atomes et les ensembles de caractÃ¨res)
 			</li>
 		</ul>
 	</td></td>
@@ -633,16 +633,16 @@
 <p> Au final on a :</p>
 <ol>
 	<li>&exist;! G &isin; NCC <br>
-		Il n'existe plus qu'un ensemble négatif de caractère (|NCC|=1).</li>
+		Il n'existe plus qu'un ensemble nÃ©gatif de caractÃ¨re (|NCC|=1).</li>
 	<li>&forall;G &isin; NCC , &forall;G1 &isin; CC , G &cap; G1 = &empty; <br>
-		Il n'y a plus d'intersection entre l'ensemble de caractère négatif et les ensembles de caractères.</li>
+		Il n'y a plus d'intersection entre l'ensemble de caractÃ¨re nÃ©gatif et les ensembles de caractÃ¨res.</li>
 	<li>&forall;G &isin; NCC , &forall;a &isin; A , a &notin; G <br>
-		Il n'y a plus d'intersection entre l'ensemble de caractère négatif et les atomes.</li>
+		Il n'y a plus d'intersection entre l'ensemble de caractÃ¨re nÃ©gatif et les atomes.</li>
 	<li>&forall;G &isin; CC , &forall;a &isin; A , a &notin; G <br>
-		Il n'y a plus d'intersection entre les ensembles de caractères et les atomes.</li>
+		Il n'y a plus d'intersection entre les ensembles de caractÃ¨res et les atomes.</li>
 	<li>&forall;G1 &isin; CC , &forall;G2 &isin; CC , si G1 &ne; G2 alors G1 &cap; G2 = &empty;  <br>
-		Il n'y a plus d'intersection entre les ensembles de caractères.</li>
-	<li>Le symbole ANY n'est plus utilisé.</li>
+		Il n'y a plus d'intersection entre les ensembles de caractÃ¨res.</li>
+	<li>Le symbole ANY n'est plus utilisÃ©.</li>
 </ol>
 
 

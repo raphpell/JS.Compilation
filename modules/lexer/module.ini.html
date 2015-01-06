@@ -1,14 +1,14 @@
-<html><head></head><body><pre>
-¤ whitespaces
+ï»¿<html><head></head><body><pre>
+Â¤ whitespaces
 
 hspaces	= SPACES|TAB
 
 !@	INI		=	S_INI_SECTION|S_INI_COMMENT|INI_KEYWORD|INI_VAR|S_INI_VALUE|{hspaces}|L_NEW_LINE|INI_TMP
 
-// Aide analyse syntaxique : mot clé interdit en nom de variable
+// Aide analyse syntaxique : mot clÃ© interdit en nom de variable
 	INI_KEYWORD		= 	(null|yes|no|true|false|on|off|none)
 		(css:keyword)
-// Liste non exhaustive des caractères non autorisés dans les noms de variable
+// Liste non exhaustive des caractÃ¨res non autorisÃ©s dans les noms de variable
 	INI_VAR			= 	[^=!;{}"&|^~[\]()\r\n\f \t]+
 		(css:var)
 // Gestion des erreurs...

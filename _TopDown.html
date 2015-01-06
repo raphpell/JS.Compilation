@@ -1,4 +1,4 @@
-
+ï»¿
 <html>
 <head>
 	<title>Top Down Parser</title>
@@ -81,20 +81,20 @@ FOLLOW[s] &larr; { $ }
 	<b>Pour chaque</b> production X &rarr; Y<sub>0</sub>Y<sub>1</sub> &hellip; Y<sub>k</sub> // avec Y<sub>i</sub> = symbole
 		<b>Si</b> Y<sub>0</sub> &hellip; Y<sub>k</sub> sont annulables
 			NULLABLE[X] &larr; true
-		<b>Pour chaque</b> i de 0 à k 
+		<b>Pour chaque</b> i de 0 Ã  k 
 			<b>Si</b> i = 0 <b>ou</b> Y<sub>0</sub> &hellip; Y<sub>i-1</sub> sont annulables
 				FIRST[X] &larr; FIRST[X] &cup; FIRST[Y<sub>i</sub>]
 			<b>Si</b> Y<sub>i</sub> &isin; T
 				<b>Si</b> i = k <b>ou</b> Y<sub>i+1</sub> &hellip; Y<sub>k</sub> sont annulables
 					FOLLOW[Y<sub>i</sub>] &larr; FOLLOW[Y<sub>i</sub>] &cup; FOLLOW[X]
-				<b>Pour chaque</b> j de i + 1 à k
+				<b>Pour chaque</b> j de i + 1 Ã  k
 					<b>Si</b> j = i + 1 <b>ou</b> Y<sub>i+1</sub> &hellip; Y<sub>j-1</sub> sont annulables
 						FOLLOW[Y<sub>i</sub>] &larr; FOLLOW[Y<sub>i</sub>] &cup; FIRST[Y<sub>j</sub>]
-<b>Tant que</b> au moins une des variables FIRST, FOLLOW ou NULLABLE est modifiée
+<b>Tant que</b> au moins une des variables FIRST, FOLLOW ou NULLABLE est modifiÃ©e
 
 // Note:
-// FOLLOW[symbole terminal] sera toujours égale à un ensemble vide
-// NULLABLE[symbole terminal] sera toujours égale à false
+// FOLLOW[symbole terminal] sera toujours Ã©gale Ã  un ensemble vide
+// NULLABLE[symbole terminal] sera toujours Ã©gale Ã  false
 	</pre>
 	<div style="clear:both;"></div>
 </div>
@@ -124,23 +124,23 @@ FOLLOW[s] &larr; { $ }
 	i &larr; index du premier T de la Phrase
 	bContinue &larr; true
 	<b>Faire</b>
-		X &larr; dépilé un élément de la Pile
+		X &larr; dÃ©pilÃ© un Ã©lÃ©ment de la Pile
 		<b>Si</b> X &ne; &epsilon;
-			a &larr; T de la phrase à la position i
+			a &larr; T de la phrase Ã  la position i
 			<b>Si</b> X = a
 				<b>Si</b> X = $
-					Succès : La phrase est reconnue !
+					SuccÃ¨s : La phrase est reconnue !
 				<b>Sinon</b>
 					positionnement de i sur le T suivant
 			<b>Sinon</b>
 				<b>Si</b> X &isin; T
-					Erreur: Il manque X dans la Phrase à lindex i
+					Erreur: Il manque X dans la Phrase Ã  lindex i
 					bContinue &larr; false
 				<b>Si</b> X &isin; N
 					<b>Si</b> M[X][a] existe
 						On empile M[X][a] en ordre inverse
 					<b>Sinon</b> 
-						Erreur: Lentrée M[X][a] nexiste pas !
+						Erreur: LentrÃ©e M[X][a] nexiste pas !
 						bContinue &larr; false
 	<b>Tant que</b> i pointe dans la phrase <b>et</b> Pile &ne; vide <b>et</b> bContinue
 	</pre>
@@ -256,7 +256,7 @@ for( var nCounter=1, bChange=true; bChange ; nCounter++ ){
 		if( ! oNULLABLE[X] && areAllNullable( aY, 0, aY.length-1 )){
 			oNULLABLE[X] = true
 			Bufferize( "<h5>" + a[0] +" &rarr; "+ a[1] + " </h5>" )
-			Bufferize( '<h5>if Y1 … Yk are all nullable (or if k = 0)</h5>' )
+			Bufferize( '<h5>if Y1 â€¦ Yk are all nullable (or if k = 0)</h5>' )
 			Bufferize( '<h4>NULLABLE['+X+'] change to ['+oNULLABLE[X]+']</h4>' )
 			bChange = true
 			}
@@ -271,7 +271,7 @@ for( var nCounter=1, bChange=true; bChange ; nCounter++ ){
 			Bufferize( "\t Y<sub>i</sub>=Y<sub>"+(i+1)+"</sub>="+Yi+" is a "+(aNonTerminalSymbols.have( Yi )?'non ':'')+"terminal symbol \n" )
 			if( aY[i+1]) Bufferize( "\t Y<sub>(i+1)</sub>=Y<sub>"+(i+2)+"</sub>="+aY[i+1]+" is a "+(aNonTerminalSymbols.have( aY[i+1] )?'non ':'')+"terminal symbol \n" )
 
-			Bufferize( "<h5> if Y<sub>1</sub> … Y<sub>(i-1)</sub> are all nullable (or if i = 1) then FIRST[X] = FIRST[X] + FIRST[Y<sub>i</sub>] </h5>" )
+			Bufferize( "<h5> if Y<sub>1</sub> â€¦ Y<sub>(i-1)</sub> are all nullable (or if i = 1) then FIRST[X] = FIRST[X] + FIRST[Y<sub>i</sub>] </h5>" )
 			var b = ( i==0 || areAllNullable( aY, 0, i-1 ))
 			Bufferize( '<center>'
 						+(b?'':'<strike>')
@@ -294,7 +294,7 @@ for( var nCounter=1, bChange=true; bChange ; nCounter++ ){
 				continue ;
 				}
 
-			Bufferize( "<h5> if Y<sub>(i+1)</sub> … Y<sub>k</sub> are all nullable (or if i = k) then FOLLOW[Y<sub>i</sub>] = FOLLOW[Y<sub>i</sub>] + FOLLOW[X] </h5>" )
+			Bufferize( "<h5> if Y<sub>(i+1)</sub> â€¦ Y<sub>k</sub> are all nullable (or if i = k) then FOLLOW[Y<sub>i</sub>] = FOLLOW[Y<sub>i</sub>] + FOLLOW[X] </h5>" )
 			var b = ( i==k || areAllNullable( aY, i+1, k ))
 			Bufferize( '<center>'
 						+(b?'':'<strike>')
@@ -320,7 +320,7 @@ for( var nCounter=1, bChange=true; bChange ; nCounter++ ){
 				if( Yj ) Bufferize( "\t Y<sub>j</sub>=Y<sub>"+(j+1)+"</sub>="+Yj+" is a "+(aNonTerminalSymbols.have( Yj )?'non ':'')+"terminal symbol \n" )
 				Bufferize( "\t Y<sub>(j-1)</sub>=Y<sub>"+(j)+"</sub>="+aY[j-1]+" is a "+(aNonTerminalSymbols.have( aY[j-1] )?'non ':'')+"terminal symbol \n" )
 					
-				Bufferize( "<h5> if Y<sub>(i+1)</sub> … Y<sub>(j-1)</sub> are all nullable (or if i + 1 = j ) then FOLLOW[Y<sub>i</sub>] = FOLLOW[Y<sub>i</sub>] + FIRST[Y<sub>j</sub>] </h5>" )
+				Bufferize( "<h5> if Y<sub>(i+1)</sub> â€¦ Y<sub>(j-1)</sub> are all nullable (or if i + 1 = j ) then FOLLOW[Y<sub>i</sub>] = FOLLOW[Y<sub>i</sub>] + FIRST[Y<sub>j</sub>] </h5>" )
 				var b = ( j==i+1 || areAllNullable( aY, i+1, j-1 ))
 				Bufferize( '<center>'
 							+(b?'':'<strike>')
@@ -353,8 +353,8 @@ for( var nCounter=1, bChange=true; bChange ; nCounter++ ){
 		/*
 		G is LL(1) if for a rule A -> alpha | beta
 		a) First(alpha) intersection First(beta) = ensemble vide
-		b) alpha ou beta dérive epsilon
-		c) If beta dérive epsilon,  Follow(alpha) intersection Follow(beta) = ensemble vide
+		b) alpha ou beta dÃ©rive epsilon
+		c) If beta dÃ©rive epsilon,  Follow(alpha) intersection Follow(beta) = ensemble vide
 		*/
 		a.every( function(){
 			return 1

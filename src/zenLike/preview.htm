@@ -1,4 +1,4 @@
-<!DOCTYPE HTML>
+ï»¿<!DOCTYPE HTML>
 <html>
 <head>
 	<title>Module ZenLike</title>
@@ -62,7 +62,7 @@ H1 {
 <textarea id="eInput">(div>dl>(dt+dd)*3)+footer>p</textarea>
 <input type="button" id="eBtnScan" value="Analyse lexicale">
 <input type="button" id="eBtnParse" value="Analyse syntaxique">
-<input type="button" id="eBtnCompile" value="Générer la source">
+<input type="button" id="eBtnCompile" value="GÃ©nÃ©rer la source">
 <input type="checkbox" id="eRelief" checked><label for="eRelief">Relief.</label>
 <input type="button" onclick="fSyntaxWindow()" value="Syntaxe">
 <input type="button" id="eCheatsheet" value="Cheatsheet">
@@ -71,17 +71,17 @@ H1 {
 <div id="eCompare"></div>
 <textarea id="eCompil" wrap="off"></textarea>
 <dl class="legend">
-	<dt><i>Légende</i></dt>
-	<dt class="elt">Elément, attribut ou valeur.</dt>
+	<dt><i>LÃ©gende</i></dt>
+	<dt class="elt">ElÃ©ment, attribut ou valeur.</dt>
 	<dt class="punctuator">Ponctuation</dt>
-	<dt class="operator">Opérateur</dt>
+	<dt class="operator">OpÃ©rateur</dt>
 	<dt class="multiplication">Multiplication</dt>
-	<dt class="string">Chaîne de caractère</dt>
+	<dt class="string">ChaÃ®ne de caractÃ¨re</dt>
 	<dt class="space">Espace blanc</dt>
 	<dt class="arguments">Arguments</dt>
 	<dt class="attributes">Attributs</dt>
-	<dt class="id">Identifiant élément</dt>
-	<dt class="className">Classe css élément</dt>
+	<dt class="id">Identifiant Ã©lÃ©ment</dt>
+	<dt class="className">Classe css Ã©lÃ©ment</dt>
 </dl>
 
 
@@ -383,21 +383,21 @@ oResult.date = ( new Date()).toLocaleString()
 <script><!-- UNIT TEST -->
 var _searchValue =function( sShortCut, aChoices ){
 	/*
-	Recherche dans aChoices la valeur correspondant le mieux à sShortCut
-		(1) Seul les valeurs ayant comme première lettre celle du raccourcie seront sélectionnées
+	Recherche dans aChoices la valeur correspondant le mieux Ã  sShortCut
+		(1) Seul les valeurs ayant comme premiÃ¨re lettre celle du raccourcie seront sÃ©lectionnÃ©es
 			( + 1000 pts )
-		(2) Retourne null si aucune valeur n'est déjà sélectionné
+		(2) Retourne null si aucune valeur n'est dÃ©jÃ  sÃ©lectionnÃ©
 		(3) Chaque valeur est parcourue qu'une seul fois.
-			( + 50 pts - la longueur de la valeur ) = Une valeur plus petite à plus de points dés le départ
-		(4) Si la lettre raccourcie suivante est présente dans la valeur et quelle est précédé par le symbole '-'
+			( + 50 pts - la longueur de la valeur ) = Une valeur plus petite Ã  plus de points dÃ©s le dÃ©part
+		(4) Si la lettre raccourcie suivante est prÃ©sente dans la valeur et quelle est prÃ©cÃ©dÃ© par le symbole '-'
 			( + 500 pts pour la lettre )
-				on avance à la position ( index du  '-' + 2 )
-		(5) Sinon si elle est simplement présente dans la valeur :  les 12 premières positions sont privilégiées et rapportent des points, le reste en enlève
-			( + 12 pts - son index dans la valeur ) pour chaque occurence trouvée
-				on avance à la position ( index du caractère + 1 )
-		(6) Sinon si elle n'est pas présente dedans 
+				on avance Ã  la position ( index du  '-' + 2 )
+		(5) Sinon si elle est simplement prÃ©sente dans la valeur :  les 12 premiÃ¨res positions sont privilÃ©giÃ©es et rapportent des points, le reste en enlÃ¨ve
+			( + 12 pts - son index dans la valeur ) pour chaque occurence trouvÃ©e
+				on avance Ã  la position ( index du caractÃ¨re + 1 )
+		(6) Sinon si elle n'est pas prÃ©sente dedans 
 			( - 2000 pts )
-				la recherche des caractères raccourcie est stoppée pour la valeur
+				la recherche des caractÃ¨res raccourcie est stoppÃ©e pour la valeur
 	*/
 	var aResult = []
 	for(var i=0, ni=aChoices.length; i<ni; i++ )

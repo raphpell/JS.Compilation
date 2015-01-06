@@ -1,5 +1,5 @@
-<html><head></head><body><pre>
-¤ strings&comments
+ï»¿<html><head></head><body><pre>
+Â¤ strings&comments
 
 !@	WIZ		=	WHITE_SPACES|{comments}|COMPIL|IDENTIFIER|S_WIZ_IMPORT|S_RULE|S_BLOCK
 
@@ -13,7 +13,7 @@
 // Fichier requis
 !@	WIZ_IMPORT		=	WIZ_FILE|ELISION
 			( translation:REQUIRED )
-	S_WIZ_IMPORT	=	¤
+	S_WIZ_IMPORT	=	Â¤
 			( css:compil )
 	WIZ_FILE		=	[^\r\n\f,]+
 			( css:value )
@@ -40,10 +40,10 @@
 	VALUE_IN	=	[^,\)]+
 	
 // Macros
-	// partie d'une aggrégation
+	// partie d'une aggrÃ©gation
 	comments	= S_MLC|S_SLC
 	
-	// partie d'expressions régulières
+	// partie d'expressions rÃ©guliÃ¨res
 	id		=	\w+
 	hs		=	[ \t]
 	nl		=	\r\n|[\n\r\f]

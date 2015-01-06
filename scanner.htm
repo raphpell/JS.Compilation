@@ -1,30 +1,30 @@
-<pre>
+ï»¿<pre>
 AutomatonLexer = Objet singleton... prototype
 
-<h2>Méthodes privées</h2>
+<h2>MÃ©thodes privÃ©es</h2>
 <ul>
 	<li>finalizeParent
 	finalise un noeud parent (HTMLElement)
-		1- défini son attribut lineEnd
-		2- défini son titre
+		1- dÃ©fini son attribut lineEnd
+		2- dÃ©fini son titre
 	</li>
 </ul>
 	
-<h2>Méthodes publiques</h2>
-<h3>Méthodes objet</h3>
+<h2>MÃ©thodes publiques</h2>
+<h3>MÃ©thodes objet</h3>
 <ul>
 	<li>addTokenFromString( sTokenName, sEngine )
 	Ajoute un token : son automate est sous forme de chaine...
 	</li>
 </ul>
-<h3>Méthodes prototype</h3>
+<h3>MÃ©thodes prototype</h3>
 <ul>
 	<li>init( sTextScanned, sTokensRules ) voir scan
 	Initialise le scanner
 		1- Initialise des attributs publics
 			nLine=1, nPos=0, bParent=0, sPreviousToken=null, sText=sTextScanned, nTextLength=...
-		2- Créer la racine (HTMLElement)
-		3- Créer la pile des noeuds parents
+		2- CrÃ©er la racine (HTMLElement)
+		3- CrÃ©er la pile des noeuds parents
 		retourne la racine (HTMLElement)
 	</li>
 	<li>scan( sTextScanned, sTokensRules )
@@ -45,35 +45,35 @@ AutomatonLexer = Objet singleton... prototype
 	
 	
 	</li>
-	<dt><b>Analyse incrémentielle</b></dt>
+	<dt><b>Analyse incrÃ©mentielle</b></dt>
 	<li>rescan( eRootScanned, sTextScanned, nPos, nDeleted, nAdded )
 	Effectue une analyse partielle du texte sachant que
-		1- eRootScanned est le résultat de l'analyse totale du texte sTextScanned avant modification
-		2- Une modification à lieu à l'index 'nPos' dans sTextScanned
-			- nDeleted caractères ont été effacés
-			- nAdded caractères ont été ajoutés
+		1- eRootScanned est le rÃ©sultat de l'analyse totale du texte sTextScanned avant modification
+		2- Une modification Ã  lieu Ã  l'index 'nPos' dans sTextScanned
+			- nDeleted caractÃ¨res ont Ã©tÃ© effacÃ©s
+			- nAdded caractÃ¨res ont Ã©tÃ© ajoutÃ©s
 	
 	</li>
 	<li>haveNode( e )
-	Recherche à savoir si l'analyse doit stopper au 'token' e.
-		- Faux si EndToken est égale à null
-			(les tokens ont été effacé jusqu'à la fin, il faut les reconstruire!)
-		- tant que EndToken est avant e, EndToken est mise à jour avec son élément suivant
-		- Si e est égale EndToken
-			- l'analyse est stoppé
-			- e n'est pas ajouté
-			- tous les éléments suivants sont mise à jour
-		- Sinon EndToken est mise à jour
+	Recherche Ã  savoir si l'analyse doit stopper au 'token' e.
+		- Faux si EndToken est Ã©gale Ã  null
+			(les tokens ont Ã©tÃ© effacÃ© jusqu'Ã  la fin, il faut les reconstruire!)
+		- tant que EndToken est avant e, EndToken est mise Ã  jour avec son Ã©lÃ©ment suivant
+		- Si e est Ã©gale EndToken
+			- l'analyse est stoppÃ©
+			- e n'est pas ajoutÃ©
+			- tous les Ã©lÃ©ments suivants sont mise Ã  jour
+		- Sinon EndToken est mise Ã  jour
 	</li>
 	<li>getTokenAfter( e )
-	Retourne l'élément suivant e.
-	Si par hasard il n'y en pas et qu'il à un parent, elle retourne l'élément suivant le parent.
+	Retourne l'Ã©lÃ©ment suivant e.
+	Si par hasard il n'y en pas et qu'il Ã  un parent, elle retourne l'Ã©lÃ©ment suivant le parent.
 	Si le parent est la racine, elle retourne null.
 	</li>
 	<li>getNextEndToken( e )
-		1- Redéfini EndToken avec l'élément le suivant.
+		1- RedÃ©fini EndToken avec l'Ã©lÃ©ment le suivant.
 		2- Efface l'ancien EndToken des tokens
-		3- ... redéfini lineEnd
+		3- ... redÃ©fini lineEnd
 	</li>
 </ul>
 		

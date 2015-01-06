@@ -1,6 +1,6 @@
-<html>
+ï»¿<html>
 <head>
-	<title>Création de raccourcies</title>
+	<title>CrÃ©ation de raccourcies</title>
 	<link rel="stylesheet" type="text/css" href="styles.css">
 	<style>
 .used		{ background: yellow; }
@@ -25,36 +25,36 @@ TD DIV {
 	</style>
 </head>
 <body>
-	<h1>Création de raccourcies</h1>
+	<h1>CrÃ©ation de raccourcies</h1>
 
 <fieldset><legend>Source</legend>
 	<dl>
-		<dt><label for="eValues">Mots séparés par '<code>:</code>'</label></dt>
+		<dt><label for="eValues">Mots sÃ©parÃ©s par '<code>:</code>'</label></dt>
 		<dt><textarea id="eValues">background:background-attachment:background-break:background-clip:background-color:background-image:background-origin:background-position:background-position-x:background-position-y:background-repeat:background-size:border:border-bottom:border-bottom-color:border-bottom-image:border-bottom-left-image:border-bottom-left-radius:border-bottom-right-image:border-bottom-right-radius:border-bottom-style:border-bottom-width:border-break:border-collapse:border-color:border-corner-image:border-fit:border-image:border-left:border-left-color:border-left-image:border-left-style:border-left-width:border-length:border-radius:border-right:border-right-color:border-right-image:border-right-style:border-right-width:border-spacing:border-style:border-top:border-top:border-top-color:border-top-image:border-top-left-image:border-top-left-radius:border-top-right-image:border-top-right-radius:border-top-style:border-top-width:border-width:bottom:box-shadow:box-sizing:caption-side:clear:clip:color:content:counter-increment:counter-reset:cursor:display:empty-cells:float:font:font:font-effect:font-emphasize:font-emphasize-position:font-emphasize-style:font-family:font-size:font-size-adjust:font-smooth:font-stretch:font-style:font-variant:font-weight:height:left:letter-spacing:line-height:list-style:list-style:list-style-image:list-style-position:list-style-type:margin:margin-bottom:margin-left:margin-right:margin-top:max-height:max-width:min-height:min-width:opacity:orphans:outline:outline-color:outline-offset:outline-style:outline-width:overflow:overflow:overflow-style:overflow-x:overflow-y:padding:padding-bottom:padding-left:padding-right:padding-top:page-break-after:page-break-before:page-break-inside:position:quotes:resize:right:table-layout:text-align:text-align-last:text-decoration:text-emphasis:text-height:text-indent:text-justify:text-outline:text-replace:text-shadow:text-transform:text-wrap:top:vertical-align:visibility:white-space:white-space-collapse:widows:width:word-break:word-spacing:word-wrap:z-index:zoom</textarea></dt>
-		<dt><input id="eBtn" type="button" value="Générer"></dt>
+		<dt><input id="eBtn" type="button" value="GÃ©nÃ©rer"></dt>
 	</dl>
 </fieldset>
 <fieldset><legend>Info</legend>
 	<ol>
-		<li>Raccourcie d'un mot = quelques lettres du mot dans le même ordre d'apparition.</li>
-		<li>La première lettre d'un mot est toujours la première lettre de son raccourcie.
+		<li>Raccourcie d'un mot = quelques lettres du mot dans le mÃªme ordre d'apparition.</li>
+		<li>La premiÃ¨re lettre d'un mot est toujours la premiÃ¨re lettre de son raccourcie.
 			<ul>
-				<li>Si on a qu'un mot commençant par cette lettre, son raccourcie est cette lettre.</li>
-				<li>Le mot le plus petit l'emporte (poids supérieur).</li>
-				<li>Si deux mot ont la même taille, le premier mot dans l'ordre alphabétique l'emporte.</li>
+				<li>Si on a qu'un mot commenÃ§ant par cette lettre, son raccourcie est cette lettre.</li>
+				<li>Le mot le plus petit l'emporte (poids supÃ©rieur).</li>
+				<li>Si deux mot ont la mÃªme taille, le premier mot dans l'ordre alphabÃ©tique l'emporte.</li>
 			</ul></li>
-		<li>Les lettres d'un mot précédées par le symbole '<code>-</code>' feront toujours partie de son raccourcie.</li>
-		<li>Les lettres d'un mot n'étant pas présente dans les autres valeurs en conflit servent d'alternative.</li>
+		<li>Les lettres d'un mot prÃ©cÃ©dÃ©es par le symbole '<code>-</code>' feront toujours partie de son raccourcie.</li>
+		<li>Les lettres d'un mot n'Ã©tant pas prÃ©sente dans les autres valeurs en conflit servent d'alternative.</li>
 	</ol>
 </fieldset>
-<fieldset><legend>Légende</legend>
+<fieldset><legend>LÃ©gende</legend>
 	<dl>
 		<dt><label class="used">bg</label> : choisie </dt>
 		<dt><label class="green"><b>bg</b></label> : sans conflit </dt>
 		<dt><label class="orange"><b>bg</b></label> : suggestion 1 </dt>
 		<dt><label class="darkorange"><b>bg</b></label> : suggestion 2 </dt>
 		<dt><label class="red"><b>bg</b></label> : a exclure </dt>
-		<dt><label class="suggestion"><b>bg</b></label> : idéal </dt>
+		<dt><label class="suggestion"><b>bg</b></label> : idÃ©al </dt>
 		<dt><label class="notfound"><b>bg</b></label> : ? </dt>
 	</dl>
 </fieldset>
@@ -70,21 +70,21 @@ _('eValues,eBtn,eShortCuts')
 
 var _searchValue =function( sShortCut, aChoices ){
 	/*
-	Recherche dans aChoices le mot correspondant le mieux à sShortCut
-		(1) Seul les mots ayant comme première lettre celle du raccourcie sont sélectionnées
+	Recherche dans aChoices le mot correspondant le mieux Ã  sShortCut
+		(1) Seul les mots ayant comme premiÃ¨re lettre celle du raccourcie sont sÃ©lectionnÃ©es
 			( + 1000 pts )
-		(2) Retourne null si aucune mot n'est trouvé
+		(2) Retourne null si aucune mot n'est trouvÃ©
 		(3) Chaque mot est parcourue qu'une seul fois.
-			( + 50 pts - la longueur du mot ) = Un mot plus petit à plus de points dés le départ
-		(4) Si la lettre raccourcie suivante est présente dans le mot et quelle est précédé par le symbole '-'
+			( + 50 pts - la longueur du mot ) = Un mot plus petit Ã  plus de points dÃ©s le dÃ©part
+		(4) Si la lettre raccourcie suivante est prÃ©sente dans le mot et quelle est prÃ©cÃ©dÃ© par le symbole '-'
 			( + 500 pts pour la lettre )
-				on avance à la position ( index du  '-' + 2 )
-		(5) Sinon si elle est simplement présente dans le mot:  les 12 premières positions sont privilégiées et rapportent des points, le reste en enlève
-			( + 12 pts - son index dans le mot) pour chaque occurence trouvée
-				on avance à la position ( index du caractère + 1 )
-		(6) Sinon si elle n'est pas présente dedans 
+				on avance Ã  la position ( index du  '-' + 2 )
+		(5) Sinon si elle est simplement prÃ©sente dans le mot:  les 12 premiÃ¨res positions sont privilÃ©giÃ©es et rapportent des points, le reste en enlÃ¨ve
+			( + 12 pts - son index dans le mot) pour chaque occurence trouvÃ©e
+				on avance Ã  la position ( index du caractÃ¨re + 1 )
+		(6) Sinon si elle n'est pas prÃ©sente dedans 
 			( - 2000 pts )
-				et la recherche des caractères raccourcies est stoppée pour le mot
+				et la recherche des caractÃ¨res raccourcies est stoppÃ©e pour le mot
 	*/
 	if( ! sShortCut ) return null
 	var aResult = []
@@ -267,7 +267,7 @@ var createShortcuts =function(){
 				}
 				
 			if( aSpecialChars.length ){
-				// Supprime du premier groupe les valeurs sans la suite de caractères spéciaux de la valeur
+				// Supprime du premier groupe les valeurs sans la suite de caractÃ¨res spÃ©ciaux de la valeur
 				FirstGroup:
 				for(var k=0; k<aFirstGroup.length; k++ ){
 					var nIndex = 0
@@ -284,7 +284,7 @@ var createShortcuts =function(){
 						}
 					}
 				
-				if( aFirstGroup.length==0 ){ // Cas la valeur avec ses caractères spéciaux et la seule existante
+				if( aFirstGroup.length==0 ){ // Cas la valeur avec ses caractÃ¨res spÃ©ciaux et la seule existante
 					ShortCuts.add( sFirstChar + aSpecialChars.join(''), 'green' )
 					}
 				else if( isWeightest( sValue, aFirstGroup, oValues )){ // Cas la valeur est la valeur ayant le plus de poids
@@ -293,7 +293,7 @@ var createShortcuts =function(){
 				}
 				
 			if( aFirstGroup.length ){
-				// Enumère tous les caractères uniquement dans la valeur
+				// EnumÃ¨re tous les caractÃ¨res uniquement dans la valeur
 				var aCharsOnlyInValue = getCharOnlyInValue( sValue, aFirstGroup )
 				// Ajoute les raccourcies depuis cette liste
 				if( aCharsOnlyInValue.length ){
@@ -306,7 +306,7 @@ var createShortcuts =function(){
 					}
 				}
 
-			// Supprime toutes les valeurs ayant des poids inférieure (ATTENTION caractères spéciaux ayant plus de poids)
+			// Supprime toutes les valeurs ayant des poids infÃ©rieure (ATTENTION caractÃ¨res spÃ©ciaux ayant plus de poids)
 			if( aFirstGroup.length ){
 				for(var k=0; k<aFirstGroup.length; k++ ){
 					if( isWeightest( sValue, [ aFirstGroup[k]], oValues )){
@@ -315,14 +315,14 @@ var createShortcuts =function(){
 						k--
 						}
 					}
-				// Enumère les caractères spéciaux des valeurs de poids inférieures
+				// EnumÃ¨re les caractÃ¨res spÃ©ciaux des valeurs de poids infÃ©rieures
 				var aExcludedChars = []
 				for(var k=0, nk=aSecondGroup.length; k<nk; k++ ){
 					aExcludedChars = aExcludedChars.concat( getSpecialChars( aSecondGroup[k]))
 					}
 				aExcludedChars = Array.unique( aExcludedChars )
 					
-				// Enumère tous les caractères uniquement dans la valeur
+				// EnumÃ¨re tous les caractÃ¨res uniquement dans la valeur
 				var aCharsOnlyInValue = getCharOnlyInValue( sValue, aFirstGroup )
 				// Ajoute les raccourcies depuis cette liste en faisant attention que les lettres ne fassent pas partie des lettres excluses
 				if( aCharsOnlyInValue.length ){
@@ -393,9 +393,9 @@ var createShortcuts =function(){
 					Tag('THEAD').appendNodes(
 						Tag('TH', { innerHTML:'valeur' }),
 						Tag('TH', { innerHTML:'propositions' }),
-						Tag('TH', { innerHTML:'utilisées' }),
+						Tag('TH', { innerHTML:'utilisÃ©es' }),
 						Tag('TH', { innerHTML:'conflit restant' }),
-						Tag('TH', { innerHTML:'"poids inférieure"' })
+						Tag('TH', { innerHTML:'"poids infÃ©rieure"' })
 						)
 					)
 		eShortCuts.appendChild( eFragment )

@@ -1,4 +1,4 @@
-<html>
+ï»¿<html>
 	<head>
 		<title>Les automates finis</title>
 		<link rel="stylesheet" type="text/css" href="css/fa.css">
@@ -11,33 +11,33 @@
 
 <h1>Les automates finis</h1>
 
-<p>Un automate fini est composé par :</p>
+<p>Un automate fini est composÃ© par :</p>
 
 <table cellspacing="10">
 	<tr><th>Identifiant</th><td><b>Description</b></td><th>Symbole graphique</th></tr>
 	<tr>
 		<th>I</th>
-		<td class="desc">Un état initial, I &in; S.</td>
-		<th><div class="fa Initial" title="état initial"></div></th>
+		<td class="desc">Un Ã©tat initial, I &in; S.</td>
+		<th><div class="fa Initial" title="Ã©tat initial"></div></th>
 	</tr>
 	<tr>
 		<th>F</th>
-		<td class="desc">Un ensemble d'état final, F &sube; S.</td>
-		<th><div class="fa Final" title="état final"></div></th>
+		<td class="desc">Un ensemble d'Ã©tat final, F &sube; S.</td>
+		<th><div class="fa Final" title="Ã©tat final"></div></th>
 	</tr>
 	<tr>
 		<th></th>
-		<td class="desc">Note : Symbole graphique d'un état initial et final.</td>
-		<th><div class="fa InitialFinal" title="état initial et final"></div></th>
+		<td class="desc">Note : Symbole graphique d'un Ã©tat initial et final.</td>
+		<th><div class="fa InitialFinal" title="Ã©tat initial et final"></div></th>
 	</tr>
 	<tr>
 		<th>A</th>
-		<td class="desc">Un alphabet composé de symbole: caractère, ensemble de caractère (négatif ou non).</td>
+		<td class="desc">Un alphabet composÃ© de symbole: caractÃ¨re, ensemble de caractÃ¨re (nÃ©gatif ou non).</td>
 		<th></th>
 	</tr>
 	<tr>
 		<th>S</th>
-		<td class="desc">Un ensemble d'état.</td>
+		<td class="desc">Un ensemble d'Ã©tat.</td>
 		<th></th>
 	</tr>
 	<tr>
@@ -45,29 +45,29 @@
 		<td valign="top" class="desc">Un ensemble de transitions. <br>
 		(s1,a)&rarr;s2 est une transition avec s1,s2 &in; S et a &in; A.</td>
 		<th>
-			<div class="fa TransitionSymbol" title="transition pour un caractère"></div><br>
-			<div class="fa TransitionCharclass" title="transition pour un ensemble de caractère."></div><br>
+			<div class="fa TransitionSymbol" title="transition pour un caractÃ¨re"></div><br>
+			<div class="fa TransitionCharclass" title="transition pour un ensemble de caractÃ¨re."></div><br>
 			<div class="fa TransitionEpsilon" title="transition &epsilon;"></div><br>
 			<div class="fa SelfLoop" title="boucle sur soit"></div>
 		</th>
 	</tr>
 </table>
 
-<h2>Les transitions pour un caractère<br> <div class="fa TransitionSymbol"></div></h2>
-<p>La machine passe d'un état à un autre en lisant un caractère.</p>
+<h2>Les transitions pour un caractÃ¨re<br> <div class="fa TransitionSymbol"></div></h2>
+<p>La machine passe d'un Ã©tat Ã  un autre en lisant un caractÃ¨re.</p>
 
-<h2>Les transitions pour un ensemble de caractère<br> <div class="fa TransitionCharclass"></div></h2>
+<h2>Les transitions pour un ensemble de caractÃ¨re<br> <div class="fa TransitionCharclass"></div></h2>
 <p>
-	Si le caractère lu fait partie de l'ensemble de caractère accepté, la machine change d'état.
+	Si le caractÃ¨re lu fait partie de l'ensemble de caractÃ¨re acceptÃ©, la machine change d'Ã©tat.
 </p>
 <p>
-	L'automate perd en performance avec mais cette perte reste négligeable en utilisant des caches mémoires.<br>
-	Ce type de transition est nécessaire pour les ensembles de caractères négatifs.<br>
+	L'automate perd en performance avec mais cette perte reste nÃ©gligeable en utilisant des caches mÃ©moires.<br>
+	Ce type de transition est nÃ©cessaire pour les ensembles de caractÃ¨res nÃ©gatifs.<br>
 	Elles permettent de compresser l'automate.
 </p>
 
 <h2>Les transitions &epsilon; (Epsilon)<br> <div class="fa TransitionEpsilon"></div></h2>
-<p>La machine passe d'un état à un autre sans lire de caractère.</p>
+<p>La machine passe d'un Ã©tat Ã  un autre sans lire de caractÃ¨re.</p>
 
 	
 	</body>

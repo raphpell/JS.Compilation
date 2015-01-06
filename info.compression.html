@@ -1,4 +1,4 @@
-<html>
+ï»¿<html>
 	<head>
 		<title>La compression</title>
 	</head>
@@ -9,13 +9,13 @@
 <ol>
 		<li><a href="#1">Table de symbole A</a></li>
 		<li><a href="#2">Matrice M</a></li>
-		<li><a href="#3">Les fonctions  spéciales</a></li>
+		<li><a href="#3">Les fonctions  spÃ©ciales</a></li>
 </ol>
 
 
 <h2><a name="1"></a>Table de symbole A</h2>
 <ul>
-		<li>C'est un objet ayant pour clé les symboles et pour valeur leur index (par exemple: <code>{a:0,b:1}</code> ).
+		<li>C'est un objet ayant pour clÃ© les symboles et pour valeur leur index (par exemple: <code>{a:0,b:1}</code> ).
 		</li>
 		<li>On utilise <a href="#g">la fonction g</a> pour le compresser.</li>
 </ul>
@@ -24,25 +24,25 @@
 <h2><a name="2"></a>Matrice M</h2>
 <ul>
 		<li>M est initialement un tableau de tableaux.</li>
-		<li>Chaque index <code>i</code> de M est un nom détat.
+		<li>Chaque index <code>i</code> de M est un nom dÃ©tat.
 			<ul>
-				<li>0 : état Not Found.</li>
-				<li>1 : état initial.</li>
+				<li>0 : Ã©tat Not Found.</li>
+				<li>1 : Ã©tat initial.</li>
 			</ul>
 		</li>
 		<li>Chaque index <code>j</code> du tableau M[i] est un index de symbole de l'alphabet.</li>
-		<li>On accède à l'état suivant avec M[i][j] donc M[i] peut-être un objet.<br>
+		<li>On accÃ¨de Ã  l'Ã©tat suivant avec M[i][j] donc M[i] peut-Ãªtre un objet.<br>
 			<code>{1:10}</code> est plus court que <code>[,10,,,,,,,,,,,,,]</code><br>
 			mais ici <code>[,10]</code> est encore plus court.
 		</li>
-		<li>Si un tableau M[i] est composé principalement d'une certaine valeur, on utilise <a href="#h">la fonction h</a>.<br>
-			Pour l'exemple précédant on a <code>h(15,0,1,10)</code>.
+		<li>Si un tableau M[i] est composÃ© principalement d'une certaine valeur, on utilise <a href="#h">la fonction h</a>.<br>
+			Pour l'exemple prÃ©cÃ©dant on a <code>h(15,0,1,10)</code>.
 		</li>
 </ul>
 
 
-<h2><a name="3"></a>Les fonctions spéciales</h2>
-<p>Ces fonctions servent à compresser la taille des automates, c'est pour cela que leur nom est si court !</p>
+<h2><a name="3"></a>Les fonctions spÃ©ciales</h2>
+<p>Ces fonctions servent Ã  compresser la taille des automates, c'est pour cela que leur nom est si court !</p>
 
 <h3><a name="f"></a>La fonction  <code>f</code></h3>
 <p> Renvoie une fonction ayant comme arguments <code>symb</code> et <code>state</code>.</p>
@@ -61,7 +61,7 @@ var f =function( sCharSet, bIn ){
 </pre>
 
 <h3><a name="g"></a>La fonction  <code>g</code></h3>
-<p> Renvoie un objet ayant comme clé les symboles et comme valeur un index.</p>
+<p> Renvoie un objet ayant comme clÃ© les symboles et comme valeur un index.</p>
 <pre>
 var g =function( sSymb1 /*,  sSymb2, ... */ ){ 
 	var o = {}
@@ -74,8 +74,8 @@ var g =function( sSymb1 /*,  sSymb2, ... */ ){
 <p> Renvoie un tableau :</p>
 <ul>
 	<li>de longueur <code>nLength</code></li>
-	<li>ayant comme valeur par défaut <code>nDefaultValue</code></li>
-	<li>la valeur <code>nValue1</code> à l'index <code>nIndex1</code></li>
+	<li>ayant comme valeur par dÃ©faut <code>nDefaultValue</code></li>
+	<li>la valeur <code>nValue1</code> Ã  l'index <code>nIndex1</code></li>
 	<li>...</li>
 </ul>
 <pre>

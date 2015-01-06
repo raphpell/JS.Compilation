@@ -1,6 +1,6 @@
-<html>
+ï»¿<html>
 <head>
-	<title>Création de module Lexer</title>
+	<title>CrÃ©ation de module Lexer</title>
 	<link rel="stylesheet" type="text/css" href="css/styles.css">
 	<link rel="stylesheet" type="text/css" href="widget/ProgressBar/css/styles.css">
 	<script src="widget/ProgressBar/js/scripts.js"></script>
@@ -51,7 +51,7 @@
 <body>
 <a href="index.htm">Index</a>
 
-<h1>Création de module Lexer</h1>
+<h1>CrÃ©ation de module Lexer</h1>
 
 <label for="eSourceFiles">Exemple: </label><select id="eSourceFiles"></select> <a href="#" onclick="wizSyntax()">syntaxe WIZ</a>
 <iframe id="eTextPlain" name="_source" src="" style="display:none;"></iframe><br>
@@ -80,7 +80,7 @@
 
 <input type="checkbox" checked id="eDisplayOk"><label for="eDisplayOk">ok.</label>
 <input type="checkbox" id="eDisplaySource"><label for="eDisplaySource">Source.</label>
-<input type="checkbox" checked id="eDisplayResult"><label for="eDisplayResult">Expressions régulières.</label>
+<input type="checkbox" checked id="eDisplayResult"><label for="eDisplayResult">Expressions rÃ©guliÃ¨res.</label>
 <input type="checkbox" id="eDisplayAnnotation"><label for="eDisplayAnnotation">Annotations.</label>
 <input type="checkbox" checked id="eParentTokens"><label for="eParentTokens">Parent tokens.</label>
 <input type="checkbox" checked id="eTokens"><label for="eTokens">Tokens.</label>
@@ -89,7 +89,7 @@
 
 <hr>
 
-<label for="eExport">Résultat: </label>
+<label for="eExport">RÃ©sultat: </label>
 <textarea id="eExport" spellcheck="false"></textarea>
 
 <script src="js/shared.js"></script>
@@ -480,7 +480,7 @@ function exportRegExp (){
 		var sToken = oDefinition.tokens[i][0]
 		aResult.push( "['"+ sToken +"', /"+ oDefinition.tokens[i][1] +"/ ]" )
 		}
-	eExport.value = '// Expressions régulières\n'+ aResult.join( ',\n' ) +","
+	eExport.value = '// Expressions rÃ©guliÃ¨res\n'+ aResult.join( ',\n' ) +","
 	}
 </script>
 
