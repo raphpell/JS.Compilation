@@ -1,4 +1,4 @@
-var aExamples =[
+ï»¿var aExamples =[
 	 [	'',
 		'',
 		'',
@@ -51,7 +51,7 @@ var aExamples =[
 		' S -> A a b \n A -> a | epsilon ',
 		['a b','a a b'],
 		'LL1']
-	,[	'4.1. ...solution : réécriture LR(0)',
+	,[	'4.1. ...solution : rÃ©Ã©criture LR(0)',
 		' S -> a a b | a b ',
 		['a b','a a b'],
 		'LR0']
