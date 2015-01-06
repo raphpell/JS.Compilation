@@ -1,11 +1,11 @@
-EPSILON = '&epsilon;'
+ï»¿EPSILON = '&epsilon;'
 
 var Grammar =function( sGrammar, sType ){
 	var s = sGrammar
 	, sSeparator = s.indexOf('->')>-1 ? '->' : String.fromCharCode( 8594 )
 	, sEpsilonChar = String.fromCharCode( 949 )
 	, aGrammar = []
-	/* PRÊT A ÊTRE INCLUS
+	/* PRÃŠT A ÃŠTRE INCLUS
 	var eGrammar = document.createElement( 'GRAMMAR')
 	eGrammar.appendChild( ParserLR(
 		to_array( AutomatonLexer( sGrammar, 'GRAMMAR' ).childNodes ),
@@ -27,7 +27,7 @@ var Grammar =function( sGrammar, sType ){
 
 Grammar.getEngine =function( aGrammar, sType ){
 	var G = aGrammar
-	, s = G[0]?G[0][0]:'' // Symbole de départ
+	, s = G[0]?G[0][0]:'' // Symbole de dÃ©part
 	, PRODUCTION =function( sLHS, aRHS ){
 		return {
 			LHS: sLHS,
@@ -67,8 +67,8 @@ Grammar.getEngine =function( aGrammar, sType ){
 				return ( s==EPSILON && Prod.RHS.length==1 ) ? null : s
 				},
 			sameAs :function( Item ){ return this.toString( 1, 1 )==Item.toString( 1, 1 ) },
-			toString :function( b, bNoLookahead ){ return fShow( b, '->', '¤', bNoLookahead?[]:this.lookahead )},
-			toHTML :function( b ){ return fShow( b, '&rarr;', '<b>¤</b>', this.lookahead )}
+			toString :function( b, bNoLookahead ){ return fShow( b, '->', 'Â¤', bNoLookahead?[]:this.lookahead )},
+			toHTML :function( b ){ return fShow( b, '&rarr;', '<b>Â¤</b>', this.lookahead )}
 			}
 		}
 	, STATE =function( a ){
@@ -185,7 +185,7 @@ Grammar.getEngine =function( aGrammar, sType ){
 	, R = {}
 	
 	;(function initialize (){
-		// Créé les productions
+		// CrÃ©Ã© les productions
 		if( sType.indexOf('LR')!=-1 ) PRODUCTIONS.push( PRODUCTION( s+"'", [ s, end ]))
 		for(var i=0, ni=G.length; i<ni; i++ ){
 			var X = G[i][0]
@@ -622,7 +622,7 @@ Grammar.parseLR =function( aPhrase, ENGINE ){
 					aNodes.push( oParent )
 					Bufferize( '<span class="bg_skyblue">' + Production.toHTML(1) + "</span></td></tr>" )
 					} else{
-						Bufferize( "Pas de goto ? Pas d'action défini ! réviser la grammaire.</td></tr>" )
+						Bufferize( "Pas de goto ? Pas d'action dÃ©fini ! rÃ©viser la grammaire.</td></tr>" )
 						}
 				} else Bufferize( "Plus de pile ? Stack est vide !</td></tr>" )
 			return false
@@ -644,11 +644,11 @@ Grammar.parseLR =function( aPhrase, ENGINE ){
 		TNodes = aPhraseNodes[i]
 		action = ENGINE.M.get( nStateID, Token, aPhrase[i])
 		Bufferize( '<tr><td>'+ aStack.join(' ') + '</td><td>'+ aSymbols.join(' ') + '</td><td class="right">'+ aPhrase.slice(i).join(' ') + '</td><td>' + (action||'') + '  ' )
-		if( ! action ) return ParseError( 'action ENGINE.M["'+ nStateID +'"]["'+ Token +'"] indéfinie.' )
+		if( ! action ) return ParseError( 'action ENGINE.M["'+ nStateID +'"]["'+ Token +'"] indÃ©finie.' )
 		else if( f = ACTIONS[ action[0]]){ if( result = f()) return result }
 		else return ParseError( 'action '+ action +' inconnue !' )
 		}while( i<aPhrase.length && aStack.length )
-	return ParseError( 'Phrase incomplète...' )
+	return ParseError( 'Phrase incomplÃ¨te...' )
 	}
 Grammar.parseLL =function( aPhrase, ENGINE ){
 	Bufferize.init( '<table cellspacing="0" cellpadding="0" class="parser">' )
@@ -683,25 +683,25 @@ Grammar.parseLL =function( aPhrase, ENGINE ){
 				}
 			else{
 				i++
-				Bufferize( '<span class="bg_green">Dépilage: les symboles terminaux sont identiques.</td></tr>' )
+				Bufferize( '<span class="bg_green">DÃ©pilage: les symboles terminaux sont identiques.</td></tr>' )
 				}
 			}
 		else{
 			if( ENGINE.T.have( X )){
-				Bufferize( '<span class="bg_red">Erreur: Les symboles terminaux '+X+' et '+Token+' sont différents !</span></td></tr>' )
+				Bufferize( '<span class="bg_red">Erreur: Les symboles terminaux '+X+' et '+Token+' sont diffÃ©rents !</span></td></tr>' )
 				break;
 				}
 			else if( ENGINE.N.have( X )){
 				var RHS = ENGINE.M.get( X, Token )
 				var bConflict = ENGINE.M.conflict( X, Token )
 				if( ! RHS ){
-					Bufferize( "La règle M["+X+"]["+Token+"] n'existe pas.<br>" )
-					Bufferize( "La règle M["+X+"]["+EPSILON+"] est prise en alternative.<br>" )
+					Bufferize( "La rÃ¨gle M["+X+"]["+Token+"] n'existe pas.<br>" )
+					Bufferize( "La rÃ¨gle M["+X+"]["+EPSILON+"] est prise en alternative.<br>" )
 					Token = EPSILON
 					RHS = ENGINE.M.get( X, Token )
 					bConflict = ENGINE.M.conflict( X, Token )
 					}
-				if( bConflict ) Bufferize( '<span class="bg_orange">Conflit ( '+ENGINE.M[ X][ Token ]+' ) rencontré.</span><br>' )
+				if( bConflict ) Bufferize( '<span class="bg_orange">Conflit ( '+ENGINE.M[ X][ Token ]+' ) rencontrÃ©.</span><br>' )
 				if( RHS ){
 					if( RHS[0]==X ){
 						nInfinitLoop++
@@ -711,7 +711,7 @@ Grammar.parseLL =function( aPhrase, ENGINE ){
 							}
 						} else nInfinitLoop = 0
 					Bufferize( '<span class="bg_skyblue">'+ X +' &rarr; '+ RHS.join(' ') +'</span>' )
-					if( bConflict ) Bufferize( ' a été choisi !' )
+					if( bConflict ) Bufferize( ' a Ã©tÃ© choisi !' )
 					Bufferize( "</td></tr>" )
 					var a = RHS.concat([]) // 'cause reverse
 					var aNodes = []
@@ -722,8 +722,8 @@ Grammar.parseLL =function( aPhrase, ENGINE ){
 					aNodesStack = aNodesStack.concat( aNodes.reverse() )
 					}
 				else{
-					Bufferize( "La règle M["+X+"]["+Token+"] n'existe pas.<br>" )
-					Bufferize( "L'analyse est stoppée.</td></tr>" )
+					Bufferize( "La rÃ¨gle M["+X+"]["+Token+"] n'existe pas.<br>" )
+					Bufferize( "L'analyse est stoppÃ©e.</td></tr>" )
 					break;
 					}
 				}
