@@ -4,11 +4,9 @@ Compilation
 - Comprendre comment fonctionne un scanner et un parser
 - Générer des modules pour le scanner et le parser
 
-[Principes de fonctionnement](http://raphpell.github.io/Compilation/index.htm)
-
-Features
+[Formulaires](http://raphpell.github.io/Compilation/index.htm)
 --------
-	- Générer un automate JavaScript depuis une expression régulière
+	- Créer un automate JavaScript depuis une expression régulière
 	- Aggréger des automates
-	- Générer des modules pour le lexer
-	- Générer des modules pour le parser
+	- Créer un module pour le lexer
+	- Créer un module pour le parser
