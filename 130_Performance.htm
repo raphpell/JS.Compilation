@@ -5,12 +5,14 @@
 UL {
 	list-style-position: inside;
 	padding: 0 1em;
+	margin: 1em 0;
 	}
 LI {
 	padding: 0 1em;
 	}
 .automatonLexer {
 	background: #FEA;
+	margin: .5em 0;
 	padding: .5em 1em;
 	}
 .regexpMultipleLexer {
@@ -20,6 +22,7 @@ LI {
 	}
 .regexpOneLexer {
 	background: #FDD;
+	margin: .5em 0;
 	padding: .5em 1em;
 	}
 		</style>
@@ -31,9 +34,10 @@ LI {
 <p>La difficulté est de trouver où le temps est perdu.</p>
 
 
-<h2>Les lexers</h2>
+<h2>Mes lexers</h2>
 <p>
-	Mes Lexer sont puissant au niveau de la <a href="131_Lexer.byStep.htm">lecture des tokens</a> (&lt;1ms). <br>
+	Mes Lexer sont rapides au niveau de la <a href="131_Lexer.byStep.htm">lecture des tokens</a>, 
+	mais cette vitesse dépend du <a href="#LexerNode">LexerNode</a> utilisé.<br>
 	Voici la liste de <a href="133_Lexer.comparison.htm">mes Lexer</a> classés par préférence:
 </p>
 <ul>
@@ -55,6 +59,7 @@ LI {
 			<li>Il vaut mieux quelle soit classée par ordre d'apparition courante.</li>
 			<li>Première arrivée, première servie.</li>
 			<li>Un ordre des ER est requis: mots clés avant identifiant, etc...</li>
+			<li>Lexer le plus rapide...</li>
 		</ul></li>
 	<li class="regexpOneLexer"><b>"1 RegExp" Lexer</b> <sup style="color:red;">A éviter!</sup>
 		<ul>
@@ -69,30 +74,31 @@ LI {
 	Normalement:
 </p>
 <ul style="margin-top:0;">
-	<li>seule une liste de token devrait-être générée</li>
-	<li>une <a href="200_AnalyseSyntaxique.htm">analyse syntaxique</a> devrait-être faite en parallèle, depuis une <a href="210_Parser.html">grammaire</a>.</li>
+	<li>Seule une liste de token devrait-être générée</li>
+	<li>L'<a href="200_AnalyseSyntaxique.htm">analyse syntaxique</a> devrait-être faite en parallèle (voir <a href="210_Parser.html">grammaire</a>).</li>
 </ul>
 
+<a name="LexerNode"></a>
 <h2>La fonction LexerNode</h2>
 <p>
-	La performance des lexer dépend surtout de la fonction '<var>LexerNode</var>' utilisée. <br>
-	Elle retourne un objet affecté avec l'attribut <var>oValue</var> (valeurs du token). <br>
-	Cet objet peut-être un nouvel élément HTML, car il doit avoir comme membres minimum (pour le Lexer):
+	Elle influe La performance des lexers car la création des tokens prend du temps ! 
+	Plus l'objet est gros, plus le temps mis pour le créer est long.<br>
+	Elle retourne un objet affecté avec un attribut nommé <var>oValue</var> (valeurs du token). <br>
+	Cet objet est soit :
 </p>
-<code><ul>
-	<li>parentNode</li>
-	<li>firstChild</li>
-	<li>lastChild</li>
-	<li>previousSibling</li>
-	<li>nextSibling</li>
-	<li>appendChild( oChild ) return oChild</li>
-	<li>insertBefore( oChild, oChildAfter ) return oChild</li>
-	<li>removeChild( oChild ) return oChild</li>
-</ul></code>
-<p>
-	Pour l'instant l'éditeur créé avec le Lexer Automaton est plus rapide avec...<br>
-	Mais les éléments HTML ralentissent l'analyse car se sont de gros objets.
-</p>
+<ul style="margin: 0 0 2em 2em;">
+	<li><b>Un élément HTML</b>
+		<ul>
+			<li>Plus lent.</li>
+			<li>Permet d'afficher facilement le résultat de l'analyse.</li>
+			<li>Pour l'instant mon éditeur créé avec le Lexer Automaton est plus rapide avec (Il utilise pleinement les possibilités HTML !).</li>
+		</ul></li>
+	
+	<li><b>Un objet JavaScript implémentant l'interface des éléments HTML</b>
+		<ul>
+			<li>Plus rapide (interface implémentée réduite).</li>
+		</ul></li>
+</ul>
 
 
 	</body>
