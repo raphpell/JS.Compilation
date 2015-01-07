@@ -12,3 +12,6 @@ Formulaires disponibles
 - Aggrégation d'automates
 - Création d'un module pour le lexer
 - Création d'un module pour le parser
+
+
+Celà dit, l'analyse lexicale est plus rapide avec des expressions régulières.
