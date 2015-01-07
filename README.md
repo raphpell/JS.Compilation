@@ -8,10 +8,22 @@ _Motivations_:
 
 Formulaires disponibles
 --------
-- Création d'un automate depuis une expression régulière
-- Aggrégation d'automates
-- Création d'un module pour le lexer
-- Création d'un module pour le parser
+- [Création d'un automate depuis une expression régulière](http://raphpell.github.io/Compilation/110_Automates.htm)
+- [Aggrégation d'automates](http://raphpell.github.io/Compilation/120_DFA.aggregation.htm)
+- [Création d'un module pour le lexer](http://raphpell.github.io/Compilation/140_Lexer.modules.htm)
+- [Création d'un module pour le parser](http://raphpell.github.io/Compilation/210_Parser.html)
 
 
-Celà dit, l'analyse lexicale est plus rapide avec des expressions régulières.
+Visualiser les performances de mes Lexers
+--------
+- [Analyse lexicale: readToken](http://raphpell.github.io/Compilation/131_Lexer.byStep.htm)
+- [Comparaison de mes lexers](http://raphpell.github.io/Compilation/133_Lexer.comparison.htm)
+
+
+Chose à faire ou à refaire
+--------
+- L'analyse lexicale incrémentielle
+- L'analyse syntaxique incrémentielle
+
+
+_NB_: l'analyse lexicale est plus rapide avec une liste d'expressions régulières.
