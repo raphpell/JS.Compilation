@@ -1,12 +1,14 @@
 Compilation
 ===========
-- Colorer du code source.
-- Comprendre comment fonctionne un scanner et un parser
-- Générer des modules pour le scanner et le parser
+_Motivations_:
+- Colorer du code source à l'aide d'un objet JavaScript.
+- Créer mon propre éditeur de code.
 
-[Formulaires](http://raphpell.github.io/Compilation/index.htm)
+[Aperçu du résultat](http://raphpell.github.io/Compilation/index.htm)
+
+Formulaires disponibles
 --------
-	- Créer un automate JavaScript depuis une expression régulière
-	- Aggréger des automates
-	- Créer un module pour le lexer
-	- Créer un module pour le parser
+- Création d'un automate depuis une expression régulière
+- Aggrégation d'automates
+- Création d'un module pour le lexer
+- Création d'un module pour le parser
