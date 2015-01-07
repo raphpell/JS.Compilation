@@ -17,7 +17,7 @@ Formulaires disponibles
 Visualiser les performances de mes Lexers
 --------
 - [Analyse lexicale: readToken](http://raphpell.github.io/Compilation/131_Lexer.byStep.htm)
-- [Comparaison de mes lexers](http://raphpell.github.io/Compilation/133_Lexer.comparison.htm)
+- [Analyse lexicale: scan](http://raphpell.github.io/Compilation/133_Lexer.comparison.htm)
 
 
 Chose à faire ou à refaire
