@@ -111,6 +111,7 @@
 			<input type="checkbox" id="eAutoMatch"><label for="eAutoMatch">Analyser automatiquement.</label>
 		</dt>
 		<dt><pre id="eResult"></pre></dt>
+		<dt><small><dl id="eLexersTest"></dl></small></dt>
 	</dl>
 </fieldset>
 <fieldset><legend>DFA en RE <sup style="color:red;">experimental</sup></legend>
@@ -123,7 +124,6 @@
 <!-- FRAMEWORK... -->
 <script src="js/framework.js"></script>
 <script src="js/lexer.automaton.js"></script>
-<script src="js/lexer.automaton.modules.js"></script>
 <script src="js/parserLR.js"></script>
 <script src="src/regexp/node.js"></script>
 <script src="src/regexp/lexer.js"></script>
@@ -143,6 +143,7 @@ _( 'eBtnMatch' )
 _( 'eBtnExport,eExportResult,eExportWhiteSpace,eExportCompressed,eExportSize' )
 _( 'eAutoValidation,eAutoMinimization,eAutoMatch,eAutoExport' )
 _( 'eBtnToRE,eAutoToRE,eDFAToRE' )
+_( 'eLexersTest' )
 
 previewRE = (function(){
 	var f = function(){ if( ! oNFA.M ) buildTable( oNFA ); previewREScanning({type:'RE',re:eRE.value }) }
@@ -261,12 +262,11 @@ var parseRE =function( bValidate, bMinimize, bMatch, bExport ){
 		else clearExport()
 	}
 
-var clearTest =function(){
-	eResult.innerHTML = ''
-	}
+var clearTest =function(){ eResult.innerHTML = '' }
+var clearExport =function(){ eExportResult.value = '' }
+
 var match =function( s, n ){
 	clearTest()
-	var oChrono = new Chrono()
 	oDFA.M = oDFA.M || buildTable( oDFA.T )
 	
 	var sWordChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_'
@@ -302,8 +302,7 @@ var match =function( s, n ){
 			if( oDFA.F.have( sState )) LongestMatch = { matched: sInput.substring( nStart, nIndex )}
 			}
 	if( oDFA.F.have( sState )) LongestMatch = { matched: sInput.substring( nStart, nIndex )}
-		
-	Bufferize( oChrono.stop()+'ms\n' )
+
 	switch( sState ){
 		case -1: sError = 'NOT_IN_CHAR_CLASS'; break
 		case -2: sError = 'INVALID_CHARACTER'; break
@@ -321,9 +320,6 @@ var match =function( s, n ){
 			//	+\n+ eResult.innerHTML
 				)
 	}
-var clearExport =function(){
-	eExportResult.value = ''
-	}
 var exportDFA =function( bWhiteSpace, bUnCompressed ){
 	clearExport()
 	var sResult = DFAToJS( oDFA, bWhiteSpace, bUnCompressed )
@@ -340,6 +336,7 @@ eBtnCreate.onclick()
 match()
 eExportWhiteSpace.onchange()
 </script>
+
 
 </body>
 </html>

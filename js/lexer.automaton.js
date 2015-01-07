@@ -190,7 +190,12 @@ var AutomatonLexer =(function(){
 				for(var i=0, aRule; aRule=aRules[i]; i++ )
 					Lexer.addRule( aRule[0], aRule[1].split('|'))
 			},
-		addTokenFromString :function( sName, sDFA ){ var o; eval('o='+sDFA); DFA[sName]=o },
+		addTokenFromString :function( sName, sDFA ){
+			var o;
+			eval('o='+sDFA);
+			if( ! o.TokensTable ) o.TokensTable = [,sName]
+			DFA[sName]=o
+			},
 		addTokens :function( aTokens ){
 			if( aTokens.length )
 				for(var i=0, aToken; aToken=aTokens[i]; i++ ){

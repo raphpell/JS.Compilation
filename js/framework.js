@@ -63,7 +63,7 @@ Chrono.prototype={
 	start: function(){ this.dStart = performance.now()},
 	stop: function(){
 		this.dStop = performance.now()
-		var nTime = parseInt( this.dStop - this.dStart )
+		var nTime = ( this.dStop - this.dStart ).toFixed(3)
 		if( this.onstop ) this.onstop( nTime )
 		return nTime
 		}
