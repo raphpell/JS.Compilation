@@ -1,10 +1,9 @@
 Compilation
 ===========
-_Motivations_:
-- Colorer du code source à l'aide d'un objet JavaScript.
-- Créer mon propre éditeur de code.
+Générateur de Lexer et Parser en JavaScript.
 
 [Aperçu du résultat](http://raphpell.github.io/Compilation/index.htm)
+
 
 Formulaires disponibles
 --------
@@ -14,16 +13,16 @@ Formulaires disponibles
 - [Création d'un module pour le parser](http://raphpell.github.io/Compilation/210_Parser.html)
 
 
-Visualiser les performances de mes Lexers
+Visualisation des performances des Lexers
 --------
 - [Analyse lexicale: readToken](http://raphpell.github.io/Compilation/131_Lexer.byStep.htm)
 - [Analyse lexicale: scan](http://raphpell.github.io/Compilation/133_Lexer.comparison.htm)
 
 
-Chose à faire ou à refaire
+En attente
 --------
 - L'analyse lexicale incrémentielle
 - L'analyse syntaxique incrémentielle
 
 
-_NB_: l'analyse lexicale est plus rapide avec une liste d'expressions régulières.
+_Note_: l'analyse lexicale est plus rapide avec une liste d'expressions régulières.
