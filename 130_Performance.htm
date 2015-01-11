@@ -31,15 +31,15 @@ LI {
 <a href="index.htm">Index</a>
 
 <h1>Performance du Lexer</h1>
-<p>La difficulté est de trouver où le temps est perdu.</p>
+<p>Là où temps est perdu :</p>
+<ul>
+	<li>La <a href="AnnexeA_LexerNode.htm">création des léxèmes</a>.</li>
+	<li>La <a href="131_Lexer.byStep.htm">lecture des tokens</a>.</li>
+</ul>
 
 
 <h2>Mes lexers</h2>
-<p>
-	Mes Lexer sont rapides au niveau de la <a href="131_Lexer.byStep.htm">lecture des tokens</a>, 
-	mais cette vitesse dépend du <a href="#LexerNode">LexerNode</a> utilisé.<br>
-	Voici la liste de <a href="133_Lexer.comparison.htm">mes Lexer</a> classés par préférence:
-</p>
+<p>Voici la liste de <a href="133_Lexer.comparison.htm">mes Lexer</a> classés par préférence:</p>
 <ul>
 	<li class="automatonLexer"><b>Automaton Lexer</b>
 		<ul>
@@ -77,29 +77,6 @@ LI {
 	<li>Seule une liste de token devrait-être générée</li>
 	<li>L'<a href="200_AnalyseSyntaxique.htm">analyse syntaxique</a> devrait-être faite en parallèle (voir <a href="210_Parser.html">grammaire</a>).</li>
 </ul>
-
-<a name="LexerNode"></a>
-<h2>La fonction LexerNode</h2>
-<p>
-	Elle influe La performance des lexers car la création des tokens prend du temps ! 
-	Plus l'objet est gros, plus le temps mis pour le créer est long.<br>
-	Elle retourne un objet affecté avec un attribut nommé <var>oValue</var> (valeurs du token). <br>
-	Cet objet est soit :
-</p>
-<ul style="margin: 0 0 2em 2em;">
-	<li><b>Un élément HTML</b>
-		<ul>
-			<li>Plus lent.</li>
-			<li>Permet d'afficher facilement le résultat de l'analyse.</li>
-			<li>Pour l'instant mon éditeur créé avec le Lexer Automaton est plus rapide avec (Il utilise pleinement les possibilités HTML !).</li>
-		</ul></li>
-	
-	<li><b>Un objet JavaScript implémentant l'interface des éléments HTML</b>
-		<ul>
-			<li>Plus rapide (interface implémentée réduite).</li>
-		</ul></li>
-</ul>
-
 
 	</body>
 </html>
