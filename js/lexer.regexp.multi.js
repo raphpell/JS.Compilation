@@ -1,50 +1,75 @@
-// LexerNode requis
+// LexerNode REQUIS
 
 var MultiRegExpLexer =(function(){
-	var LexerRules =(function(){
-		var Groups ={
-			list: {},
-			get :function( ID ){
-				var o = Groups.list[ID]
-				if( ! o ) throw new Error ( 'Lexer: "'+ ID +'" is not a group.' )
-				else return o
-				},
-			add :function( ID, m ){
-				if( Groups.list[ID]) throw new Error ( 'Lexer group "'+ ID +'" already exist.' )
-				return Groups.list[ID] = m
+	var SINGLETON
+	, LexerRules =(function(){
+		var Dictionary =function( sId ){
+			var sGetError = '"$1" is not a lexer '+ sId
+			var sAddError = 'Lexer '+ sId +' "$1" already exist.'
+			return {
+				list: {},
+				add :function( ID, m ){
+					if( this.list[ID]) throw new Error ( sAddError.replace( '$1', ID ))
+					return this.list[ID] = m
+					},
+				get :function( ID ){
+					if( this.list[ID]) return this.list[ID]
+					throw new Error ( sGetError.replace( '$1', ID ))
+					},
+				have :function( ID ){
+					return this.list[ID]
+					}
 				}
 			}
-		var Tokens ={
-			list: {},
-			get :function( ID ){
-				var o = Tokens.list[ID]
-				if( ! o ) throw new Error ( 'Lexer: "'+ ID +'" is not a token.' )
-				else return o
-				},
-			add :function( ID, m ){
-				if( Tokens.list[ID]) throw new Error ( 'Lexer token "'+ ID +'" already exist.' )
-				return Tokens.list[ID] = m
-				}
-			}
+		, Rules=Dictionary('rule')
+		, Tokens=Dictionary('token')
 		return{
-			addGroup :function( o ){
+			CSS: {},
+			addCSSClass :function( m ){ // m = 'class1=TOKEN1|TOKEN2&class2=TOKEN3'
+				var o = this.CSS
+				var aCouples = m.constructor==Array ? m : m.split('&')
+				for(var i=0, s ; s=aCouples[i]; i++){
+					var aCouple = s.split('=')
+					var sClassName = aCouple[0]
+					var aTokens=aCouple[1].split('|')
+					for(var j=0, sToken; sToken=aTokens[j]; j++){
+						o[sToken] = o[sToken] ? o[sToken].split(' ') : []
+						o[sToken].push( sClassName )
+						o[sToken].sort()
+						o[sToken] = Array.unique( o[sToken]).join(' ')
+						}
+					}
+				},
+			Translation: {},
+			setTokensTranslation :function( m ){ // m = 'TOKEN1=NEWNAME1&TOKEN2=NEWNAME2'
+				var o = this.Translation
+				var aCouples = m.constructor==Array ? m : m.split('&')
+				for(var aCouple, sToken, i=0, ni=aCouples.length; i<ni ; i++ ){
+					aCouple = aCouples[i].split('=')
+					sToken = aCouple[0]
+					if( o[sToken]) throw Error ( 'Token Translation of '+ sToken +' already defined with '+ o[sToken] +' !' )
+					o[sToken] = aCouple[1]
+					}
+				},
+				
+			addRule :function( o ){
 				var a = []
 				for(var i=0; o.list[i]; i++ ){
 					var ID = o.list[i]
 					var oToken = Tokens.list[ID]
 					if( oToken ) a.push( oToken )
 					else {
-						var aGroup = Groups.list[ID]
-						a = Array.merge( a, aGroup )
+						var aRule = Rules.list[ID]
+						a = Array.merge( a, aRule )
 						}
 					}
-				return Groups.add( o.name, a )
+				return Rules.add( o.name, a )
 				},
-			addGroups :function( a ){
-				for(var i=0; a[i]; i++ ) LexerRules.addGroup( a[i])
+			addRules :function( a ){
+				for(var i=0; a[i]; i++ ) LexerRules.addRule( a[i])
 				},
-			getGroup :function( ID ){ return Groups.get( ID )},
-			isGroup :function( ID ){ return Groups.list[ID]},
+			getRule :function( ID ){ return Rules.get( ID )},
+			isRule :function( ID ){ return Rules.list[ID]},
 			addTokens :function( o ){
 				for(var i=0, aToken; aToken = o.list[i]; i++ )
 					Tokens.add( aToken[0], {
@@ -95,10 +120,10 @@ var MultiRegExpLexer =(function(){
 		startParent :function(){
 			sToken=sToken.slice( 2 )
 			eNewParent = LexerNode({
-				token:Translation[sToken]||sToken,
+				token: LexerRules.Translation[sToken]||sToken,
+				css: LexerRules.CSS[sToken]||'',
 				rule:sToken,
 				value:'',
-				css:CSS[sToken]||'',
 				index:eNode.oValue.index,
 				lineStart:this.nLine,
 				parentToken:this.sSyntax
@@ -112,43 +137,8 @@ var MultiRegExpLexer =(function(){
 			if( Skip.notFor[ this.sSyntax ])
 				while( this.eParent==eNewParent && this.readToken());
 			return eNewParent
-			}
+			} 
 		}
-	, CSS =(function(){
-		var o={}
-		o.add =function( aCLASSES ){
-			for(var i=0, aClass; aClass=aCLASSES[i]; i++)
-				for(var sCSS=aClass[0], aTOKENS=aClass[1].split('|'), j=0, sToken; sToken=aTOKENS[j]; j++)
-					o[sToken] = o[sToken] ? o[sToken]+' '+sCSS : sCSS
-			}
-		o.add([ // ['css class','token1|token2|...'], 'add' ne doit pas être un nom de token
-			['charset','CHARSET'],
-			['punctuator','PIPE|PUNCTUATOR'],
-			['repetition','QUANTIFIER1|QUANTIFIER2'],
-			['character','CHAR_ESCAPED|ANY|CHAR'],
-			['operator','UNARY_OPERATOR|LOGICAL_OPERATOR|ARITHMETIC_OPERATOR|ASSIGNMENT_OPERATOR|COMPARISON_OPERATOR'],
-			['linefeed','L_NEW_LINE'],
-			['whitespaces','WHITE_SPACES'],
-			['tab','TAB'],
-			['space','SPACES|TAB'],
-			['undefined','NOT_WHITE_SPACES|BACKSLASH'],
-			['string','SSQ|SDQ'],
-			['comment','SLC|MLC'],
-			['regexp','R_REGULAR_EXPRESSION'],
-			['number','NUMBER'],
-			['block','JS_BRACE|PHP_BRACE'],
-			['punctuator','ELISION|LBRACE|RBRACE|LPAREN|RPAREN|LBRACK|RBRACK|DOT|SEMI|QUESTION|COLON'],
-			['elision','ELISION'],
-			['identifier','JS_IDENTIFIER|PHP_IDENTIFIER'],
-			['keyword','JS_KEYWORD|PHP_KEYWORD|PHP_RESERVED'],
-			['literal','JS_LITERAL|PHP_LITERAL'],
-			['tag','S_PHP|E_PHP'],
-			['php','PHP'],
-			['special','PHP_SPECIAL_VARS'],
-			['function','PHP_FUNCTION']
-			])
-		return o
-		})()
 	, Previous =(function(){
 		var o =function(){
 			var s = ''
@@ -157,7 +147,7 @@ var MultiRegExpLexer =(function(){
 					return o.ofToken[sToken] && o.ofToken[sToken].indexOf(s)<0
 					},
 				set :function( sToken ){
-					if( !o.excluded[sToken]) s = Translation[sToken]||sToken
+					if( !o.excluded[sToken]) s = LexerRules.Translation[sToken]||sToken
 					},
 				get :function(){ return s }
 				}
@@ -199,15 +189,6 @@ var MultiRegExpLexer =(function(){
 				}
 			}
 		}
-	, Translation ={
-		'L_NEW_LINE':'NEW_LINE',
-		'R_REGULAR_EXPRESSION':'REGULAR_EXPRESSION',
-		'SSQ':'STRING','S_SSQ':'SINGLE_QUOTE','E_SSQ':'SINGLE_QUOTE',
-		'SDQ':'STRING','S_SDQ':'DOUBLE_QUOTE','E_SDQ':'DOUBLE_QUOTE',
-		'SLC':'COMMENT','MLC':'COMMENT',
-		'JS_BRACE':'BRACE','S_JS_BRACE':'LBRACE','E_JS_BRACE':'RBRACE',
-		'PHP_BRACE':'BRACE','S_PHP_BRACE':'LBRACE','E_PHP_BRACE':'RBRACE'
-		}
 	, Skip =(function(){
 		var o = function( that ){
 			var f = that.bSkip
@@ -228,17 +209,14 @@ var MultiRegExpLexer =(function(){
 		if( sText ) return SINGLETON.scan( sText, sSyntax )
 		}
 	Lexer.union({
-		CSS: CSS,
 		Previous: Previous,
 		Rules: LexerRules,
 		Skip: Skip,
-		Stack: Stack,
-		Translation: Translation
+		Stack: Stack
 		})
 	Lexer.prototype ={
-		sSyntax: null,
 		end :function(){
-			if( this.sText.length ) alert("Error Scanning !")
+			if( this.sText.length ) alert("Incomplete Scanning !")
 			return this.eRoot
 			},
 
@@ -261,9 +239,12 @@ var MultiRegExpLexer =(function(){
 				: this.eParent.appendChild( e )
 			},
 		init :function( sText, sSyntax ){
-			this.union({ nLine:1, nPos:0, sText:sText,
-				stack:Stack(this),
+			this.union({
+				nLine:1,
+				nPos:0,
+				sText:sText,
 				skip:Skip(this),
+				stack:Stack(this),
 				previous:Previous()
 				})
 			sSyntax = sSyntax || 'RegExp'
@@ -277,7 +258,7 @@ var MultiRegExpLexer =(function(){
 				}))
 			},
 		readToken :function(){
-			var a = LexerRules.getGroup( this.sSyntax )
+			var a = LexerRules.getRule( this.sSyntax )
 			bNoSkip = Skip.notFor[ this.sSyntax ]
 			for(var i=0; a[i]; i++ ){
 				if( ! a[i].re.test( this.sText ) || this.previous.invalidFor( a[i].name )) continue;
@@ -285,10 +266,10 @@ var MultiRegExpLexer =(function(){
 				if( nMatchLength = aMatch[0].length ){
 					sToken = a[i].name
 					eNode = LexerNode({
-						token:Translation[sToken]||sToken,
+						token: LexerRules.Translation[sToken]||sToken,
+						css: LexerRules.CSS[sToken]||'',
 						rule:sToken,
 						value:aMatch[0],
-						css:CSS[sToken]||'',
 						index:this.nPos,
 						lineStart:this.nLine,
 						lineEnd:this.nLine,

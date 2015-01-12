@@ -1,30 +1,91 @@
 // LexerNode REQUIS
-var throwError=function( s ){ alert(s);throw Error ( s );}
 
 var AutomatonLexer =(function(){
 	var SINGLETON
-	// Fonction comprimant les automates
-	,f=function( sCharSet, bIn ){
-		var cache = {}
-		for(var i=0, ni=sCharSet.length; i<ni; i++ ) cache[ sCharSet[i]] = -1
-		return bIn
-			? function(symb,state){ return cache[symb] ? state : -1 }
-			: function(symb,state){ return cache[symb] || state }
-		}
-	,g=function( /* sSymb1, ... */ ){ 
-		var o = {}
-		for(var i=0, ni=arguments.length; i<ni; i++ ) o[ arguments[i]] = i
-		return o
-		}
-	,h=function( nLength, nDefaultValue /*,  nIndex1, nValue1, ...*/){
-		var a = []
-		var o = {}
-		for(var i=2, ni=arguments.length; i<ni; i=i+2 ) o[ arguments[i]] = arguments[i+1]
-		for(var i=0; i<nLength; i++ ) a[i] = o[i]!=undefined ? o[i] : nDefaultValue
-		return a
-		}
+	, LexerRules =(function(){
+		var Dictionary =function( sId ){
+			var sGetError = '"$1" is not a lexer '+ sId
+			var sAddError = 'Lexer '+ sId +' "$1" already exist.'
+			return {
+				list: {},
+				add :function( ID, m ){
+					if( this.list[ID]) throw new Error ( sAddError.replace( '$1', ID ))
+					return this.list[ID] = m
+					},
+				get :function( ID ){
+					if( this.list[ID]) return this.list[ID]
+					throw new Error ( sGetError.replace( '$1', ID ))
+					},
+				have :function( ID ){
+					return this.list[ID]
+					}
+				}
+			}
+		, Rules = Dictionary('rule')
+		, DFA = Dictionary('DFA')
+		return{
+			CSS: {},
+			addCSSClass :function( m ){ // m = 'class1=TOKEN1|TOKEN2&class2=TOKEN3'
+				var o = this.CSS
+				var aCouples = m.constructor==Array ? m : m.split('&')
+				for(var i=0, s ; s=aCouples[i]; i++){
+					var aCouple = s.split('=')
+					var sClassName = aCouple[0]
+					var aTokens=aCouple[1].split('|')
+					for(var j=0, sToken; sToken=aTokens[j]; j++){
+						o[sToken] = o[sToken] ? o[sToken].split(' ') : []
+						o[sToken].push( sClassName )
+						o[sToken].sort()
+						o[sToken] = Array.unique( o[sToken]).join(' ')
+						}
+					}
+				},
+			Translation: {},
+			setTokensTranslation :function( m ){ // m = 'TOKEN1=NEWNAME1&TOKEN2=NEWNAME2'
+				var o = this.Translation
+				var aCouples = m.constructor==Array ? m : m.split('&')
+				for(var aCouple, sToken, i=0, ni=aCouples.length; i<ni ; i++ ){
+					aCouple = aCouples[i].split('=')
+					sToken = aCouple[0]
+					if( o[sToken]) throw Error ( 'Token Translation of '+ sToken +' already defined with '+ o[sToken] +' !' )
+					o[sToken] = aCouple[1]
+					}
+				},
+
+			DFA: DFA,
+			addRule :function( sName, aTokens ){
+				return Rules.add( sName, aTokens )
+				},
+			addRules :function( aRules ){
+				for(var i=0, aRule; aRule=aRules[i]; i++ )
+					Rules.add( aRule[0], aRule[1].split('|'))
+				},
+			haveRule :function( sName ){
+				return Rules.have( sName )
+				},
+			addTokenFromString :function( sName, sDFA ){
+				var o;
+				eval('o='+sDFA);
+				if( ! o.TokensTable ) o.TokensTable = [,sName]
+				DFA.add( sName, o )
+				},
+			addTokens :function( aTokens ){
+				if( aTokens.length )
+					for(var i=0, aToken; aToken=aTokens[i]; i++ ){
+						var sName=aToken[0], oDFA=aToken[1]
+						DFA.add( sName, oDFA )
+						if( ! oDFA.TokensTable ) oDFA.TokensTable = [,sName]
+						}
+				},
+			setPreviousTokenOf :function( sToken, sPreviousTokens ){
+				if( Previous.ofToken[sToken]) throw new Error ( 'Previous token of '+ sToken +' already defined !' )
+				Previous.ofToken[sToken] = sPreviousTokens
+				}
+			}
+		})()
+	
 	// ...
-	,nextState =function( oFA, sStateI, sChar ){
+	, nextState =function( oFA, sStateI, sChar ){
 		var cache = oFA.cache || ( oFA.cache = [] )
 		cache = cache[sStateI] || ( cache[sStateI] = {} )
 		if( cache[sChar]) return cache[sChar]
@@ -38,19 +99,9 @@ var AutomatonLexer =(function(){
 				})())
 			|| -2 
 		}
-	,finalizeParent =function( eNode ){
-		eNode.oValue.lineEnd = eNode.lastChild && eNode.lastChild.oValue.lineEnd || 1
-		if( eNode.setTitle ) eNode.setTitle()
-		return eNode
-		}
+
 	// Données d'analyse
-	, DFA ={
-		WHITE_SPACES:{A:g("[\t \n\r\f]"),R:[[0,f("\t \n\r\f",1)]],M:[[],[2],[2]],F:[,,1],TokensTable:[,'WHITE_SPACES']},
-		NOT_WHITE_SPACES:{A:{"[^\t \n\r\f]":0},R:[[0,f("\t \n\r\f")]],M:[[1],[1]],F:{1:1},TokensTable:[,'NOT_WHITE_SPACES']},
-		TXT:{A:g("\n","[^\t\n\f\r ]","\t","\f","\r"," "),R:[[1,f("\t\n\f\r ")]],M:[[],[5,3,4,5,2,6],[5],[,3]],F:[,,3,5,2,3,4],TokensTable:',,TAB,L_NEW_LINE,SPACES,TEXT'.split(',')}
-		}
-	, Rules ={}
-	, sWSTokens ='|WHITE_SPACES|SPACES|SPACE|NEW_LINE|L_NEW_LINE|TAB|'
+	var sWSTokens ='|WHITE_SPACES|SPACES|SPACE|NEW_LINE|L_NEW_LINE|TAB|'
 	, sToken, eNode, bNoSkip
 	, Actions ={
 		add :function(){
@@ -60,7 +111,7 @@ var AutomatonLexer =(function(){
 		endParent :function( bPartialScan ){
 			this.previous.set( this.eParent.oValue.token )
 			this.appendNode( eNode )
-			this.stackPop( bPartialScan )
+			this.stack.pop( bPartialScan )
 			return eNode
 			},
 		newLine :function(){
@@ -78,21 +129,21 @@ var AutomatonLexer =(function(){
 			eNode.oValue.value = eNode.innerHTML = ''
 			eNode.oValue.rule = sRule
 			var eParent = this.appendNode( eNode )
-			this.stackPush( eNode )
+			this.stack.push( eNode )
 			this.previous.set( eNode.oValue.token )
 			this.sText = this.sText.slice( 0, nEnd )
 			do{ this.readToken()}while( this.nPos < nEnd )
 			this.sText = sTMP
-			this.stackPop( bPartialScan )
+			this.stack.pop( bPartialScan )
 			return eParent
 			},
 		startParent :function(){
 			sToken = sToken.slice( 2 )
 			var eNewParent = LexerNode({
-				token: Translation[sToken]||sToken,
+				token: LexerRules.Translation[sToken]||sToken,
+				css: LexerRules.CSS[sToken]||'',
 				rule:sToken,
 				value:'',
-				css:CSS[sToken]||'',
 				index:eNode.oValue.index,
 				lineStart:this.nLine,
 				parentToken:this.eParent.oValue.rule
@@ -102,13 +153,12 @@ var AutomatonLexer =(function(){
 			eNewParent.appendChild( eNode )
 			this.previous.set( eNode.oValue.token )
 			this.appendNode( eNewParent )
-			this.stackPush( eNewParent )
+			this.stack.push( eNewParent )
 			if( Skip.notFor[ this.sSyntax ])
 				while( this.eParent==eNewParent && this.readToken());
 			return eNewParent
 			}
 		}
-	, CSS ={}
 	, Previous =(function(){
 		var o =function(){
 			var s = ''
@@ -117,7 +167,7 @@ var AutomatonLexer =(function(){
 					return o.ofToken[sToken] && o.ofToken[sToken].indexOf(s)<0
 					},
 				set :function( sToken ){
-					if( !o.excluded[sToken]) s = Translation[sToken]||sToken
+					if( !o.excluded[sToken]) s = LexerRules.Translation[sToken]||sToken
 					},
 				get :function(){ return s }
 				}
@@ -136,7 +186,45 @@ var AutomatonLexer =(function(){
 			})
 		return o
 		})()
-	, Translation ={}
+	, Stack =function( that ){
+		var a = []
+		return {
+		//	value: a,
+			pop :function( bPartialScan ){
+				if( bPartialScan ){
+					if( that.eEndToken && that.eParent==that.eEndToken.parentNode ){
+						// Efface tous les éléments après la fin du parent dans celui-ci
+						for(var e=that.eEndToken; e;){
+							var eTMP = e
+							e = e.nextSibling
+							that.eParent.removeChild( eTMP )
+							}
+						// New End Token
+						that.eEndToken = that.eParent.nextSibling
+						}
+					}
+				// A faire après suppression des éléments inutiles
+				if( a.length ){
+					var e = a.pop()
+					e.oValue.lineEnd = e.lastChild && e.lastChild.oValue.lineEnd || 1
+					if( e.setTitle ) e.setTitle()
+					}
+				if( a.length ){
+					if( that.eParent==that.eScanParent ) that.eScanParent = a[a.length-1]
+					that.eParent = a[a.length-1]
+					that.sSyntax = that.eParent.oValue.rule
+					}
+				return a.length
+				},
+			push :function( e ){
+				a.push( that.eParent = e )
+				that.sSyntax = e.oValue.rule
+				return e
+				},
+			top :function(){ return a[a.length-1] },
+			unshift :function( e ){ a.unshift(e) }
+			}
+		}
 	, Skip =(function(){
 		var o = function( that ){
 			var f = that.bSkip
@@ -153,84 +241,47 @@ var AutomatonLexer =(function(){
 		o.notFor={SSQ:1,SDQ:1,MLC:1,SLC:1,REGULAR_EXPRESSION:1}
 		return o
 		})()
-	, Lexer =function( sText, sLexerRule ){
-		if( sText ) return SINGLETON.scan( sText, sLexerRule )
+	, Lexer =function( sText, sSyntax ){
+		if( sText ) return SINGLETON.scan( sText, sSyntax )
 		}
 	Lexer.union({
 		Previous: Previous,
-		bConsole: false,
-		console :function( sType, sText ){
-			if( Lexer.bConsole && window.console ) console[sType]( sText )
-			},
+		Rules: LexerRules,
+		Skip: Skip,
+		Stack: Stack,
+
 	// ...
 		rescan :function( eRoot, sSource, nPos, nDeleted, nAdded ){
 			return SINGLETON.rescan( eRoot, sSource, nPos, nDeleted, nAdded )
 			},
 	// Ajout de données
-		insert :function( fModule ){ fModule( Lexer, f, g, h )},
-		addCSSClass :function( sCSSClasses ){ // sCSSClasses = 'class1=TOKEN1|TOKEN2&class2=TOKEN3'
-			var o = CSS
-			for(var aCouple, i=0, aCouples=sCSSClasses.split('&'), ni=aCouples.length; i<ni ; i++ ){
-				aCouple = aCouples[i].split('=')
-				var sCSS = aCouple[0]
-				for(var sToken, j=0, aTokens=aCouple[1].split('|'), nj=aTokens.length; j<nj ; j++ ){
-					sToken = aTokens[j]
-					o[ sToken ] = o[ sToken ] ? o[ sToken ].split(' ') : []
-					o[ sToken ].push( sCSS )
-					o[ sToken ] = Array.unique( o[ sToken ]).join(' ')
-					}
+		insert :function( fModule ){
+			// Fonctions comprimant la taille des automates
+			var f=function( sCharSet, bIn ){
+				var cache = {}
+				for(var i=0, ni=sCharSet.length; i<ni; i++ ) cache[ sCharSet[i]] = -1
+				return bIn
+					? function(symb,state){ return cache[symb] ? state : -1 }
+					: function(symb,state){ return cache[symb] || state }
 				}
-			},
-		addRule :function( sName, aTokens ){
-			if( Rules[sName]) Lexer.console('warn', 'Règle '+ sName +' modifiée.' )
-			Rules[sName] = aTokens
-			},
-		addRules :function( aRules ){
-			if( aRules.length )
-				for(var i=0, aRule; aRule=aRules[i]; i++ )
-					Lexer.addRule( aRule[0], aRule[1].split('|'))
-			},
-		addTokenFromString :function( sName, sDFA ){
-			var o;
-			eval('o='+sDFA);
-			if( ! o.TokensTable ) o.TokensTable = [,sName]
-			DFA[sName]=o
-			},
-		addTokens :function( aTokens ){
-			if( aTokens.length )
-				for(var i=0, aToken; aToken=aTokens[i]; i++ ){
-					var oDFA = aToken[1], sName = aToken[0]
-					if( DFA[ sName ]) Lexer.console('warn', 'Token '+ sName +' modifié.' )
-					DFA[ sName ] = oDFA
-					if( ! oDFA.TokensTable ) oDFA.TokensTable = [,sName]
-					}
-			},
-		setPreviousTokenOf :function( sToken, sPreviousTokens ){
-			if( Previous.ofToken[sToken]) throw new Error ( 'Previous token of '+ sToken +' already defined !' )
-			Previous.ofToken[sToken] = sPreviousTokens
-			},
-		setTokensTranslation :function( sTranslations ){ // sTranslations = 'TOKEN1=NEWNAME1&TOKEN2=NEWNAME2'
-			var o = Translation
-			for(var aCouple, sToken, i=0, aCouples=sTranslations.split('&'), ni=aCouples.length; i<ni ; i++ ){
-				aCouple = aCouples[i].split('=')
-				sToken = aCouple[0]
-				if( o[sToken]) Lexer.console('warn', 'Token Translation of '+ sToken +' already defined with '+ o[sToken] +' !' )
-				o[sToken] = aCouple[1]
+			var g=function( /* sSymb1, ... */ ){ 
+				var o = {}
+				for(var i=0, ni=arguments.length; i<ni; i++ ) o[ arguments[i]] = i
+				return o
 				}
+			var h=function( nLength, nDefaultValue /*,  nIndex1, nValue1, ...*/){
+				var a = []
+				var o = {}
+				for(var i=2, ni=arguments.length; i<ni; i=i+2 ) o[ arguments[i]] = arguments[i+1]
+				for(var i=0; i<nLength; i++ ) a[i] = o[i]!=undefined ? o[i] : nDefaultValue
+				return a
+				}
+			fModule( LexerRules, f, g, h )
 			}
 		})
 	Lexer.prototype ={
-		aStack:null,
-		nLine:null,
-		nPos:null,
-		sText:null,
-		
-		analyse :function(){
-			while( this.readToken());
-			while( this.aStack.length ) finalizeParent( this.aStack.pop())
-			},		
 		searchToken :function( sToken, nStart ){
-			var oFA=DFA[sToken], nEnd=nStart, sState=1, oMatched=null
+			var oFA=LexerRules.DFA.have( sToken ), nEnd=nStart, sState=1, oMatched=null
 			if( this.previous.invalidFor( sToken )) return false;
 			while( ( sState = nextState( oFA, sState, this.sText.charAt( nEnd++ ))) > 0 ){
 				if( oFA.F[ sState ]){
@@ -241,35 +292,7 @@ var AutomatonLexer =(function(){
 				}
 			return oMatched
 			},
-		stackPop :function( bPartialScan ){
-			var a = this.aStack
-			if( bPartialScan ){
-				if( this.eEndToken && this.eParent==this.eEndToken.parentNode ){
-					// Efface tous les éléments après la fin du parent dans celui-ci
-					for(var e=this.eEndToken; e;){
-						var eTMP = e
-						e = e.nextSibling
-						this.eParent.removeChild( eTMP )
-						}
-					// New End Token
-					this.eEndToken = this.eParent.nextSibling
-					}
-				}
-			// A faire après suppression des éléments inutiles
-			if( a.length ) finalizeParent( a.pop()) 
-			if( a.length ){
-				if( this.eParent==this.eScanParent ) this.eScanParent = a[a.length-1]
-				this.eParent = a[a.length-1]
-				this.sSyntax = this.eParent.oValue.rule
-				}
-			return a.length
-			},
-		stackPush :function( e ){
-			this.aStack.push( this.eParent = e )
-			this.sSyntax = e.oValue.rule
-			return e
-			},
-
+		
 		bSkip: 0,
 		eParent:null,
 		action :function( bPartialScan ){
@@ -297,14 +320,15 @@ var AutomatonLexer =(function(){
 			this.union({
 				nLine: 1,
 				nPos: 0,
-				skip:Skip(this),
-				previous:Previous(),
 				sText: sText,
+				skip:Skip(this),
+				stack:Stack(this),
+				previous:Previous(),
 				sSyntax: sRule,
 				eRoot: e,
-				eParent: e,
-				aStack: [e]
+				eParent: e
 				})
+			this.stack.push( e )
 			this.appendNode =function( e ){
 				return this.skip( e.oValue.token )
 					? true
@@ -314,17 +338,17 @@ var AutomatonLexer =(function(){
 			},
 		readToken :function( bPartialScan ){
 			var sParentToken=this.eParent.oValue.rule
-			, a=Rules[sParentToken]||[sParentToken]
+			, a=LexerRules.haveRule( sParentToken )||[sParentToken]
 			, o
 			bNoSkip = Skip.notFor[ sParentToken ]
 			for(var j=0; sToken=a[j]; j++){
 				if( o = this.searchToken( sToken, this.nPos )){
 					sToken = o.token
 					eNode = LexerNode({
-						token:Translation[sToken]||sToken,
+						token: LexerRules.Translation[sToken]||sToken,
+						css: LexerRules.CSS[sToken]||'',
 						rule:sParentToken,
 						value:this.sText.substring(o.start,o.end),
-						css:CSS[sToken]||'',
 						index:this.nPos,
 						lineStart:this.nLine,
 						lineEnd:this.nLine,
@@ -335,11 +359,11 @@ var AutomatonLexer =(function(){
 					return this.action( bPartialScan )
 					}
 				}
-			return this.stackPop( bPartialScan ) ? true : null
+			return this.stack.pop( bPartialScan ) ? true : null
 			},
-		scan :function( sSource, sRuleName ){
-			this.init( sSource, sRuleName )
-			this.analyse()
+		scan :function( sText, sSyntax ){
+			this.init( sText, sSyntax )
+			while( this.readToken());
 			return this.eRoot
 			}
 		}
@@ -369,7 +393,6 @@ var AutomatonLexer =(function(){
 		haveNode :function( eNode ){
 			if( ! this.eEndToken ) return false
 			var o1 = eNode.oValue
-		//	console.info( JSON.stringify( o1 ))
 			// Efface les éléments dépassés par le nouveau token eNode
 			while( this.eEndToken && this.eEndToken.oValue.index + this.nShift < o1.index )
 			// pas <= sinon autant faire une analyse totale
@@ -379,7 +402,7 @@ var AutomatonLexer =(function(){
 			// Si le nouveau token est 'identique' à eEndToken
 			if( o2 && o1.token==o2.token && o1.value==o2.value && o1.index==o2.index+this.nShift ){
 				// 1. Contrôle si les tokens sont bien identique = ont le même parent
-				if( this.aStack[this.aStack.length-1] !== this.eEndToken.parentNode )
+				if( this.stack.top() !== this.eEndToken.parentNode )
 					this.getNextEndToken()
 				// 2. FIN ANALYSE: Met à jour les éléments suivant ( index et ligne ) 
 				else{
@@ -465,7 +488,7 @@ var AutomatonLexer =(function(){
 				}
 					
 			if( ePrevious && eNext && ePrevious.parentNode != eNext.parentNode )
-				throwError( 'Pas le même parent ! final' )
+				throw Error( 'Pas le même parent ! final' )
 			return {
 				before: ! e ? this.eRoot.lastChild: ePrevious,
 				after: eNext
@@ -514,12 +537,12 @@ var AutomatonLexer =(function(){
 				}
 			this.nLineEnd = this.eEndToken ? this.eEndToken.oValue.lineStart : eRoot.oValue.lineEnd
 			var nLineStart = this.nLine
-			this.aStack = []
+			this.stack = Stack(this)
 			for(var e=this.eParent; e; e=e.parentNode ){
-				this.aStack.unshift( e )
+				this.stack.unshift( e )
 				if( e==eRoot ) break;
 				}
-			this.analyse()
+			while( this.readToken());
 			var nLineShift = eRoot.oValue.lineEnd-nRootOldLineEnd 
 			if( nLineShift>=0 ) this.nLineEnd = this.eEndToken ? this.eEndToken.oValue.lineStart : eRoot.oValue.lineEnd
 			this.eEndToken = null
@@ -554,7 +577,16 @@ var AutomatonLexer =(function(){
 			}
 		})
 
+	// Analyse par défaut: fichier .txt
+	Lexer.insert(function(o,f,g,h){
+		o.addTokens([
+			['WHITE_SPACES',{A:g("[\t \n\r\f]"),R:[[0,f("\t \n\r\f",1)]],M:[[],[2],[2]],F:[,,1],TokensTable:[,'WHITE_SPACES']}],
+			['NOT_WHITE_SPACES',{A:{"[^\t \n\r\f]":0},R:[[0,f("\t \n\r\f")]],M:[[1],[1]],F:{1:1},TokensTable:[,'NOT_WHITE_SPACES']}],
+			['TXT',{A:g("\n","[^\t\n\f\r ]","\t","\f","\r"," "),R:[[1,f("\t\n\f\r ")]],M:[[],[5,3,4,5,2,6],[5],[,3]],F:[,,3,5,2,3,4],TokensTable:',,TAB,L_NEW_LINE,SPACES,TEXT'.split(',')}]
+			])
+		o.addCSSClass( 'whitespaces=WHITE_SPACES&undefined=NOT_WHITE_SPACES' )
+		})
+		
 	SINGLETON = new Lexer
-	Lexer.addCSSClass( 'whitespaces=WHITE_SPACES&undefined=NOT_WHITE_SPACES' )
 	return Lexer
 	})()

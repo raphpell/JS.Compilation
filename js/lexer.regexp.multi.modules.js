@@ -1,6 +1,6 @@
 ;(function(){ // Languages definition
 	var o = MultiRegExpLexer.Rules
-	// REGEXP LANGUAGE
+	// SimpleRegexp = Sample test
 	o.addTokens({ list:[
 		['CHARSET',/\[\^?|\]|\-/],
 		['PIPE',/\|/],
@@ -11,7 +11,7 @@
 		['ANY',/\./],
 		['CHAR',/[^\(\)\\\|\.\[\]\*\+\?\{\-]/]
 		]})
-	o.addGroup({name:'RegExp', list:'CHARSET,PIPE,PUNCTUATOR,QUANTIFIER1,QUANTIFIER2,CHAR_ESCAPED,ANY,CHAR'.split(',')})
+	o.addRule({name:'SimpleRegExp', list:'CHARSET,PIPE,PUNCTUATOR,QUANTIFIER1,QUANTIFIER2,CHAR_ESCAPED,ANY,CHAR'.split(',')})
 	// JS + PHP LANGUAGE
 	o.addTokens({ list:[
 		['ELISION',/,/],
@@ -59,7 +59,7 @@
 		['PHP_IDENTIFIER',/\$[\w_][\w\d_]*\b/],
 		['PHP_FUNCTION',/\b\w[\w\d_]*\b/]
 		]})
-	o.addGroups([
+	o.addRules([
 		{name:'JS', list:[
 			'L_NEW_LINE','SPACES','TAB',
 			'JS_KEYWORD','JS_LITERAL','JS_IDENTIFIER',
@@ -91,5 +91,41 @@
 		{name:'SDQ', list:'L_NEW_LINE,TAB,SPACES,SDQ_IN,E_SDQ,BACKSLASH'.split(',')},
 		{name:'MLC', list:'L_NEW_LINE,TAB,SPACES,E_MLC,MLC_IN'.split(',')},
 		{name:'SLC', list:'TAB,SPACES,SLC_IN'.split(',')}
+		])
+	// ...
+	o.addCSSClass([
+		'charset=CHARSET',
+		'punctuator=PIPE|PUNCTUATOR',
+		'repetition=QUANTIFIER1|QUANTIFIER2',
+		'character=CHAR_ESCAPED|ANY|CHAR',
+		'operator=UNARY_OPERATOR|LOGICAL_OPERATOR|ARITHMETIC_OPERATOR|ASSIGNMENT_OPERATOR|COMPARISON_OPERATOR',
+		'linefeed=L_NEW_LINE',
+		'whitespaces=WHITE_SPACES',
+		'tab=TAB',
+		'space=SPACES|TAB',
+		'undefined=NOT_WHITE_SPACES|BACKSLASH',
+		'string=SSQ|SDQ',
+		'comment=SLC|MLC',
+		'regexp=R_REGULAR_EXPRESSION',
+		'number=NUMBER',
+		'block=JS_BRACE|PHP_BRACE',
+		'punctuator=ELISION|LBRACE|RBRACE|LPAREN|RPAREN|LBRACK|RBRACK|DOT|SEMI|QUESTION|COLON',
+		'elision=ELISION',
+		'identifier=JS_IDENTIFIER|PHP_IDENTIFIER',
+		'keyword=JS_KEYWORD|PHP_KEYWORD|PHP_RESERVED',
+		'literal=JS_LITERAL|PHP_LITERAL',
+		'tag=S_PHP|E_PHP',
+		'php=PHP',
+		'special=PHP_SPECIAL_VARS',
+		'function=PHP_FUNCTION'
+		])
+	o.setTokensTranslation([
+		'L_NEW_LINE=NEW_LINE',
+		'R_REGULAR_EXPRESSION=REGULAR_EXPRESSION',
+		'SSQ=STRING','S_SSQ=SINGLE_QUOTE','E_SSQ=SINGLE_QUOTE',
+		'SDQ=STRING','S_SDQ=DOUBLE_QUOTE','E_SDQ=DOUBLE_QUOTE',
+		'SLC=COMMENT','MLC=COMMENT',
+		'JS_BRACE=BRACE','S_JS_BRACE=LBRACE','E_JS_BRACE=RBRACE',
+		'PHP_BRACE=BRACE','S_PHP_BRACE=LBRACE','E_PHP_BRACE=RBRACE'
 		])
 	})();

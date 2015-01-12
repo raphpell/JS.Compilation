@@ -1,6 +1,6 @@
-if( AutomatonLexer.addCSSClass ){
-AutomatonLexer.addCSSClass('whitespaces=WHITE_SPACES&undefined=NOT_WHITE_SPACES' )
+if( AutomatonLexer.insert ){
 AutomatonLexer.insert(function(o,f,g,h){
+o.addCSSClass('whitespaces=WHITE_SPACES&undefined=NOT_WHITE_SPACES' )
 
 // WHITESPACES
 o.addTokens([
@@ -34,17 +34,19 @@ o.addTokens([
 	])
 o.addCSSClass("tag=S_PHP&elt=E_HTMLScript")
 
+
 // INI
 o.addTokens([
-["INI",{A:g("[^\t\n\f\r !\"&();=[]^{|}~flnseouatry]","a","e","f","l","n","o","r","s","t","u","y","\n","\t","\f","\r"," ",";","=","[","[!\"&()]^{|}~]"),M:[,[2,2,2,5,2,8,12,2,2,14,2,16,19,20,19,18,21,22,23,24,25],h(12,2),h(12,2),h(12,2,2,3),h(12,2,1,6),h(12,2,4,7),h(12,2,8,4),h(12,2,6,9,10,10),h(12,2,5,4),h(12,2,4,11),h(12,2,4,3),h(12,2,3,13,5,3),h(12,2,3,3),h(12,2,7,15),h(12,2,10,4),h(12,2,2,17),h(12,2,8,3),{12:19}],F:[,,8,9,8,8,8,8,8,9,8,8,8,8,8,8,8,8,2,2,1,3,4,5,6,7],R:[[0,f("\t\n\f\r !\"&();=[]^{|}~flnseouatry")],[20,f("!\"&()]^{|}~",1)]],TokensTable:',TAB,L_NEW_LINE,SPACES,S_INI_COMMENT,S_INI_VALUE,S_INI_SECTION,INI_TMP,INI_VAR,INI_KEYWORD'.split(',')}],
-["INI_COMMENT",{A:g("[\t ]","[^\n\f\r \t]"),M:[,[2,2],[2,2]],F:[,,1],R:[[0,f("\t ",1)],[1,f("\n\f\r \t")]],TokensTable:[,'INI_COMMENT_IN']}],
-["INI_SECTION",{A:g("[^\t\n\f\r ]]","\t"," ","]"),M:[,[2,3,4,5],[2]],F:[,,3,1,2,4],R:[[0,f("\t\n\f\r ]")]],TokensTable:[,'TAB','SPACES','INI_SECTION_IN','E_INI_SECTION']}],
-["INI_VALUE",{A:g("[^\t\n\f\r \"';]","\t"," ","\"","'"),M:[,[2,3,4,5,6],[2]],F:[,,5,1,2,3,4],R:[[0,f("\t\n\f\r \"';")]],TokensTable:[,'TAB','SPACES','S_INI_SDQ','S_INI_SSQ','INI_VALUE_IN']}],
-["INI_SDQ",{A:g("[^\t\n\f\r \"\\]","\\","\"","\t"," "),M:[,[3,2,6,4,5],[3,3,3],[3,2]],F:[,,,4,1,2,3],R:[[0,f("\t\n\f\r \"\\")]],TokensTable:[,'TAB','SPACES','E_INI_SDQ','INI_SDQ_IN']}],
-["INI_SSQ",{A:g("\n","[^\t\n\f\r ']","\t","\f","\r"," ","'"),M:[,[5,3,4,5,2,6,7],[5],[,3]],F:[,,2,5,1,2,3,4],R:[[1,f("\t\n\f\r '")]],TokensTable:[,'TAB','L_NEW_LINE','SPACES','E_INI_SSQ','INI_SSQ_IN']}]
-])
+	["INI",{A:g("[^\t\n\f\r !\"&();=[]^{|}~flnseouatry]","a","e","f","l","n","o","r","s","t","u","y","\n","\t","\f","\r"," ",";","=","[","[!\"&()]^{|}~]"),M:[,[2,2,2,5,2,8,12,2,2,14,2,16,19,20,19,18,21,22,23,24,25],h(12,2),h(12,2),h(12,2,2,3),h(12,2,1,6),h(12,2,4,7),h(12,2,8,4),h(12,2,6,9,10,10),h(12,2,5,4),h(12,2,4,11),h(12,2,4,3),h(12,2,3,13,5,3),h(12,2,3,3),h(12,2,7,15),h(12,2,10,4),h(12,2,2,17),h(12,2,8,3),{12:19}],F:[,,8,9,8,8,8,8,8,9,8,8,8,8,8,8,8,8,2,2,1,3,4,5,6,7],R:[[0,f("\t\n\f\r !\"&();=[]^{|}~flnseouatry")],[20,f("!\"&()]^{|}~",1)]],TokensTable:',TAB,L_NEW_LINE,SPACES,S_INI_COMMENT,S_INI_VALUE,S_INI_SECTION,INI_TMP,INI_VAR,INI_KEYWORD'.split(',')}],
+	["INI_COMMENT",{A:g("[\t ]","[^\n\f\r \t]"),M:[,[2,2],[2,2]],F:[,,1],R:[[0,f("\t ",1)],[1,f("\n\f\r \t")]],TokensTable:[,'INI_COMMENT_IN']}],
+	["INI_SECTION",{A:g("[^\t\n\f\r ]]","\t"," ","]"),M:[,[2,3,4,5],[2]],F:[,,3,1,2,4],R:[[0,f("\t\n\f\r ]")]],TokensTable:[,'TAB','SPACES','INI_SECTION_IN','E_INI_SECTION']}],
+	["INI_VALUE",{A:g("[^\t\n\f\r \"';]","\t"," ","\"","'"),M:[,[2,3,4,5,6],[2]],F:[,,5,1,2,3,4],R:[[0,f("\t\n\f\r \"';")]],TokensTable:[,'TAB','SPACES','S_INI_SDQ','S_INI_SSQ','INI_VALUE_IN']}],
+	["INI_SDQ",{A:g("[^\t\n\f\r \"\\]","\\","\"","\t"," "),M:[,[3,2,6,4,5],[3,3,3],[3,2]],F:[,,,4,1,2,3],R:[[0,f("\t\n\f\r \"\\")]],TokensTable:[,'TAB','SPACES','E_INI_SDQ','INI_SDQ_IN']}],
+	["INI_SSQ",{A:g("\n","[^\t\n\f\r ']","\t","\f","\r"," ","'"),M:[,[5,3,4,5,2,6,7],[5],[,3]],F:[,,2,5,1,2,3,4],R:[[1,f("\t\n\f\r '")]],TokensTable:[,'TAB','L_NEW_LINE','SPACES','E_INI_SSQ','INI_SSQ_IN']}]
+	])
 o.addCSSClass("keyword=INI_KEYWORD&var=INI_VAR&undefined=INI_TMP&comment=INI_COMMENT&section=INI_SECTION_IN&value=INI_VALUE&punctuator=S_INI_VALUE&string=INI_SDQ|INI_SSQ")
 o.setTokensTranslation('INI_COMMENT=COMMENT&INI_SECTION_IN=SECTION&INI_VALUE=VALUES&S_INI_VALUE=OPERATOR&INI_SDQ=STRING&INI_SSQ=STRING')
+
 
 // CSS
 var s="GHIJKLMNOPQRSTUVWXYZ"
@@ -52,61 +54,22 @@ var s="GHIJKLMNOPQRSTUVWXYZ"
 	"ABCDEFabcdef",
 	"0123456789",
 	s+"_ghijklmnopqrstuvwxyz",
-	s+"_gijklmnoqrstuvwxyz",
-	"\u0000\u0001\u0002\u0003\u0004\u0005\u0006\u0007\b",
-	"\u000b\u000e\u000f\u0010\u0011\u0012\u0013\u0014\u0015\u0016\u0017\u0018\u0019\u001a\u001b\u001c\u001d\u001e\u001f",
-	"°¢£§•¶ß®©™´¨≠ÆØ∞±≤≥¥µ∂∑∏π∫ªºΩæø¿¡¬√ƒ≈∆«»… ÀÃÕŒœ–—“”‘’÷◊ÿŸ⁄€‹›ﬁﬂ‡·‚„‰ÂÊÁËÈÍÎÏÌ"
+	s+"_gijklmnoqrstuvwxyz"
 	]
 o.addTokens([
-["BIG_CSS",(function(a0,a1,a2,a3){return {A:g("È","-","p","["+a0+"]","h","["+a1+"]","["+a2+"]","\\","/","<","=","?","[^È-ph\\/<=?*:\t #,.@[{\n\f\r"+a0+a1+a2+a3+"]","*",":","\t"," ","#",",",".","@","[","["+a3+"]","{","\n","\f","\r"),M:[,[6,7,11,10,11,11,11,2,8,16,10,10,10,27,23,28,29,15,30,18,19,34,27,35,26,26,22],h(24,11),h(24,12),h(24,13),h(24,14),[6,6,11,6,11,11,11,2,10,10,10,10,10],h(13,10,0,6,2,11,4,11,5,11,6,11,7,2),[10,10,,10,,,,,10,10,10,10,10,31],[10,10,24,10,,,,,10,10,17,10,10],h(13,10,2,0,4,0,5,0,6,0,7,0),h(8,11,7,2),h(8,12,7,3),h(8,13,7,4),h(8,14,7,5),h(8,14,7,5),[10,10,,10,,,,,10,10,10,9,10],h(13,10,2,0,4,0,5,0,6,0,7,0),h(8,12,1,20,3,0,7,3),h(8,13,1,21,3,0,7,4),h(8,12,1,0,3,0,7,3),h(8,13,1,0,3,0,7,4),{24:26},{14:32},{4:25},[,,33]],F:[,,,,,,8,7,7,7,7,8,9,13,4,,7,12,,,,,2,11,,,2,5,1,3,6,10,11,12,14,15],R:[[3,f(a0,1)],[5,f(a1,1)],[6,f(a2,1)],[12,f("È-ph\\/<=?*:\t #,.@[{\n\f\r"+a0+a1+a2+a3+"")],[22,f(a3,1)]],TokensTable:',TAB,L_NEW_LINE,SPACES,HASH,COMBINATOR,ELISION,CSS_ERROR,IDENT,CLASS,S_MLC,S_PSEUDO,S_PHP,ATKEYWORD,S_ATTRIBUTE_SELECTOR,S_RULE_SET'.split(',')}})
-(
-	"0123456789",
-	"ABCDEFabcdef",
-	"GHIJKLMNOPQRSTUVWXYZ_gijklmnoqrstuvwxyz",
-	"+>~"
-)],
-["ATTRIBUTE_SELECTOR",(function(a0,a1,a2,a3){return {A:g("["+a0+"]","["+a1+"]","\\","È","-","=","\"","'","["+a2+"]","["+a3+"]","]","[^\\È-=\"']"+a0+a1+a2+a3+"]"),M:[,[3,3,2,3,4,8,6,7,,5,9],h(12,3),[3,3,2,3,3,,,,3],[3,3,2,3],{5:8}],F:[,,,3,,,1,2,4,5],R:[[0,f(a0,1)],[1,f(a1,1)],[8,f(a2,1)],[9,f(a3,1)],[11,f("\\È-=\"']"+a0+a1+a2+a3+"")]],TokensTable:[,'S_SDQ','S_SSQ','IDENT','ATTRIBUTE_OPERATOR','E_ATTRIBUTE_SELECTOR']}})
-(
-	"ABCDEFabcdef",
-	"GHIJKLMNOPQRSTUVWXYZ_ghijklmnopqrstuvwxyz",
-	"0123456789",
-	"$*^|~"
-)],
-["RULE_SET",(function(a0,a1,a2){return {A:g("p","h","["+a0+"]","["+a1+"]","\\","È","-","\t","\n"," ","["+a2+"]","*","/",":","<","=","?","}","\f","\r","[^ph\\È-\t\n */:<=?}\f\r"+a0+a1+a2+"]"),M:[,[3,3,3,3,2,3,4,13,11,14,,,7,16,8,,,17,11,6],h(21,3,8,0,18,0,19,0),[3,3,3,3,2,3,3,,,,3],h(6,3,4,2),{0:9,15:12},{8:11},{11:15},{16:5},[,10],[12]],F:[,,,4,,,2,,,,,2,7,1,3,5,6,8],R:[[2,f(a0,1)],[3,f(a1,1)],[10,f(a2,1)],[20,f("ph\\È-\t\n */:<=?}\f\r"+a0+a1+a2+"")]],TokensTable:',TAB,L_NEW_LINE,SPACES,IDENT,S_MLC,S_PROP_VALUE,S_PHP,E_RULE_SET'.split(',')}})
-(
-	"ABCDEFabcdef",
-	"GHIJKLMNOPQRSTUVWXYZ_gijklmnoqrstuvwxyz",
-	"0123456789"
-)],
-["PROP_VALUE",(function(a0,a1,a2){return {A:g("["+a0+"]","m","h","p","c","d","e","g","r","s","i","k","x","a","n","t","z","-","["+a1+"]","["+a2+"]","\\","l","u","È",".","%","(","/","\t"," ","!","\"","#","'","*","+",",",";","<","=","?","[^mhpcdegrsikxantz-\\luÈ.%(/\t !\"#'*+,;<=?"+a0+a1+a2+"]"),M:[,[12,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,10,4,4,2,4,5,4,29,38,,33,40,41,42,43,9,44,,38,45,47,34],h(42,4),h(42,8),h(27,4,20,2,24,0,25,0,26,37),h(27,4,8,6,20,2,24,0,25,0,26,37),h(27,4,20,2,21,7,24,0,25,0,26,37),h(27,4,20,2,24,0,25,0,26,48),h(24,8,20,3),h(24,8,20,3),h(25,4,0,12,17,0,20,2,24,29),[11,18,23,15,24,25,17,26,22,21,27,28,,,,,,,,,,,,,30,21],[12,18,23,15,24,25,17,26,22,21,27,28,,,,,,,,,,,,,29,21],[13,18,23,15,24,25,17,26,22,21,27,28,,,,,,,,,,,,,,21],[14,18,23,15,24,25,17,26,22,21,27,28,,,,,,,,,,,,,,21],{4:21,12:21,15:21},{0:11,17:19,24:30},{1:21,12:21},{1:21,9:21},{0:11,24:30},{3:35,39:39},{27:16},{13:32},{16:21},[,21],{6:31},{8:22},{14:21},[,,23],[13],[14],{7:21},{5:21},{34:46},{40:20},[,,36],{3:39}],F:[,,,,11,11,11,11,5,,6,,9,9,,,,,,,,10,,,,,,,,,,,,,,,,12,6,15,1,2,3,4,7,8,13,14,16],R:[[0,f(a0,1)],[18,f(a1,1)],[19,f(a2,1)],[41,f("mhpcdegrsikxantz-\\luÈ.%(/\t !\"#'*+,;<=?"+a0+a1+a2+"")]],TokensTable:',TAB,SPACES,S_IMPORTANT,S_SDQ,HASH,CSS_PHP_BUG,S_SSQ,ELISION,NUMBER,DIMENSIONS,IDENT,S_FUNCTION,S_MLC,E_PROP_VALUE,S_PHP,S_URL'.split(',')}})
-(
-	"0123456789",
-	"ABCDEFbf",
-	"GHIJKLMNOPQRSTUVWXYZ_joqvwy"
-)],
-["PSEUDO",(function(a0,a1,a2){return {A:g("["+a0+"]","["+a1+"]","\\","È","-","(","["+a2+"]","[^\\È-("+a0+a1+a2+"]"),M:[,[3,3,2,3,4],h(8,3),h(7,3,2,2,5,5),[3,3,2,3]],F:[,,,1,,2],R:[[0,f(a0,1)],[1,f(a1,1)],[6,f(a2,1)],[7,f("\\È-("+a0+a1+a2+"")]],TokensTable:[,'IDENT','S_FUNCTION']}})
-(
-	"ABCDEFabcdef",
-	"GHIJKLMNOPQRSTUVWXYZ_ghijklmnopqrstuvwxyz",
-	"0123456789"
-)],
-["IMPORTANT",{A:g("\n","t","\t","\f","\r"," ","/","*","i","m","p","o","r","a","n"),M:[,[12,,13,12,2,14,3,,4],[12],{7:15},{9:5},{10:6},{11:7},{12:8},[,9],{13:10},{14:11},[,16]],F:[,,2,,,,,,,,,,2,1,3,4,5],TokensTable:[,'TAB','L_NEW_LINE','SPACES','S_MLC','E_IMPORTANT']}],
-["URL",(function(a0,a1){return {A:g("<","=","?","["+a0+"]","["+a1+"]","\\","h","p","È","\t","\n"," ","\"","'",")","\f","\r","[^<=?\\hpÈ\t\n \"')\f\r"+a0+a1+"]"),M:[,[5,3,3,3,3,2,3,3,3,11,10,12,13,14,15,10,9],h(18,3,5,2,10,0,15,0,16,0),h(9,3,5,2),h(9,3,5,2),h(9,3,2,6,5,2),h(9,3,1,4,5,2,7,7),h(9,3,5,2,6,8),h(9,3,5,2,7,4),{10:10}],F:[,1,1,1,8,1,1,1,1,3,3,2,4,5,6,7],R:[[3,f(a0,1)],[4,f(a1,1)],[17,f("<=?\\hpÈ\t\n \"')\f\r"+a0+a1+"")]],TokensTable:',PATH,TAB,L_NEW_LINE,SPACES,S_SDQ,S_SSQ,E_URL,S_PHP'.split(',')}})
-(
-	"!#$%&*+,-./:;>@GHIJKLMNOPQRSTUVWXYZ[]^_`gijklmnoqrstuvwxyz{|}~",
-	"0123456789ABCDEFabcdef"
-)],
-["FUNCTION",(function(a0,a1,a2,a3){return {A:g("p","h","-","["+a0+"]","["+a1+"]","["+a2+"]","\\","È","=","?","\t"," ",")",",","<","[^\n\f\r0123456789ABCDEFabcdefGHIJKLMNOPQRSTUVWXYZ_ghijklmnopqrstuvwxyz-È\\\t ,<?=)"+a3+"]","[{}]","\n","\f","\r"),M:[,[5,5,7,6,5,5,4,5,14,14,16,17,18,19,10,14,,13,13,9],h(17,5),h(17,6),h(17,5),h(8,5,6,2),h(8,6,6,3),[5,5,6,6,5,5,2,5],{0:11,8:15},{17:13},{9:8},[,12],[15]],F:[,,,,8,7,6,6,,2,8,,,2,8,9,1,3,4,5],R:[[3,f(a0,1)],[4,f(a1,1)],[5,f(a2,1)],[15,f("ph-\\È=?\t ),<\n\f\r"+a0+a1+a2+a3+"")],[16,f(a3,1)]],TokensTable:',TAB,L_NEW_LINE,SPACES,E_FUNCTION,ELISION,NAME,IDENT,FUNCTION_ARG,S_PHP'.split(',')}})
-(
-	"0123456789",
-	"ABCDEFabcdef",
-	"GHIJKLMNOPQRSTUVWXYZ_gijklmnoqrstuvwxyz",
-	"{}"
-)]
-])
+	["BIG_CSS",(function(a0,a1,a2,a3){return {A:g("È","-","p","["+a0+"]","h","["+a1+"]","["+a2+"]","\\","/","<","=","?","[^È-ph\\/<=?*:\t #,.@[{\n\f\r"+a0+a1+a2+a3+"]","*",":","\t"," ","#",",",".","@","[","["+a3+"]","{","\n","\f","\r"),M:[,[6,7,11,10,11,11,11,2,8,16,10,10,10,27,23,28,29,15,30,18,19,34,27,35,26,26,22],h(24,11),h(24,12),h(24,13),h(24,14),[6,6,11,6,11,11,11,2,10,10,10,10,10],h(13,10,0,6,2,11,4,11,5,11,6,11,7,2),[10,10,,10,,,,,10,10,10,10,10,31],[10,10,24,10,,,,,10,10,17,10,10],h(13,10,2,0,4,0,5,0,6,0,7,0),h(8,11,7,2),h(8,12,7,3),h(8,13,7,4),h(8,14,7,5),h(8,14,7,5),[10,10,,10,,,,,10,10,10,9,10],h(13,10,2,0,4,0,5,0,6,0,7,0),h(8,12,1,20,3,0,7,3),h(8,13,1,21,3,0,7,4),h(8,12,1,0,3,0,7,3),h(8,13,1,0,3,0,7,4),{24:26},{14:32},{4:25},[,,33]],F:[,,,,,,8,7,7,7,7,8,9,13,4,,7,12,,,,,2,11,,,2,5,1,3,6,10,11,12,14,15],R:[[3,f(a0,1)],[5,f(a1,1)],[6,f(a2,1)],[12,f("È-ph\\/<=?*:\t #,.@[{\n\f\r"+a0+a1+a2+a3+"")],[22,f(a3,1)]],TokensTable:',TAB,L_NEW_LINE,SPACES,HASH,COMBINATOR,ELISION,CSS_ERROR,IDENT,CLASS,S_MLC,S_PSEUDO,S_PHP,ATKEYWORD,S_ATTRIBUTE_SELECTOR,S_RULE_SET'.split(',')}})(b[1],b[0],b[3],"+>~")],
+	["ATTRIBUTE_SELECTOR",(function(a0,a1,a2,a3){return {A:g("["+a0+"]","["+a1+"]","\\","È","-","=","\"","'","["+a2+"]","["+a3+"]","]","[^\\È-=\"']"+a0+a1+a2+a3+"]"),M:[,[3,3,2,3,4,8,6,7,,5,9],h(12,3),[3,3,2,3,3,,,,3],[3,3,2,3],{5:8}],F:[,,,3,,,1,2,4,5],R:[[0,f(a0,1)],[1,f(a1,1)],[8,f(a2,1)],[9,f(a3,1)],[11,f("\\È-=\"']"+a0+a1+a2+a3+"")]],TokensTable:[,'S_SDQ','S_SSQ','IDENT','ATTRIBUTE_OPERATOR','E_ATTRIBUTE_SELECTOR']}})(b[0],b[2],b[1],"$*^|~")],
+	["RULE_SET",(function(a0,a1,a2){return {A:g("p","h","["+a0+"]","["+a1+"]","\\","È","-","\t","\n"," ","["+a2+"]","*","/",":","<","=","?","}","\f","\r","[^ph\\È-\t\n */:<=?}\f\r"+a0+a1+a2+"]"),M:[,[3,3,3,3,2,3,4,13,11,14,,,7,16,8,,,17,11,6],h(21,3,8,0,18,0,19,0),[3,3,3,3,2,3,3,,,,3],h(6,3,4,2),{0:9,15:12},{8:11},{11:15},{16:5},[,10],[12]],F:[,,,4,,,2,,,,,2,7,1,3,5,6,8],R:[[2,f(a0,1)],[3,f(a1,1)],[10,f(a2,1)],[20,f("ph\\È-\t\n */:<=?}\f\r"+a0+a1+a2+"")]],TokensTable:',TAB,L_NEW_LINE,SPACES,IDENT,S_MLC,S_PROP_VALUE,S_PHP,E_RULE_SET'.split(',')}})(b[0],b[3],b[1])],
+	["PROP_VALUE",(function(a0,a1,a2){return {A:g("["+a0+"]","m","h","p","c","d","e","g","r","s","i","k","x","a","n","t","z","-","["+a1+"]","["+a2+"]","\\","l","u","È",".","%","(","/","\t"," ","!","\"","#","'","*","+",",",";","<","=","?","[^mhpcdegrsikxantz-\\luÈ.%(/\t !\"#'*+,;<=?"+a0+a1+a2+"]"),M:[,[12,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,4,10,4,4,2,4,5,4,29,38,,33,40,41,42,43,9,44,,38,45,47,34],h(42,4),h(42,8),h(27,4,20,2,24,0,25,0,26,37),h(27,4,8,6,20,2,24,0,25,0,26,37),h(27,4,20,2,21,7,24,0,25,0,26,37),h(27,4,20,2,24,0,25,0,26,48),h(24,8,20,3),h(24,8,20,3),h(25,4,0,12,17,0,20,2,24,29),[11,18,23,15,24,25,17,26,22,21,27,28,,,,,,,,,,,,,30,21],[12,18,23,15,24,25,17,26,22,21,27,28,,,,,,,,,,,,,29,21],[13,18,23,15,24,25,17,26,22,21,27,28,,,,,,,,,,,,,,21],[14,18,23,15,24,25,17,26,22,21,27,28,,,,,,,,,,,,,,21],{4:21,12:21,15:21},{0:11,17:19,24:30},{1:21,12:21},{1:21,9:21},{0:11,24:30},{3:35,39:39},{27:16},{13:32},{16:21},[,21],{6:31},{8:22},{14:21},[,,23],[13],[14],{7:21},{5:21},{34:46},{40:20},[,,36],{3:39}],F:[,,,,11,11,11,11,5,,6,,9,9,,,,,,,,10,,,,,,,,,,,,,,,,12,6,15,1,2,3,4,7,8,13,14,16],R:[[0,f(a0,1)],[18,f(a1,1)],[19,f(a2,1)],[41,f("mhpcdegrsikxantz-\\luÈ.%(/\t !\"#'*+,;<=?"+a0+a1+a2+"")]],TokensTable:',TAB,SPACES,S_IMPORTANT,S_SDQ,HASH,CSS_PHP_BUG,S_SSQ,ELISION,NUMBER,DIMENSIONS,IDENT,S_FUNCTION,S_MLC,E_PROP_VALUE,S_PHP,S_URL'.split(',')}})(b[1],"ABCDEFbf","GHIJKLMNOPQRSTUVWXYZ_joqvwy")],
+	["PSEUDO",(function(a0,a1,a2){return {A:g("["+a0+"]","["+a1+"]","\\","È","-","(","["+a2+"]","[^\\È-("+a0+a1+a2+"]"),M:[,[3,3,2,3,4],h(8,3),h(7,3,2,2,5,5),[3,3,2,3]],F:[,,,1,,2],R:[[0,f(a0,1)],[1,f(a1,1)],[6,f(a2,1)],[7,f("\\È-("+a0+a1+a2+"")]],TokensTable:[,'IDENT','S_FUNCTION']}})(b[0],b[2],b[1])],
+	["IMPORTANT",{A:g("\n","t","\t","\f","\r"," ","/","*","i","m","p","o","r","a","n"),M:[,[12,,13,12,2,14,3,,4],[12],{7:15},{9:5},{10:6},{11:7},{12:8},[,9],{13:10},{14:11},[,16]],F:[,,2,,,,,,,,,,2,1,3,4,5],TokensTable:[,'TAB','L_NEW_LINE','SPACES','S_MLC','E_IMPORTANT']}],
+	["URL",(function(a0,a1){return {A:g("<","=","?","["+a0+"]","["+a1+"]","\\","h","p","È","\t","\n"," ","\"","'",")","\f","\r","[^<=?\\hpÈ\t\n \"')\f\r"+a0+a1+"]"),M:[,[5,3,3,3,3,2,3,3,3,11,10,12,13,14,15,10,9],h(18,3,5,2,10,0,15,0,16,0),h(9,3,5,2),h(9,3,5,2),h(9,3,2,6,5,2),h(9,3,1,4,5,2,7,7),h(9,3,5,2,6,8),h(9,3,5,2,7,4),{10:10}],F:[,1,1,1,8,1,1,1,1,3,3,2,4,5,6,7],R:[[3,f(a0,1)],[4,f(a1,1)],[17,f("<=?\\hpÈ\t\n \"')\f\r"+a0+a1+"")]],TokensTable:',PATH,TAB,L_NEW_LINE,SPACES,S_SDQ,S_SSQ,E_URL,S_PHP'.split(',')}})("!#$%&*+,-./:;>@GHIJKLMNOPQRSTUVWXYZ[]^_`gijklmnoqrstuvwxyz{|}~","0123456789ABCDEFabcdef")],
+	["FUNCTION",(function(a0,a1,a2,a3){return {A:g("p","h","-","["+a0+"]","["+a1+"]","["+a2+"]","\\","È","=","?","\t"," ",")",",","<","[^\n\f\r0123456789ABCDEFabcdefGHIJKLMNOPQRSTUVWXYZ_ghijklmnopqrstuvwxyz-È\\\t ,<?=)"+a3+"]","[{}]","\n","\f","\r"),M:[,[5,5,7,6,5,5,4,5,14,14,16,17,18,19,10,14,,13,13,9],h(17,5),h(17,6),h(17,5),h(8,5,6,2),h(8,6,6,3),[5,5,6,6,5,5,2,5],{0:11,8:15},{17:13},{9:8},[,12],[15]],F:[,,,,8,7,6,6,,2,8,,,2,8,9,1,3,4,5],R:[[3,f(a0,1)],[4,f(a1,1)],[5,f(a2,1)],[15,f("ph-\\È=?\t ),<\n\f\r"+a0+a1+a2+a3+"")],[16,f(a3,1)]],TokensTable:',TAB,L_NEW_LINE,SPACES,E_FUNCTION,ELISION,NAME,IDENT,FUNCTION_ARG,S_PHP'.split(',')}})(b[1],b[0],b[3],"{}")]
+	])
 o.addRules([["CSS","BIG_CSS|NOT_WHITE_SPACES"]])
 o.addCSSClass("punctuator=ELISION|S_RULE_SET|E_RULE_SET|S_PROP_VALUE|E_PROP_VALUE&undefined=CSS_ERROR|ATTRIBUTE_SELECTOR_ERROR&attribute_selector=ATTRIBUTE_SELECTOR&operator=ATTRIBUTE_OPERATOR&ruleset=RULE_SET&value=PROP_VALUE&combinator=COMBINATOR&id=ATKEYWORD|HASH&name=NAME&selector=IDENT&class=CLASS&pseudo=PSEUDO&important=IMPORTANT&number=NUMBER&dimension=DIMENSIONS&url=URL&url_delimiter=S_URL|E_URL&function=FUNCTION&argument=FUNCTION_ARG")
 o.setTokensTranslation('S_ATTRIBUTE_SELECTOR=LBRACK&E_ATTRIBUTE_SELECTOR=RBRACK&S_RULE_SET=LBRACE&E_RULE_SET=RBRACE&S_PROP_VALUE=COLON&E_PROP_VALUE=SEMI')
+
 
 // HTML Lexer
 var s = "-0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefgijklmnoqrstuvwxyz"
@@ -141,6 +104,7 @@ o.addCSSClass("js=JS&regexp=R_REGULAR_EXPRESSION&keyword=JS_KEYWORD&literal=JS_L
 o.setPreviousTokenOf("R_REGULAR_EXPRESSION","ARITHMETIC_OPERATOR|ASSIGNMENT_OPERATOR|BITWISE_OPERATOR|COMPARISON_OPERATOR|LOGICAL_OPERATOR|ELISION|DOT|LPAREN|LBRACE|LBRACK|COLON|SEMI|QUESTION|JS_KEYWORD")
 o.setTokensTranslation('R_REGULAR_EXPRESSION=REGULAR_EXPRESSION')
 
+
 // PHP
 o.addTokens([
 	["BIG_PHP",{A:g("0","1","=","[234567]","[89]","a","o","e","b",".","E",">","r","f","n","c","+","-","d","\n","&",")","l","t","i","*","[ABCDF]","x","/","<","|","\t","\f","\r"," ","!","\"","%","'","(","y","j","s","g","X",",",":",";","?","@","[","]","{","}","~"),M:[,[4,5,20,5,5,52,28,,,11,,21,,,,,6,7,,58,18,65,,,,26,,54,15,16,22,60,58,29,61,30,62,26,63,10,,,,,,66,69,70,51,72,73,74,75,76,77],[2,2,,2,2,2,,2,2,,2,,,2,,2,,,2,,,,,,,,2],[2,2,,2,2,2,,2,2,,2,,,2,,2,,,2,,,,,,,,2],{0:5,1:5,3:5,4:5,7:9,8:19,9:8,10:9,27:3,44:3},[5,5,,5,5,,,9,,8,9],[4,5,55,5,5,,,,,13,,,,,,,59],[4,5,55,5,5,,,,,13,,,,,,,,59],[8,8,,8,8,,,9,,,9],[12,12,,12,12,,,,,,,,,,,,14,14],{5:31,6:42,8:35,13:38,24:41,42:46},h(5,8,2,55),h(5,12,2,0),[8,8,,8,8],h(5,12,2,0),{2:55,25:67,28:68},{2:56,11:56,29:27},[17,17],{2:55,20:57},[17,17],{2:25,11:55},{2:56,11:27},{2:55,30:57},{21:64},{23:23},[,,56],[,,55],[,,55],{12:57},{19:58},[,,25],{12:32},{12:33},{5:34},{40:23},{6:36},{6:37},{22:23},{22:39},{6:40},{5:24},{14:24},{8:43},{41:44},{7:45},{15:24},{23:47},{12:48},{24:49},{14:50},{43:23},{11:71},{14:53},{18:57},{6:28}],F:[,,14,,14,14,7,7,14,,11,16,14,,,7,5,14,9,,8,5,9,,,5,7,9,,2,4,,,,,,,,,,,,,,,,,,,,,21,,,,8,5,4,2,7,1,3,6,10,12,13,15,17,18,19,20,22,23,24,25,26,27,9],R:[[3,f("234567",1)],[4,f("89",1)],[26,f("ABCDF",1)]],TokensTable:',TAB,L_NEW_LINE,SPACES,LOGICAL_OPERATOR,COMPARISON_OPERATOR,S_SDQ,ARITHMETIC_OPERATOR,ASSIGNMENT_OPERATOR,BITWISE_OPERATOR,S_SSQ,LPAREN,TYPE_OPERATOR,RPAREN,NUMBER,ELISION,STRING_OPERATOR,S_MLC,S_SLC,COLON,SEMI,QUESTION,E_PHP,ERROR_CONTROL_OPERATOR,LBRACK,RBRACK,LBRACE,RBRACE'.split(',')}],
@@ -149,12 +113,14 @@ o.addTokens([
 o.addRules([["PHP","S_PHP|BIG_PHP|PHP_ID|NOT_WHITE_SPACES"]])
 o.addCSSClass("php=PHP&tag=E_PHP&function=PHP_FUNCTION&identifier=PHP_IDENTIFIER&special=PHP_SPECIAL_VARS&keyword=PHP_KEYWORD|PHP_RESERVED&literal=PHP_LITERAL&operator=ARITHMETIC_OPERATOR|ASSIGNMENT_OPERATOR|BITWISE_OPERATOR|COMPARISON_OPERATOR|ERROR_CONTROL_OPERATOR|LOGICAL_OPERATOR|STRING_OPERATOR|TYPE_OPERATOR&elision=ELISION&punctuator=LBRACE|RBRACE|LPAREN|RPAREN|LBRACK|RBRACK|DOT|SEMI|QUESTION|COLON")
 
-// Regexp one level
+
+// SimpleRegexp = Sample test
 o.addTokens([
-	["REGEXP",{A:g("[0123456789]","[ABCDEFabdef]","c","}",",","^","[GHIJKLMNOPQRSTUVWXYZghijklmnopqrstvwyz]","u","x",".","[","[()]","[*+?]","[-]]","[^\\cxu0123456789ABCDEFabdefGHIJKLMNOPQRSTUVWXYZghijklmnopqrstvwyz()*+?-]}[^{,|c\\x.]","\\","{","|","[cx]"),R:[[0,f("0123456789",1)],[1,f("ABCDEFabdef",1)],[6,f("GHIJKLMNOPQRSTUVWXYZghijklmnopqrstvwyz",1)],[11,f("()",1)],[12,f("*+?",1)],[13,f("-]",1)],[14,f("\\cxu0123456789ABCDEFabdefGHIJKLMNOPQRSTUVWXYZghijklmnopqrstvwyz()*+?-]}[^{,|c\\x.")],[18,f("cx",1)]],M:[,h(19,14,9,16,10,11,11,18,12,19,13,17,15,2,16,12,17,15),h(18,20,2,3,7,4,8,8),[,20,20,,,,20,20,20],[5,5,5],[6,6,6],[7,7,7],[20,20,20],[7,7,7],[9,,,13,10],[10,,,13],{5:17},[9]],F:[,,2,7,7,,,,7,,,4,,8,2,9,3,4,5,6,7],TokensTable:',,CHAR,ANY,CHARSET,PUNCTUATOR,QUANTIFIER2,CHAR_ESCAPED,QUANTIFIER1,PIPE'.split(',')}]
+	["SIMPLE_REGEXP",{A:g("[0123456789]","[ABCDEFabdef]","c","}",",","^","[GHIJKLMNOPQRSTUVWXYZghijklmnopqrstvwyz]","u","x",".","[","[()]","[*+?]","[-]]","[^\\cxu0123456789ABCDEFabdefGHIJKLMNOPQRSTUVWXYZghijklmnopqrstvwyz()*+?-]}[^{,|c\\x.]","\\","{","|","[cx]"),R:[[0,f("0123456789",1)],[1,f("ABCDEFabdef",1)],[6,f("GHIJKLMNOPQRSTUVWXYZghijklmnopqrstvwyz",1)],[11,f("()",1)],[12,f("*+?",1)],[13,f("-]",1)],[14,f("\\cxu0123456789ABCDEFabdefGHIJKLMNOPQRSTUVWXYZghijklmnopqrstvwyz()*+?-]}[^{,|c\\x.")],[18,f("cx",1)]],M:[,h(19,14,9,16,10,11,11,18,12,19,13,17,15,2,16,12,17,15),h(18,20,2,3,7,4,8,8),[,20,20,,,,20,20,20],[5,5,5],[6,6,6],[7,7,7],[20,20,20],[7,7,7],[9,,,13,10],[10,,,13],{5:17},[9]],F:[,,2,7,7,,,,7,,,4,,8,2,9,3,4,5,6,7],TokensTable:',,CHAR,ANY,CHARSET,PUNCTUATOR,QUANTIFIER2,CHAR_ESCAPED,QUANTIFIER1,PIPE'.split(',')}]
 	])
-o.addRules([["RegExp","REGEXP"]])
+o.addRules([["SimpleRegExp","SIMPLE_REGEXP"]])
 o.addCSSClass("charset=CHARSET&punctuator=PIPE|PUNCTUATOR&repetition=QUANTIFIER1|QUANTIFIER2&character=CHAR_ESCAPED|ANY|CHAR")
+
 
 // ZenLike
 o.addTokens([

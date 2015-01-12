@@ -244,7 +244,7 @@ var LexerNode =function( o ){
 		}
 	return e
 	}
-LexerNode.RegExp =function( e, sTokenName, sMatched ){
+LexerNode.SimpleRegExp =function( e, sTokenName, sMatched ){
 	e.value = sMatched
 	switch( sTokenName ){
 		case 'PIPE':
@@ -344,9 +344,9 @@ var getTokens1 =function(){
 	var ni = eRepeatTest1.value
 	var oLexer = oRELexers[ eRegExpLexer.value ]
 	eRegExpResult1.innerHTML = ''
-	eRegExpResult1.appendChild( oLexer( eRegExp.value, 'RegExp' ))
+	eRegExpResult1.appendChild( oLexer( eRegExp.value, 'SimpleRegExp' ))
 	var oChrono = new Chrono
-	for(var i=0; i<ni; i++ ) oLexer( eRegExp.value, 'RegExp' )
+	for(var i=0; i<ni; i++ ) oLexer( eRegExp.value, 'SimpleRegExp' )
 	Stats.set( 1, oChrono.stop()/ni )
 	eChrono1.innerHTML = Stats.compare( 1, 2 )
 	eChrono2.innerHTML = Stats.compare( 2, 1 )
@@ -354,9 +354,9 @@ var getTokens1 =function(){
 var getTokens2 =function(){
 	var ni = eRepeatTest1.value
 	eRegExpResult2.innerHTML = ''
-	eRegExpResult2.appendChild( AutomatonLexer( eRegExp.value, 'RegExp' ))
+	eRegExpResult2.appendChild( AutomatonLexer( eRegExp.value, 'SimpleRegExp' ))
 	var oChrono = new Chrono
-	for(var i=0; i<ni; i++ ) AutomatonLexer( eRegExp.value, 'RegExp' )
+	for(var i=0; i<ni; i++ ) AutomatonLexer( eRegExp.value, 'SimpleRegExp' )
 	Stats.set( 2, oChrono.stop()/ni )
 	eChrono1.innerHTML = Stats.compare( 1, 2 )
 	eChrono2.innerHTML = Stats.compare( 2, 1 )
