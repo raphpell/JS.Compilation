@@ -242,7 +242,7 @@ var AutomatonLexer =(function(){
 		return o
 		})()
 	, Lexer =function( sText, sSyntax ){
-		if( sText ) return SINGLETON.scan( sText, sSyntax )
+		if( sText!=undefined ) return SINGLETON.scan( sText, sSyntax )
 		}
 	Lexer.union({
 		Previous: Previous,
@@ -447,16 +447,17 @@ var AutomatonLexer =(function(){
 			eParent = eParent || this.eRoot
 			var a = eParent.childNodes
 			, nStart = 0, nMiddle, nEnd = a.length-1
-
+			
 			//Boucle de recherche
-			do{
-				nMiddle = Math.round( nStart + ( nEnd - nStart ) / 2 )
-				var e = a[nMiddle]
-				if( this.isPartOfRange( e, nPos ))
-					return this.isParent( e ) ? this.nodeAt( nPos, e ) : e
-				else if( nPos < e.oValue.index ) nEnd = nMiddle - 1
-				else nStart = nMiddle + 1
-			} while ( nStart <= nEnd )
+			if( a.length )
+				do{
+					nMiddle = Math.round( nStart + ( nEnd - nStart ) / 2 )
+					var e = a[nMiddle]
+					if( this.isPartOfRange( e, nPos ))
+						return this.isParent( e ) ? this.nodeAt( nPos, e ) : e
+					else if( nPos < e.oValue.index ) nEnd = nMiddle - 1
+					else nStart = nMiddle + 1
+				} while ( nStart <= nEnd )
 			return null
 			},
 		removeDeletedNodes :function( eParent, nPos, nDeleted ){
@@ -476,10 +477,9 @@ var AutomatonLexer =(function(){
 					this.removeNode( e )
 					}
 				}
-			
 			var remove = CallBack( this, function( e1, e2 ){
-				if( e2 ) return this.removeNode( e1 )
 				var eParent = e1.parentNode
+				if( e2 || ! this.isParent( eParent )) return this.removeNode( e1 )
 				if( this.isParent( eParent )){
 					ePrevious = eParent.previousSibling
 					eNext = eParent.nextSibling
@@ -494,6 +494,7 @@ var AutomatonLexer =(function(){
 				if( this.isWhiteSpace( eNext.oValue.token ) && ! this.isPartOfRange( eNext, nPos, nDeleted )) break;
 				remove( eNext, eNext = eNext.nextSibling )
 				}
+			console.warn( eParent.lastChild , eParent.childNodes.length )
 					
 			if( ePrevious && eNext && ePrevious.parentNode != eNext.parentNode )
 				throw Error( 'Pas le même parent ! final' )

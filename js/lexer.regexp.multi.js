@@ -206,7 +206,7 @@ var MultiRegExpLexer =(function(){
 		return o
 		})()
 	, Lexer =function( sText, sSyntax ){
-		if( sText ) return SINGLETON.scan( sText, sSyntax )
+		if( sText!=undefined ) return SINGLETON.scan( sText, sSyntax )
 		}
 	Lexer.union({
 		Previous: Previous,
