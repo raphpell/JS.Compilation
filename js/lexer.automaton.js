@@ -443,12 +443,20 @@ var AutomatonLexer =(function(){
 			return ~sWSTokens.indexOf( '|'+sToken+'|' )
 			},
 		nodeAt :function( nPos, eParent ){
+			//initialisation
 			eParent = eParent || this.eRoot
-			for(var e = eParent.firstChild; e ; e = e.nextSibling ){
-				if( ! this.isPartOfRange( e, nPos )) continue;	
-				if( this.isParent( e )) this.nodeAt( nPos, e )
-				return e
-				}
+			var a = eParent.childNodes
+			, nStart = 0, nMiddle, nEnd = a.length-1
+
+			//Boucle de recherche
+			do{
+				nMiddle = Math.round( nStart + ( nEnd - nStart ) / 2 )
+				var e = a[nMiddle]
+				if( this.isPartOfRange( e, nPos ))
+					return this.isParent( e ) ? this.nodeAt( nPos, e ) : e
+				else if( nPos < e.oValue.index ) nEnd = nMiddle - 1
+				else nStart = nMiddle + 1
+			} while ( nStart <= nEnd )
 			return null
 			},
 		removeDeletedNodes :function( eParent, nPos, nDeleted ){
