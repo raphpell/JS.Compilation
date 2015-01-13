@@ -494,7 +494,6 @@ var AutomatonLexer =(function(){
 				if( this.isWhiteSpace( eNext.oValue.token ) && ! this.isPartOfRange( eNext, nPos, nDeleted )) break;
 				remove( eNext, eNext = eNext.nextSibling )
 				}
-			console.warn( eParent.lastChild , eParent.childNodes.length )
 					
 			if( ePrevious && eNext && ePrevious.parentNode != eNext.parentNode )
 				throw Error( 'Pas le même parent ! final' )
