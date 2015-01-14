@@ -56,30 +56,14 @@ var BenchmarkFunctions =(function(){
 var Stats =(function(){
 	var aStats = []
 	aStats.compare =function( nID, nID2 ){
-		var tag =function(s,color){ return '<b style="color:'+color+'">'+s+'</b>'}
-		, red =function(s){ return tag(s,'red')}
-		, green =function(s){ return tag(s,'green')}
-		, black =function(s){ return tag(s,'black')}
-		, simpleresult =function( o1 ){
-			return o1.lastTime.toFixed(2) +' ms'+
-				'<br>min:'+ o1.min.toFixed(2) +
-				'<br>moy:'+ o1.moy.toFixed(2) +
-				'<br>max:'+ o1.max.toFixed(2) +
-				'<br>nbre:'+ o1.count
-			}
-		, result =function( n1, bInf, bSup ){
-			return bInf ? green( n1)
-				: ( bSup ? red( n1 )
-					: black( n1 ))
-			}
 		var o1 = this[nID]
-		if( ! o1 ) return '...'
-			else if( arguments.length == 1 )
-				return simpleresult( o1 )
-		var bTimeInf=1, bTimeSup=1
+		, bTimeInf=1, bTimeSup=1
 		, bMinInf=1, bMinSup=1
 		, bMoyInf=1, bMoySup=1
 		, bMaxInf=1, bMaxSup=1
+		if( ! o1 ) return '...'
+			else if( arguments.length == 1 )
+				return aStats.print.only( o1 )
 		for(var i=1, a=arguments, ni=a.length; i<ni; i++ ){
 			var o2 = this[a[i]]
 			if( ! o2 ) continue ;
@@ -92,11 +76,13 @@ var Stats =(function(){
 			if( bMaxInf ) bMaxInf = o1.max <= o2.max
 			if( bMaxSup ) bMaxSup = o1.max >= o2.max
 			}
-		return  result( o1.lastTime.toFixed(2), bTimeInf, bTimeSup ) +' ms'+
-				'<br>min:'+ result( o1.min.toFixed(2), bMinInf, bMinSup ) +
-				'<br>moy:'+ result( o1.moy.toFixed(2), bMoyInf, bMoySup ) +
-				'<br>max:'+ result( o1.max.toFixed(2), bMaxInf, bMaxSup ) +
-				'<br>nbre:'+ o1.count
+		
+		var mask =function(){
+			var a=[]
+			for(var n=0, ni=arguments.length; n<ni; a[n]=( arguments[n++] ? 1 : 0 ));
+			return a
+			}
+		return aStats.print.result( o1, mask( bTimeInf, bTimeSup, bMinInf, bMinSup, bMoyInf, bMoySup, bMaxInf, bMaxSup ))
 		}
 	aStats.get =function( nID ){ return this[nID] }
 	aStats.init =function( nID ){ return this[nID] = null }
@@ -104,6 +90,35 @@ var Stats =(function(){
 		for(var s in this ){
 			var o = Stats[s]
 			if( o && o.count ) delete Stats[s]
+			}
+		}
+	
+	aStats.getTime =function( n ){
+		return n.toFixed(2) +' ms'
+		}
+	aStats.print ={
+		only :function( o ){
+			return aStats.getTime( o.lastTime )
+				+'<br>min:'+ aStats.getTime( o.min )
+				+'<br>moy:'+ aStats.getTime( o.moy )
+				+'<br>max:'+ aStats.getTime( o.max )
+				+'<br>nbre:'+ o.count
+			},
+		result :function( o, a ){
+			var tag =function(s,color){ return '<b style="color:'+color+'">'+s+'</b>'}
+			var f =function( n1, bInf, bSup ){
+				return bInf
+					? tag(n1,'green')
+					: ( bSup
+						? tag(n1,'red')
+						: tag(n1,'black')
+						)
+				}
+			return f( aStats.getTime( o.lastTime ), a[0], a[1] ) +
+				'<br>min:'+ f( aStats.getTime( o.min ), a[2], a[3] ) +
+				'<br>moy:'+ f( aStats.getTime( o.moy ), a[4], a[5] ) +
+				'<br>max:'+ f( aStats.getTime( o.max ), a[6], a[7] ) +
+				'<br>nbre:'+ o.count
 			}
 		}
 	aStats.set =function( nID, n ){
@@ -118,7 +133,7 @@ var Stats =(function(){
 			o.count++
 			o.moy = o.sum / o.count
 			}
-		return n.toFixed(2) +' ms<br>min:'+ o.min.toFixed(2) +'<br>moy:'+ o.moy.toFixed(2) + '<br>max:'+ o.max.toFixed(2) + '<br>nbre:'+ o.count
+		return this.print.only(o)
 		}
 	return aStats
 	})()

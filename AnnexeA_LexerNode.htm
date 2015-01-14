@@ -1,6 +1,6 @@
-<html>
+Ôªø<html>
 	<head>
-		<title>Les lÈxËmes : LexerNode</title>
+		<title>Les l√©x√®mes : LexerNode</title>
 		<style>
 CODE, PRE {
 	background: #EEE;
@@ -14,14 +14,14 @@ CODE, PRE {
 <body>
 
 <a href="index.htm">Index</a>
-<h1>La crÈation des lÈxËmes: la fonction <code>LexerNode</code></h1>
+<h1>La cr√©ation des l√©x√®mes: la fonction <code>LexerNode</code></h1>
 
-<p>Les lÈxËmes sont crÈÈs gr‚ce ‡ une fonction globale nommÈe LexerNode.</p>
+<p>Les l√©x√®mes sont cr√©√©s gr√¢ce √† une fonction globale nomm√©e LexerNode.</p>
 <pre>var oLexeme = LexerNode( oScanResult )</pre>
 
 <p><cite>
-	Leur crÈation influe la performance des lexers car elle prend du temps ! <br>
-	Plus l'objet est gros, plus le temps mis pour les crÈer est long.
+	Leur cr√©ation influe la performance des lexers car elle prend du temps ! <br>
+	Plus l'objet est gros, plus le temps mis pour les cr√©er est long.
 </cite></p>
 
 
@@ -31,29 +31,34 @@ CODE, PRE {
 </p>
 
 
-<h2>Valeur retournÈe</h2>
+<h2>Valeur retourn√©e</h2>
 <p>
-	Elle retourne un objet affectÈ avec l'attribut <code>oValue</code> : <code>oLexeme.oValue===oScanResult</code>.<br>
-	L'objet retournÈ est soit :
+	Elle retourne un objet affect√© avec l'attribut <code>oValue</code> : <code>oLexeme.oValue===oScanResult</code>.<br>
+	L'objet retourn√© est soit :
 </p>
 <ul>
-	<li><b>Un ÈlÈment HTML</b>
+	<li><b>Un √©l√©ment HTML</b>
 		<ul>
-			<li>Plus lent.</li>
-			<li>Permet d'afficher facilement le rÈsultat de l'analyse.</li>
-			<li>Pour l'instant mon Èditeur crÈÈ avec le Lexer Automaton est plus rapide avec (Il utilise pleinement les possibilitÈs HTML !).</li>
+			<li>Permet d'afficher facilement le r√©sultat de l'analyse.</li>
+			<li>Pour l'instant mon √©diteur cr√©√© avec le Lexer Automaton est plus rapide avec (Il utilise pleinement les possibilit√©s HTML !).</li>
 		</ul><br></li>
 	
-	<li><b>Un objet JavaScript implÈmentant l'interface des ÈlÈments HTML</b>
+	<li><b>Un objet JavaScript impl√©mentant l'interface des √©l√©ments HTML</b>
 		<ul>
-			<li>Plus rapide (interface implÈmentÈe rÈduite).</li>
+			<li>Pas forcement plus rapide dans les stats <a href="AnnexeA1_LexerNode.comparaison.htm">(pourquoi?)</a>.
+				<ul>
+					<li>Cr√©ation plus rapide.</li>
+					<li>M√©thodes plus lentes...</li>
+				</ul>
+			</li>
+			<li>Moins pratique de fa√ßon g√©n√©ral.</li>
 		</ul></li>
 </ul>
-<p>Cet objet doit impÈrativement implÈmenter l'interface des ÈlÈments HTML.</p>
+<p>Cet objet doit imp√©rativement impl√©menter l'interface des √©l√©ments HTML.</p>
 
 
 
-<h2>Exemple de crÈation de la fonction</h2>
+<h2>Exemple de cr√©ation de la fonction</h2>
 <pre>
 var createLexerNode =function( sType ){
 	var s = '{}'
@@ -62,7 +67,7 @@ var createLexerNode =function( sType ){
 			s='document.createElement(o.token)';
 			break;
 		case 'ObjectNode':
-			// Node est un objet utilisateur implÈmentant l'interface des ÈlÈments HTML
+			// Node est un objet utilisateur impl√©mentant l'interface des √©l√©ments HTML
 			s='new Node(o.token)';
 			break;
 		}

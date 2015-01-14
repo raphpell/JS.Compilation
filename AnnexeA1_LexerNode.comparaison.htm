@@ -1,0 +1,153 @@
+<html>
+	<head>
+		<title>Comparaison des LexerNodes</title>
+		<link rel="stylesheet" type="text/css" href="widget/Stats/styles.css">
+		<style>
+CODE, PRE {
+	background: #EEE;
+	border: 1px solid #666;
+	color: #000;
+	font-weight: bold;
+	}
+		</style>
+	</head>
+<body>
+
+<a href="index.htm">Index</a>
+<h1>Comparaison des LexerNodes</h1>
+
+<input type="button" id="eTest" onclick="UnitTest()" value="test">
+<input type="input" id="eRepeat" value="100" size="3"> fois
+
+<table border="1">
+	<tr>
+		<th>HTMLElement</th>
+		<th>ObjectNode</th>
+	</tr>
+	<tr>
+		<td id="eHTMLElement"></td>
+		<td id="eObjectNode"></td>
+	</tr>
+</table>
+
+
+
+<script src="js/framework.js"></script>
+<script src="js/shared.js"></script>
+<script src="js/lexer.node.object.js"></script>
+
+<!-- LexerNode -->
+<script>
+var LexerNode
+, createLexerNode =function( sNodeType ){
+	var s
+	switch( sNodeType ){
+		case 'HTMLElement': s='document.createElement(o.token)'; break;
+		case 'ObjectNode': s='new Node(o.token)'; break;
+		default: throw Error ('Invalid LexerNode Type.')
+		}
+	LexerNode = new Function ( 'o', 
+		'var e = '+ s +';'
+		+'e.oValue=o;'
+		+'return e;'
+		)
+	}
+</script>
+
+<!-- Stats -->
+<script src="widget/Stats/scripts.js"></script>
+<script>
+Stats.getTime =function( n ){
+	return (n*1000).toFixed(2) +' µs'
+	}
+Stats.getName =function( sNodeType, nId ){
+	return sNodeType + nId
+	}
+</script>
+
+<script>
+_('eTest,eRepeat,eHTMLElement,eObjectNode')
+var oChrono = new Chrono (), oResult
+var aLexerNodeType = ['ObjectNode','HTMLElement']
+
+var Compare ={
+	HTMLElement:['ObjectNode'],
+	ObjectNode:['HTMLElement'],
+	test:function( nId ){
+		var a = Array.merge( aLexerNodeType, [])
+		for(var i=0; a[i]; i++) a[i] = Stats.getName(a[i], nId )
+		for(var i=0, ni=a.length; i<ni; i++){
+			if( _( a[0] )) _( a[0]).lastChild.innerHTML = Stats.compare.apply( Stats, a )
+			a.push( a.shift())
+			}
+		}
+	}
+
+var aTests =(function(){
+	var o1, o2
+	return [
+		{name:'o1 = new LexerNode',test:function(){
+			o1 = new LexerNode ({token:'STRING'})
+			}},
+		{name:'o2 = new LexerNode',test:function(){
+			o2 = new LexerNode ({token:'STRING'})
+			}},
+		{name:'o1.appendChild( o2 )',test:function(){
+			o1.appendChild( o2 )
+			}},
+		{name:'o1.removeChild( o2 )',test:function(){
+			o1.removeChild( o2 )
+			}}
+		]
+	})()
+
+UnitTest=function(){
+	var nLimit = eRepeat.value
+	for(var j=0; aLexerNodeType[j]; j++){
+		var sNodeType = aLexerNodeType[j]
+		createLexerNode( sNodeType )
+		for(var i=0; i<nLimit; i++)
+			for(var k=0; aTests[k]; k++)
+				UnitTest.test( Stats.getName( sNodeType, k ), k )
+		}
+	UnitTest.show()
+	}
+UnitTest.init =function( sNodeType, nId ){
+	for(var j=0; aLexerNodeType[j]; j++)
+		for(var k=0; aTests[k]; k++){
+			var sNodeType = aLexerNodeType[j]
+			var nId = k
+			var sName = Stats.getName( sNodeType, nId )
+			window['e'+sNodeType].appendChild( Tag('DIV', {
+				id: sName,
+				innerHTML: '<code>'+ aTests[nId].name +'</code><div></div>'
+				}))
+			}
+	}
+UnitTest.test =function( sName, nId ){
+	oChrono.start()
+	aTests[nId].test()
+	Stats.set( sName, oChrono.stop())
+	}
+UnitTest.show =function(){
+	for(var i=0; aTests[i]; i++) Compare.test( i )
+	}
+UnitTest.simple =function( sNodeType, nId ){
+	UnitTest.test( sNodeType, nId )
+	Compare.test( nId )
+	}
+	
+UnitTest.init()
+UnitTest()
+
+var nTime=0
+var nInterval = setInterval(
+	function(){
+		UnitTest()
+		if( nTime++ > 20 ) clearInterval( nInterval )
+	}, 200 )
+eTest.focus()
+</script>
+
+</body>
+</html>

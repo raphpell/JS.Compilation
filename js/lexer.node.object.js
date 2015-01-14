@@ -23,19 +23,19 @@ Node.prototype ={
 	nextSibling:null,
 	ownerRoot:null,
 	appendChild :function( o ){
-		if( ! o ) return Exception("UNDEFINED_ERR")
-		if( this.readOnly ) return Exception("NO_MODIFICATION_ALLOWED_ERR")
+	//	if( ! o ) return Exception("UNDEFINED_ERR")
+	//	if( this.readOnly ) return Exception("NO_MODIFICATION_ALLOWED_ERR")
 		if( o.nodeType == Node.FRAGMENT_NODE ){
 			var a = o.childNodes
 			for(var i=0, n=a.length; i<n; i++ )
 				this.appendChild( a[i])
 			return o
 			}
-		if( o === this ) Exception("HIERARCHY_REQUEST_ERR")
-		if( o.isAncestor( this )) Exception("HIERARCHY_REQUEST_ERR")
+	//	if( o === this ) Exception("HIERARCHY_REQUEST_ERR")
+	//	if( o.isAncestor( this )) Exception("HIERARCHY_REQUEST_ERR")
 		var o2 = o.parentNode
 		if( o2 ) o = o2.removeChild( o )
-		o.ownerRoot = this.ownerRoot
+		if( o.ownerRoot = this.ownerRoot ) this.ownerRoot.addId( o )
 		o.nextSibling = null
 		o.parentNode = this
 		o.previousSibling = this.lastChild
@@ -43,7 +43,6 @@ Node.prototype ={
 		if( this.childNodes.length==0 ) this.firstChild = o 
 		this.lastChild = o
 		this.childNodes.push( o )
-		if( this.ownerRoot ) this.ownerRoot.addId( o )
 		return o
 		},
 	getElementsByTagName :function( s ){

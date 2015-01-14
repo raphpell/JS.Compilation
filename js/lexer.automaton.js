@@ -174,7 +174,7 @@ var AutomatonLexer =(function(){
 			}
 		o.union({
 			excluded :{
-				WHITE_SPACES:1,SPACES:1,SPACE:1,TAB:1,
+				WHITE_SPACES:1,SPACES:1,SPACE:1,TAB:1,NEW_LINE:1,L_NEW_LINE:1,
 				S_SLC:1,SLC:1,SLC_IN:1,
 				S_MLC:1,MLC:1,MLC_IN:1,E_MLC:1,
 				COMMENT:1,
