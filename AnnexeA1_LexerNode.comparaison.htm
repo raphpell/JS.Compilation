@@ -5,9 +5,22 @@
 		<style>
 CODE, PRE {
 	background: #EEE;
-	border: 1px solid #666;
+	border: 2px solid #666;
+	border-width: 1px 0 2px 0;
 	color: #000;
+	display: block;
 	font-weight: bold;
+	margin: 1em 0 .25em;
+	padding: .5em 1em;
+	}
+H2 {
+	background: #EEE;
+	border-bottom: 4px solid #666;
+	margin: 0;
+	padding: .25em;
+	}
+DIV {
+	margin: 0 0 1em;
 	}
 		</style>
 	</head>
@@ -16,20 +29,16 @@ CODE, PRE {
 <a href="index.htm">Index</a>
 <h1>Comparaison des LexerNodes</h1>
 
+<p>
+	Les differents objets sont censés répondre aux mêmes tests unitaires.
+	Le temps d'execution est la seule chose observée ici.
+</p>
+
 <input type="button" id="eTest" onclick="UnitTest()" value="test">
 <input type="input" id="eRepeat" value="100" size="3"> fois
 
-<table border="1">
-	<tr>
-		<th>HTMLElement</th>
-		<th>ObjectNode</th>
-	</tr>
-	<tr>
-		<td id="eHTMLElement"></td>
-		<td id="eObjectNode"></td>
-	</tr>
-</table>
 
+<table border="1" id="eTABLE"></table>
 
 
 <script src="js/framework.js"></script>
@@ -44,6 +53,7 @@ var LexerNode
 	switch( sNodeType ){
 		case 'HTMLElement': s='document.createElement(o.token)'; break;
 		case 'ObjectNode': s='new Node(o.token)'; break;
+		case 'EmptyObject': s='EmptyObject(o.token)'; break;
 		default: throw Error ('Invalid LexerNode Type.')
 		}
 	LexerNode = new Function ( 'o', 
@@ -52,6 +62,22 @@ var LexerNode
 		+'return e;'
 		)
 	}
+	
+EmptyObject=(function(){ // Pas une solution !
+	var _proto ={
+		appendChild :function(){},
+		insertBefore :function(){},
+		removeChild :function(){}
+		}
+	return function( sTokenName ){
+		return {
+			nodeName: sTokenName,
+			appendChild: _proto.appendChild,
+			removeChild: _proto.removeChild
+			}
+		}
+	})()
+
 </script>
 
 <!-- Stats -->
@@ -66,20 +92,16 @@ Stats.getName =function( sNodeType, nId ){
 </script>
 
 <script>
-_('eTest,eRepeat,eHTMLElement,eObjectNode')
+_('eTest,eRepeat,eTABLE')
 var oChrono = new Chrono (), oResult
-var aLexerNodeType = ['ObjectNode','HTMLElement']
+var aLexerNodeType = ['HTMLElement','ObjectNode','EmptyObject']
 
-var Compare ={
-	HTMLElement:['ObjectNode'],
-	ObjectNode:['HTMLElement'],
-	test:function( nId ){
-		var a = Array.merge( aLexerNodeType, [])
-		for(var i=0; a[i]; i++) a[i] = Stats.getName(a[i], nId )
-		for(var i=0, ni=a.length; i<ni; i++){
-			if( _( a[0] )) _( a[0]).lastChild.innerHTML = Stats.compare.apply( Stats, a )
-			a.push( a.shift())
-			}
+var CompareTests =function( nId ){
+	var a = Array.merge( aLexerNodeType, [])
+	for(var i=0; a[i]; i++) a[i] = Stats.getName(a[i], nId )
+	for(var i=0, ni=a.length; i<ni; i++){
+		if( _( a[0] )) _( a[0]).lastChild.innerHTML = Stats.compare.apply( Stats, a )
+		a.push( a.shift())
 		}
 	}
 
@@ -97,6 +119,9 @@ var aTests =(function(){
 			}},
 		{name:'o1.removeChild( o2 )',test:function(){
 			o1.removeChild( o2 )
+			}},
+		{name:'',test:function(){
+			o1 = o2 = null
 			}}
 		]
 	})()
@@ -113,16 +138,21 @@ UnitTest=function(){
 	UnitTest.show()
 	}
 UnitTest.init =function( sNodeType, nId ){
-	for(var j=0; aLexerNodeType[j]; j++)
-		for(var k=0; aTests[k]; k++){
-			var sNodeType = aLexerNodeType[j]
-			var nId = k
-			var sName = Stats.getName( sNodeType, nId )
-			window['e'+sNodeType].appendChild( Tag('DIV', {
-				id: sName,
-				innerHTML: '<code>'+ aTests[nId].name +'</code><div></div>'
-				}))
-			}
+	var eTR = Tag('TR'), eTH
+	for(var j=0; aLexerNodeType[j]; j++){
+		var sNodeType = aLexerNodeType[j]
+		eTH = eTR.appendChild( Tag('TH', {
+			id:'e'+sNodeType,
+			innerHTML:'<h2>'+sNodeType+'</h2>'
+			}))
+		for(var k=0; aTests[k]; k++)
+			if( aTests[k].name )
+				eTH.appendChild( Tag('DIV', {
+					id: Stats.getName( aLexerNodeType[j], k ),
+					innerHTML: '<code>'+ aTests[k].name +'</code><div></div>'
+					}))
+		}
+	eTABLE.appendChild( eTR )
 	}
 UnitTest.test =function( sName, nId ){
 	oChrono.start()
@@ -130,11 +160,7 @@ UnitTest.test =function( sName, nId ){
 	Stats.set( sName, oChrono.stop())
 	}
 UnitTest.show =function(){
-	for(var i=0; aTests[i]; i++) Compare.test( i )
-	}
-UnitTest.simple =function( sNodeType, nId ){
-	UnitTest.test( sNodeType, nId )
-	Compare.test( nId )
+	for(var i=0; aTests[i]; i++) CompareTests( i )
 	}
 	
 UnitTest.init()
@@ -143,8 +169,8 @@ UnitTest()
 var nTime=0
 var nInterval = setInterval(
 	function(){
-		UnitTest()
-		if( nTime++ > 20 ) clearInterval( nInterval )
+		if( ++nTime == 20 ) clearInterval( nInterval )
+		else UnitTest()
 	}, 200 )
 eTest.focus()
 </script>

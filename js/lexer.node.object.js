@@ -23,26 +23,21 @@ Node.prototype ={
 	nextSibling:null,
 	ownerRoot:null,
 	appendChild :function( o ){
-	//	if( ! o ) return Exception("UNDEFINED_ERR")
-	//	if( this.readOnly ) return Exception("NO_MODIFICATION_ALLOWED_ERR")
+		if( ! o ) return Exception("UNDEFINED_ERR")
+		if( this.readOnly ) return Exception("NO_MODIFICATION_ALLOWED_ERR")
 		if( o.nodeType == Node.FRAGMENT_NODE ){
 			var a = o.childNodes
-			for(var i=0, n=a.length; i<n; i++ )
-				this.appendChild( a[i])
+			for(var i=0; a[i]; i++) this.appendChild( a[i])
 			return o
 			}
-	//	if( o === this ) Exception("HIERARCHY_REQUEST_ERR")
-	//	if( o.isAncestor( this )) Exception("HIERARCHY_REQUEST_ERR")
-		var o2 = o.parentNode
-		if( o2 ) o = o2.removeChild( o )
-		if( o.ownerRoot = this.ownerRoot ) this.ownerRoot.addId( o )
-		o.nextSibling = null
+		if( o===this || o.isAncestor( this )) Exception("HIERARCHY_REQUEST_ERR")
+		if( o.parentNode ) o = o.parentNode.removeChild( o )
+		o.ownerRoot = this.ownerRoot
 		o.parentNode = this
-		o.previousSibling = this.lastChild
-		if( o2 = this.lastChild ) o2.nextSibling = o
-		if( this.childNodes.length==0 ) this.firstChild = o 
-		this.lastChild = o
-		this.childNodes.push( o )
+		if( o.previousSibling = this.lastChild ) this.lastChild.nextSibling = o
+		if( ! this.childNodes.length ) this.firstChild = o 
+		this.childNodes.push( this.lastChild = o )
+		if( this.ownerRoot ) this.ownerRoot.addId( o )
 		return o
 		},
 	getElementsByTagName :function( s ){
@@ -96,29 +91,20 @@ Node.prototype ={
 		return this.parentNode === this.ownerRoot
 		},
 	removeChild :function( o ){
-		if( ! o ) return Exception( "UNDEFINED_ERR" )
-		if( this.readOnly ) return Exception( "NO_MODIFICATION_ALLOWED_ERR" )
-		if( o.parentNode != this ) return Exception( "NOT_FOUND_ERR" )
-		var o1 = o.nextSibling, o2 = o.previousSibling
-		if( o1 ) o1.previousSibling = o2
-		if( o2 ) o2.nextSibling = o1
-		var a = this.childNodes , bFound = false
-		for( var i=0, n=a.length; i<n; i++ )
-			if( a[i]===o ){
-				bFound = ( a.splice( i, 1 ))[0]
-				break
-				}
-		this.firstChild = a[0]
-		this.lastChild = a[ a.length-1 ]
-		this.childNodes = a
-		if( this.ownerRoot ) this.ownerRoot.removeId( o )
-		if( bFound ){
-			o.ownerRoot = null
-			o.parentNode = null
-			o.nextSibling = null
-			o.previousSibling = null
+		if( ! o ) return Exception("UNDEFINED_ERR")
+		if( this.readOnly ) return Exception("NO_MODIFICATION_ALLOWED_ERR")
+		var a = this.childNodes, n = a.indexOf(o)
+		if( ~n ){
+			a.splice(n,1)
+			if( n==0 ) this.firstChild = a[0]
+			else if( n==a.length ) this.lastChild = a[a.length-1]
+			if( o.nextSibling ) o.nextSibling.previousSibling = o.previousSibling
+			if( o.previousSibling ) o.previousSibling.nextSibling = o.nextSibling
+			if( this.ownerRoot ) this.ownerRoot.removeId( o )
+			o.ownerRoot = o.parentNode = o.nextSibling = o.previousSibling = null
 			return o
-			} return Exception( "NOT_FOUND_ERR" )
+			}
+		return Exception("NOT_FOUND_ERR")
 		},
 	replaceChild :function( o1, o2 ){
 		this.insertBefore( o1, o2 )
