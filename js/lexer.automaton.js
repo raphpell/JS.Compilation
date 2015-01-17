@@ -187,9 +187,9 @@ var AutomatonLexer =(function(){
 		return o
 		})()
 	, Stack =function( that ){
-		var a = []
+		var a =[0,0,0,0,0]
+		var n = 0 // StackLength
 		return {
-		//	value: a,
 			pop :function( bPartialScan ){
 				if( bPartialScan ){
 					if( that.eEndToken && that.eParent==that.eEndToken.parentNode ){
@@ -204,25 +204,28 @@ var AutomatonLexer =(function(){
 						}
 					}
 				// A faire après suppression des éléments inutiles
-				if( a.length ){
-					var e = a.pop()
+				if( n ){
+					var e = a[--n]
 					e.oValue.lineEnd = e.lastChild && e.lastChild.oValue.lineEnd || 1
 					if( e.setTitle ) e.setTitle()
 					}
-				if( a.length ){
-					if( that.eParent==that.eScanParent ) that.eScanParent = a[a.length-1]
-					that.eParent = a[a.length-1]
+				if( n ){
+					if( that.eParent==that.eScanParent ) that.eScanParent = a[n-1]
+					that.eParent = a[n-1]
 					that.sSyntax = that.eParent.oValue.rule
 					}
-				return a.length
+				return n
 				},
 			push :function( e ){
-				a.push( that.eParent = e )
+				a[n++] = that.eParent = e
 				that.sSyntax = e.oValue.rule
 				return e
 				},
-			top :function(){ return a[a.length-1] },
-			unshift :function( e ){ a.unshift(e) }
+			top :function(){ return a[n-1]},
+			unshift :function( e ){
+				a.unshift(e)
+				n++
+				}
 			}
 		}
 	, Skip =(function(){

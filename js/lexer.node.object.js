@@ -1,3 +1,4 @@
+
 /*----------------------------------
 	- class Node 
 ----------------------------------*/
@@ -30,7 +31,8 @@ Node.prototype ={
 			for(var i=0; a[i]; i++) this.appendChild( a[i])
 			return o
 			}
-		if( o===this || o.isAncestor( this )) Exception("HIERARCHY_REQUEST_ERR")
+		if( o===this || o.isAncestor( this ))
+			Exception("HIERARCHY_REQUEST_ERR")
 		if( o.parentNode ) o = o.parentNode.removeChild( o )
 		o.ownerRoot = this.ownerRoot
 		o.parentNode = this
@@ -38,6 +40,47 @@ Node.prototype ={
 		if( ! this.childNodes.length ) this.firstChild = o 
 		this.childNodes.push( this.lastChild = o )
 		if( this.ownerRoot ) this.ownerRoot.addId( o )
+		return o
+		},
+	cloneNode :function( bDeep ){
+		if( this.nodeType == Node.FRAGMENT_NODE ){
+			var a = this.childNodes
+			for( var i=0, aClones=[], n=a.length; i<n; i++ )
+				aClones [i] = a [i].cloneNode( bDeep )
+			return new this.constructor( aClones )
+			}
+		var aExclude = 'ownerRoot,childNodes,nextSibling,previousSibling,firstChild,lastChild,parentNode'.split( ',' )
+		, Clone =function( o, b ){
+			this.constructor = o.constructor
+			for(var s in o ){
+				var m = o[s]
+				if( m && ( typeof m == "object" ))
+					this[s] = ( in_array( s, aExclude ) || m.ownerDocument )
+						? null
+						: new Clone ( m, true )
+					else this[s] = m
+				}
+			if( o.childNodes ){
+				if( ! b ) this.childNodes = []
+					else {
+						var a = [], ni = o.childNodes.length
+						for( var i=0; i<ni; i++ ) a[i] = new Clone ( o.childNodes[i], b )
+						for( var i=0; i<ni; i++ )
+							a[i].union({
+								nextSibling: i<ni-1 ? a[i+1] : null,
+								previousSibling: i>0 ? a[i-1] : null,
+								parentNode: this
+								})
+						this.union({
+							firstChild: a[0] || null,
+							lastChild: a[ a.length-1 ] || null,
+							childNodes: a
+							})
+						}
+				}
+			this.ownerRoot = o.ownerRoot || null
+			}
+		var o = new Clone ( this, bDeep )
 		return o
 		},
 	getElementsByTagName :function( s ){
@@ -93,15 +136,22 @@ Node.prototype ={
 	removeChild :function( o ){
 		if( ! o ) return Exception("UNDEFINED_ERR")
 		if( this.readOnly ) return Exception("NO_MODIFICATION_ALLOWED_ERR")
-		var a = this.childNodes, n = a.indexOf(o)
+		var a = this.childNodes
+		, n = a.indexOf(o)
+		, o1 = o.previousSibling
+		, o2 = o.nextSibling
 		if( ~n ){
 			a.splice(n,1)
-			if( n==0 ) this.firstChild = a[0]
-			else if( n==a.length ) this.lastChild = a[a.length-1]
-			if( o.nextSibling ) o.nextSibling.previousSibling = o.previousSibling
-			if( o.previousSibling ) o.previousSibling.nextSibling = o.nextSibling
-			if( this.ownerRoot ) this.ownerRoot.removeId( o )
 			o.ownerRoot = o.parentNode = o.nextSibling = o.previousSibling = null
+			if( n==0 && (this.firstChild=o2 ))
+				o2.previousSibling = null
+			else if( n==a.length && (this.lastChild=o1))
+				o1.nextSibling = null
+			else if( a.length ){
+				o2.previousSibling = o1
+				o1.nextSibling = o2
+				}
+			if( this.ownerRoot ) this.ownerRoot.removeId( o )
 			return o
 			}
 		return Exception("NOT_FOUND_ERR")
@@ -111,12 +161,3 @@ Node.prototype ={
 		return this.removeChild( o2 )
 		}
 	}
-
-/*----------------------------------
-	- class Fragment
-----------------------------------*/
-Fragment =function( a ){
-	Node.call( this, null, null, Node.FRAGMENT_NODE )
-	this.childNodes = a || []
-	}
-Fragment.inheritFrom( Node )

@@ -167,25 +167,30 @@ var MultiRegExpLexer =(function(){
 		return o
 		})()
 	, Stack =function( that ){
-		var a = []
+		var a =[0,0,0,0,0]
+		var n = 0 // StackLength
 		return {
-		//	value: a,
 			pop :function(){
-				if( a.length ){
-					var e = a.pop()
+				if( n ){
+					var e = a[--n]
 					e.oValue.lineEnd = e.lastChild && e.lastChild.oValue.lineEnd || 1
 					if( e.setTitle ) e.setTitle()
 					}
-				if( a.length ){
-					that.eParent = a[a.length-1]
+				if( n ){
+					that.eParent = a[n-1]
 					that.sSyntax = that.eParent.oValue.rule
 					}
-				return a.length
+				return n
 				},
 			push :function( e ){
-				a.push( that.eParent = e )
+				a[n++] = that.eParent = e
 				that.sSyntax = e.oValue.rule
 				return e
+				},
+			top :function(){ return a[n-1]},
+			unshift :function( e ){
+				a.unshift(e)
+				n++
 				}
 			}
 		}

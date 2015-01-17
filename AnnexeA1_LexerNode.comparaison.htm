@@ -44,6 +44,7 @@ DIV {
 <script src="js/framework.js"></script>
 <script src="js/shared.js"></script>
 <script src="js/lexer.node.object.js"></script>
+<script src="js/lexer.node.simple.js"></script>
 
 <!-- LexerNode -->
 <script>
@@ -52,32 +53,33 @@ var LexerNode
 	var s
 	switch( sNodeType ){
 		case 'HTMLElement': s='document.createElement(o.token)'; break;
-		case 'ObjectNode': s='new Node(o.token)'; break;
-		case 'EmptyObject': s='EmptyObject(o.token)'; break;
+		case 'ObjectNode': s='new Node (o.token)'; break;
+		case 'SimpleNode': s='new SimpleNode (o.token)'; break;
+		case 'EmptyObject': s='new EmptyObject (o.token)'; break;
 		default: throw Error ('Invalid LexerNode Type.')
 		}
 	LexerNode = new Function ( 'o', 
-		'var e = '+ s +';'
-		+'e.oValue=o;'
-		+'return e;'
+		'var m = '+ s +';'
+		+'m.oValue=o;'
+		+'return m;'
 		)
 	}
 	
-EmptyObject=(function(){ // Pas une solution !
-	var _proto ={
-		appendChild :function(){},
-		insertBefore :function(){},
-		removeChild :function(){}
+EmptyObject=(function(){ // C'est pas une solution !
+	var OO =function(){}
+	OO.prototype ={
+		nodeName:null,
+		nodeType:null,
+		parentNode:null,
+		firstChild:null,
+		lastChild:null,
+		previousSibling:null,
+		nextSibling:null,
+		appendChild: function(){},
+		removeChild: function(){}
 		}
-	return function( sTokenName ){
-		return {
-			nodeName: sTokenName,
-			appendChild: _proto.appendChild,
-			removeChild: _proto.removeChild
-			}
-		}
+	return OO
 	})()
-
 </script>
 
 <!-- Stats -->
@@ -94,7 +96,7 @@ Stats.getName =function( sNodeType, nId ){
 <script>
 _('eTest,eRepeat,eTABLE')
 var oChrono = new Chrono (), oResult
-var aLexerNodeType = ['HTMLElement','ObjectNode','EmptyObject']
+var aLexerNodeType = ['HTMLElement','ObjectNode','SimpleNode','EmptyObject'] // 
 
 var CompareTests =function( nId ){
 	var a = Array.merge( aLexerNodeType, [])
@@ -108,21 +110,11 @@ var CompareTests =function( nId ){
 var aTests =(function(){
 	var o1, o2
 	return [
-		{name:'o1 = new LexerNode',test:function(){
-			o1 = new LexerNode ({token:'STRING'})
-			}},
-		{name:'o2 = new LexerNode',test:function(){
-			o2 = new LexerNode ({token:'STRING'})
-			}},
-		{name:'o1.appendChild( o2 )',test:function(){
-			o1.appendChild( o2 )
-			}},
-		{name:'o1.removeChild( o2 )',test:function(){
-			o1.removeChild( o2 )
-			}},
-		{name:'',test:function(){
-			o1 = o2 = null
-			}}
+		{name:'o1 = new LexerNode',test:function(){ o1 = new LexerNode ({token:'STRING'}) }},
+		{name:'o2 = new LexerNode',test:function(){ o2 = new LexerNode ({token:'STRING'}) }},
+		{name:'o1.appendChild( o2 )',test:function(){ o1.appendChild( o2 ) }},
+		{name:'o1.removeChild( o2 )',test:function(){ o1.removeChild( o2 ) }},
+		{name:'',test:function(){ o1 = o2 = null }}
 		]
 	})()
 
@@ -155,9 +147,11 @@ UnitTest.init =function( sNodeType, nId ){
 	eTABLE.appendChild( eTR )
 	}
 UnitTest.test =function( sName, nId ){
+	var nTime
 	oChrono.start()
 	aTests[nId].test()
-	Stats.set( sName, oChrono.stop())
+	nTime = oChrono.stop()
+	Stats.set( sName, nTime )
 	}
 UnitTest.show =function(){
 	for(var i=0; aTests[i]; i++) CompareTests( i )
