@@ -24,42 +24,68 @@ SimpleNode.prototype ={
 	lastChild:null,
 	previousSibling:null,
 	nextSibling:null,
-	appendChild :function( o ){
-		if( o.parentNode ) o = o.parentNode.removeChild( o )
-		// Pas fait ici normalement
-		else o.nextSibling = o.previousSibling = null
-		o.parentNode = this
-		if( this.lastChild ){
-			o.previousSibling = this.lastChild
-			this.lastChild.nextSibling = o
-			} else this.firstChild = o 
-		this.childNodes[ this.childNodes.length ] = this.lastChild = o
-		return o
+	appendChild :(function(){
+		var doIt =function( o ){
+			if( o.parentNode ) o = o.parentNode.removeChild( o )
+			o.parentNode = this
+			if( o.previousSibling = this.lastChild ) this.lastChild.nextSibling = o
+			return doIt.update( this, o, this.childNodes )
+			}
+		doIt.update =function( oP, oC, a ){
+			if( ! a.length ) oP.firstChild = oC 
+			a.push( oP.lastChild = oC )
+			return oC
+			}
+		return doIt
+		})(),
+	hasChildNodes :function(){
+		return this.childNodes.length
 		},
-	removeChild :function( o ){
-		var a = this.childNodes
-		, n = a.indexOf(o)
-		//, n = indexOf(a,o)
-		, o1 = o.previousSibling
-		, o2 = o.nextSibling
-		if( ~n ){
-			splice(a,n)
-			// Attention: à décommenter
-			// o.parentNode = o.nextSibling = o.previousSibling = null
-			if( n==0 && (this.firstChild=o2 ))
-				o2.previousSibling = null
-			else if( n==a.length && (this.lastChild=o1))
-				o1.nextSibling = null
-			else if( a.length ){
-				o2.previousSibling = o1
-				o1.nextSibling = o2
-				}
+	insertBefore :(function(){
+		var doIt =function( o, oRefChild ){
+			if( ! oRefChild ) return this.appendChild( o )
+			if( o.parentNode ) o.parentNode.removeChild( o )
+			doIt.updateAttributes( this, oRefChild.previousSibling, o, oRefChild )
+			this.childNodes = doIt.updateChilds( this.childNodes, o, oRefChild )
 			return o
 			}
-		return null
-		},
-	replaceChild :function( o1, o2 ){
-		this.insertBefore( o1, o2 )
-		return this.removeChild( o2 )
-		}
+		doIt.updateAttributes =function( oP, oPS, o, oNS ){
+			if( oPS ) oPS.nextSibling = o
+				else oP.firstChild = o
+			oNS.previousSibling = o
+			o.parentNode = oP
+			o.previousSibling = oPS
+			o.nextSibling = oNS
+			}
+		doIt.updateChilds =function( a, o, oRefChild ){
+			for(var i=0; a[i]; i++) if( a[i]===oRefChild ) break
+			return a.slice( 0, i ).concat( [ o ]).concat( a.slice( i, a.length ))
+			}
+		return doIt
+		})(),
+	removeChild :(function(){
+		var doIt =function( o ){
+			return doIt.update( this, this.childNodes, this.childNodes.indexOf(o), o ) // indexOf(a,o)
+			}
+		doIt.update=function( oP, a, i, oC ){
+			if( ~i ){
+				splice(a,i)
+				doIt.updateAttributes( oP, a.length, i, oC.previousSibling, oC.nextSibling )
+				oC.parentNode = oC.nextSibling = oC.previousSibling = null
+				return oC
+				}
+			return null
+			}
+		doIt.updateAttributes =function( oP, nLength, i, oPS, oNS ){
+			if( i==0 && (oP.firstChild=oNS ))
+				oNS.previousSibling = null
+			else if( i==nLength && (oP.lastChild=oPS))
+				oPS.nextSibling = null
+			else if( nLength ){
+				oNS.previousSibling = oPS
+				oPS.nextSibling = oNS
+				}
+			}
+		return doIt
+		})()
 	}

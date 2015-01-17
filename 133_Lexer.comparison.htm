@@ -94,6 +94,7 @@ FIELDSET DL {
 		<dt><select id="eLexerNode">
 			<option value="HTMLElement" selected>HTMLElement</option>
 			<option value="ObjectNode">ObjectNode</option>
+			<option value="SimpleNode">SimpleNode</option>
 		</select></dt>
 		<dt><input type="checkbox" id="eClassName"><label for="eClassName">className</label></dt>
 		<dt><input type="checkbox" id="eTitle"><label for="eTitle">title</label></dt>
@@ -168,6 +169,7 @@ var test_1 =function(){
 
 <!-- LEXER NODE -->
 <script src="js/lexer.node.object.js"></script>
+<script src="js/lexer.node.simple.js"></script>
 <script>
 var getElementsByLine =function( nLine ){
 	var a=[]
@@ -200,6 +202,7 @@ var LexerNode
 	switch( eLexerNode.value ){
 		case 'HTMLElement': s='document.createElement(o.token)'; break;
 		case 'ObjectNode': s='new Node(o.token)'; break;
+		case 'SimpleNode': s='new SimpleNode(o.token)'; break;
 		}
 	LexerNode = new Function ( 'o', 
 		'var e = '+ s +';'
@@ -323,7 +326,8 @@ Events.add(
 	'change',
 		eLexerNode, function(){
 			initStats()
-			if( this.value=='ObjectNode' && nDisplayMode==11 ) eShowResults.checked = false
+			if( nDisplayMode==11 && this.value!='HTMLElement' )
+				eShowResults.checked = false
 			createLexerNode( eClassName.checked,eTitle.checked,eInnerHTML.checked,eByLine.checked );
 			},
 	'click',
@@ -350,7 +354,8 @@ Events.add(
 			},
 		eTestCase1, function(){
 			eTestCase1.checked = nDisplayMode = 11; initStats();
-			if( eShowResults.checked && eLexerNode.value=='ObjectNode' ) eShowResults.checked = false
+			if( eShowResults.checked && eLexerNode.value!='HTMLElement' )
+				eShowResults.checked = false
 			createLexerNode( 1,0,1,0 );
 			fTest()
 			},

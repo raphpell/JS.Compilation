@@ -103,6 +103,7 @@ FIELDSET DL {
 		<dt><select id="eLexerNode">
 			<option value="HTMLElement" selected>HTMLElement</option>
 			<option value="ObjectNode">ObjectNode</option>
+			<option value="SimpleNode">SimpleNode</option>
 		</select></dt>
 		<dt><input type="checkbox" id="eClassName"><label for="eClassName">className</label></dt>
 		<dt><input type="checkbox" id="eTitle"><label for="eTitle">title</label></dt>
@@ -209,6 +210,7 @@ alert('ok')
 
 <!-- LEXER NODE -->
 <script src="js/lexer.node.object.js"></script>
+<script src="js/lexer.node.simple.js"></script>
 <script>
 var LexerNode
 , createLexerNode =function( bClassName, bTitle, bInnerHTML, bByLine ){
@@ -220,6 +222,7 @@ var LexerNode
 	switch( eLexerNode.value ){
 		case 'HTMLElement': s='document.createElement(o.token)'; break;
 		case 'ObjectNode': s='new Node(o.token)'; break;
+		case 'SimpleNode': s='new SimpleNode(o.token)'; break;
 		}
 	LexerNode = new Function ( 'o', 
 		'var e = '+ s +';'
@@ -432,7 +435,7 @@ var Analyse =(function(){
 					default:; break;
 					}
 			var nTime = oChrono.stop()
-			eDisplayTime.innerHTML = ( nTime - Stats.get('global_time').lastTime ).toFixed(3)
+			eDisplayTime.innerHTML = ( nTime - Stats.get('global_time').now ).toFixed(3)
 			eTime2.innerHTML = nTime.toFixed(3) + 'ms'
 			eTest2.appendChild( eResult2 )
 			},
@@ -462,7 +465,7 @@ var nDisplayMode
 Events.add(
 	'change',
 		eLexerNode, function(){
-			if( this.value=='ObjectNode' && nDisplayMode==11 ) eShowResults.checked = false
+			if( this.value!='HTMLElement' && nDisplayMode==11 ) eShowResults.checked = false
 			createLexerNode( eClassName.checked,eTitle.checked,eInnerHTML.checked,eByLine.checked );
 			Analyse.init()
 			},
@@ -497,7 +500,7 @@ Events.add(
 			},
 		eTestCase1, function(){
 			eTestCase1.checked = nDisplayMode = 11;
-			if( eShowResults.checked && eLexerNode.value=='ObjectNode' ) eShowResults.checked = false
+			if( eShowResults.checked && eLexerNode.value!='HTMLElement' ) eShowResults.checked = false
 			createLexerNode( 1,0,1,0 );
 			Analyse.init()
 			},
@@ -523,7 +526,7 @@ Events.add(
 			if( eLocalAnalyse.checked ) Analyse.partielle.doIt( nPos, nDeleted, nAddded )
 			if( eLocalAnalyse.checked && eGlobalAnalyse.checked ){
 				if( eCheckDifference.checked ) Analyse.compare()
-				var n = Stats.get('global_time').lastTime / Stats.get('local_time').lastTime
+				var n = Stats.get('global_time').now / Stats.get('local_time').now
 				_('eVelocity').innerHTML = n != Infinity
 					? n.toFixed( 1 ) + 'x plus rapide'
 					: '...non mesurable !'

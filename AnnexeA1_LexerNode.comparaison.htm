@@ -5,22 +5,30 @@
 		<style>
 CODE, PRE {
 	background: #EEE;
-	border: 2px solid #666;
-	border-width: 1px 0 2px 0;
 	color: #000;
 	display: block;
 	font-weight: bold;
-	margin: 1em 0 .25em;
-	padding: .5em 1em;
 	}
-H2 {
+H2, H3 {
 	background: #EEE;
 	border-bottom: 4px solid #666;
 	margin: 0;
 	padding: .25em;
 	}
+B {
+	font-size: 1.2em;
+	}
 DIV {
 	margin: 0 0 1em;
+	}
+TABLE {
+	font-family: 'Monaco','Menlo','Ubuntu Mono','Consolas','source-code-pro',monospace !important;
+	}
+FIELDSET {
+	float: right;
+	}
+FIELDSET DL {
+	margin: 0;
 	}
 		</style>
 	</head>
@@ -37,6 +45,17 @@ DIV {
 <input type="button" id="eTest" onclick="UnitTest()" value="test">
 <input type="input" id="eRepeat" value="100" size="3"> fois
 
+
+<fieldset><legend>Attributs</legend>
+	<dl id="eAttributes">
+		<dt><input id="eNow" type="checkbox"><label for="eNow">now</label></dt>
+		<dt><input id="eMin" type="checkbox"><label for="eMin">min</label></dt>
+		<dt><input id="eMoy" type="checkbox" checked><label for="eMoy">moy</label></dt>
+		<dt><input id="eMax" type="checkbox"><label for="eMax">max</label></dt>
+		<dt><input id="eTot" type="checkbox"><label for="eTot">tot</label></dt>
+		<dt><input id="eSum" type="checkbox"><label for="eSum">sum</label></dt>
+	</dl>
+</fieldset>
 
 <table border="1" id="eTABLE"></table>
 
@@ -68,6 +87,7 @@ var LexerNode
 EmptyObject=(function(){ // C'est pas une solution !
 	var OO =function(){}
 	OO.prototype ={
+		// Lexer
 		nodeName:null,
 		nodeType:null,
 		parentNode:null,
@@ -76,7 +96,10 @@ EmptyObject=(function(){ // C'est pas une solution !
 		previousSibling:null,
 		nextSibling:null,
 		appendChild: function(){},
-		removeChild: function(){}
+		hasChildNodes: function(){},
+		removeChild: function(){},
+		// Incremental Lexer
+		insertBefore: function(){}
 		}
 	return OO
 	})()
@@ -85,36 +108,62 @@ EmptyObject=(function(){ // C'est pas une solution !
 <!-- Stats -->
 <script src="widget/Stats/scripts.js"></script>
 <script>
+_('eAttributes,eNow,eMin,eMoy,eMax,eTot,eSum')
+Stats.print.union({
+	now: eNow.checked,
+	min: eMin.checked,
+	moy: eMoy.checked,
+	max: eMax.checked,
+	tot: eTot.checked,
+	sum: eSum.checked
+	})
 Stats.getTime =function( n ){
 	return (n*1000).toFixed(2) +' µs'
 	}
 Stats.getName =function( sNodeType, nId ){
 	return sNodeType + nId
 	}
+var displayAttr =function( evt ){
+	var e = Events.element( evt )
+	Stats.print[ e.nextSibling.innerHTML ] =  e.checked
+	UnitTest()
+	eTest.focus()
+	}
+Events.add( 'click',
+	eNow, displayAttr,
+	eMin, displayAttr,
+	eMoy, displayAttr,
+	eMax, displayAttr,
+	eTot, displayAttr,
+	eSum, displayAttr
+	)
 </script>
 
 <script>
 _('eTest,eRepeat,eTABLE')
 var oChrono = new Chrono (), oResult
-var aLexerNodeType = ['HTMLElement','ObjectNode','SimpleNode','EmptyObject'] // 
+var aLexerNodeType = ['HTMLElement','ObjectNode','SimpleNode'] // ,'EmptyObject'
 
 var CompareTests =function( nId ){
 	var a = Array.merge( aLexerNodeType, [])
 	for(var i=0; a[i]; i++) a[i] = Stats.getName(a[i], nId )
 	for(var i=0, ni=a.length; i<ni; i++){
-		if( _( a[0] )) _( a[0]).lastChild.innerHTML = Stats.compare.apply( Stats, a )
+		if( _( a[0] )) _( a[0]).innerHTML = Stats.compare.apply( Stats, a )
 		a.push( a.shift())
 		}
 	}
 
 var aTests =(function(){
-	var o1, o2
+	var o1, o2, o3
 	return [
-		{name:'o1 = new LexerNode',test:function(){ o1 = new LexerNode ({token:'STRING'}) }},
-		{name:'o2 = new LexerNode',test:function(){ o2 = new LexerNode ({token:'STRING'}) }},
-		{name:'o1.appendChild( o2 )',test:function(){ o1.appendChild( o2 ) }},
-		{name:'o1.removeChild( o2 )',test:function(){ o1.removeChild( o2 ) }},
-		{name:'',test:function(){ o1 = o2 = null }}
+		{name:'new',test:function(){ o1 = LexerNode ({token:'STRING'}) }},
+		{name:'',test:function(){ o2 = new LexerNode ({token:'STRING'}) }},
+		{name:'',test:function(){ o3 = new LexerNode ({token:'STRING'}) }},
+		{name:'appendChild',test:function(){ o1.appendChild( o2 ) }},
+		{name:'insertBefore',test:function(){ o1.insertBefore( o3, o2 ) }},
+		{name:'hasChildNodes',test:function(){ o1.hasChildNodes() }},
+		{name:'removeChild',test:function(){ o1.removeChild( o2 ) }},
+		{name:'',test:function(){ o1 = o2 = o3 = null }}
 		]
 	})()
 
@@ -137,14 +186,20 @@ UnitTest.init =function( sNodeType, nId ){
 			id:'e'+sNodeType,
 			innerHTML:'<h2>'+sNodeType+'</h2>'
 			}))
-		for(var k=0; aTests[k]; k++)
-			if( aTests[k].name )
-				eTH.appendChild( Tag('DIV', {
-					id: Stats.getName( aLexerNodeType[j], k ),
-					innerHTML: '<code>'+ aTests[k].name +'</code><div></div>'
-					}))
 		}
 	eTABLE.appendChild( eTR )
+	
+	for(var k=0; aTests[k]; k++){
+		if( aTests[k].name ){
+			eTABLE.appendChild( Tag('TR', { innerHTML:'<th colspan="'+ aLexerNodeType.length +'"><h3><code>'+ aTests[k].name +'</code></h3></th>' }))
+			eTR = Tag('TR')
+			for(var j=0; aLexerNodeType[j]; j++){
+				eTR.appendChild( Tag('TD', { id: Stats.getName( aLexerNodeType[j], k )}))
+				}
+			eTABLE.appendChild( eTR )
+			}
+		}
+					
 	}
 UnitTest.test =function( sName, nId ){
 	var nTime

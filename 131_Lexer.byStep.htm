@@ -82,6 +82,7 @@ TH {
 		<dt><select id="eLexerNode">
 			<option value="HTMLElement" selected>HTMLElement</option>
 			<option value="ObjectNode">ObjectNode</option>
+			<option value="SimpleNode">SimpleNode</option>
 		</select></dt>
 	</dl>
 </fieldset>
@@ -138,6 +139,11 @@ TH {
 <div style="float: left;">
 	<p>La performance est moindre lorsque:</p>
 	<ol>
+		<li>Il créé un token composé
+			<ul>
+				<li>COMMENT: Commentaire simple ou multi ligne.</li>
+				<li>STRING: Chaine de caractère.</li>
+			</ul></li>
 		<li>Une fois un token détecté le <i>lexer revient en arrière</i><br>
 			et le <b>rescanne</b> pour détecter ses enfants (pour les espaces blancs...)
 			<ul>
@@ -150,11 +156,6 @@ TH {
 				<li><abbr title="String Double Quote">SDQ</abbr> ou DOUBLE_QUOTE: Chaine de caractère.</li>
 				<li><abbr title="String Single Quote">SSQ</abbr> ou SINGLE_QUOTE:. Chaine de caractère.</li> -->
 				<li>PHP: Code PHP....</li>
-			</ul></li>
-		<li>Il créé un token composé
-			<ul>
-				<li>COMMENT: Commentaire simple ou multi ligne.</li>
-				<li>STRING: Chaine de caractère.</li>
 			</ul></li>
 	</ol>
 	<p>A noter que lorsque lexer utilise une règle d'un token parent et ne trouve plus de token , il:</p>
@@ -169,9 +170,15 @@ TH {
 <script src="js/framework.js"></script>
 <script src="js/shared.js"></script>
 <script src="widget/Stats/scripts.js"></script>
-
+<script>
+Stats.getTime =function( n ){
+	return (n*1000).toFixed(2)
+	}
+</script>
+	
 <!-- LEXER NODE -->
 <script src="js/lexer.node.object.js"></script>
+<script src="js/lexer.node.simple.js"></script>
 <script>
 var replaceSpecialHTML =function( s ){
 	return s.str_replace( ['&','<','>'], ['&amp;','&lt;','&gt;'])
@@ -197,6 +204,11 @@ var LexerNodes ={
 		},
 	ObjectNode :function( o ){
 		var oNode = new Node ( o.token )
+		oNode.oValue = o
+		return oNode
+		},
+	SimpleNode :function( o ){
+		var oNode = new SimpleNode ( o.token )
 		oNode.oValue = o
 		return oNode
 		}
@@ -270,25 +282,27 @@ View ={
 			var aStats = []
 			for(var s in Stats ){
 				var o = Stats[s]
-				o.toString =function(){
-					return '<td>'+ this.key+'</td>'+
-						'<td>'+ this.count + '</td>'+
-						'<td>'+ (this.min.toFixed(3)) + '</td>'+
-						'<td>'+ (this.moy.toFixed(3)) + '</td>'+
-						'<td>'+ (this.max.toFixed(3)) + '</td>'+
-						'<td>'+ (this.sum.toFixed(3)) + '</td>'
+				if( o && o.max && s!='print' ){
+					o.toString =function(){
+						return '<td>'+ this.key+'</td>'+
+							'<td>'+ this.tot + '</td>'+
+							'<td>'+ Stats.getTime( this.min ) + '</td>'+
+							'<td>'+ Stats.getTime( this.moy ) + '</td>'+
+							'<td>'+ Stats.getTime( this.max ) + '</td>'+
+							'<td>'+ (this.sum.toFixed(3)) + '</td>'
+						}
+					aStats.push( o )
 					}
-				if( o && o.count && s!='scan' ) aStats.push( o )
 				}
 			aStats.sortBy( 'count', 'DESC' )
 			eStats.innerHTML =
 				'<thead><tr>'
 					+'<th>'+'token</th>'
 					+'<th abbr="number">nbre</th>'
-					+'<th abbr="number">min</th>'
-					+'<th abbr="number">moy</th>'
-					+'<th abbr="number">max</th>'
-					+'<th abbr="number">total</th>'
+					+'<th abbr="number">min (µs)</th>'
+					+'<th abbr="number">moy (µs)</th>'
+					+'<th abbr="number">max (µs)</th>'
+					+'<th abbr="number">total (ms)</th>'
 				+'</tr></thead>'
 				+'<tbody><tr>'+ aStats.join('</tr><tr>') +'</tr></tbody>'
 				

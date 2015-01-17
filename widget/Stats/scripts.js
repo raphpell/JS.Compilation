@@ -67,8 +67,8 @@ var Stats =(function(){
 		for(var i=1, a=arguments, ni=a.length; i<ni; i++ ){
 			var o2 = this[a[i]]
 			if( ! o2 ) continue ;
-			if( bTimeInf ) bTimeInf = o1.lastTime <= o2.lastTime
-			if( bTimeSup ) bTimeSup = o1.lastTime >= o2.lastTime
+			if( bTimeInf ) bTimeInf = o1.now <= o2.now
+			if( bTimeSup ) bTimeSup = o1.now >= o2.now
 			if( bMinInf ) bMinInf = o1.min <= o2.min
 			if( bMinSup ) bMinSup = o1.min >= o2.min
 			if( bMoyInf ) bMoyInf = o1.moy <= o2.moy
@@ -89,7 +89,7 @@ var Stats =(function(){
 	aStats.reset =function( nID ){
 		for(var s in this ){
 			var o = Stats[s]
-			if( o && o.count ) delete Stats[s]
+			if( o && o.tot && s!='print' ) delete Stats[s]
 			}
 		}
 	
@@ -97,41 +97,63 @@ var Stats =(function(){
 		return n.toFixed(2) +' ms'
 		}
 	aStats.print ={
+		now:1,
+		min:1,
+		moy:1,
+		max:1,
+		tot:1,
+		sum:0,
+		times :function( nNow, nMin, nMoy, nMax, nTot, nSum ){
+			var a =[]
+			if( this.now ) a.push( 'now: ' +nNow )
+			if( this.min ) a.push( 'min: '+ nMin )
+			if( this.moy ) a.push( 'moy: '+ nMoy )
+			if( this.max ) a.push( 'max: '+ nMax )
+			if( this.tot ) a.push( 'tot: '+ nTot )
+			if( this.sum ) a.push( 'sum: '+ nSum )
+			return a.join('<br>')
+			},
 		only :function( o ){
-			return aStats.getTime( o.lastTime )
-				+'<br>min:'+ aStats.getTime( o.min )
-				+'<br>moy:'+ aStats.getTime( o.moy )
-				+'<br>max:'+ aStats.getTime( o.max )
-				+'<br>nbre:'+ o.count
+			return this.times(
+				aStats.getTime( o.now ),
+				aStats.getTime( o.min ),
+				aStats.getTime( o.moy ),
+				aStats.getTime( o.max ),
+				o.tot,
+				o.sum.toFixed(2) +' ms'
+				)
 			},
 		result :function( o, a ){
 			var tag =function(s,color){ return '<b style="color:'+color+'">'+s+'</b>'}
-			var f =function( n1, bInf, bSup ){
+			var f =function( s, bInf, bSup ){
 				return bInf
-					? tag(n1,'green')
+					? tag(s,'green')
 					: ( bSup
-						? tag(n1,'red')
-						: tag(n1,'black')
+						? tag(s,'red')
+						: tag(s,'black')
 						)
 				}
-			return f( aStats.getTime( o.lastTime ), a[0], a[1] ) +
-				'<br>min:'+ f( aStats.getTime( o.min ), a[2], a[3] ) +
-				'<br>moy:'+ f( aStats.getTime( o.moy ), a[4], a[5] ) +
-				'<br>max:'+ f( aStats.getTime( o.max ), a[6], a[7] ) +
-				'<br>nbre:'+ o.count
+			return this.times(
+				f( aStats.getTime( o.now ), a[0], a[1] ),
+				f( aStats.getTime( o.min ), a[2], a[3] ),
+				f( aStats.getTime( o.moy ), a[4], a[5] ),
+				f( aStats.getTime( o.max ), a[6], a[7] ),
+				o.tot,
+				f( o.sum.toFixed(2) +' ms', a[4], a[5] )
+				)
 			}
 		}
 	aStats.set =function( nID, n ){
 		var o = this[nID]
-		if( ! o ) o = this[nID] = { key:nID, lastTime:n, min:n, moy:n, max:n, sum:n, count:1 }
+		if( ! o ) o = this[nID] = { key:nID, now:n, min:n, moy:n, max:n, sum:n, tot:1 }
 		else {
 			o = this[nID]
-			o.lastTime = n
+			o.now = n
 			if( n < o.min ) o.min = n
 			if( n > o.max ) o.max = n
 			o.sum += n
-			o.count++
-			o.moy = o.sum / o.count
+			o.tot++
+			o.moy = o.sum / o.tot
 			}
 		return this.print.only(o)
 		}
