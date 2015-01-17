@@ -2,7 +2,7 @@
 /*----------------------------------
 	- class SimpleNode 
 ----------------------------------*/
-var splice =function( a, n ){
+var spliceOne =function( a, n ){
 	if(!a.length)return;
 	while(n<a.length)a[n]=a[++n]
 	--a.length
@@ -69,7 +69,7 @@ SimpleNode.prototype ={
 			}
 		doIt.update=function( oP, a, i, oC ){
 			if( ~i ){
-				splice(a,i)
+				spliceOne(a,i)
 				doIt.updateAttributes( oP, a.length, i, oC.previousSibling, oC.nextSibling )
 				oC.parentNode = oC.nextSibling = oC.previousSibling = null
 				return oC
