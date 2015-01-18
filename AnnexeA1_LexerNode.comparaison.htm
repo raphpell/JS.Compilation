@@ -43,7 +43,7 @@ FIELDSET DL {
 </p>
 
 <input type="button" id="eTest" onclick="UnitTest()" value="test">
-<input type="input" id="eRepeat" value="100" size="3"> fois
+<input type="input" id="eRepeat" value="10" size="3"> fois
 
 
 <fieldset><legend>Attributs</legend>
@@ -96,6 +96,7 @@ EmptyObject=(function(){ // C'est pas une solution !
 		previousSibling:null,
 		nextSibling:null,
 		appendChild: function(){},
+		getElementsByTagName:function(){},
 		hasChildNodes: function(){},
 		removeChild: function(){},
 		// Incremental Lexer
@@ -160,8 +161,24 @@ var aTests =(function(){
 		{name:'',test:function(){ o2 = new LexerNode ({token:'STRING'}) }},
 		{name:'',test:function(){ o3 = new LexerNode ({token:'STRING'}) }},
 		{name:'appendChild',test:function(){ o1.appendChild( o2 ) }},
-		{name:'insertBefore',test:function(){ o1.insertBefore( o3, o2 ) }},
+		{name:'',test:function(){
+			var nChild = 5
+			var nDepth = 3
+			var appendNodes=function( oP, n ){
+				if( n<nDepth )
+					for(var i=0; i<nChild; i++ )
+						oP.appendChild(
+							appendNodes( LexerNode({ token:'STRING'+ (i>1?i:'') }), n+1 )
+							)
+				return oP
+				}
+			appendNodes( o1, 0 )
+			}},
+		{name:'getElementsByTagName',test:function(){
+			o1.getElementsByTagName('STRING')
+			}},
 		{name:'hasChildNodes',test:function(){ o1.hasChildNodes() }},
+		{name:'insertBefore',test:function(){ o1.insertBefore( o3, o2 ) }},
 		{name:'removeChild',test:function(){ o1.removeChild( o2 ) }},
 		{name:'',test:function(){ o1 = o2 = o3 = null }}
 		]

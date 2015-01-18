@@ -38,6 +38,16 @@ SimpleNode.prototype ={
 			}
 		return doIt
 		})(),
+	getElementsByTagName :function( s ){
+		var a = []
+		, o = this.firstChild
+		while( o ){
+			if( o.nodeName == s || s == "*" ) a.push( o )
+			a = a.concat( o.getElementsByTagName( s ))
+			o = o.nextSibling
+			}
+		return a
+		},
 	hasChildNodes :function(){
 		return this.childNodes.length
 		},
@@ -77,9 +87,9 @@ SimpleNode.prototype ={
 			return null
 			}
 		doIt.updateAttributes =function( oP, nLength, i, oPS, oNS ){
-			if( i==0 && (oP.firstChild=oNS ))
+			if( i==0 && ( oP.firstChild=oNS ))
 				oNS.previousSibling = null
-			else if( i==nLength && (oP.lastChild=oPS))
+			else if( i==nLength && ( oP.lastChild=oPS ))
 				oPS.nextSibling = null
 			else if( nLength ){
 				oNS.previousSibling = oPS

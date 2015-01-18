@@ -451,7 +451,7 @@ var AutomatonLexer =(function(){
 			var a = eParent.childNodes
 			, nStart = 0, nMiddle, nEnd = a.length-1
 			
-			//Boucle de recherche
+			// Recherche dichotomique
 			if( a.length )
 				do{
 					nMiddle = Math.round( nStart + ( nEnd - nStart ) / 2 )
