@@ -2,17 +2,6 @@
 /*----------------------------------
 	- class SimpleNode 
 ----------------------------------*/
-var spliceOne =function( a, n ){
-	if(!a.length)return;
-	while(n<a.length)a[n]=a[++n]
-	--a.length
-	}
-var indexOf =function( a, o ){
-	for(var i=0;a[i];i++)
-		if(a[i]===o)return i
-	return -1
-	}
-
 SimpleNode =function( s1 ){
 	if( s1 )this.nodeName = s1
 	this.childNodes=[]
@@ -24,78 +13,75 @@ SimpleNode.prototype ={
 	lastChild:null,
 	previousSibling:null,
 	nextSibling:null,
-	appendChild :(function(){
-		var doIt =function( o ){
-			if( o.parentNode ) o = o.parentNode.removeChild( o )
-			o.parentNode = this
-			if( o.previousSibling = this.lastChild ) this.lastChild.nextSibling = o
-			return doIt.update( this, o, this.childNodes )
-			}
-		doIt.update =function( oP, oC, a ){
-			if( ! a.length ) oP.firstChild = oC 
-			a.push( oP.lastChild = oC )
-			return oC
-			}
-		return doIt
-		})(),
-	getElementsByTagName :function( s ){
-		var a = []
-		, o = this.firstChild
-		while( o ){
-			if( o.nodeName == s || s == "*" ) a.push( o )
-			a = a.concat( o.getElementsByTagName( s ))
-			o = o.nextSibling
-			}
+	appendChild :function( o ){
+		if( o.parentNode ) o = o.parentNode.removeChild( o )
+		o.parentNode = this
+		if( o.previousSibling = this.lastChild ) this.lastChild.nextSibling = o
+		if( ! this.childNodes.length ) this.firstChild = o 
+		this.childNodes.push( this.lastChild = o )
+		return o
+		},
+	getElementsByTagName :function( tagName ){
+		//http://dean.edwards.name/weblog/2009/12/getelementsbytagname/
+		var a = [], i = 0, node, next = this.firstChild
+		if( tagName=="*" )
+			while( node = next ){
+				a[i++] = node
+				next = node.firstChild || node.nextSibling
+				while( !next && ( node = node.parentNode )) next = node===this ? null : node.nextSibling
+				}
+		else
+			while( node = next ){
+				if( node.nodeName==tagName ) a[i++] = node
+				next = node.firstChild || node.nextSibling
+				while( !next && ( node = node.parentNode )) next = node===this ? null : node.nextSibling
+				}
 		return a
 		},
 	hasChildNodes :function(){
 		return this.childNodes.length
 		},
-	insertBefore :(function(){
-		var doIt =function( o, oRefChild ){
-			if( ! oRefChild ) return this.appendChild( o )
-			if( o.parentNode ) o.parentNode.removeChild( o )
-			doIt.updateAttributes( this, oRefChild.previousSibling, o, oRefChild )
-			this.childNodes = doIt.updateChilds( this.childNodes, o, oRefChild )
-			return o
-			}
-		doIt.updateAttributes =function( oP, oPS, o, oNS ){
-			if( oPS ) oPS.nextSibling = o
-				else oP.firstChild = o
-			oNS.previousSibling = o
-			o.parentNode = oP
-			o.previousSibling = oPS
-			o.nextSibling = oNS
-			}
-		doIt.updateChilds =function( a, o, oRefChild ){
-			for(var i=0; a[i]; i++) if( a[i]===oRefChild ) break
-			return a.slice( 0, i ).concat( [ o ]).concat( a.slice( i, a.length ))
-			}
-		return doIt
-		})(),
-	removeChild :(function(){
-		var doIt =function( o ){
-			return doIt.update( this, this.childNodes, this.childNodes.indexOf(o), o ) // indexOf(a,o)
-			}
-		doIt.update=function( oP, a, i, oC ){
-			if( ~i ){
-				spliceOne(a,i)
-				doIt.updateAttributes( oP, a.length, i, oC.previousSibling, oC.nextSibling )
-				oC.parentNode = oC.nextSibling = oC.previousSibling = null
-				return oC
+	insertBefore :function( o, NS ){
+		if( ! NS ) return this.appendChild( o )
+		if( o.parentNode ) o.parentNode.removeChild( o )
+		o.previousSibling = (o.nextSibling = NS).previousSibling
+		NS.previousSibling = NS.previousSibling
+			? NS.previousSibling.nextSibling = o
+			: this.firstChild = o
+		o.parentNode = this
+		var a = []
+	 	for(var i=0; this.childNodes[i]; i++){
+			if( this.childNodes[i]===NS ){
+				a[i]=o
+				for(; this.childNodes[i]; i++) a[i+1]=this.childNodes[i]
+				break;
 				}
-			return null
+			a[i]=this.childNodes[i]
 			}
-		doIt.updateAttributes =function( oP, nLength, i, oPS, oNS ){
-			if( i==0 && ( oP.firstChild=oNS ))
-				oNS.previousSibling = null
-			else if( i==nLength && ( oP.lastChild=oPS ))
-				oPS.nextSibling = null
-			else if( nLength ){
-				oNS.previousSibling = oPS
-				oPS.nextSibling = oNS
+		this.childNodes = a
+		return o
+		},
+	removeChild :function( o ){
+		var a = []
+		, PS = o.previousSibling
+		, NS = o.nextSibling
+	 	for(var i=0; this.childNodes[i]; i++){
+			if( this.childNodes[i]===o ){
+				for( i++; this.childNodes[i]; i++) a[i-1]=this.childNodes[i]
+				break;
 				}
+			a[i]=this.childNodes[i]
 			}
-		return doIt
-		})()
+		this.childNodes = a
+		if( this.firstChild==o && ( this.firstChild=NS ))
+			NS.previousSibling = null
+		else if( this.lastChild==o && ( this.lastChild=PS ))
+			PS.nextSibling = null
+		else if( this.childNodes.length ){
+			NS.previousSibling = PS
+			PS.nextSibling = NS
+			}
+		o.parentNode = o.nextSibling = o.previousSibling = null
+		return o
+		}
 	}

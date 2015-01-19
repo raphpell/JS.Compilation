@@ -175,7 +175,7 @@ var aTests =(function(){
 			appendNodes( o1, 0 )
 			}},
 		{name:'getElementsByTagName',test:function(){
-			o1.getElementsByTagName('STRING')
+			o1.lastChild.getElementsByTagName('STRING')
 			}},
 		{name:'hasChildNodes',test:function(){ o1.hasChildNodes() }},
 		{name:'insertBefore',test:function(){ o1.insertBefore( o3, o2 ) }},
