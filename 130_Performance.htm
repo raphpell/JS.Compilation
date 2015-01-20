@@ -1,6 +1,6 @@
 ﻿<html>
 	<head>
-		<title>Performance du Lexer</title>
+		<title>Les Lexers</title>
 		<style>
 UL {
 	list-style-position: inside;
@@ -10,72 +10,96 @@ UL {
 LI {
 	padding: 0 1em;
 	}
-.automatonLexer {
-	background: #FEA;
-	margin: .5em 0;
+.lexer {
+	background: #EEE;
+	border: 1px solid #666;
+	float: left;
+	list-style-type: none;
+	margin: 0 .5em 2em;
 	padding: .5em 1em;
+	white-space: nowrap;
 	}
-.regexpMultipleLexer {
-	background: #DFD;
-	margin: .5em 0;
-	padding: .5em 1em;
-	}
-.regexpOneLexer {
-	background: #FDD;
-	margin: .5em 0;
-	padding: .5em 1em;
+UL + P {
+	clear: left;
 	}
 		</style>
 	</head>
 	<body>
 <a href="index.htm">Index</a>
 
-<h1>Performance du Lexer</h1>
-<p>Là où temps est perdu :</p>
+<h1>Les Lexers</h1>
+
+<p>Il y a trois différents lexers testés. Mais il n'y en a que deux à privilégier.</p>
+
+<h2>Performance</h2>
+<p>Elle est mesurée sur deux méthodes :</p>
 <ul>
-	<li>La <a href="AnnexeA_LexerNode.htm">création des léxèmes</a>.</li>
-	<li>La <a href="131_Lexer.byStep.htm">lecture des tokens</a>.</li>
+	<li><b>readToken</b>: <a href="131_Lexer.byStep.htm">vitesse de lecture des tokens</a> pour un lexer.</li>
+	<li><b>scan</b>: comparaison <a href="133_Lexer.comparison.htm">vitesse de lecture totale</a> des lexers.</li>
+</ul>
+<p>
+	L'<a href="132_Lexer.level.html">équivalence des résultats</a> des analyses lexicales est comparée 
+	afin d'assurer des mesures dans des conditions identiques.
+</p>
+<p>La performance est dependante du <a href="AnnexeA_LexerNode.htm">LexerNode</a> utilisé.</p>
+
+<h2>Description</h2>
+
+
+<p style="margin-bottom:0;">
+	Ils réalisent tous une analyse à <a href="132_Lexer.level.html">plusieurs niveaux</a>: un <i>arbre lexicale</i> est créé.<br>
+</p>
+
+
+<p>Les deux lexers <b>à privilégier</b> :</p>
+<ul>
+	<li>Parcourent le texte une et une seule fois...</li>
+	<li>Permettent de:
+		<ol>
+			<li>rescanner un token (il en fait un token parent).</li>
+			<li>détecter le début et la fin d'un token parent.</li>
+		</ol>
+	</li>
+	<li>Utilisent une liste d'<i>objet reconnaissant des tokens</i>.<br>
+		<small><b>ATTENTION</b></small>: Premier objet arrivé, premier servi.
+		<ol>
+			<li>Un ordre est requis (mots clés avant identifiant, ...)</li>
+			<li>Les objets trouvés le plus souvant doivent être classés en tête :
+				<i>amélioration des performances</i>.</li>
+		</ol>
+	</li>
 </ul>
 
-
-<h2>Mes lexers</h2>
-<p>Voici la liste de <a href="133_Lexer.comparison.htm">mes Lexer</a> classés par préférence:</p>
+<p>Comparaisons des deux lexers :</p>
 <ul>
-	<li class="automatonLexer"><b>Automaton Lexer</b>
+	<li class="lexer"><b>Automaton Lexer</b>. <br>
+		Utilise des AFD : Il reconnaisse 1 à plusieurs tokens.
 		<ul>
-			<li>Le texte est parcourue une et une seule fois et voila...</li>
-			<li>Le plus long token trouvé est toujours retourné.</li>
-			<li>Il peut aussi:
-				<ol>
-					<li>parcourir une liste d'automates.</li>
-					<li>rescanner un token trouvé.</li>
-					<li>réaliser une <a href="134_Lexer.update.htm">analyse partielle</a></li>
-				</ol>
-			</li>
+			<li style="color:red;">Lexer plus lent.</li>
+			<li style="color:red;">Code source très grand.</li>
+			<li style="color:green;">Analyse partielle implémenté (<a href="134_Lexer.update.htm">aperçu</a>).</li>
+			<li style="color:green;">Le plus long token trouvé est toujours retourné.</li>
 		</ul></li>
-	<li class="regexpMultipleLexer"><b>Multiple RegExp Lexer</b>
+	<li class="lexer"><b>Multiple RegExp Lexer</b>. <br>
+		Utilise des ER : Elle reconnaisse 1 et 1 seul token.
 		<ul>
-			<li>Il parcourt une liste d'ER une à une tant que tout le texte n'est pas parcouru.</li>
-			<li>Il vaut mieux quelle soit classée par ordre d'apparition courante.</li>
-			<li>Première arrivée, première servie.</li>
-			<li>Un ordre des ER est requis: mots clés avant identifiant, etc...</li>
-			<li>Lexer le plus rapide...</li>
+			<li style="color:green;">Lexer plus rapide.</li>
+			<li style="color:green;">Code source beaucoup plus petit.</li>
+			<li style="color:red;">Analyse partielle non implémentée.</li>
+			<li style="color:red;">Premier arrivé, premier servi.</li>
 		</ul></li>
-	<li class="regexpOneLexer"><b>"1 RegExp" Lexer</b> <sup style="color:red;">A éviter!</sup>
+</ul>
+
+<p>Le dernier est <b>à éviter impérativement !</b></p>
+<ul>
+	<li class="lexer"><b>"1 RegExp" Lexer</b> <sup style="color:red;">deprecated</sup>
 		<ul>
 			<li>Une seule grande expression régulière est créée pour parcourir le texte.</li>
 			<li>Le défaut: quand un mot est trouvé il faut déterminé son type.</li>
 			<li>Pour cela il faut parcourir toutes les expressions régulières (celles utilisées pour créer la grande).</li>
-			<li>Les expressions régulières utilisées pour créer la grande ont une organisation spéciale... (voir Multiple RegExp Lexer)</li>
+			<li>Les expressions régulières utilisées pour créer la grande ont une organisation spéciale... (voir ci-dessus!)</li>
+			<li>J'ai abandonné son utilisation.</li>
 		</ul></li>
-</ul>
-<p style="margin-bottom:0;">
-	Ils réalisent tous une analyse sur <a href="132_Lexer.level.html">plusieurs niveaux</a>: un <i>arbre lexicale</i> est créé.<br>
-	Normalement:
-</p>
-<ul style="margin-top:0;">
-	<li>Seule une liste de token devrait-être générée</li>
-	<li>L'<a href="200_AnalyseSyntaxique.htm">analyse syntaxique</a> devrait-être faite en parallèle (voir <a href="210_Parser.html">grammaire</a>).</li>
 </ul>
 
 	</body>

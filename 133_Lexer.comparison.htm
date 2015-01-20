@@ -92,7 +92,7 @@ FIELDSET DL {
 <fieldset><legend>LexerNode</legend>
 	<dl>
 		<dt><select id="eLexerNode">
-			<option value="HTMLElement" selected>HTMLElement</option>
+			<option value="HTMLElement">HTMLElement</option>
 			<option value="ObjectNode">ObjectNode</option>
 			<option value="SimpleNode">SimpleNode</option>
 		</select></dt>
@@ -106,7 +106,7 @@ FIELDSET DL {
 	<dl>
 		<dt>
 			<input type="button" value="Répéter automatiquement" onclick="this.value=this.value=='Arrêter'?'Répéter':'Arrêter'; test()">
-			<input type="button" value="Scanner" onclick="fTest()">
+			<input type="button" id="eBtnScan" value="Scanner" onclick="fTest()">
 		</dt>
 		<dt><input type="checkbox" id="eOnKeyUp"><label for="eOnKeyUp">Executer lors du relâchement d'une touche.</label></dt>
 	</dl>
@@ -299,6 +299,7 @@ var nDisplayMode
 <!-- STATS -->
 <script src="widget/Stats/scripts.js"></script>
 <script>
+_( 'eBtnScan' )
 _( 'eText,eOnKeyUp,eShowResults' )
 _( 'eResult1,eResult2,eResult3,eResult4' )
 _( 'eTest1,eTest2,eTest3,eTest4' )
@@ -319,6 +320,7 @@ var fTest =function(){
 	eChrono2.innerHTML = eEnabled2.checked ? Stats.compare( 2, eEnabled3.checked?3:0, eEnabled4.checked?4:0 ) : '...'
 	eChrono3.innerHTML = eEnabled3.checked ? Stats.compare( 3, eEnabled4.checked?4:0, eEnabled2.checked?2:0 ) : '...'
 	eChrono4.innerHTML = eEnabled4.checked ? Stats.compare( 4, eEnabled2.checked?2:0 ,eEnabled3.checked?3:0 ) : '...'
+	eBtnScan.focus()
 	}
 var test =benchmark( fTest, 1000 )
 
@@ -329,6 +331,7 @@ Events.add(
 			if( nDisplayMode==11 && this.value!='HTMLElement' )
 				eShowResults.checked = false
 			createLexerNode( eClassName.checked,eTitle.checked,eInnerHTML.checked,eByLine.checked );
+			eBtnScan.focus()
 			},
 	'click',
 		eShowResults, function(){
@@ -383,7 +386,8 @@ Events.add(
 			}},
 	'keyup', eText, function(){ if( eOnKeyUp.checked ) fTest()}
 	)
-eTestCase3.onclick()
+eTestCase2.onclick()
+eBtnScan.focus()
 </script>
 
 </body>

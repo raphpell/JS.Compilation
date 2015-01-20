@@ -39,7 +39,7 @@ SimpleNode.prototype ={
 		return a
 		},
 	hasChildNodes :function(){
-		return this.childNodes.length
+		return this.firstChild && true
 		},
 	insertBefore :function( o, NS ){
 		if( ! NS ) return this.appendChild( o )
@@ -49,8 +49,7 @@ SimpleNode.prototype ={
 			? NS.previousSibling.nextSibling = o
 			: this.firstChild = o
 		o.parentNode = this
-		var a = []
-	 	for(var i=0; this.childNodes[i]; i++){
+	 	for(var i=0, a=[]; this.childNodes[i]; i++){
 			if( this.childNodes[i]===NS ){
 				a[i]=o
 				for(; this.childNodes[i]; i++) a[i+1]=this.childNodes[i]
@@ -62,10 +61,7 @@ SimpleNode.prototype ={
 		return o
 		},
 	removeChild :function( o ){
-		var a = []
-		, PS = o.previousSibling
-		, NS = o.nextSibling
-	 	for(var i=0; this.childNodes[i]; i++){
+	 	for(var i=0, a=[]; this.childNodes[i]; i++){
 			if( this.childNodes[i]===o ){
 				for( i++; this.childNodes[i]; i++) a[i-1]=this.childNodes[i]
 				break;
@@ -73,13 +69,13 @@ SimpleNode.prototype ={
 			a[i]=this.childNodes[i]
 			}
 		this.childNodes = a
-		if( this.firstChild==o && ( this.firstChild=NS ))
-			NS.previousSibling = null
-		else if( this.lastChild==o && ( this.lastChild=PS ))
-			PS.nextSibling = null
+		if( this.firstChild==o && ( this.firstChild=o.nextSibling ))
+			o.nextSibling.previousSibling = null
+		else if( this.lastChild==o && ( this.lastChild=o.previousSibling ))
+			o.previousSibling.nextSibling = null
 		else if( this.childNodes.length ){
-			NS.previousSibling = PS
-			PS.nextSibling = NS
+			o.nextSibling.previousSibling = o.previousSibling
+			o.previousSibling.nextSibling = o.nextSibling
 			}
 		o.parentNode = o.nextSibling = o.previousSibling = null
 		return o

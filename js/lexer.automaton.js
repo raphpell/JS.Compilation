@@ -283,6 +283,9 @@ var AutomatonLexer =(function(){
 			}
 		})
 	Lexer.prototype ={
+		end :function(){
+			return this.eRoot
+			},
 		searchToken :function( sToken, nStart ){
 			var oFA=LexerRules.DFA.have( sToken ), nEnd=nStart, sState=1, oMatched=null
 			if( this.previous.invalidFor( sToken )) return false;
@@ -367,7 +370,7 @@ var AutomatonLexer =(function(){
 		scan :function( sText, sSyntax ){
 			this.init( sText, sSyntax )
 			while( this.readToken());
-			return this.eRoot
+			return this.end()
 			}
 		}
 	// RESCAN
