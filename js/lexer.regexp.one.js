@@ -129,7 +129,7 @@ var OneRegExpLexer =(function(){
 		['ANY', /\./, 'character' ],
 		['CHAR', /[^\(\)\\\|\.\[\]\*\+\?\{\-]/, 'character' ]
 		])
-	Lexer.rule( 'RegExp',
+	Lexer.rule( 'SimpleRegExp',
 		'CHARSET,PIPE,PUNCTUATOR,QUANTIFIER1,QUANTIFIER2,CHAR_ESCAPED,ANY,CHAR'.split(',')
 		)
 		

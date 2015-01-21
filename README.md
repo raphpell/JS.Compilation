@@ -15,8 +15,8 @@ Formulaires disponibles
 
 Visualisation des performances des Lexers
 --------
-- [Analyse lexicale: readToken](http://raphpell.github.io/JS.Compilation/131_Lexer.byStep.htm)
-- [Analyse lexicale: scan](http://raphpell.github.io/JS.Compilation/133_Lexer.comparison.htm)
+- [Analyse lexicale: readToken](http://raphpell.github.io/JS.Compilation/132_Lexers.performance.readToken.htm)
+- [Analyse lexicale: scan](http://raphpell.github.io/JS.Compilation/133_Lexers.performance.scan.htm)
 
 
 En attente

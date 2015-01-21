@@ -36,7 +36,7 @@
 <h2>Principes</h2>
 <p>
 	Le lexer parcours un texte source caractère/caractère et le transforme en 
-	<a href="131_Lexer.byStep.htm">liste de lexèmes</a> (ayant comme attributs: type, index, valeur, ...).<br>
+	<a href="132_Lexers.performance.readToken.htm">liste de lexèmes</a> (ayant comme attributs: type, index, valeur, ...).<br>
 	Essayer de changer le texte ci-dessous :
 </p>
 <textarea id="eTextScanned" type="text">Le texte source.
@@ -46,7 +46,7 @@ FIN.</textarea>
 <p>Chaque type de lexème est défini à l'aide d'une <a href="src/regexp/syntax.htm">ER</a>.</p>
 <p>
 	Le lexer utilise <b>directement les ER</b> ou des <b>AFD issus de ces ER</b>. 
-	Les <a href="133_Lexer.comparison.htm">performances</a> sont sensiblement équivalente.
+	Les <a href="133_Lexers.performance.scan.htm">performances</a> sont sensiblement équivalente.
 	<br>
 	Mais la dernière solution est préférable car elle nous laissent plus possibilités en programmation
 	<br>
@@ -100,6 +100,7 @@ FIN.</textarea>
 	<li>Maintenance / Evolution = Plusieurs AFDs.</li>
 	<li>Performance téléchargement = Fonction de la taille des AFDs.</li>
 </ul>
+<p>Un mini langage a été créé pour <a href="140_Lexer.modules.htm">créer des modules pour le Lexer Automaton</a>.</p>
 
 
 
