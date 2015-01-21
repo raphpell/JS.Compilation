@@ -4,15 +4,17 @@
 		<link rel="stylesheet" type="text/css" href="css/fa.css">
 		<link rel="stylesheet" type="text/css" href="css/reToNFA.css">
 		<style>
+h2 {
+	margin: 0;
+	}
 		</style>
 	</head>
 	<body>
 <a href="index.htm">Index</a>
 
+
 <h1>Les automates finis</h1>
-
 <p>Un automate fini est composé par :</p>
-
 <table cellspacing="10">
 	<tr><th>Identifiant</th><td><b>Description</b></td><th>Symbole graphique</th></tr>
 	<tr>
@@ -53,22 +55,40 @@
 	</tr>
 </table>
 
-<h2>Les transitions pour un caractère<br> <div class="fa TransitionSymbol"></div></h2>
-<p>La machine passe d'un état à un autre en lisant un caractère.</p>
 
-<h2>Les transitions pour un ensemble de caractère<br> <div class="fa TransitionCharclass"></div></h2>
-<p>
-	Si le caractère lu fait partie de l'ensemble de caractère accepté, la machine change d'état.
-</p>
-<p>
-	L'automate perd en performance avec mais cette perte reste négligeable en utilisant des caches mémoires.<br>
-	Ce type de transition est nécessaire pour les ensembles de caractères négatifs.<br>
-	Elles permettent de compresser l'automate.
-</p>
+<table cellspacing="20">
+	<tr>
+		<th valign="top"><div class="fa TransitionSymbol"></div></th>
+		<td>
+			<h2>Transition à un caractère</h2>
+			<p>La machine passe d'un état à un autre en lisant un caractère.</p>
+		</td>
+	</tr>
+	<tr>
+		<th valign="top"><div class="fa TransitionCharclass"></div></th>
+		<td>
+			<h2>Transition pour un ensemble de caractère</h2>
+			<p>
+				Si le caractère lu fait partie de l'ensemble de caractère accepté, la machine change d'état.
+			</p>
+			<p>
+				L'automate perd en performance avec mais cette perte reste négligeable en utilisant des caches mémoires.<br>
+				Ce type de transition est nécessaire pour les ensembles de caractères négatifs.<br>
+				Elles permettent aussi de compresser l'automate.
+			</p>
+		</td>
+	</tr>
+	<tr>
+		<th valign="top"><div class="fa TransitionEpsilon"></div></th>
+		<td>
+			<h2>Transition &epsilon; (epsilon)</h2>
+			<p>
+				La machine passe d'un état à un autre sans lire de caractère.<br>
+				Ce type de transition est utilisé dans les AFN.
+			</p>
+		</td>
+	</tr>
+</table>
 
-<h2>Les transitions &epsilon; (Epsilon)<br> <div class="fa TransitionEpsilon"></div></h2>
-<p>La machine passe d'un état à un autre sans lire de caractère.</p>
-
-	
 	</body>
 </html>

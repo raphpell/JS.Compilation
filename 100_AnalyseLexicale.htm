@@ -27,50 +27,81 @@
 <a href="index.htm">Index</a>
 
 <h1>Analyse lexicale</h1>
-
-<p>La machine réalisant cette tâche se nomme 
-<i>scanneur</i>, <i>lexeur</i> ou <i>analyseur lexical</i>.
+<p>
+	La machine réalisant cette tâche est nommée <b>lexer</b> dans cette application.<br>
+	Autres noms possibles:  <i>scanneur</i>, <i>lexeur</i> ou <i>analyseur lexical</i>.
 </p>
 
-<p>L'analyse lexicale parcours un texte source caractère/caractère et le transforme en <a href="131_Lexer.byStep.htm">liste de lexème</a> (attributs: texte, index, type, ...) :</p>
 
+<h2>Principes</h2>
+<p>
+	Le lexer parcours un texte source caractère/caractère et le transforme en 
+	<a href="131_Lexer.byStep.htm">liste de lexèmes</a> (ayant comme attributs: type, index, valeur, ...).<br>
+	Essayer de changer le texte ci-dessous :
+</p>
 <textarea id="eTextScanned" type="text">Le texte source.
 	
 FIN.</textarea>
 <div id="eResult">...</div>
-
+<p>Chaque type de lexème est défini à l'aide d'une <a href="src/regexp/syntax.htm">ER</a>.</p>
 <p>
-	Chaque type de lexème est défini à l'aide d'une <a href="src/regexp/syntax.htm">expression régulière</a>. <br>
-	<a href="110_Automates.htm">Cette ER est transformée en <abbr title="Automate Fini Déterministe">AFD</abbr></a> 
-	et le résultat est stocké car le coût en calcul est important.
-</p>
-<p>
-	La <a href="133_Lexer.comparison.htm">performance</a> des AFDs est sensiblement équivalente à celles des expressions régulières. <br>
-	Mais ils nous laissent plus de possibilités en programmation. 
-	L'<a href="134_Lexer.update.htm">analyse partielle</a> n'est pas forcement un exemple...
+	Le lexer utilise <b>directement les ER</b> ou des <b>AFD issus de ces ER</b>. 
+	Les <a href="133_Lexer.comparison.htm">performances</a> sont sensiblement équivalente.
+	<br>
+	Mais la dernière solution est préférable car elle nous laissent plus possibilités en programmation
+	<br>
+	L'<a href="134_Lexer.update.htm">analyse partielle</a> n'est pas forcement un exemple... 
+	elle n'est pas implémenté pour le lexer à ER pour qu'il puisse rester le plus performant.
 </p>
 
-<p>Les <a href="120_DFA.aggregation.htm">AFDs sont aggrégés</a> entre eux par la suite.</p>
 
+<h2>Considérations techniques</h2>
+
+
+<h3>Les Expressions Régulières</h3>
 <p>
-	L'analyse lexicale se fait ensuite avec un ou plusieurs AFD. 
-	Le choix se fait selon :
+	Pour simplifier significativement la création des ER,
+	le lexer peut retourner un 'arbre lexical' à la place d'une liste de lexème, en créant des léxèmes parents.
 </p>
+<p>Principe de fonctionnement:</p>
+<ol>
+	<li>Le lexer détecte le lexème débutant un parent.</li>
+	<li>Il est ajouté à un nouveau lexème parent.</li>
+	<li>L'analyse continue avec les règles du parent jusqu'à ce que sa fin soit trouvée ou qu'aucun lexème ne soit trouvé.</li>
+	<li>Le lexème parent est ajouté.</li>
+	<li>Puis l'analyse continue avec les régles précédant la rencontre du lexème parent.</li>
+</ol>
+
+<p>Cela permet de détecter des léxèmes de type:</p>
+<ul>
+	<li>chaines de caractères compris entre des guillements</li>
+	<li>commentaires multiligne de type (/* */)</li>
+	<li>commentaires sur une ligne de type (//)</li>
+	<li>... code php.</li>
+</ul>
+
+<p>Ceci n'a pas forcement de répercution sur l'analyse syntaxique...</p>
+
+
+<h3>Les Automates Finis Déterministes</h3>
+<p>Ils doivent-être précalculés :</p>
+<ol>
+	<li>Chaque <a href="110_Automates.htm">ER est transformée en AFD</a></li>
+	<li>Ces <a href="120_DFA.aggregation.htm">AFDs sont aggrégés entre eux</a> afin d'en obtenir plus qu'un !</li>
+</ol>
+<p>Malheureusement il est parfois préférable d'en utiliser plusieurs à la place :</p>
+<ul>
+	<li>La taille de l'automate résultat pouvant-être trop volumineuse, </li>
+	<li>ou sa création prennant beaucoup trop de temps.</li>
+</ul>
+<p>L'analyse lexicale se fait ensuite avec un ou plusieurs AFD :</p>
 <ul>
 	<li>Performance (calcul) = 1 AFD.</li>
 	<li>Maintenance / Evolution = Plusieurs AFDs.</li>
 	<li>Performance téléchargement = Fonction de la taille des AFDs.</li>
 </ul>
 
-<h4>Note</h4>
-<p>  L'analyse lexicale peut se faire sur <a href="144_Lexer.modules.Parenthesis.htm">plusieurs niveaux</a>.</p>
-<ul>
-	<li>L'analyseur syntaxique détecte le début d'un token parent.</li>
-	<li>Le token 'début' est ajouté au nouveau token parent.</li>
-	<li>L'analyse continue avec les règles du parent jusqu'à ce que sa fin soit trouvée ou qu'aucun token ne soit trouvé.</li>
-	<li>Puis l'analyse continue avec les régles précédant la rencontre du token parent.</li>
-</ul>
-<p>... et ceci à une répercution sur l'analyse syntaxique...</p>
+
 
 
 <script src="js/framework.js"></script>
