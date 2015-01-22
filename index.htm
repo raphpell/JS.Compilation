@@ -25,10 +25,7 @@
 	</head>
 	<body>
 	
-<div class="warn">
-	<big>!! ATTENTION !!</big><br>
-	Les calculs peuvent SURCHAUFFER votre ORDINATEUR. <br>
-</div>
+
 
 <a href="https://github.com/raphpell/JS.Compilation">Répertoire du projet</a>
 
@@ -38,7 +35,7 @@
 
 <div style="float:left;">
 <ol>
-	<li>1. <a href="Node.htm">LexerNode : Les léxèmes</a></li>
+	<li>1. <b>Structure de donnée:</b> <a href="Node.htm">LexerNode</a></li>
 	<li>2. <a href="AnalyseLexicale.htm">Analyse lexicale</a></li>
 		<ol>
 			<li>2.1. <a href="Lexers.htm">Les Lexers</a>
@@ -51,7 +48,7 @@
 				<ol>
 					<li>2.2.1. <a href="LexerAutomaton.module.generator.htm">Création de module</a>
 						<ol>
-							<li>2.2.1.1. <a href="AFD.generator.htm">Transformation ER en AFD</a></li>
+							<li>2.2.1.1. <a href="AFD.generator.htm">Création d'un AFD</a></li>
 							<li>2.2.1.2. <a href="AFD.aggregator.htm">Aggrégation d'AFD</a></li>
 						</ol></li>
 					<li>2.2.2. <a href="LexerAutomaton.module.preview.htm">Modules existants</a></li>
@@ -64,31 +61,41 @@
 		</ol>
 	<li>3. <a href="AnalyseSyntaxique.htm">Analyse syntaxique</a>
 		<ol>
-			<li>3.1. <a href="Parser.htm">Création de module pour le Parser</a></li>
-			<li>3.2. <a href="Parser.byStep.htm">Analyse syntaxique: readToken</a></li>
+			<li>3.1. <a href="Parser.htm">Création de module pour les Parsers</a></li>
+			<li>3.2. <b>Le Parser LR</b>
+				<ol>
+					<li>3.2.1. <a href="Parser.byStep.htm">readToken</a>...</li>
+				</ol></li>
 		</ol></li>
 	<li><h3>Annexes</h3>
 		<ol>
-			<li>A. <a href="src/regexp/syntax.htm">Les Expressions Régulières</a></li>
+			<li>A. <a href="src/regexp/syntax.htm">Les ER</a></li>
 			<li>B. <a href="AF.info.htm">Les automates finis</a></li>
-			<li>C. <a href="AFN.info.htm">Conversion des ER en AFN</a></li>
+			<li>C. <a href="AFN.info.htm">Conversion ER &rArr; AFN</a></li>
 			<li>D. <a href="AFN.ValidationAlphabet.htm">Validation de l'alphabet</a></li>
-			<li>E. <a href="AFD.info.htm">Conversion des AFN en AFD</a></li>
+			<li>E. <a href="AFD.info.htm">Conversion AFN &rArr; AFD</a></li>
 		</ol></li>
 </ol>
 </div>
 
+<div style="float:right; margin:2em;">
+	<dl>
+		<dt><b><a href="src/regexp/syntax.htm">ER</a></b>: Expression régulière.</dt>
+		<dt><b><a href="AFN.info.htm">AFN</a></b> ou <b>NFA</b>: Automate Fini Non déterministe.</dt>
+		<dt><b><a href="AFD.info.htm">AFD</a></b> ou <b>DFA</b>: Automate Fini Déterministe.</dt>
+	</dl>
+</div>
+
 <div style="float:right;">
+	<div class="warn">
+		<big>!! ATTENTION !!</big><br>
+		Le calcul des automates peut SURCHAUFFER votre ORDINATEUR.
+	</div>
 	<p style="text-align:center;">
 		<img src="img/firefox.png" width="100" title="Firefox">
 		<img src="img/opera.png" width="100" title="Opera">
 		<br>Firefox requis. Pas Firebug !
 	</p>
-	<dl>
-		<dt><b><a href="src/regexp/syntax.htm">ER</a></b>: Expression régulière.</dt>
-		<dt><b><a href="AFN.info.htm">AFN</a> ou NFA</b>: Automate Fini Non déterministe.</dt>
-		<dt><b><a href="AFD.info.htm">AFD</a> ou DFA</b>: Automate Fini Déterministe.</dt>
-	</dl>
 </div>
 	
 	</body>
