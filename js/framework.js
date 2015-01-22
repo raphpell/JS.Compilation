@@ -44,7 +44,7 @@ previewREScanning =SubWindow( "src/regexp/preview.htm", "PreviewRE", 600, 650, '
 regexpSyntax =SubWindow( "src/regexp/syntax.htm" )
 wizSyntax =SubWindow( "src/wiz/syntax.htm" )
 grammarSyntax =SubWindow( "src/grammar/syntax.htm" )
-previewFA =SubWindow( "previewFA.htm", "PreviewFA", 600, 600, 'setFA' )
+previewFA =SubWindow( "AF.preview.htm", "PreviewFA", 600, 600, 'setFA' )
 
 CallBack =function( o, m ){
 	var a=to_array(arguments).slice(2), f=m.constructor

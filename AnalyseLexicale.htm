@@ -36,7 +36,7 @@
 <h2>Principes</h2>
 <p>
 	Le lexer parcours un texte source caractère/caractère et le transforme en 
-	<a href="132_Lexers.performance.readToken.htm">liste de lexèmes</a> (ayant comme attributs: type, index, valeur, ...).<br>
+	<a href="Lexers.performance.readToken.htm">liste de lexèmes</a> (ayant comme attributs: type, index, valeur, ...).<br>
 	Essayer de changer le texte ci-dessous :
 </p>
 <textarea id="eTextScanned" type="text">Le texte source.
@@ -46,11 +46,11 @@ FIN.</textarea>
 <p>Chaque type de lexème est défini à l'aide d'une <a href="src/regexp/syntax.htm">ER</a>.</p>
 <p>
 	Le lexer utilise <b>directement les ER</b> ou des <b>AFD issus de ces ER</b>. 
-	Les <a href="133_Lexers.performance.scan.htm">performances</a> sont sensiblement équivalente.
+	Les <a href="Lexers.performance.scan.htm">performances</a> sont sensiblement équivalente.
 	<br>
 	Mais la dernière solution est préférable car elle nous laissent plus possibilités en programmation
 	<br>
-	L'<a href="134_Lexer.update.htm">analyse partielle</a> n'est pas forcement un exemple... 
+	L'<a href="LexerAutomaton.incremental.htm">analyse partielle</a> n'est pas forcement un exemple... 
 	elle n'est pas implémenté pour le lexer à ER pour qu'il puisse rester le plus performant.
 </p>
 
@@ -61,7 +61,7 @@ FIN.</textarea>
 <h3>Les Expressions Régulières</h3>
 <p>
 	Pour simplifier significativement la création des ER,
-	le lexer peut retourner un 'arbre lexical' à la place d'une liste de lexème, en créant des léxèmes parents.
+	les lexers retourne un 'arbre lexical' à la place d'une liste de lexème, en créant des léxèmes parents.
 </p>
 <p>Principe de fonctionnement:</p>
 <ol>
@@ -86,8 +86,8 @@ FIN.</textarea>
 <h3>Les Automates Finis Déterministes</h3>
 <p>Ils doivent-être précalculés :</p>
 <ol>
-	<li>Chaque <a href="110_Automates.htm">ER est transformée en AFD</a></li>
-	<li>Ces <a href="120_DFA.aggregation.htm">AFDs sont aggrégés entre eux</a> afin d'en obtenir plus qu'un !</li>
+	<li>Chaque <a href="AFD.generator.htm">ER est transformée en AFD</a></li>
+	<li>Ces <a href="AFD.aggregator.htm">AFDs sont aggrégés entre eux</a> afin d'en obtenir plus qu'un !</li>
 </ol>
 <p>Malheureusement il est parfois préférable d'en utiliser plusieurs à la place :</p>
 <ul>
@@ -100,7 +100,7 @@ FIN.</textarea>
 	<li>Maintenance / Evolution = Plusieurs AFDs.</li>
 	<li>Performance téléchargement = Fonction de la taille des AFDs.</li>
 </ul>
-<p>Un mini langage a été créé pour <a href="140_Lexer.modules.htm">créer des modules pour le Lexer Automaton</a>.</p>
+<p>Un mini langage a été créé pour <a href="LexerAutomaton.module.generator.htm">créer des modules pour le Lexer Automaton</a>.</p>
 
 
 

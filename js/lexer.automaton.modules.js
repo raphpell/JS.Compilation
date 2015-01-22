@@ -45,7 +45,7 @@ o.addTokens([
 	["INI_SSQ",{A:g("\n","[^\t\n\f\r ']","\t","\f","\r"," ","'"),M:[,[5,3,4,5,2,6,7],[5],[,3]],F:[,,2,5,1,2,3,4],R:[[1,f("\t\n\f\r '")]],TokensTable:[,'TAB','L_NEW_LINE','SPACES','E_INI_SSQ','INI_SSQ_IN']}]
 	])
 o.addCSSClass("keyword=INI_KEYWORD&var=INI_VAR&undefined=INI_TMP&comment=INI_COMMENT&section=INI_SECTION_IN&value=INI_VALUE&punctuator=S_INI_VALUE&string=INI_SDQ|INI_SSQ")
-o.setTokensTranslation('INI_COMMENT=COMMENT&INI_SECTION_IN=SECTION&INI_VALUE=VALUES&S_INI_VALUE=OPERATOR&INI_SDQ=STRING&INI_SSQ=STRING')
+o.setTokensTranslation('INI_COMMENT=COMMENT&INI_SECTION_IN=SECTION_PART&INI_VALUE=VALUES&S_INI_VALUE=OPERATOR&INI_SDQ=STRING&INI_SSQ=STRING')
 
 
 // CSS

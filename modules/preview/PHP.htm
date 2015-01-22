@@ -1,0 +1,236 @@
+﻿<html><head>
+<style>TEXTAREA{ width:100%; height:100%;}</style>
+</head><body><textarea><?php
+class Folder {
+	public $aFiles = array();
+	public $aFolders = array();
+	public $bExist = FALSE ;
+	public $bStat ;
+	public $sPath ;
+		
+	function Folder ( $sPath='', $bStat=false ){
+		if( $sPath<>'' && is_dir( $sPath )){
+			$this->bExist = TRUE ;
+			$this->sPath = $sPath ;
+			$a = Folder::scan( $sPath, $bStat );
+			$this->aFolders = $a['folders'];
+			$this->aFiles = $a['files'];
+			if( $this->bStat=$bStat ){
+				$stat = stat( $sPath );
+				$this->mtime = $stat[9];
+				// $this->nSize = Folder::sizeOf( $sPath ); 
+				}
+			}
+		}
+
+	public static function isDir ( $sPath, $sFile ){
+		return is_dir( $sPath.$sFile ) && ! in_array( $sFile, array('.','..'));
+		}
+	public static function getFreeName ( $sFile ){
+		$s = $sFile ;
+		$sPattern = '';
+		if( is_file( $s )) $sPattern = '@(^.*?)( \d+)?(\.\w+$)@';
+		if( is_dir( $s )) $sPattern = '@(^.*?)( \d+)?($)@';
+		if( $sPattern ){
+			$n = 1;
+			while( is_file( $s ) || is_dir( $s )){
+				if( preg_match( $sPattern, $s, $matches )){
+				//	var_dump( $matches );
+					$s = $matches[1] .' '. ($n++) . $matches[3];
+					}
+				else break;
+				}
+			}
+		return $s;
+		}
+		
+	private static function path ( $sPath ){
+		return $sPath.( substr( $sPath, -1, 1 )==='/' ? '' : '/' );
+		}
+
+	// soucis de "/"
+	static function copy ( $sSourcePath, $sTargetPath, $aOption=array()){
+		$o = new Folder ( $sSourcePath );
+		if( $o->bExist ) $o->copyTo( $sTargetPath, $aOption );
+		return is_dir( $sTargetPath );
+		}
+	static function delete ( $sPath, $aExclude=array(), $bProtect=false ){
+		$sPath = Folder::path( $sPath );
+		$oFolder = new Folder ( $sPath );
+		if( $oFolder->bExist ){
+			while( list( $sKey, $aFolder )=each( $oFolder->aFolders )){
+				$sFolder = $sPath.$aFolder['name'].'/' ;
+				if( ! ( $bProtect && in_array( $sFolder, $aExclude )))
+					Folder::delete( $sFolder, $aExclude, $bProtect );
+				}
+			while( list( $sKey, $oDocument )=each( $oFolder->aFiles )){
+				$sDocument = $sPath.$oDocument['name'];
+				if( ! in_array( $sDocument, $aExclude )) unlink( $sDocument );	
+				};
+			if( !in_array( $sPath, $aExclude )){
+				closedir( opendir( $sPath )); // Fix window bug.
+				@rmdir( $sPath ); // Le @ est important !
+				}
+			return is_dir( $sPath );
+			}
+		return NULL;
+		}
+	static function deleteFiles ( $sFileName, $sFromPath, $sInFolder=NULL ){
+		$oFolders = new Folder ( $sFromPath );
+		if( $oFolders->bExist ){
+			$sUrl = $sFromPath.$sFileName ;
+			if( $sInFolder==NULL AND $a=glob( $sUrl )){
+				foreach( $a as $sFile )	@unlink( $sFile );
+			}elseif( basename( $sFromPath )==$sInFolder ){
+				if( is_file( $sUrl )) @unlink( $sUrl );
+				}
+			while( list(, $aFolder )=each( $oFolders->aFolders ))
+				Folder::deleteFiles( $sFileName, $sFromPath.$aFolder['name'].'/', $sInFolder );
+			@rmdir( $sFromPath );
+			}
+		unset( $oFolders );
+		}
+	static function scan ( $sPath, $bStat=false ){
+		$sPath = Folder::path( $sPath );
+		$aFiles = @scandir( $sPath );
+		if( !$aFiles ) return NULL ;
+		$a = array( 'folders'=>array(), 'files'=>array());
+		while( list(, $sFile )=each( $aFiles )){
+			$path_parts = pathinfo( $sFile );
+			$sUrl = $sPath.$sFile ;
+			$tmp = array();
+			if( Folder::isDir( $sPath, $sFile )){
+				$tmp['name'] = $path_parts['basename'];
+				if( $bStat ){
+					$stat = stat( $sUrl );
+					$tmp['mtime'] = $stat[9];
+					}	
+				$a[ 'folders' ][] = $tmp ;
+			} elseif( is_file( $sUrl )){
+				$tmp['name'] = $path_parts[ 'basename' ];
+				// if( strpos( $tmp['name'], '.' )===0 ) continue; // Fichiers systemes... GRRR !
+				$tmp['extension'] = @( $path_parts['extension']);
+				if( $bStat ){
+					$stat = stat( $sUrl );
+					$tmp['mtime'] = $stat[9];
+					$tmp['size'] = $stat[7];
+					}	
+				$a['files'][] = $tmp ;
+				}
+			}
+		return $a ;
+		}
+	static function scanRecursive ( $sPath, $mExclude=array()){
+		$a = array();
+		$mExclude = is_array( $mExclude ) ? $mExclude : array( $mExclude );
+		$o = new Folder ( $sPath );
+		if( ! $o->bExist ) return NULL;
+		while( list(, $aFile )=each( $o->aFiles )){
+			$s = $aFile['name'];
+			if( in_array( $s, $mExclude )) continue;
+			$a[] = $s;
+			}
+		while( list(, $aFile )=each( $o->aFolders )){
+			$s = $aFile['name'];
+			if( in_array( $s, $mExclude ) || @rmdir( $sPath.$s.'/' )) continue;
+			$a[] = array(
+				'folder'=> $s,
+				'files' => Folder::scanRecursive( $sPath.$s.'/', $mExclude )
+				);
+			}
+		return $a;
+		}
+	static function makePath ( $sPath ){
+		if( is_dir( $sPath )) return TRUE;
+		// Interdire ici les caractres incorrectes pour windows
+		if( strpos( $sPath, '?' ) !== FALSE ) return FALSE;
+		$a = explode( '/', $sPath );
+		$sDirectory = '.' ;
+		while( list(, $sFolderName )=each( $a )){
+			$sDirectory .= '/'. trim( $sFolderName );
+			if( ! is_dir( $sDirectory ) AND ! is_file( $sDirectory ))
+				@mkdir( $sDirectory .'/' );
+			}
+		return is_dir( $sDirectory ) ? $sDirectory : FALSE ;
+		}
+	static function roundOffSize ( $n, $sUnit=NULL, $nPrecision=NULL ){
+		$aUnits = array( 'o', 'Ko', 'Mo', 'Go', 'To' );
+		if( !in_array( $sUnit, $aUnits )) $sUnit = NULL ;
+
+		// cas particulier zéro
+		if( $n==0 ) return '0 '. ( $sUnit<>NULL ? $sUnit : 'o' );
+
+		// calcul de la taille dans l'unité désirée ou celle par défaut
+		$Unit = 'o' ;
+		if( $sUnit<>'o' )
+			for( $i=1; $i<5 && ( $n>=1024 || $sUnit<>NULL ); $i++ ){
+				$n = $n/1024 ;
+				$Unit = $aUnits[$i];
+				if( $sUnit==$Unit ) break;
+				}
+
+		// ...
+		$n = round( $n, $nPrecision===NULL ? 2 : $nPrecision );
+		return "$n $Unit" ;
+		}
+	static function sizeOf ( $sPath ){
+		$sPath = Folder::path( $sPath );
+		$nSize = 0 ; 
+		if( $oHandle = @opendir( $sPath )){
+			while( $sFile = readdir( $oHandle )){
+				$sUrl = $sPath.$sFile ;
+				if( is_file( $sUrl )) 
+					$nSize += filesize( $sUrl );
+				if ( Folder::isDir( $sPath, $sFile ))  
+					$nSize += Folder::sizeOf( $sUrl );
+				}
+			closedir( $oHandle );
+			}
+		return $nSize ;
+		}
+
+	public function applyFunction ( $cFunction, $sPath=NULL, $bStat=FALSE ){
+		if( $sPath==NULL ){
+			if( ! $this->bExist ) return FALSE;
+			$sPath = $this->sPath ;
+			$aFiles = $this->aFiles ;
+			$aFolders = $this->aFolders ;
+			$bStat = $this->bStat ;
+		}else{
+			$oFolder = new Folder ( $sPath, $bStat );
+			if( $oFolder->bExist ){
+				$aFiles = $oFolder->aFiles ;
+				$aFolders = $oFolder->aFolders ;
+				}
+			else return FALSE;
+			}
+		if( call_user_func( $cFunction, $sPath, $aFiles, $aFolders ))
+			while( list(, $oFolder )=each( $aFolders ))
+				Folder::applyFunction( $cFunction, $sPath . $oFolder['name'] .'/', $bStat );
+		return TRUE;
+		}
+	public function copyTo ( $sPath, $aOption=array()){
+		$aExcludeDirName = isset( $aOption['aExcludeDirName'])? $aOption['aExcludeDirName']: array( '_safeguards' );
+		$aExcludeFileName = isset( $aOption['aExcludeFileName'])? $aOption['aExcludeFileName']: array();
+		$bExcludeDirectories = isset( $aOption['bExcludeDirectories'])? $aOption['bExcludeDirectories'] : false ;
+		Folder::makePath( $sPath );
+		$b = is_dir( $sPath );
+		if( $b ){
+			if( is_array( $this->aFiles ))
+				while( list( $key, $oDocument )=each( $this->aFiles ))
+					if( ! in_array( $oDocument['name'], $aExcludeFileName ))
+						copy( $this->sPath.'/'.$oDocument['name'], $sPath.$oDocument['name']);
+			if( ! $bExcludeDirectories && is_array( $this->aFolders ))
+				while( list( $key, $oFolder )=each( $this->aFolders )){
+					if( ! in_array( $oFolder['name'], $aExcludeDirName )){
+						$sNewPath = $sPath.$oFolder['name'].'/' ;
+						if( ! is_dir( $sNewPath )) mkdir( $sNewPath );
+						$o = new Folder ( $this->sPath.'/'.$oFolder['name'].'/' );
+						$o->copyTo( $sNewPath, $aOption );
+						}
+					}
+			}
+		return $b ;
+		}
+	}
+?></textarea></body></html>

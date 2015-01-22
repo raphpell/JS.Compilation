@@ -28,8 +28,7 @@ var match =function(){
 		if( e.lineNumber ) eResult.innerHTML += '<br>ligne: '+ e.lineNumber
 		}
 	}
-	
-_( 'eH1,eRE' )
+
 _( 'eInput,eBtnMatch,eRelief,eWhiteSpaces,eResult' )
 var changeClassList =function( b, sClass ){
 	if( eResult.classList ) eResult.classList[ b?'add':'remove']( sClass )

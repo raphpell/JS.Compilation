@@ -138,8 +138,8 @@ throwError =function( s ){
 	
 Calcul =(function(){
 	var aUrl =[
-		'110_Automates.htm',
-		'120_DFA.aggregation.htm'
+		'AFD.generator.htm',
+		'AFD.aggregator.htm'
 		]
 	var waitFor =function( sWinFunction, oOwner, sFunctionName ){
 		if( oWindowIFRAME && ! oWindowIFRAME[sWinFunction] ){
@@ -541,7 +541,7 @@ Tag.addChildNodes( eSourceFiles, 'OPTION', [
 	'module.zenLike',
 	'module.grammar',
 	'token.REGULAR_EXPRESSION'
-	], 'regexp' )
+	])
 eSourceFiles.onchange =function(){
 	eTextPlain.src = 'modules/lexer/'+ eSourceFiles.value +".html"
 	}

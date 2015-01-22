@@ -34,46 +34,46 @@
 
 <h1>Compilation</h1>
 
+<p><cite>Mon objectif était de colorer du code.</cite></p>
 
 <div style="float:left;">
-<p><cite>Mon objectif était de colorer du code.</cite></p>
 <ol>
-	<li>1. <a href="100_AnalyseLexicale.htm">Analyse lexicale</a></li>
+	<li>1. <a href="Node.htm">LexerNode : Les léxèmes</a></li>
+	<li>2. <a href="AnalyseLexicale.htm">Analyse lexicale</a></li>
 		<ol>
-			<!-- <li>1.1. <a href="110_ExpressionsRégulière.htm">Les automates</a> -->
-			<li>1.1. <a href="110_Automates.htm">Transformation ER en AFD</a>
+			<li>2.1. <a href="Lexers.htm">Les Lexers</a>
 				<ol>
-					<li>Les étapes</li>
-					<li>1.1.1. <a href="111_FA.htm">Les automates finis</a></li>
-					<li>1.1.2. <a href="112_NFA.htm">AFN</a></li>
-					<li>1.1.3. <a href="113_ValidationAlphabet.htm">Validation de l'alphabet</a></li>
-					<li>1.1.4. <a href="114_DFA.htm">AFD</a></li>
+					<li>2.1.1. <a href="Lexers.result.comparaison.htm">Comparaison des résultats des Lexers</a></li>
+					<li>2.1.2. <a href="Lexers.performance.readToken.htm">Performance: readToken</a></li>
+					<li>2.1.3. <a href="Lexers.performance.scan.htm">Performance: scan</a></li>
 				</ol></li>
-			<li>1.2. <a href="120_DFA.aggregation.htm">Aggrégation d'AFD</a></li>
-			<li>1.3. <a href="130_Lexers.htm">Les Lexers</a>
+			<li>2.2. <b>Le Lexer Automaton</b>
 				<ol>
-					<li>1.3.1. <a href="131_Lexers.comparaison.html">Comparaison des résultats</a></li>
-					<li>1.3.2. <a href="132_Lexers.performance.readToken.htm">Performance: readToken</a></li>
-					<li>1.3.3. <a href="133_Lexers.performance.scan.htm">Performance: scan</a></li>
-					<li>1.3.4. <a href="134_Lexer.update.htm">Analyse lexicale incrementielle</a> (partielle)</li>
+					<li>2.2.1. <a href="LexerAutomaton.module.generator.htm">Création de module</a>
+						<ol>
+							<li>2.2.1.1. <a href="AFD.generator.htm">Transformation ER en AFD</a></li>
+							<li>2.2.1.2. <a href="AFD.aggregator.htm">Aggrégation d'AFD</a></li>
+						</ol></li>
+					<li>2.2.2. <a href="LexerAutomaton.module.preview.htm">Modules existants</a></li>
+					<li>2.2.3. <a href="LexerAutomaton.incremental.htm">Analyse lexicale incrementielle</a> (partielle)</li>
 				</ol></li>
-			<li>1.4. <a href="140_Lexer.modules.htm">Création de module pour le Lexer Automaton</a>
+			<li>2.2. <b>Le Lexer MultiRegExp</b>
 				<ol>
-					<li>Aperçus</li>
-					<li>1.4.1. <a href="141_Lexer.modules.HTML.htm">Module HTML</a></li>
-					<li>1.4.2. <a href="142_Lexer.modules.CSS.htm">Module CSS</a></li>
-					<li>1.4.3. <a href="143_Lexer.modules.JS.htm">Module JavaScript</a></li>
-					<li>1.4.4. <a href="144_Lexer.modules.Parenthesis.htm">Module Parenthèses</a></li>
+					<li>2.2.1. Modules existants</li>
 				</ol></li>
 		</ol>
-	<li>2. <a href="200_AnalyseSyntaxique.htm">Analyse syntaxique</a>
+	<li>3. <a href="AnalyseSyntaxique.htm">Analyse syntaxique</a>
 		<ol>
-			<li>2.1. <a href="210_Parser.html">Création de module pour le Parser</a></li>
-			<li>2.2. <a href="220_Parser.byStep.htm">Analyse syntaxique: readToken</a></li>
+			<li>3.1. <a href="Parser.htm">Création de module pour le Parser</a></li>
+			<li>3.2. <a href="Parser.byStep.htm">Analyse syntaxique: readToken</a></li>
 		</ol></li>
 	<li><h2>Annexe</h2>
 		<ol>
-			<li>A. <a href="AnnexeA_LexerNode.htm">Les léxèmes : LexerNode</a></li>
+			<li>A. <a href="src/regexp/syntax.htm">Les Expressions Régulières</a></li>
+			<li>B. <a href="AF.info.htm">Les automates finis</a></li>
+			<li>C. <a href="AFN.info.htm">Conversion des ER en AFN</a></li>
+			<li>D. <a href="AFN.ValidationAlphabet.htm">Validation de l'alphabet</a></li>
+			<li>E. <a href="AFD.info.htm">Conversion des AFN en AFD</a></li>
 		</ol></li>
 </ol>
 </div>
@@ -86,8 +86,8 @@
 	</p>
 	<dl>
 		<dt><b><a href="src/regexp/syntax.htm">ER</a></b>: Expression régulière.</dt>
-		<dt><b><a href="112_NFA.htm">AFN</a> ou NFA</b>: Automate Fini Non déterministe.</dt>
-		<dt><b><a href="114_DFA.htm">AFD</a> ou DFA</b>: Automate Fini Déterministe.</dt>
+		<dt><b><a href="AFN.info.htm">AFN</a> ou NFA</b>: Automate Fini Non déterministe.</dt>
+		<dt><b><a href="AFD.info.htm">AFD</a> ou DFA</b>: Automate Fini Déterministe.</dt>
 	</dl>
 </div>
 	

@@ -1,17 +1,6 @@
-﻿<!DOCTYPE HTML>
-<html>
-<head>
-	<title>Module CSS</title>
-	<link rel="stylesheet" type="text/css" href="css/syntaxes.css">
-	<link rel="stylesheet" type="text/css" href="css/LexerModule.preview.css">
-</head>
-<body spellcheck="false">
-<a href="index.htm">Index</a>
-
-<h1 id="eH1">Module CSS</h1>
-
-<label for="eInput">Texte : </label><br>
-<textarea id="eInput"><![CDATA[/* I - COMMENTS */
+﻿<html><head>
+<style>TEXTAREA{ width:100%; height:100%;}</style>
+</head><body><textarea>/* I - COMMENTS */
 	/* Comments in a block */
 	body {
 		/*background: #ffe;*/
@@ -153,19 +142,4 @@ http://www.w3.org/TR/css3-selectors/
 			echo "background: darkblue ;" ; /* Php string */
 		?> 
 		}
-]]></textarea>
-<input type="button" id="eBtnMatch" value="Analyser">
-<input type="checkbox" id="eRelief"><label for="eRelief">Relief.</label>
-<input type="checkbox" id="eWhiteSpaces"><label for="eWhiteSpaces">Espaces blancs.</label>
-<pre id="eResult"></pre>
-
-<!-- FRAMEWORK... -->
-<script src="js/framework.js"></script>
-<script src="js/lexer.automaton.js"></script>
-<script src="js/lexer.automaton.modules.js"></script>
-
-<script>var sLexerRule='CSS'</script>
-<script src="js/LexerModule.preview.js"></script>
-
-</body>
-</html>
+</textarea></body></html>

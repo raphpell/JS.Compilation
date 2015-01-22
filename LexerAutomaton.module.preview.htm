@@ -1,0 +1,192 @@
+<html>
+<head>
+	<title>module.preview</title>
+	<link rel="stylesheet" type="text/css" href="css/syntaxes.css">
+	<style>
+#eInput{
+	width: 100%;
+	height: 75px;
+	}
+#eResult{
+    border: 1px solid #000;
+	}
+.undefined {
+    background: red !important;
+	}
+/* Arbre syntaxique */
+.relief .myNode {
+    background: none repeat scroll 0 0 #EEEEEE;
+    border: 1px solid #CCCCCC;
+    box-shadow: 2px -2px 2px #999999;
+    display: inline;
+	line-height: 2em;
+    margin: 2px;
+    padding: 1px;
+	position: relative;
+	vertical-align: text-top;
+    white-space: pre;
+	}
+.relief .myNode .myNode {
+	margin: 1px;
+	}
+.relief .myNode:hover {
+	background: lime !important;
+	border: 1px solid #000;
+	transition: 1s ease;
+	}
+	.relief .myNode:hover > .myNode {
+		background: yellow;
+		color:#000;
+		}
+
+.seeWS .tab	{ background: LIGHTBLUE !important; }
+.seeWS .space	{ background: LIGHTGREEN !important; }
+.seeWS .linefeed	{ background: ORANGE !important; }
+
+#eResult {
+	box-shadow: 0 0 1em #999;
+	padding: 1em;
+	}
+	</style>
+</head>
+<body spellcheck="false">
+<a href="index.htm">Index</a>
+
+<h1>module.preview</h1>
+
+<dl>
+	<dt>
+		<label for="eExamples">Exemples : </label>
+		<select id="eExamples"></select>
+		<hr>
+	</dt>
+	<dt>
+		<label for="eRules">Régle : </label>
+		<select id="eRules"></select>
+	</dt>
+	<dt>
+		<label for="eInput">Source : </label><br>
+		<textarea id="eInput"></textarea>
+	</dt>
+	<dt>
+		<input type="button" id="eBtnMatch" value="Analyser">
+		<input type="checkbox" id="eRelief"><label for="eRelief">Relief.</label>
+		<input type="checkbox" id="eWhiteSpaces"><label for="eWhiteSpaces">Espaces blancs.</label>
+	</dt>
+</dl>
+<pre id="eResult"></pre>
+
+<!-- FRAMEWORK... -->
+<script src="js/shared.js"></script>
+<script src="js/framework.js"></script>
+<script src="js/lexer.automaton.js"></script>
+<script src="js/lexer.automaton.modules.js"></script>
+
+
+
+
+<hr>
+<script><!-- Module Parenthesis -->
+AutomatonLexer.insert(function(o,f,g,h){
+	o.addTokens([["Parenthesis",{A:g("\n","[^\t\n\f\r ()]","\t","\f","\r","(",")","[ ]"),R:[[1,f("\t\n\f\r ()")],[7,f(" ",1)]],M:[[],[8,2,3,8,4,5,6,7],[,2],[],[8],[],[],[],[]],F:[,,7,2,3,4,5,6,3],TokensTable:',,TAB,L_NEW_LINE,S_Parenthesis,E_Parenthesis,SPACE,WORD'.split(',')}]])
+	o.addCSSClass("punctuator=S_Parenthesis|E_Parenthesis&space=SPACE&tab=TAB&linefeed=L_NEW_LINE")
+	o.setTokensTranslation('S_Parenthesis=LPAREN&E_Parenthesis=RPAREN')
+	});
+</script>
+<p>
+	Le module Parenthesis est un exemple simple d'une analyse lexicale créant des lexèmes parents.<br>
+	Définition du module:
+</p>
+<pre>
+!@	Parenthesis		=	S_Parenthesis|E_Parenthesis|WORD|SPACE|TAB|L_NEW_LINE
+
+	S_Parenthesis		=	\(
+		{css:punctuator, translation:LPAREN}
+	E_Parenthesis		=	\)
+		{css:punctuator, translation:RPAREN}
+	WORD		=	[^\(\)\n\r\f \t]+
+
+	SPACE		=	[ ]
+		{css:space}
+	TAB		=	\t
+		{css:tab}
+	L_NEW_LINE	=	\r\n|[\n\r\f]
+		{css:linefeed}
+</pre>
+
+
+<script>
+var valueToString =function(o){
+	return JSON.stringify( o, 'token,parentToken,css,index,lineStart,lineEnd'.split(','), " " ).str_replace('"', '')
+	}
+var LexerNode =function( o ){
+	var sToken = o.token
+	, e = document.createElement( sToken )
+	, sValue = o.value
+	e.oValue = o
+	e.title = valueToString( o )
+		// sToken +'\n\u25B6'+ sValue +'\u25C0'
+	if( sValue ) e.innerHTML = sValue.str_replace( ['&','<','>'], ['&amp;','&lt;','&gt;'])
+	e.className = 'myNode'
+	if( o.css ) e.className += ' '+ o.css
+	return e
+	}
+	
+var match =function(){
+	eResult.innerHTML = ''
+	if( ! eRules.value ) return;
+	try{
+		var sText = eInput.value
+	//	if( sText.substr(0,9)=='<![CDATA[' ) sText = eInput.value = sText.slice( 9, -3 )
+		var eLexer = AutomatonLexer( sText, eRules.value )
+		eResult.appendChild( eLexer )
+	}catch(e){
+		eResult.innerHTML = e.message + '<br>'
+		if( e.fileName ) eResult.innerHTML += '<br>fichier: '+ e.fileName.split('/').pop()
+		if( e.lineNumber ) eResult.innerHTML += '<br>ligne: '+ e.lineNumber
+		}
+	}
+</script>
+
+<iframe id="eTextPlain" name="_source" src="" style="display:none;"></iframe>
+<script>
+_('eTextPlain,eExamples,eInput,eRules')
+_( 'eInput,eBtnMatch,eRelief,eWhiteSpaces,eResult' )
+
+var aRules = '|CSS|HTML|INI|JS|Parenthesis|PHP'.split('|')
+Tag.addChildNodes( eExamples, 'OPTION', aRules )
+Tag.addChildNodes( eRules, 'OPTION', aRules )
+
+var changeClassList =function( b, sClass ){
+	if( eResult.classList ) eResult.classList[ b?'add':'remove']( sClass )
+		else eResult.className = (eRelief.checked?'relief':'')+' '+(eWhiteSpaces.checked?'seeWS':'')
+	}
+Events.add(
+	'click',
+		eBtnMatch, match,
+		eRelief, function(){ changeClassList( eRelief.checked, 'relief' )},
+		eWhiteSpaces, function(){ changeClassList( eWhiteSpaces.checked, 'seeWS' )},
+	'change',
+		eExamples, function(){
+			eTextPlain.src = 'modules/preview/'+ eExamples.value +".htm"
+			eRules.value = eExamples.value
+			},
+		eRules, match,
+	'load', /* Chargement de fichier */
+		eTextPlain, function(){ 
+			var e = eTextPlain.contentWindow.document.firstChild
+			if( e ){
+				while( e && e.nodeType!=3 ) e = e.lastChild 
+				if( e ){
+					eInput.value = e.nodeValue
+					match()
+					}
+				}
+			}
+	)
+eRelief.onclick()
+eWhiteSpaces.onclick()
+</script>
+
+</body>
+</html>
