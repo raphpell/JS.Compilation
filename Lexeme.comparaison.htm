@@ -1,6 +1,6 @@
 ﻿<html>
 	<head>
-		<title>Comparaison des LexerNodes</title>
+		<title>Performance des structures de données</title>
 		<link rel="stylesheet" type="text/css" href="widget/Stats/styles.css">
 		<style>
 CODE, PRE {
@@ -35,11 +35,10 @@ FIELDSET DL {
 <body>
 
 <a href="index.htm">Index</a>
-<h1>Comparaison des LexerNodes</h1>
-
+<h1>Performance des structures de données</h1>
 <p>
-	Les differents objets sont censés répondre aux mêmes tests unitaires.
-	Le temps d'execution est la seule chose observée ici.
+	Les differentes structures sont censés répondre aux mêmes tests unitaires.<br>
+	Le temps d'execution est la seule chose observée ici.<br>
 </p>
 
 <input type="button" id="eTest" onclick="UnitTest()" value="test">
@@ -68,7 +67,7 @@ FIELDSET DL {
 <!-- Lexeme -->
 <script>
 var Lexeme
-, createLexerNode =function( sNodeType ){
+, createLexemeFunction =function( sNodeType ){
 	var s
 	switch( sNodeType ){
 		case 'HTMLElement': s='document.createElement(o.token)'; break;
@@ -143,10 +142,10 @@ Events.add( 'click',
 <script>
 _('eTest,eRepeat,eTABLE')
 var oChrono = new Chrono (), oResult
-var aLexerNodeType = ['HTMLElement','ObjectNode','SimpleNode'] // ,'EmptyObject'
+var aLexemeType = ['HTMLElement','ObjectNode','SimpleNode'] // ,'EmptyObject'
 
 var CompareTests =function( nId ){
-	var a = Array.merge( aLexerNodeType, [])
+	var a = Array.merge( aLexemeType, [])
 	for(var i=0; a[i]; i++) a[i] = Stats.getName(a[i], nId )
 	for(var i=0, ni=a.length; i<ni; i++){
 		if( _( a[0] )) _( a[0]).innerHTML = Stats.compare.apply( Stats, a )
@@ -186,9 +185,9 @@ var aTests =(function(){
 
 UnitTest=function(){
 	var nLimit = eRepeat.value
-	for(var j=0; aLexerNodeType[j]; j++){
-		var sNodeType = aLexerNodeType[j]
-		createLexerNode( sNodeType )
+	for(var j=0; aLexemeType[j]; j++){
+		var sNodeType = aLexemeType[j]
+		createLexemeFunction( sNodeType )
 		for(var i=0; i<nLimit; i++)
 			for(var k=0; aTests[k]; k++)
 				UnitTest.test( Stats.getName( sNodeType, k ), k )
@@ -197,8 +196,8 @@ UnitTest=function(){
 	}
 UnitTest.init =function( sNodeType, nId ){
 	var eTR = Tag('TR'), eTH
-	for(var j=0; aLexerNodeType[j]; j++){
-		var sNodeType = aLexerNodeType[j]
+	for(var j=0; aLexemeType[j]; j++){
+		var sNodeType = aLexemeType[j]
 		eTH = eTR.appendChild( Tag('TH', {
 			id:'e'+sNodeType,
 			innerHTML:'<h2>'+sNodeType+'</h2>'
@@ -208,10 +207,10 @@ UnitTest.init =function( sNodeType, nId ){
 	
 	for(var k=0; aTests[k]; k++){
 		if( aTests[k].name ){
-			eTABLE.appendChild( Tag('TR', { innerHTML:'<th colspan="'+ aLexerNodeType.length +'"><h3><code>'+ aTests[k].name +'</code></h3></th>' }))
+			eTABLE.appendChild( Tag('TR', { innerHTML:'<th colspan="'+ aLexemeType.length +'"><h3><code>'+ aTests[k].name +'</code></h3></th>' }))
 			eTR = Tag('TR')
-			for(var j=0; aLexerNodeType[j]; j++){
-				eTR.appendChild( Tag('TD', { id: Stats.getName( aLexerNodeType[j], k )}))
+			for(var j=0; aLexemeType[j]; j++){
+				eTR.appendChild( Tag('TD', { id: Stats.getName( aLexemeType[j], k )}))
 				}
 			eTABLE.appendChild( eTR )
 			}

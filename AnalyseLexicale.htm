@@ -45,8 +45,8 @@ FIN.</textarea>
 <div id="eResult">...</div>
 <p>Chaque type de lexème est défini à l'aide d'une <a href="src/regexp/syntax.htm">ER</a>.</p>
 <p>
-	Le lexer utilise <b>directement les ER</b> ou des <b>AFD issus de ces ER</b>. 
-	Les <a href="Lexers.performance.scan.htm">performances</a> sont sensiblement équivalente.
+	<a href="Lexers.htm">Les lexers</a> utilisent soit <b>directement les ER</b> ou soit les <b>AFD issus de ces ER</b>. 
+	<a href="Lexers.performance.scan.htm">Les performances</a> sont sensiblement équivalente.
 	<br>
 	Mais la dernière solution est préférable car elle nous laissent plus possibilités en programmation
 	<br>
@@ -61,7 +61,7 @@ FIN.</textarea>
 <h3>Les Expressions Régulières</h3>
 <p>
 	Pour simplifier significativement la création des ER,
-	les lexers retourne un 'arbre lexical' à la place d'une liste de lexème, en créant des léxèmes parents.
+	les lexers retourne un 'arbre lexical' à la place d'une liste de lexème (voir la fonction <a href="Lexeme.htm">Lexeme</a>).
 </p>
 <p>Principe de fonctionnement:</p>
 <ol>

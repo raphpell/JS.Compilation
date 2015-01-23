@@ -43,7 +43,7 @@ TABLE COL {
 
 <fieldset><legend>Actions</legend>
 	<dl>
-		<dt><input type="hidden" id="eLexerNode" value="HTMLElement"></dt>
+		<dt><input type="hidden" id="eLexeme" value="HTMLElement"></dt>
 		<dt><input type="button" id="eBtnScan" value="scan()"></dt>
 		<dt><input type="button" id="eBtnParse" value="parse()"></dt>
 		<dt><input type="button" id="eBtnReadToken" value="parser: readToken()"></dt>
@@ -92,9 +92,9 @@ var valueToString =function(o){
 	}
 
 // var Lexeme
-var createLexerNode =function( bClassName, bTitle, bInnerHTML, bByLine ){
+var createLexeme =function( bClassName, bTitle, bInnerHTML, bByLine ){
 	var s = '{}'
-	switch( eLexerNode.value ){
+	switch( eLexeme.value ){
 		case 'HTMLElement': s='document.createElement(o.token)'; break;
 		case 'ObjectNode': s='new Node(o.token)'; break;
 		}
@@ -108,7 +108,7 @@ var createLexerNode =function( bClassName, bTitle, bInnerHTML, bByLine ){
 		+'return e;'
 		)
 	}
-// createLexerNode(1,1,1,0)
+// createLexeme(1,1,1,0)
 </script> -->
 
 <!-- LEXERS + PARSER -->
@@ -237,7 +237,7 @@ View ={
 
 <!-- DTHML -->
 <script>
-_( 'eInput,eLexerNode,eBtnScan,eBtnParse,eBtnReadToken,eScanResult,eParseResult' )
+_( 'eInput,eLexeme,eBtnScan,eBtnParse,eBtnReadToken,eScanResult,eParseResult' )
 _( 'eAction,eToken,eStack,eEngineTable' )
 
 Events.add(

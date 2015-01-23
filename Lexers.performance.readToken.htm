@@ -79,7 +79,7 @@ TH {
 </fieldset>
 <fieldset><legend>Lexeme</legend>
 	<dl>
-		<dt><select id="eLexerNode">
+		<dt><select id="eLexeme">
 			<option value="HTMLElement" selected>HTMLElement</option>
 			<option value="ObjectNode">ObjectNode</option>
 			<option value="SimpleNode">SimpleNode</option>
@@ -190,7 +190,7 @@ var setTitle =function(){
 	if( ! this.oValue ) console.warn(this)
 	this.title = valueToString( this.oValue )
 	}
-var LexerNodes ={
+var Lexemes ={
 	HTMLElement :function( o ){
 		var e = document.createElement( o.token )
 		e.oValue = o
@@ -233,9 +233,9 @@ var oChrono = new Chrono ()
 View ={
 	bScanning: false,
 	reset :function(){
-		var b = eLexerNode.value=='ObjectNode'
+		var b = eLexeme.value=='ObjectNode'
 		if( eShowResult.disabled = b ) eShowResult.checked = false
-		Lexeme = window.LexerNodes[ eLexerNode.value ]
+		Lexeme = window.Lexemes[ eLexeme.value ]
 		oLexer = new window[ eLexer.value ]
 		Stats.reset()
 		View.init()
@@ -328,9 +328,9 @@ Events.add(
 		eBtnScan, View.scan,
 	'change',
 		eLexer ,View.reset,
-		eLexerNode ,View.reset
+		eLexeme ,View.reset
 	)
-eLexerNode.onchange()
+eLexeme.onchange()
 eLexer.onchange()
 </script>
 
