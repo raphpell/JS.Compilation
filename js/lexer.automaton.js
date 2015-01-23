@@ -2,6 +2,28 @@
 
 var AutomatonLexer =(function(){
 	var SINGLETON
+	// Fonctions comprimant la taille des automates
+	, f=function( sCharSet, bIn ){
+		var cache = {}
+		for(var i=0, ni=sCharSet.length; i<ni; i++ ) cache[ sCharSet[i]] = -1
+		return bIn
+			? function(symb,state){ return cache[symb] ? state : -1 }
+			: function(symb,state){ return cache[symb] || state }
+		}
+	, g=function( /* sSymb1, ... */ ){ 
+		var o = {}
+		for(var i=0, ni=arguments.length; i<ni; i++ ) o[ arguments[i]] = i
+		return o
+		}
+	, h=function( nLength, nDefaultValue /*,  nIndex1, nValue1, ...*/){
+		var a = []
+		var o = {}
+		for(var i=2, ni=arguments.length; i<ni; i=i+2 ) o[ arguments[i]] = arguments[i+1]
+		for(var i=0; i<nLength; i++ ) a[i] = o[i]!=undefined ? o[i] : nDefaultValue
+		return a
+		}
+	
+	// Données d'analyse
 	, LexerRules =(function(){
 		var Dictionary =function( sId ){
 			var sGetError = '"$1" is not a lexer '+ sId
@@ -259,26 +281,6 @@ var AutomatonLexer =(function(){
 			},
 	// Ajout de données
 		insert :function( fModule ){
-			// Fonctions comprimant la taille des automates
-			var f=function( sCharSet, bIn ){
-				var cache = {}
-				for(var i=0, ni=sCharSet.length; i<ni; i++ ) cache[ sCharSet[i]] = -1
-				return bIn
-					? function(symb,state){ return cache[symb] ? state : -1 }
-					: function(symb,state){ return cache[symb] || state }
-				}
-			var g=function( /* sSymb1, ... */ ){ 
-				var o = {}
-				for(var i=0, ni=arguments.length; i<ni; i++ ) o[ arguments[i]] = i
-				return o
-				}
-			var h=function( nLength, nDefaultValue /*,  nIndex1, nValue1, ...*/){
-				var a = []
-				var o = {}
-				for(var i=2, ni=arguments.length; i<ni; i=i+2 ) o[ arguments[i]] = arguments[i+1]
-				for(var i=0; i<nLength; i++ ) a[i] = o[i]!=undefined ? o[i] : nDefaultValue
-				return a
-				}
 			fModule( LexerRules, f, g, h )
 			}
 		})

@@ -78,13 +78,13 @@
 	<li>Les <b>tokens</b> : expression régulière (à transformer en AFD)</li>
 	<dd><code>!	REGULAR_EXPRESSION	=	\/<i>{reBody}</i>\/<i>{reFlags}</i></code></dd>
 	<li>Les <b>règles d'analyse</b> (liste de tokens à tester lors de l'analyse)</li>
-	<dd><code>!#@	R_REGULAR_EXPRESSION		=	<i>{hspaces}</i>|REGULAR_EXPRESSION_IN</code></dd>
+	<dd><code>!#	JS		=	BIG_JS|NOT_WHITE_SPACES	</code></dd>
 	<li>Les <b>aggrégations</b> de token : assemblage de plusieurs automates en un seul</li>
-	<dd><code>!#@	INI_VALUE			=	S_INI_SDQ|S_INI_SSQ|INI_VALUE_IN|<i>{hspaces}</i></code></dd>
+	<dd><code>!@	INI_VALUE			=	S_INI_SDQ|S_INI_SSQ|INI_VALUE_IN|<i>{hspaces}</i></code></dd>
 	<li>Les <b>macros</b> :
 		<ul>
-			<li>expression régulière intégrée dans d'autres.</li>
-			<li>portion d'une aggrégation, d'une règle d'analyse ou de l'attribut <i>previousTokens</i>: liste de noms de token.</li>
+			<li>Expression régulière intégrée dans d'autres.</li>
+			<li>Liste de noms de token (portion d'une aggrégation, d'une règle d'analyse ou de l'attribut <i>previousTokens</i>).</li>
 		</ul>
 		Elles sont intégrées dans les valeurs en étant encadrées par les symboles '{}'
 	</li>

@@ -60,7 +60,6 @@ TABLE.Table {
 <!-- FRAMEWORK... -->
 <script src="js/framework.js"></script>
 <script src="js/lexer.automaton.js"></script>
-<script src="js/lexer.automaton.modules.js"></script>
 <script src="js/automaton.js"></script>
 
 <!-- GRAPH... -->
@@ -250,8 +249,8 @@ var setFA =function( o ){
 	oFA = o.oFA
 	if( o.test ) eInput.value = o.test
 	if( sToken ){
-		AutomatonLexer.addTokenFromString( sToken, o.automate )
-		AutomatonLexer.addRule( 'ROOT', [ sToken ])
+		AutomatonLexer.Rules.addTokenFromString( sToken, o.automate )
+		AutomatonLexer.Rules.addRule( 'ROOT', [ sToken ])
 		}
 	refreshFAHTML('FA')
 	if( eShowFAGraph.checked ) showGraph( 'FA' )

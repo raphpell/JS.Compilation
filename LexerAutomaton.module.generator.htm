@@ -52,7 +52,7 @@
 <a href="index.htm">Index</a>
 
 <h1>Création de module Lexer</h1>
-<p>Les automates calculés sont mis en cache.</p>
+<p>Les automates calculés sont mis en cache : les modules requis ne se chargeront pas automatiquement !</p>
 
 <label for="eSourceFiles">Module: </label><select id="eSourceFiles"></select> <a href="#" onclick="wizSyntax()">syntaxe WIZ</a>
 <iframe id="eTextPlain" name="_source" src="" style="display:none;"></iframe><br>
@@ -79,13 +79,13 @@
 
 <hr>
 
-<input type="checkbox" checked id="eDisplayOk"><label for="eDisplayOk">ok.</label>
+<input type="checkbox" checked id="eDisplayOk"><label for="eDisplayOk">Expression utilisé.</label>
 <input type="checkbox" id="eDisplaySource"><label for="eDisplaySource">Source.</label>
-<input type="checkbox" checked id="eDisplayResult"><label for="eDisplayResult">Expressions régulières.</label>
+<input type="checkbox" checked id="eDisplayResult"><label for="eDisplayResult">Source évaluée.</label>
 <input type="checkbox" id="eDisplayAnnotation"><label for="eDisplayAnnotation">Annotations.</label>
-<input type="checkbox" checked id="eParentTokens"><label for="eParentTokens">Parent tokens.</label>
-<input type="checkbox" checked id="eTokens"><label for="eTokens">Tokens.</label>
-<input type="checkbox" checked id="eMacros"><label for="eMacros">Macros.</label>
+<input type="checkbox" id="eParentTokens"><label for="eParentTokens">AFD agrégats.</label>
+<input type="checkbox" id="eTokens"><label for="eTokens">AFD.</label>
+<input type="checkbox" id="eMacros"><label for="eMacros">Macros.</label>
 <pre id="eResult"></pre>
 
 <hr>
@@ -179,7 +179,7 @@ Calcul =(function(){
 			},
 		nextToken :function(){
 			if( waitFor( 'calcul', this, 'nextToken' )) return ;
-			var item = oDef.tokens[ nToken ]
+			var item = oDef.DFA[ nToken ]
 			nToken++
 			if( item ){
 				try{
@@ -201,7 +201,7 @@ Calcul =(function(){
 			},
 		nextParentToken :function(){
 			if( waitFor( 'calculAggregation', this, 'nextParentToken' )) return ;
-			var item = oDef.parents[ nToken ]
+			var item = oDef.aggregatesDFA[ nToken ]
 			if( item ){
 				try{
 					nTokenChild = 0
@@ -214,7 +214,7 @@ Calcul =(function(){
 				}
 			},
 		nextAggregation :function(){
-			var item = oDef.parents[ nToken ]
+			var item = oDef.aggregatesDFA[ nToken ]
 			, sChildToken = item[1][nTokenChild]
 			nTokenChild++
 			if( sChildToken ){
@@ -264,8 +264,8 @@ Calcul =(function(){
 							}
 				}
 
-			exportAutomaton( 'tokens' )
-			exportAutomaton( 'parents' )
+			exportAutomaton( 'DFA' )
+			exportAutomaton( 'aggregatesDFA' )
 			
 			for(var i=0, aPrevious; aPrevious=oDefinition.previousTokensOf[i]; i++ ){
 				oDefinition.previousTokensOf[i] = "o.setPreviousTokenOf("+ JSON.stringify( aPrevious[0]) +","+ JSON.stringify( aPrevious[1]) +")"
@@ -304,8 +304,8 @@ function scan (){
 		previousTokensOf:[],
 		translations:[],
 		rules:[],
-		parents:[],
-		tokens:[],
+		aggregatesDFA:[],
+		DFA:[],
 		macros:[]
 		}
 	var sSource = document.getElementById( 'eSource' ).value
@@ -363,11 +363,11 @@ function scan (){
 			var bExport = sComp.indexOf('!')>-1
 			
 			
-			if( bAggregation ) aTarget = oDefinition.parents
+			if( bAggregation ) aTarget = oDefinition.aggregatesDFA
 			if( ! bRule && ! bAggregation ){
 				var sC = sID.charAt(0)
 				if( sC==sC.toLowerCase()) aTarget = oDefinition.macros
-				if( sC==sC.toUpperCase()) aTarget = oDefinition.tokens
+				if( sC==sC.toUpperCase()) aTarget = oDefinition.DFA
 				}
 			var aAdded = [ sID, sValue ]
 			if( bRule ){
@@ -383,15 +383,15 @@ function scan (){
 		oDefinition.css = aCSS_Classes.join('&')
 		
 		oItems = {}
-//		oDefinition.parents.sort()
-//		oDefinition.tokens.sort().reverse()
+//		oDefinition.aggregatesDFA.sort()
+//		oDefinition.DFA.sort().reverse()
 //		oDefinition.macros.sort()
 		for(var i=0, item; item=oDefinition.macros[i]; i++ ) oItems[item[0]]=item[1]
-		for(var i=0, item; item=oDefinition.tokens[i]; i++ ) oItems[item[0]]=item[1]
-		for(var i=0, item; item=oDefinition.parents[i]; i++ ) oItems[item[0]]=item[1]
+		for(var i=0, item; item=oDefinition.DFA[i]; i++ ) oItems[item[0]]=item[1]
+		for(var i=0, item; item=oDefinition.aggregatesDFA[i]; i++ ) oItems[item[0]]=item[1]
 		compileMacros()
-		compileParentsToken()
-		oProgressBar.setTotal( 1 + oProgressBar.nTotal + oDefinition.tokens.length + 1 )
+		compileAgregation()
+		oProgressBar.setTotal( 1 + oProgressBar.nTotal + oDefinition.DFA.length + 1 )
 
 		exportRegExp()
 		oProgressBar.add(1)
@@ -404,7 +404,7 @@ function compileMacros (){
 		var bChange = true
 		while( bChange ){
 			bChange = false
-			for(var i=0, ni=a.length; i<ni ; i++ ){
+			for(var i=0, ni=a.length; i < ni ; i++ ){
 				var item=a[i]
 				while( re.test( item[1]) ){
 					var sMatch
@@ -420,13 +420,13 @@ function compileMacros (){
 			}
 		}
 	fFunction( oDefinition.macros, 1 )
-	fFunction( oDefinition.tokens, 1 )
-	fFunction( oDefinition.parents )
+	fFunction( oDefinition.DFA, 1 )
+	fFunction( oDefinition.aggregatesDFA )
 	fFunction( oDefinition.previousTokensOf )
 	}
-function compileParentsToken (){
+function compileAgregation (){
 	var nLength = 0
-	for(var i=0, item; item=oDefinition.parents[i]; i++ ){
+	for(var i=0, item; item=oDefinition.aggregatesDFA[i]; i++ ){
 		var a = item[1].split('|')
 		for(var j=0, token; token=a[j]; j++ ){
 			oOK[token] = oOK[token] || []
@@ -468,8 +468,8 @@ function display (){
 			}
 		}
 	var aResult = ['<table cellspacing="0" cellpadding="0" border="1">']
-	fFunction( eParentTokens, oDefinition.parents, 'Parent tokens' )
-	fFunction( eTokens, oDefinition.tokens, 'Tokens' )
+	fFunction( eParentTokens, oDefinition.aggregatesDFA, 'AFD agrégats' )
+	fFunction( eTokens, oDefinition.DFA, 'AFD' )
 	fFunction( eMacros, oDefinition.macros, 'Macros' )
 	aResult.push( '</table>' )
 	eResult.innerHTML = aResult.join('')
@@ -477,9 +477,9 @@ function display (){
 function exportRegExp (){
 	var aResult = []
 	display()
-	for(var i=0, ni=oDefinition.tokens.length; i<ni; i++ ){
-		var sToken = oDefinition.tokens[i][0]
-		aResult.push( "['"+ sToken +"', /"+ oDefinition.tokens[i][1] +"/ ]" )
+	for(var i=0, ni=oDefinition.DFA.length; i<ni; i++ ){
+		var sToken = oDefinition.DFA[i][0]
+		aResult.push( "['"+ sToken +"', /"+ oDefinition.DFA[i][1] +"/ ]" )
 		}
 	eExport.value = '// Expressions régulières\n'+ aResult.join( ',\n' ) +","
 	}
@@ -521,7 +521,7 @@ eScanResult.onclick = function(){
 	eTest.style.display = eScanResult.checked ? '' : 'none'
 	}
 eScanResult.onclick()
-eSteps.onclick()
+//eSteps.onclick()
 </script>
 <script><!-- Chargement de fichier -->
 _('eTextPlain,eSourceFiles')
