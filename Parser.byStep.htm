@@ -91,14 +91,14 @@ var valueToString =function(o){
 	return JSON.stringify( o, 'token,parentToken,css,index,lineStart,lineEnd'.split(','), " " ).str_replace('"', '')
 	}
 
-// var LexerNode
+// var Lexeme
 var createLexerNode =function( bClassName, bTitle, bInnerHTML, bByLine ){
 	var s = '{}'
 	switch( eLexerNode.value ){
 		case 'HTMLElement': s='document.createElement(o.token)'; break;
 		case 'ObjectNode': s='new Node(o.token)'; break;
 		}
-	LexerNode = new Function ( 'o', 
+	Lexeme = new Function ( 'o', 
 		'var e = '+ s +';'
 		+'e.oValue=o;'
 		+( bByLine ? 'e.getElementsByLine=getElementsByLine;' : '' )
@@ -118,7 +118,7 @@ var createLexerNode =function( bClassName, bTitle, bInnerHTML, bByLine ){
 <script src="src/regexp/futurParser.js"></script>
 <script src="js/futurParser.js"></script>
 <script>
-// ParserLR.Node = LexerNode
+// ParserLR.Node = Lexeme
 </script>
 
 <!-- CODE -->

@@ -191,7 +191,7 @@ var GrammarParserEngine={
 				case "(2) RHS -> &epsilon;": return false;
 				case "(3) UNION -> CONCAT PIPE UNION":
 					if( RHS[0] && RHS[2] ){
-						o = LexerNode({token:'PIPE',css:'alternation'})
+						o = Lexeme({token:'PIPE',css:'alternation'})
 						var addPipeChild =function( eChild ){
 							if( eChild.nodeName=='PIPE' ){
 								for(var e=eChild.firstChild; e ;  ){
@@ -209,7 +209,7 @@ var GrammarParserEngine={
 				case "(4) UNION -> CONCAT": return RHS[0];
 				case "(5) CONCAT -> SYMBOLS CONCAT":
 					if( RHS[0] && RHS[1] ){
-						o = LexerNode({token:'CONCAT',css:'concat'})
+						o = Lexeme({token:'CONCAT',css:'concat'})
 						o.appendChild( RHS[0])
 						if( RHS[1].nodeName=='CONCAT' ){
 							for(var e=RHS[1].firstChild; e ;  ){

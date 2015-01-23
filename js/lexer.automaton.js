@@ -1,4 +1,4 @@
-// LexerNode REQUIS
+// Lexeme REQUIS
 
 var AutomatonLexer =(function(){
 	var SINGLETON
@@ -139,7 +139,7 @@ var AutomatonLexer =(function(){
 			},
 		startParent :function(){
 			sToken = sToken.slice( 2 )
-			var eNewParent = LexerNode({
+			var eNewParent = Lexeme({
 				token: LexerRules.Translation[sToken]||sToken,
 				css: LexerRules.CSS[sToken]||'',
 				rule:sToken,
@@ -314,7 +314,7 @@ var AutomatonLexer =(function(){
 			},
 		appendNode :null, // varie selon scan ou rescan
 		init :function( sText, sRule ){
-			var e = LexerNode({
+			var e = Lexeme({
 				token:sRule,
 				rule:sRule,
 				value:'',
@@ -350,7 +350,7 @@ var AutomatonLexer =(function(){
 			for(var j=0; sToken=a[j]; j++){
 				if( o = this.searchToken( sToken, this.nPos )){
 					sToken = o.token
-					eNode = LexerNode({
+					eNode = Lexeme({
 						token: LexerRules.Translation[sToken]||sToken,
 						css: LexerRules.CSS[sToken]||'',
 						rule:sParentToken,

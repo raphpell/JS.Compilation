@@ -77,7 +77,7 @@ TH {
 		<dt><input type="checkbox" id="eShowStats" checked><label for="eShowStats">Afficher les stats.</label></dt>
 	</dl>
 </fieldset>
-<fieldset><legend>LexerNode</legend>
+<fieldset><legend>Lexeme</legend>
 	<dl>
 		<dt><select id="eLexerNode">
 			<option value="HTMLElement" selected>HTMLElement</option>
@@ -228,14 +228,14 @@ var oLexer
 <!-- TESTS -->
 <script>
 var oChrono = new Chrono ()
-, eToken, oLexer, LexerNode
+, eToken, oLexer, Lexeme
 , TableSorter // TableSorter.sort(1,'DESC')
 View ={
 	bScanning: false,
 	reset :function(){
 		var b = eLexerNode.value=='ObjectNode'
 		if( eShowResult.disabled = b ) eShowResult.checked = false
-		LexerNode = window.LexerNodes[ eLexerNode.value ]
+		Lexeme = window.LexerNodes[ eLexerNode.value ]
 		oLexer = new window[ eLexer.value ]
 		Stats.reset()
 		View.init()

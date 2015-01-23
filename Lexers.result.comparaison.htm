@@ -225,15 +225,15 @@ var setTitle =function(){
 		+ '\n\u25B6'+o.value+'\u25C0'
 		+ valueToString( o )
 	}
-var LexerNode =function( o ){
+var Lexeme =function( o ){
 	// alert( JSON.stringify( o ))
 	var e = document.createElement('B')
 	, sToken = TokensBridge[o.token] || o.token
 	, sValue = o.value
 	e.oValue = o
 	if( o.parentToken ){
-		if( LexerNode[o.parentToken]) LexerNode[o.parentToken]( e, sToken, sValue )
-			else LexerNode.parent( e, sToken, o )
+		if( Lexeme[o.parentToken]) Lexeme[o.parentToken]( e, sToken, sValue )
+			else Lexeme.parent( e, sToken, o )
 			// else e.symbol = e.title = sValue
 		if( e.symbol )
 			e.innerHTML = e.symbol.str_replace( ['&','<','>'], ['&amp;','&lt;','&gt;'])
@@ -244,7 +244,7 @@ var LexerNode =function( o ){
 		}
 	return e
 	}
-LexerNode.SimpleRegExp =function( e, sTokenName, sMatched ){
+Lexeme.SimpleRegExp =function( e, sTokenName, sMatched ){
 	e.value = sMatched
 	switch( sTokenName ){
 		case 'PIPE':
@@ -278,7 +278,7 @@ LexerNode.SimpleRegExp =function( e, sTokenName, sMatched ){
 			e.title = e.value
 		}
 	}
-LexerNode.parent =function( e, sTokenName, oValue ){
+Lexeme.parent =function( e, sTokenName, oValue ){
 	e.value = oValue.value
 	e.setTitle = setTitle
 	e.setTitle()

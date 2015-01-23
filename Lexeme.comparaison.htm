@@ -65,9 +65,9 @@ FIELDSET DL {
 <script src="js/lexer.node.object.js"></script>
 <script src="js/lexer.node.simple.js"></script>
 
-<!-- LexerNode -->
+<!-- Lexeme -->
 <script>
-var LexerNode
+var Lexeme
 , createLexerNode =function( sNodeType ){
 	var s
 	switch( sNodeType ){
@@ -75,9 +75,9 @@ var LexerNode
 		case 'ObjectNode': s='new Node (o.token)'; break;
 		case 'SimpleNode': s='new SimpleNode (o.token)'; break;
 		case 'EmptyObject': s='new EmptyObject (o.token)'; break;
-		default: throw Error ('Invalid LexerNode Type.')
+		default: throw Error ('Invalid Lexeme Type.')
 		}
-	LexerNode = new Function ( 'o', 
+	Lexeme = new Function ( 'o', 
 		'var m = '+ s +';'
 		+'m.oValue=o;'
 		+'return m;'
@@ -157,9 +157,9 @@ var CompareTests =function( nId ){
 var aTests =(function(){
 	var o1, o2, o3
 	return [
-		{name:'new',test:function(){ o1 = LexerNode ({token:'STRING'}) }},
-		{name:'',test:function(){ o2 = new LexerNode ({token:'STRING'}) }},
-		{name:'',test:function(){ o3 = new LexerNode ({token:'STRING'}) }},
+		{name:'new',test:function(){ o1 = Lexeme ({token:'STRING'}) }},
+		{name:'',test:function(){ o2 = new Lexeme ({token:'STRING'}) }},
+		{name:'',test:function(){ o3 = new Lexeme ({token:'STRING'}) }},
 		{name:'appendChild',test:function(){ o1.appendChild( o2 ) }},
 		{name:'',test:function(){
 			var nChild = 5
@@ -168,7 +168,7 @@ var aTests =(function(){
 				if( n<nDepth )
 					for(var i=0; i<nChild; i++ )
 						oP.appendChild(
-							appendNodes( LexerNode({ token:'STRING'+ (i>1?i:'') }), n+1 )
+							appendNodes( Lexeme({ token:'STRING'+ (i>1?i:'') }), n+1 )
 							)
 				return oP
 				}

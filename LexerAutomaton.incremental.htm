@@ -93,12 +93,12 @@ FIELDSET DL {
 <fieldset><legend>Affichage</legend>
 	<dl>
 		<dt><input type="checkbox" id="eShowResults" checked><label for="eShowResults">Afficher le résultat</label></dt>
-		<dt><input type="radio" id="eTestCase1" name="TestCase"><label for="eTestCase1">Résultat analyse lexicale (LexerNode lourd).</label></dt>
-		<dt><input type="radio" id="eTestCase2" name="TestCase"><label for="eTestCase2">Texte généré: parcours arbre (LexerNode légé).</label></dt>
-		<dt><input type="radio" id="eTestCase3" name="TestCase"><label for="eTestCase3">Texte généré: ligne/ligne (LexerNode légé).</label></dt>
+		<dt><input type="radio" id="eTestCase1" name="TestCase"><label for="eTestCase1">Résultat analyse lexicale (Lexeme lourd).</label></dt>
+		<dt><input type="radio" id="eTestCase2" name="TestCase"><label for="eTestCase2">Texte généré: parcours arbre (Lexeme légé).</label></dt>
+		<dt><input type="radio" id="eTestCase3" name="TestCase"><label for="eTestCase3">Texte généré: ligne/ligne (Lexeme légé).</label></dt>
 	</dl>
 </fieldset>
-<fieldset><legend>LexerNode</legend>
+<fieldset><legend>Lexeme</legend>
 	<dl>
 		<dt><select id="eLexerNode">
 			<option value="HTMLElement" selected>HTMLElement</option>
@@ -212,7 +212,7 @@ alert('ok')
 <script src="js/lexer.node.object.js"></script>
 <script src="js/lexer.node.simple.js"></script>
 <script>
-var LexerNode
+var Lexeme
 , createLexerNode =function( bClassName, bTitle, bInnerHTML, bByLine ){
 	eClassName.checked = bClassName
 	eTitle.checked = bTitle
@@ -224,7 +224,7 @@ var LexerNode
 		case 'ObjectNode': s='new Node(o.token)'; break;
 		case 'SimpleNode': s='new SimpleNode(o.token)'; break;
 		}
-	LexerNode = new Function ( 'o', 
+	Lexeme = new Function ( 'o', 
 		'var e = '+ s +';'
 		+'e.oValue=o;'
 		+( bByLine ? 'e.getElementsByLine=getElementsByLine;' : '' )

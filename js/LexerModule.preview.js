@@ -1,7 +1,7 @@
 var valueToString =function(o){
 	return JSON.stringify( o, 'token,parentToken,css,index,lineStart,lineEnd'.split(','), " " ).str_replace('"', '')
 	}
-var LexerNode =function( o ){
+var Lexeme =function( o ){
 	var sToken = o.token
 	, e = document.createElement( sToken )
 	, sValue = o.value

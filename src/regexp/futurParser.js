@@ -78,7 +78,7 @@ var RegExpParser ={
 				case "(2) REGEXP -> &epsilon;": return false;
 				case "(3) UNION -> CONCAT PIPE UNION":
 					if( RHS[0] && RHS[2] ){
-						o = LexerNode({token:'PIPE',css:'alternation'})
+						o = Lexeme({token:'PIPE',css:'alternation'})
 						var addPipeChild =function( eChild ){
 							if( eChild.nodeName=='PIPE' ){
 								for(var e=eChild.firstChild; e ;  ){
@@ -96,7 +96,7 @@ var RegExpParser ={
 				case "(4) UNION -> CONCAT": return RHS[0];
 				case "(5) CONCAT -> REPEAT CONCAT":
 					if( RHS[0] && RHS[1] ){
-						o = LexerNode({token:'CONCAT',css:'concat'})
+						o = Lexeme({token:'CONCAT',css:'concat'})
 						o.appendChild( RHS[0])
 						if( RHS[1].nodeName=='CONCAT' ){
 							for(var e=RHS[1].firstChild; e ;  ){
@@ -116,7 +116,7 @@ var RegExpParser ={
 				case "(8) REPEAT -> CHAR_CLASS_EXP":
 					return RHS[0];
 				case "(9) QUANTIFIERS -> QUESTION":
-					return LexerNode({
+					return Lexeme({
 						token:'QUANTIFIER'
 						,css:'quantifier'
 						,n:'0'
@@ -124,7 +124,7 @@ var RegExpParser ={
 					//	,value: '0,1'
 						})
 				case "(10) QUANTIFIERS -> STAR":
-					return LexerNode({
+					return Lexeme({
 						token:'QUANTIFIER'
 						,css:'quantifier'
 						,n:'0'
@@ -132,7 +132,7 @@ var RegExpParser ={
 					//	,value: '0,\u221E'
 						})
 				case "(11) QUANTIFIERS -> PLUS":
-					return LexerNode({
+					return Lexeme({
 						token:'QUANTIFIER'
 						,css:'quantifier'
 						,n:'1'
@@ -145,14 +145,14 @@ var RegExpParser ={
 					var aTokens = to_array( RHS[0].childNodes )
 					return ParserLR.parse( aTokens, RegExpParser.QUANTIFIER )
 				case "(13) CHAR_CLASS_EXP -> CHARSET":
-					o = LexerNode({token:'CHARCLASS',css:'charclass'})
+					o = Lexeme({token:'CHARCLASS',css:'charclass'})
 					if( RHS[0].firstChild.nodeName=='LBRACK' ) RHS[0].removeChild( RHS[0].firstChild )
 					if( RHS[0].lastChild.nodeName=='RBRACK' ) RHS[0].removeChild( RHS[0].lastChild )
 					var aTokens = to_array( RHS[0].childNodes )
 					o.appendChild( ParserLR.parse( aTokens, RegExpParser.CHARCLASS ))
 					return o
 				case "(14) CHAR_CLASS_EXP -> NEGATED_CHARSET":
-					o = LexerNode({token:'NEGATED_CHARCLASS',css:'charclass negated'})
+					o = Lexeme({token:'NEGATED_CHARCLASS',css:'charclass negated'})
 					if( RHS[0].firstChild.nodeName=='NLBRACK' ) RHS[0].removeChild( RHS[0].firstChild )
 					if( RHS[0].lastChild.nodeName=='NRBRACK' ) RHS[0].removeChild( RHS[0].lastChild )
 					var aTokens = to_array( RHS[0].childNodes )
@@ -246,7 +246,7 @@ var RegExpParser ={
 					return o
 				case "(2) CHAR_CLASSES -> CHAR_CLASS": return RHS[0];
 				case "(3) CHAR_CLASS -> SIMPLE_CHAR MINUS SIMPLE_CHAR":
-					o = LexerNode({token:'RANGE',css:'characters_range'})
+					o = Lexeme({token:'RANGE',css:'characters_range'})
 					o.appendChild( RHS[0])
 					o.appendChild( RHS[2])
 					return o
@@ -266,7 +266,7 @@ var RegExpParser ={
 					o = RHS[0].oValue
 					o.token = 'CHAR'
 					o.css = 'character'
-					return LexerNode(o)
+					return Lexeme(o)
 				}
 			}
 		},
@@ -303,7 +303,7 @@ var RegExpParser ={
 					var m = RHS[1]  
 							? ( RHS[2] ? RHS[2].oValue.value : '\u221E' )
 							: ''
-					return LexerNode({
+					return Lexeme({
 						token:'QUANTIFIER'
 						,css:'quantifier'
 						,n:n

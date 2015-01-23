@@ -1,4 +1,4 @@
-// LexerNode REQUIS
+// Lexeme REQUIS
 
 var MultiRegExpLexer =(function(){
 	var SINGLETON
@@ -119,7 +119,7 @@ var MultiRegExpLexer =(function(){
 			},
 		startParent :function(){
 			sToken=sToken.slice( 2 )
-			eNewParent = LexerNode({
+			eNewParent = Lexeme({
 				token: LexerRules.Translation[sToken]||sToken,
 				css: LexerRules.CSS[sToken]||'',
 				rule:sToken,
@@ -253,7 +253,7 @@ var MultiRegExpLexer =(function(){
 				previous:Previous()
 				})
 			sSyntax = sSyntax || 'RegExp'
-			this.eRoot = this.stack.push( LexerNode({
+			this.eRoot = this.stack.push( Lexeme({
 				token:sSyntax,
 				rule:sSyntax,
 				value:'',
@@ -270,7 +270,7 @@ var MultiRegExpLexer =(function(){
 				aMatch = a[i].re.exec( this.sText )
 				if( nMatchLength = aMatch[0].length ){
 					sToken = a[i].name
-					eNode = LexerNode({
+					eNode = Lexeme({
 						token: LexerRules.Translation[sToken]||sToken,
 						css: LexerRules.CSS[sToken]||'',
 						rule:sToken,

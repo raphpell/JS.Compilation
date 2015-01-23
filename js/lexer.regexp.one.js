@@ -1,4 +1,4 @@
-// LexerNode requis
+// Lexeme requis
 
 var OneRegExpLexer =(function(){
 	var sDefaultSyntax = 'JS'
@@ -17,7 +17,7 @@ var OneRegExpLexer =(function(){
 		sSyntax = sSyntax || sDefaultSyntax
 		Lexer.nLine = 1
 		Lexer.nIndex = 0
-		return Lexer.parse( LexerNode({
+		return Lexer.parse( Lexeme({
 			token: sSyntax,
 			value:'',
 			css: sSyntax.toLowerCase(),
@@ -56,7 +56,7 @@ var OneRegExpLexer =(function(){
 					a = sMatched.match( oRule.re )
 					if( ! a || a[0] != sMatched ) continue;
 					oLanguageRule = Rules.get( oRule.sId +'_CHILD' )
-					oNode = LexerNode({
+					oNode = Lexeme({
 						token: oRule.sId,
 						value: oLanguageRule ? '' : sMatched,
 						css: oRule.className,

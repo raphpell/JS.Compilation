@@ -73,7 +73,7 @@ var WizParserEngine={
 				case "(8) OBJECT -> RULE":
 				case "(9) OBJECT -> RULE BLOCK":
 					var oFragment = document.createDocumentFragment ()
-					var oRule = LexerNode({
+					var oRule = Lexeme({
 						token: 'RULE',
 						css: 'rule',
 						value: RHS[0].childNodes.length > 1
@@ -142,7 +142,7 @@ var WizParserEngine={
 				case "(4) MEMBER -> ATTRIBUTE VALUE":
 					var sTokenName = RHS[0].oValue.value
 					var eValue = RHS[1].getElementsByTagName( 'VALUE_IN' )[0]
-					o = LexerNode({
+					o = Lexeme({
 						token: sTokenName,
 						css: sTokenName.toLowerCase(),
 						value: eValue ? eValue.oValue.value.trim() : ''
