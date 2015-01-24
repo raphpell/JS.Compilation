@@ -220,7 +220,7 @@ LoadFile =(function(){
 					}
 				}
 			}
+		eBODY.appendChild( eIFRAME )
 		eIFRAME.src = sFileName
-		return eBODY.appendChild( eIFRAME )
 		}
 	}())
