@@ -219,7 +219,8 @@ LoadFile =(function(){
 					return eBODY.removeChild( eIFRAME )
 					}
 				}
-			fOnLoad( 'Erreur pendant le chargement du fichier.' )
+			fOnLoad( 'Une erreur est survenu pendant le chargement du fichier.' )
+			console.warn( eIFRAME, e )
 			}
 		eBODY.appendChild( eIFRAME )
 		eIFRAME.src = sFileName
