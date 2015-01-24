@@ -54,8 +54,7 @@
 <h1>Création de module Lexer</h1>
 <p>Les automates calculés sont mis en cache : les modules requis ne se chargeront pas automatiquement !</p>
 
-<label for="eSourceFiles">Module: </label><select id="eSourceFiles"></select> <a href="#" onclick="wizSyntax()">syntaxe WIZ</a>
-<iframe id="eTextPlain" name="_source" src="" style="display:none;"></iframe><br>
+<label for="eSourceFiles">Module: </label><select id="eSourceFiles"></select> <a href="#" onclick="wizSyntax()">syntaxe WIZ</a><br>
 <label for="eSource">Source: </label><br>
 <table>
 	<tr><td style="width:100%;" valign="top">
@@ -524,7 +523,7 @@ eScanResult.onclick()
 //eSteps.onclick()
 </script>
 <script><!-- Chargement de fichier -->
-_('eTextPlain,eSourceFiles')
+_('eSourceFiles')
 Tag.addChildNodes( eSourceFiles, 'OPTION', [
 	'',
 	'module.whitespaces',
@@ -543,17 +542,10 @@ Tag.addChildNodes( eSourceFiles, 'OPTION', [
 	'token.REGULAR_EXPRESSION'
 	])
 eSourceFiles.onchange =function(){
-	eTextPlain.src = 'modules/lexer/'+ eSourceFiles.value +".html"
-	}
-eTextPlain.onload =function(){
-	var e = eTextPlain.contentWindow.document.firstChild
-	if( e ){
-		while( e && e.nodeType!=3 ) e = e.lastChild 
-		if( e ){
-			eSource.value = e.nodeValue
-			scan()
-			}
-		}
+	LoadFile( 'modules/lexer/'+ eSourceFiles.value +".html", function( s ){
+		eSource.value = s
+		scan()
+		})
 	}
 </script>
 

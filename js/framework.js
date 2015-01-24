@@ -204,3 +204,23 @@ showFrom =function( eShow, e ){
 		e.style.display= eShow.checked ? '':'none'
 		}
 	}
+
+LoadFile =(function(){
+	var eBODY = document.lastChild.lastChild
+	return function( sFileName, fOnLoad ){
+		var eIFRAME = document.createElement('IFRAME')
+		eIFRAME.style.display = 'none'
+		eIFRAME.onload =function(){
+			var e = eIFRAME.contentWindow.document.firstChild
+			if( e ){
+				while( e && e.nodeType!=3 ) e = e.lastChild 
+				if( e ){
+					fOnLoad( e.nodeValue )
+					eBODY.removeChild( eIFRAME )
+					}
+				}
+			}
+		eIFRAME.src = sFileName
+		return eBODY.appendChild( eIFRAME )
+		}
+	}())

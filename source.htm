@@ -1,0 +1,70 @@
+<html>
+<head>
+	<title id="eTitle">{fileName}</title>
+	<link rel="stylesheet" type="text/css" href="css/syntaxes.css">
+	<style>
+#eFile { float: right; }
+#eSource { float: left; }
+PRE, B {
+	font: 1em normal Lucida, Georgia;
+	}
+.literal,
+.operator,
+.keyword { font-weight: bold; letter-spacing: -1px; }
+.string *,
+.punctuator,
+.number { font-style: italic; }
+.comment * { font: .8em normal Arial; }
+	</style>
+</head>
+<body>
+<a href="index.htm">index</a>
+<center id="eFile"></center>
+<pre id="eSource"></pre>
+
+<script src="js/shared.js"></script>
+<script src="js/framework.js"></script>
+<script src="js/lexer.automaton.js"></script>
+<script src="js/lexer.automaton.modules.js"></script>
+<script>
+_('eTitle,eFile,eSource')
+
+var Lexeme =function( o ){
+	var sToken = o.token
+	, e = document.createElement('B')
+	, sValue = o.value
+	e.oValue = o
+	if( sValue ) e.innerHTML = sValue.str_replace( ['&','<','>'], ['&amp;','&lt;','&gt;'])
+	e.className = 'myNode'
+	if( o.css ) e.className += ' '+ o.css
+	return e
+	}
+
+var sQuery = unescape( document.location.search )
+if( sQuery ){
+	var aParameters = sQuery.slice(1).split('&')
+	, oQuery = {}
+	for(var i=0; aParameters[i]; i++ ){
+		var aPair = aParameters[i].split('=')
+		oQuery[ aPair[0]] = aPair[1]
+		}
+	
+	if( oQuery.file )
+		LoadFile( oQuery.file, function( sTextSource ){
+			eTitle.innerHTML = oQuery.file
+			var oChrono = new Chrono
+			eSource.appendChild( AutomatonLexer( sTextSource, oQuery.syntax||'HTML' ))
+			eFile.innerHTML = [
+				'Fichier: '+ oQuery.file,
+				'caractère: '+ sTextSource.length,
+				'Temps: '+ oChrono.stop() +"ms"
+				].join(', ')
+			
+			})
+	else {
+		eSource.innerHTML = 'File Not Found...'
+		}
+	}
+</script>
+</body>
+</html>
