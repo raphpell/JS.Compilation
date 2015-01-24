@@ -3,9 +3,44 @@
 	<title id="eTitle">{fileName}</title>
 	<link rel="stylesheet" type="text/css" href="css/syntaxes.css">
 	<style>
-#eFile { float: right; }
-#eSource { float: left; }
-PRE, B {
+HTML, BODY {
+	margin: .5em .25em .25em .25em;
+	font: 1em normal Verdana;
+	}
+.cartouche {
+	background: #FFF;
+	box-shadow: 0 0 1em #aaa;
+	border-bottom: solid .5em #000;
+	height: 2em;
+	line-height: 2em;
+	left: 0;
+	top: -2em;
+	opacity: .8;
+	padding: 0;
+	position: absolute;
+	text-align: right;
+	transition: .25s ease;
+	width: 100%;
+	}
+.cartouche:hover {
+	top: 0;
+	left: 0;
+	padding: 0;
+	}
+	.cartouche A { float: left; padding: 0 1em;  }
+	#eFile { float: right; padding: 0 1em; }
+#eSource {
+	float: left;
+	background: #fffff7;
+	box-shadow: inset 0 0 1em #aaa;
+	box-sizing: border-box;
+	overflow: auto;
+	margin: 0;
+	padding: 1em;
+	height:100%;
+	width:100%;
+	}
+PRE, PRE B {
 	font: 1em normal Lucida, Georgia;
 	}
 .literal,
@@ -18,8 +53,11 @@ PRE, B {
 	</style>
 </head>
 <body>
-<a href="index.htm">index</a>
-<center id="eFile"></center>
+<div class='cartouche'>
+	<a href="index.htm">index</a>
+	<center id="eFile"></center>
+</div>
+
 <pre id="eSource"></pre>
 
 <script src="js/shared.js"></script>
@@ -55,9 +93,9 @@ if( sQuery ){
 			var oChrono = new Chrono
 			eSource.appendChild( AutomatonLexer( sTextSource, oQuery.syntax||'HTML' ))
 			eFile.innerHTML = [
-				'Fichier: '+ oQuery.file,
-				'caractère: '+ sTextSource.length,
-				'Temps: '+ oChrono.stop() +"ms"
+				'Fichier: <b>'+ oQuery.file +'</b>',
+				'caractères: <b>'+ sTextSource.length +'</b>',
+				'Temps: <b>'+ oChrono.stop() +'ms</b>'
 				].join(', ')
 			
 			})

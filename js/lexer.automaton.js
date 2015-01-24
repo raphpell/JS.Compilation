@@ -1,4 +1,4 @@
-// Lexeme REQUIS
+ï»¿// Lexeme REQUIS
 
 var AutomatonLexer =(function(){
 	var SINGLETON
@@ -23,7 +23,7 @@ var AutomatonLexer =(function(){
 		return a
 		}
 	
-	// Données d'analyse
+	// DonnÃ©es d'analyse
 	, LexerRules =(function(){
 		var Dictionary =function( sId ){
 			var sGetError = '"$1" is not a lexer '+ sId
@@ -122,7 +122,7 @@ var AutomatonLexer =(function(){
 			|| -2 
 		}
 
-	// Données d'analyse
+	// DonnÃ©es d'analyse
 	var sWSTokens ='|WHITE_SPACES|SPACES|SPACE|NEW_LINE|L_NEW_LINE|TAB|'
 	, sToken, eNode, bNoSkip
 	, Actions ={
@@ -215,7 +215,7 @@ var AutomatonLexer =(function(){
 			pop :function( bPartialScan ){
 				if( bPartialScan ){
 					if( that.eEndToken && that.eParent==that.eEndToken.parentNode ){
-						// Efface tous les éléments après la fin du parent dans celui-ci
+						// Efface tous les Ã©lÃ©ments aprÃ¨s la fin du parent dans celui-ci
 						for(var e=that.eEndToken; e;){
 							var eTMP = e
 							e = e.nextSibling
@@ -225,7 +225,7 @@ var AutomatonLexer =(function(){
 						that.eEndToken = that.eParent.nextSibling
 						}
 					}
-				// A faire après suppression des éléments inutiles
+				// A faire aprÃ¨s suppression des Ã©lÃ©ments inutiles
 				if( n ){
 					var e = a[--n]
 					e.oValue.lineEnd = e.lastChild && e.lastChild.oValue.lineEnd || 1
@@ -279,7 +279,7 @@ var AutomatonLexer =(function(){
 		rescan :function( eRoot, sSource, nPos, nDeleted, nAdded ){
 			return SINGLETON.rescan( eRoot, sSource, nPos, nDeleted, nAdded )
 			},
-	// Ajout de données
+	// Ajout de donnÃ©es
 		insert :function( fModule ){
 			fModule( LexerRules, f, g, h )
 			}
@@ -401,18 +401,18 @@ var AutomatonLexer =(function(){
 		haveNode :function( eNode ){
 			if( ! this.eEndToken ) return false
 			var o1 = eNode.oValue
-			// Efface les éléments dépassés par le nouveau token eNode
+			// Efface les Ã©lÃ©ments dÃ©passÃ©s par le nouveau token eNode
 			while( this.eEndToken && this.eEndToken.oValue.index + this.nShift < o1.index )
 			// pas <= sinon autant faire une analyse totale
 			// mais... a voir
 				this.getNextEndToken()
 			var o2 = this.eEndToken && this.eEndToken.oValue
-			// Si le nouveau token est 'identique' à eEndToken
+			// Si le nouveau token est 'identique' Ã  eEndToken
 			if( o2 && o1.token==o2.token && o1.value==o2.value && o1.index==o2.index+this.nShift ){
-				// 1. Contrôle si les tokens sont bien identique = ont le même parent
+				// 1. ContrÃ´le si les tokens sont bien identique = ont le mÃªme parent
 				if( this.stack.top() !== this.eEndToken.parentNode )
 					this.getNextEndToken()
-				// 2. FIN ANALYSE: Met à jour les éléments suivant ( index et ligne ) 
+				// 2. FIN ANALYSE: Met Ã  jour les Ã©lÃ©ments suivant ( index et ligne ) 
 				else{
 					this.nLineShift = o1.lineStart - o2.lineStart
 					this.updateValues()
@@ -440,7 +440,7 @@ var AutomatonLexer =(function(){
 				nTokenEnd = o.index + o.value.length
 				} else nTokenEnd = nTokenStart + o.value.length
 			
-			return nStart <= nTokenStart && nTokenStart <= nEnd	// Le début du token est dans l'intervalle
+			return nStart <= nTokenStart && nTokenStart <= nEnd	// Le dÃ©but du token est dans l'intervalle
 				|| nTokenStart <= nStart && nEnd <= nTokenEnd	// L'intervalle est dans le token
 				|| nStart <= nTokenEnd && nTokenEnd <= nEnd		// La fin du token est dans l'intervalle
 			},
@@ -470,7 +470,7 @@ var AutomatonLexer =(function(){
 			},
 		removeDeletedNodes :function( eParent, nPos, nDeleted ){
 			var ePrevious, eNext
-			// Recherche et efface le premier élément
+			// Recherche et efface le premier Ã©lÃ©ment
 			, e = this.nodeAt( nPos, eParent )
 			if( e ){
 				if( this.isParent( e ) && ~e.firstChild.oValue.parentToken.indexOf('_SCAN')){
@@ -504,7 +504,7 @@ var AutomatonLexer =(function(){
 				}
 					
 			if( ePrevious && eNext && ePrevious.parentNode != eNext.parentNode )
-				throw Error( 'Pas le même parent ! final' )
+				throw Error( 'Pas le mÃªme parent ! final' )
 			return {
 				before: ! e ? this.eRoot.lastChild: ePrevious,
 				after: eNext
@@ -538,7 +538,7 @@ var AutomatonLexer =(function(){
 				this.nLine = o.token=='NEW_LINE' ? o.lineEnd+1 : o.lineEnd
 				for(var e = oScanNodes.before; this.isParent( e ); e = e.lastChild );
 				o = e.oValue
-				this.nPos = o.index + o.value.length // ATTENTION : cas parent à faire
+				this.nPos = o.index + o.value.length // ATTENTION : cas parent Ã  faire
 				
 				var e = oScanNodes.before
 				while( e && this.isWhiteSpace( e.oValue.token ))
@@ -593,7 +593,7 @@ var AutomatonLexer =(function(){
 			}
 		})
 
-	// Analyse par défaut: fichier .txt
+	// Analyse par dÃ©faut: fichier .txt
 	Lexer.insert(function(o,f,g,h){
 		o.addTokens([
 			['WHITE_SPACES',{A:g("[\t \n\r\f]"),R:[[0,f("\t \n\r\f",1)]],M:[[],[2],[2]],F:[,,1],TokensTable:[,'WHITE_SPACES']}],
