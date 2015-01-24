@@ -1,4 +1,4 @@
-<html>
+﻿<html>
 <head>
 	<title id="eTitle">{fileName}</title>
 	<link rel="stylesheet" type="text/css" href="css/syntaxes.css">
@@ -56,7 +56,7 @@ if( sQuery ){
 			eSource.appendChild( AutomatonLexer( sTextSource, oQuery.syntax||'HTML' ))
 			eFile.innerHTML = [
 				'Fichier: '+ oQuery.file,
-				'caract�re: '+ sTextSource.length,
+				'caractère: '+ sTextSource.length,
 				'Temps: '+ oChrono.stop() +"ms"
 				].join(', ')
 			
