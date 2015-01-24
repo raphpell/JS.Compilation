@@ -1,4 +1,6 @@
-﻿EPSILON = '&epsilon;'
+﻿// Require AutomatonLexer + modules
+
+EPSILON = '&epsilon;'
 EMPTY = '&empty;'
 
 /*
