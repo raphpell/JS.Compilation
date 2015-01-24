@@ -216,9 +216,10 @@ LoadFile =(function(){
 				while( e && e.nodeType!=3 ) e = e.lastChild 
 				if( e ){
 					fOnLoad( e.nodeValue )
-					eBODY.removeChild( eIFRAME )
+					return eBODY.removeChild( eIFRAME )
 					}
 				}
+			fOnLoad( 'Erreur pendant le chargement du fichier.' )
 			}
 		eBODY.appendChild( eIFRAME )
 		eIFRAME.src = sFileName
