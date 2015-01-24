@@ -352,7 +352,8 @@ var Analyse =(function(){
 			}
 		fCompare( e1, e2 )
 		if( e1 && e2 && e1.childNodes.length != e2.childNodes.length ) alert('ko')
-		for(var _e1=e1&&e1.firstChild.nodeType==1?e1.firstChild:null, _e2=e2&&e2.firstChild.nodeType==1?e2.firstChild:null;
+		for(var _e1=e1&&e1.firstChild&&e1.firstChild.nodeType==1?e1.firstChild:null,
+				_e2=e2&&e2.firstChild&&e2.firstChild.nodeType==1?e2.firstChild:null;
 			  _e1||_e2 ;
 			  _e1 = _e1?_e1.nextSibling:null, _e2 = _e2?_e2.nextSibling:null ){
 			var a = compareResult( _e1, _e2 )
@@ -388,7 +389,6 @@ var Analyse =(function(){
 				eTest1.removeChild( eResult1 )
 				var oChrono = new Chrono ()
 				var oUpdate = AutomatonLexer.rescan( eRootLocal, eText.value, nPos, nDeleted, nAddded )
-				// alert( JSON.stringify( oUpdate, null, '\t' ))
 				eChrono1.innerHTML = Stats.set( 'local_time', oChrono.stop())
 				if( oUpdate && eShowResults.checked )
 					switch( nDisplayMode ){

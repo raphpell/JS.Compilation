@@ -419,7 +419,6 @@ var AutomatonLexer =(function(){
 				else{
 					this.nLineEnd = o2.lineEnd
 					this.nLineShift = o1.lineStart - o2.lineStart
-					this.updateValues()
 					return true
 					}
 				}
@@ -547,12 +546,16 @@ var AutomatonLexer =(function(){
 				
 			// Analyse lexicale partielle
 			while( this.readToken( true ));
+			this.updateValues()
 
 			// Libération du lexer
 			this.eEndToken = null
+		//	console.warn( 'lineEnd', this.nLineEnd ,'ou', nRootOldLineEnd )
+		//	console.warn( 'lineShift', this.nLineShift ,'ou', eRoot.oValue.lineEnd ,'-', nRootOldLineEnd  )
+		//	console.warn( eRoot.oValue.lineEnd , eRoot.lastChild.oValue.lineEnd )
 			return {
 				lineStart: nLineStart,
-				lineEnd: this.nLineEnd || eRoot.oValue.lineEnd,
+				lineEnd: this.nLineEnd || nRootOldLineEnd,
 				lineShift: this.nLineShift || eRoot.oValue.lineEnd - nRootOldLineEnd 
 				}
 			},
@@ -566,20 +569,29 @@ var AutomatonLexer =(function(){
 						o.lineStart += this.nLineShift
 						if( e.setTitle ) e.setTitle()
 						if( e.bParent ) update( e.firstChild )
+						if( ! e.nextSibling ){
+							e.parentNode.oValue.lineEnd = e.oValue.lineEnd
+							if( e.parentNode.setTitle ) e.parentNode.setTitle()
+							}
 						}
 					}
 				})
-			update( this.eEndToken )
-			var eRoot = this.eRoot
-			for(var e = this.eEndToken.parentNode ; e ; e = e.parentNode ){
-				update( e.nextSibling )
-				if( e == eRoot ){
-					eRoot.oValue.lineEnd = eRoot.lastChild.oValue.lineEnd
-					if( eRoot.setTitle ) eRoot.setTitle()
-					break;
+			if( this.eEndToken ){
+				update( this.eEndToken )
+				var eRoot = this.eRoot
+				for(var e = this.eEndToken.parentNode ; e ; e = e.parentNode ){
+					update( e.nextSibling )
+					if( e == eRoot ){
+						eRoot.oValue.lineEnd = eRoot.lastChild.oValue.lineEnd
+						if( eRoot.setTitle ) eRoot.setTitle()
+						break;
+						}
 					}
+				this.eEndToken = null
 				}
-			this.eEndToken = null
+			else{
+				console.info( 'an update ?' )
+				}
 			this.nShift = null
 			this.nLineShift = null
 			}
