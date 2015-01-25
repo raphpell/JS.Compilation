@@ -30,6 +30,11 @@ UL + P {
 <h1>Les Lexers</h1>
 
 <p>Il y a trois différents lexers testés. Mais il n'y en a que deux à privilégier.</p>
+<p>
+	Les lexers utilisent soit <b>directement les ER</b> ou soit les <b>AFD issus de ces ER</b>.<br>
+	L'utilisation des AFD est préférable car elle nous laissent plus possibilités en programmation. <br>
+	L'<a href="LexerAutomaton.incremental.htm">analyse partielle</a> n'est pas implémenté pour le lexer à ER pour qu'il reste le plus performant.
+</p>
 
 <h2>Performance</h2>
 <p>Elle est mesurée sur deux méthodes :</p>
@@ -55,11 +60,11 @@ UL + P {
 	<li>Parcourent le texte une et une seule fois...</li>
 	<li>Permettent de:
 		<ol>
-			<li>rescanner un token (à éviter si possible !): il en fait un token parent.</li>
+			<li>réaliser un double scannage d'un token (à éviter si possible !): il en fait un token parent.</li>
 			<li>détecter le début et la fin d'un token parent.</li>
 		</ol>
 	</li>
-	<li>Utilisent une liste d'<i>objet reconnaissant des tokens</i>.<br>
+	<li>Utilisent une liste d'<i>objet</i> pour reconnaître des tokens.<br>
 		<small><b>ATTENTION</b></small>: Premier objet arrivé, premier servi.
 		<ol>
 			<li>Un ordre est requis (mots clés avant identifiant, ...)</li>
@@ -101,6 +106,29 @@ UL + P {
 			<li>J'ai abandonné son utilisation.</li>
 		</ul></li>
 </ul>
+
+<p></p>
+<h2>Considérations techniques</h2>
+
+
+<p>Les Automates Finis Déterministes doivent-être précalculés :</p>
+<ol>
+	<li>Chaque <a href="AFD.generator.htm">ER transformé en AFD</a></li>
+	<li>Chaque <a href="AFD.aggregator.htm">AFD aggrégé entre eux</a> afin d'en obtenir plus qu'un !</li>
+</ol>
+<p>Malheureusement il est parfois préférable d'en utiliser plusieurs à la place :</p>
+<ul>
+	<li>La taille de l'automate résultat pouvant-être trop volumineuse, </li>
+	<li>ou sa création prennant beaucoup trop de temps.</li>
+</ul>
+<p>L'analyse lexicale se fait ensuite avec un ou plusieurs AFD :</p>
+<ul>
+	<li>Performance (calcul) = 1 AFD.</li>
+	<li>Maintenance / Evolution = Plusieurs AFDs.</li>
+	<li>Performance téléchargement = Fonction de la taille des AFDs.</li>
+</ul>
+<p>Vous pouvez <a href="LexerAutomaton.module.generator.htm">créer des modules pour le Lexer Automaton</a>.</p>
+
 
 	</body>
 </html>

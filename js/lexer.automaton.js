@@ -289,6 +289,7 @@ var AutomatonLexer =(function(){
 			fModule( LexerRules, f, g, h )
 			}
 		})
+	// SCANNING
 	Lexer.prototype ={
 		end :function(){
 			return this.eRoot
@@ -380,8 +381,7 @@ var AutomatonLexer =(function(){
 			return this.end()
 			}
 		}
-
-	// RESCAN
+	// INCREMENTAL SCANNING only
 	Lexer.prototype.union({
 		eEndToken:null,
 		nShift:null,
@@ -398,7 +398,7 @@ var AutomatonLexer =(function(){
 			},
 		getNextEndToken :function(){
 			var eNext = this.getTokenAfter( this.eEndToken )
-			this.removeNode( this.eEndToken )
+			this.eEndToken.parentNode.removeChild( this.eEndToken )
 			this.eEndToken = eNext
 			},
 		haveNode :function( eNode ){
@@ -467,7 +467,7 @@ var AutomatonLexer =(function(){
 					}
 				ePrevious = e.previousSibling
 				eNext = e.nextSibling
-				return this.removeNode( e )
+				return e.parentNode.removeChild( e )
 				})
 			// Efface le premier élément à la position nPos
 			if( e ) remove( e )
@@ -490,9 +490,6 @@ var AutomatonLexer =(function(){
 				before: ! e ? this.eRoot.lastChild: ePrevious,
 				after: eNext
 				}
-			},
-		removeNode :function( e ){
-			return e.parentNode.removeChild( e )
 			},
 		rescan :function( eRoot, sSource, nPos, nDeleted, nAdded ){
 			if( ! nDeleted && ! nAdded ) return false;

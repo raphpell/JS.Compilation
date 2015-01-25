@@ -2,6 +2,8 @@
 	<head>
 		<title>Analyse lexicale</title>
 		<style>
+SECTION { margin-left: 1em; }
+CODE { background: #eee; }
 .myNode {
 	border:1px solid #CCC;
 	display:inline-block;
@@ -21,6 +23,53 @@
 	display: inline;
 	vertical-align: top;
 	}
+
+
+.text {
+	border: 1px solid #000;
+	box-sizing: border-box;
+	display: inline-block;
+	padding: 4px;
+	vertical-align: middle;
+	white-space: nowrap;
+	}
+.sentence {
+	border: 2px solid #000;
+	display: inline-block;
+	padding: 4px 2px;
+	white-space: nowrap;
+	vertical-align: middle;
+	}
+.sentence .word {
+	float: left;
+	}
+.word {
+	background-color: #FFF;
+	background-image: url(img/turing.png);
+	border: 1px solid #000;
+	box-sizing: border-box;
+	display: inline-block;
+	height: 20px;
+	margin: 0 2px;
+	vertical-align: middle;
+	}
+.caret {
+	background-color: blue;
+	box-shadow: 0 0 4px blue;
+	display: inline-block;
+	height: 20px;
+	margin: 0 2px;
+	width: 2px;
+	vertical-align: middle;
+	}
+.red { background-color: red; }
+.lime { background-color: lime; }
+.length1 { width:20px; }
+.length2 { width:40px; }
+.length3 { width:60px; }
+.length4 { width:80px; }
+.length5 { width:100px; }
+.length10 { width:200px; }
 		</style>
 	</head>
 	<body>
@@ -32,77 +81,141 @@
 	Autres noms possibles:  <i>scanneur</i>, <i>lexeur</i> ou <i>analyseur lexical</i>.
 </p>
 
-
-<h2>Principes</h2>
-<p>
-	Le lexer parcours un texte source caractère/caractère et le transforme en 
-	<a href="Lexers.performance.readToken.htm">liste de lexèmes</a> (ayant comme attributs: type, index, valeur, ...).<br>
-	Essayer de changer le texte ci-dessous :
-</p>
-<textarea id="eTextScanned" type="text">Le texte source.
+<h2>Préambule</h2><section>
+	<p>
+		Le lexer parcours un texte source caractère/caractère et le transforme en 
+		<a href="Lexers.performance.readToken.htm">liste de lexèmes</a> .<br>
+		Changer le texte ci-dessous :
+	</p>
+	<textarea id="eTextScanned" type="text">Le texte source.
 	
-FIN.</textarea>
-<div id="eResult">...</div>
-<p>Chaque type de lexème est défini à l'aide d'une <a href="src/regexp/syntax.htm">ER</a>.</p>
-<p>
-	<a href="Lexers.htm">Les lexers</a> utilisent soit <b>directement les ER</b> ou soit les <b>AFD issus de ces ER</b>. 
-	<a href="Lexers.performance.scan.htm">Les performances</a> sont sensiblement équivalente.
-	<br>
-	Mais la dernière solution est préférable car elle nous laissent plus possibilités en programmation
-	<br>
-	L'<a href="LexerAutomaton.incremental.htm">analyse partielle</a> n'est pas forcement un exemple... 
-	elle n'est pas implémenté pour le lexer à ER pour qu'il puisse rester le plus performant.
-</p>
-
-
-<h2>Considérations techniques</h2>
-
-
-<h3>Les Expressions Régulières</h3>
-<p>
-	Pour simplifier significativement la création des ER,
-	les lexers retourne un 'arbre lexical' à la place d'une liste de lexème (voir la fonction <a href="Lexeme.htm">Lexeme</a>).
-</p>
-<p>Principe de fonctionnement:</p>
-<ol>
-	<li>Le lexer détecte le lexème débutant un parent.</li>
-	<li>Il est ajouté à un nouveau lexème parent.</li>
-	<li>L'analyse continue avec les règles du parent jusqu'à ce que sa fin soit trouvée ou qu'aucun lexème ne soit trouvé.</li>
-	<li>Le lexème parent est ajouté.</li>
-	<li>Puis l'analyse continue avec les régles précédant la rencontre du lexème parent.</li>
-</ol>
-
-<p>Cela permet de détecter des léxèmes de type:</p>
-<ul>
-	<li>chaines de caractères compris entre des guillements</li>
-	<li>commentaires multiligne de type (/* */)</li>
-	<li>commentaires sur une ligne de type (//)</li>
-	<li>... code php.</li>
-</ul>
-
-<p>Ceci n'a pas forcement de répercution sur l'analyse syntaxique...</p>
-
-
-<h3>Les Automates Finis Déterministes</h3>
-<p>Ils doivent-être précalculés :</p>
-<ol>
-	<li>Chaque <a href="AFD.generator.htm">ER est transformée en AFD</a></li>
-	<li>Ces <a href="AFD.aggregator.htm">AFDs sont aggrégés entre eux</a> afin d'en obtenir plus qu'un !</li>
-</ol>
-<p>Malheureusement il est parfois préférable d'en utiliser plusieurs à la place :</p>
-<ul>
-	<li>La taille de l'automate résultat pouvant-être trop volumineuse, </li>
-	<li>ou sa création prennant beaucoup trop de temps.</li>
-</ul>
-<p>L'analyse lexicale se fait ensuite avec un ou plusieurs AFD :</p>
-<ul>
-	<li>Performance (calcul) = 1 AFD.</li>
-	<li>Maintenance / Evolution = Plusieurs AFDs.</li>
-	<li>Performance téléchargement = Fonction de la taille des AFDs.</li>
-</ul>
-<p>Un mini langage a été créé pour <a href="LexerAutomaton.module.generator.htm">créer des modules pour le Lexer Automaton</a>.</p>
-
-
+	FIN.</textarea>
+	<div id="eResult">...</div>
+</section>
+<h2>Principes</h2><section>
+	<p>Nous créons un arbre et non pas une liste de lexèmes.</p>
+	<h3>Le lexème</h3><section>
+		<ul>
+			<li>Défini par une <a href="src/regexp/syntax.htm">ER</a></li>
+			<li>Sa structure est créé avec la fonction <a href="Lexeme.htm">Lexeme</a></li>
+			<li>Est appelé token, sachant qu'ils sont une instance d'un token</li>
+		</ul>
+	</section>
+	<h3>L'environnement du lexer</h3><section>
+		<h4>Les directives: <code>Actions</code></h4><section>
+			
+			<p>
+				Par défaut, le token est ajouté au token parent courant.<br>
+				Cependant la machine peut réaliser certaines tâches décidées selon le <b>préfixe du nom du token trouvé</b>.
+			</p>
+			<p>
+				<div class="caret"></div> : Symbole représentant l'emplacement où sera ajouté le token suivant.
+			</p>
+			<ul>
+				<li><b>Le préfixe &laquo; L_ &raquo;</b>: 
+					incrémente la valeur de la ligne courante de 1.
+				</li>
+				<li><b>Le préfixe &laquo; R_ &raquo;</b>: 
+					effectue un double scannage du token : création de tokens enfants depuis la valeur du token trouvé.
+					<blockquote>
+						<div class="word length10 lime"></div> <div class="caret"></div>
+						 &xrArr; 
+						<div class="sentence lime">
+							<div class="word length1"></div>
+							<div class="word length4"></div>
+							<div class="word length3"></div>
+							<div class="word length1"></div>
+							<div class="word length1"></div>
+						</div> <div class="caret"></div>
+					</blockquote>
+				</li>
+				<li><b>Le préfixe &laquo; S_ &raquo;</b>: 
+					créé un token parent.
+					<blockquote>
+						<div class="word length2 lime"></div> <div class="caret"></div>
+						 &xrArr; 
+						<div class="sentence">
+							<div class="word length2 lime"></div>
+							<div class="caret"></div>
+						</div>
+					</blockquote>
+				</li>
+				<li><b>Le préfixe &laquo; E_ &raquo;</b>: 
+					finalise un token parent.
+					<blockquote>
+						<div class="sentence">
+							<div class="word length2"></div>
+							<div class="word length2 lime"></div>
+							<div class="caret"></div>
+						</div>
+						 &xrArr; 
+						<div class="sentence">
+							<div class="word length2"></div>
+							<div class="word length2 lime"></div>
+						</div>
+						<div class="caret"></div>
+					</blockquote>
+					<b>NB:</b> Un token parent se termine automatiquement si aucun token n'est trouvé.
+				</li>
+			</ul>
+			<p>Cette approche simplifie significativement la création des expressions régulière.</p>
+		</section>
+		<h4>La pile des parents: <code>Stack</code></h4><section>
+			<p>Elle contient la liste des ancêtres des futurs tokens trouvés.</p>
+			<p>
+				Lorsqu'un token parent est créé il est ajouté au sommet de la pile; <br>
+				Lorsque la fin d'un token parent est détecté il est retiré du sommet de pile. <br>
+				L'analyse est stoppée quand la pile est vide.
+			</p>
+			<p> Lors de changement, elle défini:</p><ul>
+				<li>le parent courant</li>
+				<li>la syntaxe à utiliser</li>
+				<li>la ligne de fin d'un parent retiré de la pile (dépendante de son dernier enfant)</li>
+			</ul>
+		</section>
+		<h4>Les tokens ignorés: <code>Skip</code></h4><section>
+			<p>Détermine les tokens devant être passés sans être ajoutés .</p>
+			<blockquote><cite>
+				Cette étape optionnelle est importante pour la phase analyse syntaxique lors de la compilation de code.
+			</cite></blockquote>
+		</section>
+		<h4>Le token précédant: <code>Previous</code></h4><section>
+			<p>Détermine si le token trouvé peut suivre le token précédant.</p>
+			<blockquote><cite>
+				Il est parfois nécessaire de connaître le token précédant pour déterminer si le token trouvé est valide...<br>
+				Vrai pour les expressions régulières en JavaScript.
+			</cite></blockquote>
+		</section>
+	</section>
+	<h3>Les modules</h3><section>
+		<h4>Les définitions des tokens (ER ou DFA)</h4><section>
+			<p>Elle détermine les types de lexème pouvant être trouvés.</p>
+			<blockquote><cite>
+				Elles peuvent être ajoutées une et une seule fois sous le nom du token associé.<br>
+				Si une tentative d'accès à une définition inexistante est réalisée, une erreur est lancée.
+			</cite></blockquote>
+		</section>
+		<h4>Les règles d'analyse</h4><section>
+			<p>Elle détermine les listes des définitions à tester pour une syntaxe.</p>
+			<blockquote><cite>
+				Elles peuvent être ajoutées une et une seule fois sous le nom de la règle associée.<br>
+				Si une tentative d'accès à une règle inexistante est réalisée, une erreur est lancée.
+			</cite></blockquote>
+		</section>
+		<h4>La mise en forme: <code>CSS</code></h4><section>
+			<p>
+				Il est possible d'affecter aux tokens une ou plusieurs classes css, 
+				pour mieux les visualiser lors de l'affichage du scannage.
+			</p>
+		</section>
+		<h4>Le renommage des token: <code>Translation</code></h4><section>
+			<p>
+				Le préfixe des tokens entrainant la création de nom de token pas très pratique, 
+				le lexer offre la possibilité de les renommer.
+			</p>
+		</section>
+	</section>
+</section>
 
 
 <script src="js/framework.js"></script>
@@ -136,6 +249,7 @@ var scan =function(){
 	}
 scan()
 eTextScanned.onkeyup = scan
+eTextScanned.focus()
 </script>
 	</body>
 </html>

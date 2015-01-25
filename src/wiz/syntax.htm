@@ -130,9 +130,14 @@
 			<dd>Détecte la fin d'un token parent</dd>
 		</dl>
 	</li>
+	<li>'L_<i>TokenName</i>' :
+		<dl>
+			<dd>Indique au lexer qu'il faut incrémenter de 1 la valeur de la ligne courante.</dd>
+		</dl>
+	</li>
 	<li>'R_<i>TokenName</i>' :
 		<dl>
-			<dd>Ce type de token permet de refaire une analyse sur la valeur d'un token trouvé nommé '<i>TokenName</i>'.</dd>
+			<dd>Ce type de token permet de faire un double scannage.</dd>
 			<dd>Si le token '<i>TokenName</i>' est trouvé,
 				<ol>
 					<li>le token parent 'TokenName' est créé</li>
