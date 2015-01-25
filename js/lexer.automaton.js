@@ -496,6 +496,7 @@ var AutomatonLexer =(function(){
 			},
 		rescan :function( eRoot, sSource, nPos, nDeleted, nAdded ){
 			if( ! nDeleted && ! nAdded ) return false;
+			
 			this.appendNode =function( eNode ){
 				if( this.haveNode( eNode )) return false
 				if( this.skip( eNode.oValue.token )) return true
@@ -503,12 +504,13 @@ var AutomatonLexer =(function(){
 					? this.eParent.insertBefore( eNode, this.eEndToken )
 					: this.eParent.appendChild( eNode )
 				}
+			
 			this.eRoot = eRoot
 			this.sText = sSource
-			this.nLineShift = this.nLineEnd = null // ! important
 			this.previous = Previous()
 			var nRootOldLineEnd = eRoot.oValue.lineEnd
 			this.nShift = nAdded-nDeleted
+			this.nLineShift = this.nLineEnd = null // ! important
 
 			var oScanLimit = this.removeDeletedNodes( eRoot, nPos, nDeleted )
 			, eBefore = oScanLimit.before
@@ -548,11 +550,6 @@ var AutomatonLexer =(function(){
 			while( this.readToken( true ));
 			this.updateValues()
 
-			// Libération du lexer
-			this.eEndToken = null
-		//	console.warn( 'lineEnd', this.nLineEnd ,'ou', nRootOldLineEnd )
-		//	console.warn( 'lineShift', this.nLineShift ,'ou', eRoot.oValue.lineEnd ,'-', nRootOldLineEnd  )
-		//	console.warn( eRoot.oValue.lineEnd , eRoot.lastChild.oValue.lineEnd )
 			return {
 				lineStart: nLineStart,
 				lineEnd: this.nLineEnd || nRootOldLineEnd,
@@ -561,6 +558,8 @@ var AutomatonLexer =(function(){
 			},
 		updateValues :function(){
 			if( ! this.nShift && ! this.nLineShift ) return ;
+			
+			// màj un elt + ceux suivants et son parent
 			var update =CallBack( this, function( eFirst ){
 				for(var e=eFirst, o ; e ; e=e.nextSibling ){
 					if( o=e.oValue ){
@@ -576,6 +575,7 @@ var AutomatonLexer =(function(){
 						}
 					}
 				})
+			
 			if( this.eEndToken ){
 				update( this.eEndToken )
 				var eRoot = this.eRoot
@@ -590,10 +590,10 @@ var AutomatonLexer =(function(){
 				this.eEndToken = null
 				}
 			else{
-				console.info( 'an update ?' )
+			//	console.info( 'an update ?' )
 				}
-			this.nShift = null
-			this.nLineShift = null
+			/* this.nShift = null
+			this.nLineShift = null */
 			}
 		})
 
