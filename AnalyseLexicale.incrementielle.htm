@@ -1,0 +1,166 @@
+﻿<html>
+	<head>
+		<title>Analyse lexicale incrémentielle</title>
+		<style>
+SECTION { margin-left: 1em; }
+.text {
+	border: 1px solid #000;
+	box-sizing: border-box;
+	display: inline-block;
+	padding: 4px;
+	vertical-align: middle;
+	white-space: nowrap;
+	}
+.sentence {
+	border: 2px solid #000;
+	box-sizing: border-box;
+	display: inline-block;
+	padding: 4px 2px;
+	white-space: nowrap;
+	vertical-align: middle;
+	}
+.sentence .word {
+	float: left;
+	}
+.word {
+	background-color: #FFF;
+	background-image: url(img/turing.png);
+	border: 1px solid #000;
+	box-sizing: border-box;
+	display: inline-block;
+	height: 20px;
+	margin: 0 2px;
+	vertical-align: middle;
+	}
+.caret {
+	background-color: blue;
+	display: inline-block;
+	height: 20px;
+	margin: 0 2px;
+	width: 2px;
+	vertical-align: middle;
+	}
+.red { background-color: red; }
+.lime { background-color: lime; }
+.length1 { width:20px; }
+.length2 { width:40px; }
+.length3 { width:60px; }
+.length4 { width:80px; }
+.length5 { width:100px; }
+.length10 { width:200px; }
+		</style>
+	</head>
+	<body>
+<a href="index.htm">Index</a>
+
+<h1>Analyse lexicale incrémentielle</h1>
+<p>
+	Cette tâche consiste à réaliser une analyse partielle d'un texte source en utilisant le résultat d'une précédente analyse.<br> 
+	<b>Finalité</b>: Optimiser les performances du lexer.
+</p>
+
+
+<h2>Préambules</h2><section>
+	<h3>L'analyse lexicale</h3><section>
+		<p>
+			L'analyse lexicale retourne une structure (arborescente).<br>
+			Chaque éléments de la structure ont les attributs :
+		</p>
+		<ul>
+			<li>index</li>
+			<li>ligne de départ</li>
+			<li>ligne de fin</li>
+		</ul>
+	</section>
+	<h3>Données de départ</h3><section>
+		<ul>
+			<li>Résultat d'une analyse lexicale d'un texte</li>
+			<li>Texte modifié</li>
+			<li>Index du début de la modification dans le texte</li>
+			<li>Nombre de caractères effacés</li>
+			<li>Nombre de caractères ajoutés</li>
+		</ul>
+	</section>
+	<h3>Etapes générales</h3><section>
+		<ol>
+			<li>Recherche de l'élément le plus profond à l'index indiquée</li>
+			<li>Suppression des éléments dans l'intervalle effacé</li>
+			<li>Initialisation du scanner:
+				<ol>
+					<li>index et ligne courante</li>
+					<li>token fin d'analyse = premier élément suivant les tokens éffacés</li>
+					<li>création de la pile des parents</li>
+				</ol>
+			</li>
+			<li>Réalisation de l'analyse lexicale incrémentielle</li>
+			<li>Mise à jour des valeurs du token fin d'analyse (concernant sa position dans le texte source), 
+				ainsi que celles des tokens suivants et des tokens parents.</li>
+			<li>Retour du résultat :
+				<ul>
+					<li>Ligne où débute les modifications</li>
+					<li>Ligne où finie les modifications (dans l'ancienne source)</li>
+					<li>Décalage de ligne = (nouveau-ancien) "nombre de ligne du texte source"</li>
+				</ul>
+			</li>
+		</ol>
+	</section>
+</section>
+
+<h2>Principes</h2><section>
+	<h3>Recherche d'un élément à un index</h3><section>
+		<p>On effectue une recherche dichotomique récursive depuis la racine de la structure lexicales.</p>
+	</section>
+	<h3>Suppression des éléments</h3><section>
+		<p>Au tout début de l'analyse est effacé:</p><ul>
+			<li>Le premier élément trouvé à l'index de la modification</li>
+			<li>Les éléments à gauche tant qu'ils ne sont pas des espaces.</li>
+			<li>Les éléments à droite tant qu'ils ne sont pas des espaces et qu'ils font parties de l'intervalle effacé.</li>
+		</ul>
+		<p>Lors de la suppression d'un élément, son élément parent est effacé à la place, si celui-ci est :</p><ul>
+			<li>une limite de parent <p>
+					<div class="sentence">
+						<div class="word length1 red"></div>
+						<div class="word length4"></div>
+						<div class="word length1"></div>
+						<div class="word length5"></div>
+						<div class="word length1 red"></div>
+					</div>
+					 ou 
+					<div class="sentence">
+						<div class="word length2 red"></div>
+						<div class="word length4"></div>
+						<div class="word length1"></div>
+					</div>
+				</p>
+			</li>
+			<li>un enfant d'un élément ayant subit un double scannage <p>
+					<div class="sentence red">
+						<div class="word length1"></div>
+						<div class="word length4 red"></div>
+						<div class="word length5"></div>
+					</div>
+				</p>
+			</li>
+		</ul>
+	</section>
+	<h3>Gestion du token fin analyse</h3><section>
+		<p>
+			Ce token change au token suivant si l'analyse le dépasse.<br>
+			Si le lexer trouve un token identique alors :
+		</p>
+		<ul>
+			<li>L'analyse est stoppée, l'élément trouvé est abandonné.</li>
+			<li>Les valeurs du token fin d'analyse sont mises à jour (celles concernant sa position dans le texte source), 
+				ainsi que celles des tokens suivants et des tokens parents.</li>
+		</ul>
+		<h4>Tokens identiques ?</h4><section>
+		</section>
+		<h4>Token suivant ?</h4><section>
+		</section>
+		<h4>Mises à jour ?</h4><section>
+		</section>
+	</section>
+</section>
+
+	</body>
+</html>

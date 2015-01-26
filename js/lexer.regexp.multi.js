@@ -112,7 +112,7 @@ var MultiRegExpLexer =(function(){
 			this.stack.push( eNode )
 			this.previous.set( eNode.oValue.token )
 			this.sText = sTextRescan
-			do{ this.readToken()}while( this.nPos < nEnd )
+			do{ this.readToken()}while( this.nPos<nEnd )
 			this.sText = sTMP
 			this.stack.pop()
 			return eParent
@@ -135,7 +135,7 @@ var MultiRegExpLexer =(function(){
 			this.appendNode( eNewParent )
 			this.stack.push( eNewParent )
 			if( Skip.notFor[ this.sSyntax ])
-				while( this.eParent==eNewParent && this.readToken());
+				do{ this.readToken()}while( this.eParent==eNewParent )
 			return eNewParent
 			} 
 		}

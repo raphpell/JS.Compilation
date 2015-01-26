@@ -156,7 +156,7 @@ var AutomatonLexer =(function(){
 			this.stack.push( eNode )
 			this.previous.set( eNode.oValue.token )
 			this.sText = this.sText.slice( 0, nEnd )
-			do{ this.readToken()}while( this.nPos < nEnd )
+			do{ this.readToken()}while( this.nPos<nEnd )
 			this.sText = sTMP
 			this.stack.pop( bPartialScan )
 			return eParent
@@ -181,7 +181,7 @@ var AutomatonLexer =(function(){
 			this.appendNode( eNewParent )
 			this.stack.push( eNewParent )
 			if( Skip.notFor[ this.sSyntax ])
-				while( this.eParent==eNewParent && this.readToken());
+				do{ this.readToken()}while( this.eParent==eNewParent )
 			return eNewParent
 			}
 		}
