@@ -22,6 +22,10 @@ SECTION { margin-left: 1em; }
 .sentence .word {
 	float: left;
 	}
+.text .sentence .word,
+.text .sentence .sentence {
+	float: none;
+	}
 .word {
 	background-color: #FFF;
 	background-image: url(img/turing.png);
@@ -42,6 +46,8 @@ SECTION { margin-left: 1em; }
 	}
 .red { background-color: red; }
 .lime { background-color: lime; }
+.yellow { background-color: yellow; }
+
 .length1 { width:20px; }
 .length2 { width:40px; }
 .length3 { width:60px; }
@@ -145,19 +151,88 @@ SECTION { margin-left: 1em; }
 	</section>
 	<h3>Gestion du token fin analyse</h3><section>
 		<p>
-			Ce token change au token suivant si l'analyse le dépasse.<br>
-			Si le lexer trouve un token identique alors :
+			Ce token change au <b>token suivant</b> si l'analyse le dépasse.<br>
+			Si le lexer trouve un <b>token identique</b> alors :
 		</p>
 		<ul>
 			<li>L'analyse est stoppée, l'élément trouvé est abandonné.</li>
-			<li>Les valeurs du token fin d'analyse sont mises à jour (celles concernant sa position dans le texte source), 
-				ainsi que celles des tokens suivants et des tokens parents.</li>
+			<li>Les valeurs du token fin d'analyse sont <b>mises à jour</b>, 
+				ainsi que celles des tokens suivants et des tokens ancêtres.</li>
 		</ul>
 		<h4>Tokens identiques ?</h4><section>
+			<p>
+				On compare un token pas ajouté issu de l'analyse incrémentielle,
+				à un token issu de l'analyse précédente.<br>
+				Les valeurs de positionnement ne sont évidemment pas encore mise à jour dans l'ancienne analyse.<br>
+				Est considéré identique les tokens ayant:
+			</p>
+			<ul>
+				<li>le même nom</li>
+				<li>la même valeur</li>
+				<li>le même index: 
+					on ajoute à l'index du token de l'ancienne analyse, le décalage en nombre caractère.<br>
+					Ce nombre est égal au nombre de caractère ajouté moins le nombre de caractère effacé.
+				</li>
+			</ul>
+			<p>Pour finir, on contrôle qu'ils auront bien le même parent.</p>
 		</section>
 		<h4>Token suivant ?</h4><section>
+			<ol>
+				<li>L'enfant suivant si il y en a un. 
+						<div class="text">
+							<div class="word length1"></div>
+							<div class="word length1 red"></div>
+							<div class="word length2 lime"></div>
+							<div class="word length1"></div>
+						</div>
+					</li>
+				<li>Le token suivant le token parent sinon.
+						<div class="text">
+							<div class="sentence">
+								<div class="word length2"></div>
+								<div class="word length1 red"></div>
+							</div>
+							<div class="word length1 lime"></div>
+						</div>
+					</li>
+				<li>... et ainsi de suite.</li>
+				<li>sinon il n'y en a pas une fois la racine atteinte.</li>
+			</ol>
 		</section>
 		<h4>Mises à jour ?</h4><section>
+			<p>
+				Elles dépendent du décalage d'index et de ligne à appliquer,  
+				et du <b class="red">token fin analyse</b>.
+			</p>
+			
+			<p>La valeur mise à jour pour les  <b class="yellow">tokens ancêtres</b> au token fin analyse est :</p>
+			<ul>
+				<li>la ligne de fin</li>
+			</ul>
+			<p>Les valeurs mises à jour pour les  <b class="lime">tokens suivants</b> sont :</p>
+			<ul>
+				<li>l'index</li>
+				<li>la ligne de départ</li>
+				<li>la ligne de fin</li>
+			</ul>
+			<p>Si un token suivant est aussi un token parent, ses enfants sont mises à jour.</p>
+			<p>
+				<div class="text yellow">
+					<div class="word length2"></div>
+					<div class="sentence yellow">
+						<div class="word length1"></div>
+						<div class="word length2 red"></div>
+						<div class="sentence lime">
+							<div class="word length1 lime"></div>
+							<div class="word length5 lime"></div>
+							<div class="word length1 lime"></div>
+						</div>
+						<div class="word length2 lime"></div>
+						<div class="word length1 lime"></div>
+					</div>
+					<div class="word length2 lime"></div>
+				</div>
+			</p>
 		</section>
 	</section>
 </section>

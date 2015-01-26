@@ -291,6 +291,7 @@ var AutomatonLexer =(function(){
 		})
 	// SCANNING
 	Lexer.prototype ={
+		eRoot:null,
 		end :function(){
 			return this.eRoot
 			},
@@ -386,7 +387,6 @@ var AutomatonLexer =(function(){
 		eEndToken:null,
 		nShift:null,
 		nLineShift:null,
-		eRoot:null,
 		getTokenAfter :function( e ){
 			var eNext
 			do{
@@ -413,7 +413,7 @@ var AutomatonLexer =(function(){
 			// Si le nouveau token est 'identique' à eEndToken
 			if( o2 && o1.token==o2.token && o1.value==o2.value && o1.index==o2.index+this.nShift ){
 				// 1. Contrôle si les tokens sont bien identique = ont le même parent
-				if( this.stack.top() !== this.eEndToken.parentNode )
+				if( this.eParent !== this.eEndToken.parentNode )
 					this.getNextEndToken()
 				// 2. FIN ANALYSE: Met à jour les éléments suivant ( index et ligne ) 
 				else{
@@ -495,7 +495,7 @@ var AutomatonLexer =(function(){
 			if( ! nDeleted && ! nAdded ) return false;
 			
 			this.appendNode =function( eNode ){
-				if( this.haveNode( eNode )) return false
+			//	if( this.haveNode( eNode )) return false
 				if( this.skip( eNode.oValue.token )) return true
 				return this.eEndToken && this.eEndToken.parentNode==this.eParent
 					? this.eParent.insertBefore( eNode, this.eEndToken )
@@ -547,6 +547,9 @@ var AutomatonLexer =(function(){
 			while( this.readToken( true ));
 			this.updateValues()
 
+			this.eEndToken = null
+			/* this.nShift = this.nLineShift = null */
+			
 			return {
 				lineStart: nLineStart,
 				lineEnd: this.nLineEnd || nRootOldLineEnd,
@@ -554,43 +557,48 @@ var AutomatonLexer =(function(){
 				}
 			},
 		updateValues :function(){
-			if( ! this.nShift && ! this.nLineShift ) return ;
-			
-			// màj un elt + ceux suivants et son parent
-			var update =CallBack( this, function( eFirst ){
-				for(var e=eFirst, o ; e ; e=e.nextSibling ){
-					if( o=e.oValue ){
-						o.index += this.nShift
-						o.lineEnd += this.nLineShift
-						o.lineStart += this.nLineShift
-						if( e.setTitle ) e.setTitle()
-						if( e.bParent ) update( e.firstChild )
-						if( ! e.nextSibling ){
-							e.parentNode.oValue.lineEnd = e.oValue.lineEnd
-							if( e.parentNode.setTitle ) e.parentNode.setTitle()
+			if( ! this.nShift || ! this.eEndToken ) return ;
+
+			if( this.nLineShift ){
+				// màj un elt + ceux suivants et les enfants des éléments parents
+				var update =CallBack( this, function( eFirst ){
+					for(var e=eFirst, o ; e ; e=e.nextSibling ){
+						if( o=e.oValue ){
+							o.index += this.nShift
+							o.lineEnd += this.nLineShift
+							o.lineStart += this.nLineShift
+							if( e.setTitle ) e.setTitle()
+							if( e.bParent ) update( e.firstChild )
 							}
 						}
-					}
-				})
+					})
 			
-			if( this.eEndToken ){
 				update( this.eEndToken )
-				var eRoot = this.eRoot
-				for(var e = this.eEndToken.parentNode ; e ; e = e.parentNode ){
+				for(var e=this.eEndToken.parentNode; e; e=e.parentNode ){
+					e.oValue.lineEnd += this.nLineShift
+					if( e.setTitle ) e.setTitle()
+					if( e == this.eRoot ) break;
 					update( e.nextSibling )
-					if( e == eRoot ){
-						eRoot.oValue.lineEnd = eRoot.lastChild.oValue.lineEnd
-						if( eRoot.setTitle ) eRoot.setTitle()
-						break;
-						}
 					}
-				this.eEndToken = null
 				}
 			else{
-			//	console.info( 'an update ?' )
+				// màj un elt + ceux suivants et les enfants des éléments parents
+				var update =CallBack( this, function( eFirst ){
+					for(var e=eFirst, o ; e ; e=e.nextSibling ){
+						if( o=e.oValue ){
+							o.index += this.nShift
+							if( e.setTitle ) e.setTitle()
+							if( e.bParent ) update( e.firstChild )
+							}
+						}
+					})
+			
+				update( this.eEndToken )
+				for(var e=this.eEndToken.parentNode; e; e=e.parentNode ){
+					if( e == this.eRoot ) break;
+					update( e.nextSibling )
+					}
 				}
-			/* this.nShift = null
-			this.nLineShift = null */
 			}
 		})
 
