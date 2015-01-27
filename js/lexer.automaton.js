@@ -43,8 +43,8 @@ var AutomatonLexer =(function(){
 					}
 				}
 			}
-		, Rules = Dictionary('rule')
-		, DFA = Dictionary('DFA')
+		, Rules=Dictionary('rule')
+		, DFA=Dictionary('DFA')
 		return{
 			CSS: {},
 			addCSSClass :function( m ){ // m = 'class1=TOKEN1|TOKEN2&class2=TOKEN3'
@@ -73,6 +73,7 @@ var AutomatonLexer =(function(){
 					o[sToken] = aCouple[1]
 					}
 				},
+
 
 			DFA: DFA,
 			addRule :function( sName, aTokens ){
@@ -130,11 +131,11 @@ var AutomatonLexer =(function(){
 			this.previous.set( eNode.oValue.token )
 			return this.appendNode( eNode )
 			},
-		endParent :function( bPartialScan ){
+		endParent :function(){
 			eNode.bParentLimit = true
 			this.previous.set( this.eParent.oValue.token )
 			this.appendNode( eNode )
-			this.stack.pop( bPartialScan )
+			this.stack.pop()
 			return eNode
 			},
 		newLine :function(){
@@ -142,11 +143,11 @@ var AutomatonLexer =(function(){
 			this.nLine++
 			return this.appendNode( eNode )
 			},
-		rescanToken :function( bPartialScan, sRule ){
-			sRule = sToken.slice( 2 )
+		rescanToken :function(){
 			this.nPos = eNode.oValue.index
 			this.nLine = eNode.oValue.lineStart
-			var sTextRescan = eNode.oValue.value
+			var sRule = sToken.slice( 2 )
+			, sTextRescan = eNode.oValue.value
 			, nEnd = this.nPos + sTextRescan.length
 			, sTMP = this.sText
 			eNode.oValue.value = eNode.innerHTML = ''
@@ -158,7 +159,7 @@ var AutomatonLexer =(function(){
 			this.sText = this.sText.slice( 0, nEnd )
 			do{ this.readToken()}while( this.nPos<nEnd )
 			this.sText = sTMP
-			this.stack.pop( bPartialScan )
+			this.stack.pop()
 			return eParent
 			},
 		startParent :function(){
@@ -171,7 +172,7 @@ var AutomatonLexer =(function(){
 				value:'',
 				index:eNode.oValue.index,
 				lineStart:this.nLine,
-				parentToken:this.eParent.oValue.rule
+				parentToken:this.sSyntax
 				})
 			eNewParent.bParent = true
 			eNode.oValue.parentToken = sToken
@@ -218,8 +219,8 @@ var AutomatonLexer =(function(){
 		var a =[0,0,0,0,0]
 		var n = 0 // StackLength
 		return {
-			pop :function( bPartialScan ){
-				if( bPartialScan ){
+			pop :function(){
+				if( that.bIncremental ){
 					// Cas : Un parent est stoppé plus top
 					if( that.eEndToken && that.eParent==that.eEndToken.parentNode ){
 						// Efface tous les enfants du parent présent après sa nouvelle fin
@@ -276,35 +277,6 @@ var AutomatonLexer =(function(){
 		if( sText!=undefined ) return SINGLETON.scan( sText, sSyntax )
 		}
 	Lexer.union({
-		NodeReuse:(function(){
-			var keys = {}
-			var nLimit = 100
-			var n = 0
-			var getKey =function( o ){ return o.token + o.value }
-			return {
-				getLength :function(){
-					return n
-					},
-				push:function( e ){
-					if( n == nLimit ) this.reset()
-					if( e.bParent ) return null
-					var sKey = getKey( e.oValue )
-					keys[ sKey ] = keys[ sKey ] || []
-					keys[ sKey ].push( e )
-					n++
-					},
-				pop :function( o ){
-					var a = keys[ getKey( o )]
-					var e = a && a.pop() || null
-					if( e ) n--
-					return e
-					},
-				reset :function(){
-					keys = {}
-					n = 0
-					}
-				}
-			})(),
 		Previous: Previous,
 		Rules: LexerRules,
 		Skip: Skip,
@@ -339,9 +311,8 @@ var AutomatonLexer =(function(){
 			},
 		
 		bSkip: 0,
-	//	nCreatedTokens: 0,
-		eParent:null,
-		action :function( bPartialScan ){
+		eParent: null,
+		action :function(){
 			return Actions[
 				sToken.charAt(1)=='_'
 					? { E:'endParent',
@@ -350,23 +321,9 @@ var AutomatonLexer =(function(){
 						S:'startParent'
 						}[ sToken.charAt(0)] || 'add'
 					: 'add'
-				].call( this, bPartialScan )
+				].call( this )
 			},
 		appendNode :null, // varie selon scan ou rescan
-/* 		createToken :function( o ){
-			if( this.eEndToken ){
-				var e = Lexer.NodeReuse.pop( o )
-				if( e ){
-					e.oValue = o
-			//		console.info( 'reused', e )
-					return e
-					}
-				}
-			var e = Lexeme( o )
-		//	if( this.eEndToken ) console.info( 'created', e )
-			this.nCreatedTokens++
-			return e
-			}, */
 		init :function( sText, sRule ){
 			var e = Lexeme({
 				token:sRule,
@@ -378,9 +335,9 @@ var AutomatonLexer =(function(){
 				lineEnd:1
 				})
 			this.union({
-				nLine: 1,
-				nPos: 0,
-				sText: sText,
+				nLine:1,
+				nPos:0,
+				sText:sText,
 				skip:Skip(this),
 				stack:Stack(this),
 				previous:Previous(),
@@ -396,7 +353,7 @@ var AutomatonLexer =(function(){
 				}
 			return this.eRoot
 			},
-		readToken :function( bPartialScan ){
+		readToken :function(){
 			var sParentToken=this.eParent.oValue.rule
 			, a=LexerRules.haveRule( sParentToken )||[sParentToken]
 			, o
@@ -416,10 +373,10 @@ var AutomatonLexer =(function(){
 						})
 					if( this.haveNode( eNode )) return false
 					this.nPos = o.end
-					return this.action( bPartialScan )
+					return this.action()
 					}
 				}
-			return this.stack.pop( bPartialScan ) ? true : null
+			return this.stack.pop() ? true : null
 			},
 		scan :function( sText, sSyntax ){
 			this.init( sText, sSyntax )
@@ -469,7 +426,6 @@ var AutomatonLexer =(function(){
 					this.getNextEndToken()
 				// 2. FIN ANALYSE: Met à jour les éléments suivant ( index et ligne ) 
 				else{
-				//	Lexer.NodeReuse.push( eNode )
 					this.nLineEnd = o2.lineEnd
 					this.nLineShift = o1.lineStart - o2.lineStart
 					return true
@@ -546,14 +502,12 @@ var AutomatonLexer =(function(){
 			},
 		removeToken :function( e ){
 			return e.parentNode.removeChild( e )
-		//	this.nDeletedTokens++
-		//	return Lexer.NodeReuse.push( e.parentNode.removeChild( e ) )
 			},
 		rescan :function( eRoot, sSource, nPos, nDeleted, nAdded ){
 			if( ! nDeleted && ! nAdded ) return false;
 			
+			this.bIncremental = true
 			this.appendNode =function( eNode ){
-			//	if( this.haveNode( eNode )) return false
 				if( this.skip( eNode.oValue.token )) return true
 				return this.eEndToken && this.eEndToken.parentNode==this.eParent
 					? this.eParent.insertBefore( eNode, this.eEndToken )
@@ -566,8 +520,6 @@ var AutomatonLexer =(function(){
 			var nRootOldLineEnd = eRoot.oValue.lineEnd
 			this.nShift = nAdded-nDeleted
 			this.nLineShift = this.nLineEnd = null // ! important
-		//	this.nDeletedTokens = 0
-		//	this.nCreatedTokens = 0
 
 			var oScanLimit = this.removeDeletedNodes( eRoot, nPos, nDeleted )
 			, eBefore = oScanLimit.before
@@ -605,16 +557,10 @@ var AutomatonLexer =(function(){
 				
 			// Analyse lexicale partielle
 			while( this.readToken( true ));
-/* 			
-			console.warn(
-				'nDeletedTokens', this.nDeletedTokens,
-				'nCreatedTokens', this.nCreatedTokens,
-				'nNotUsed', Lexer.NodeReuse.getLength()
-				)
-			 */
+
 			this.updateValues()
 
-			this.eEndToken = null
+			this.eEndToken = this.bIncremental = null
 			/* this.nShift = this.nLineShift = null */
 			
 			return {

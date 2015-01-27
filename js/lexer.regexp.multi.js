@@ -1,4 +1,4 @@
-// Lexeme REQUIS
+﻿// Lexeme REQUIS
 
 var MultiRegExpLexer =(function(){
 	var SINGLETON
@@ -51,7 +51,6 @@ var MultiRegExpLexer =(function(){
 					o[sToken] = aCouple[1]
 					}
 				},
-				
 			addRule :function( o ){
 				var a = []
 				for(var i=0; o.list[i]; i++ ){
@@ -81,7 +80,6 @@ var MultiRegExpLexer =(function(){
 			getToken :function( ID ){return Tokens.get( ID )}
 			}
 		})()
-
 	var aMatch, nMatchLength, sToken, eNode, eNewParent, bNoSkip
 	, Actions ={
 		add :function(){
@@ -89,6 +87,7 @@ var MultiRegExpLexer =(function(){
 			return this.appendNode( eNode )
 			},
 		endParent :function(){
+			eNode.bParentLimit = true
 			this.previous.set( this.eParent.oValue.token )
 			this.appendNode( eNode )
 			this.stack.pop()
@@ -102,12 +101,13 @@ var MultiRegExpLexer =(function(){
 		rescanToken :function(){
 			this.nPos = eNode.oValue.index
 			this.nLine = eNode.oValue.lineStart
-			var sRescan = sToken.slice( 2 )
+			var sRule = sToken.slice( 2 )
 			, sTextRescan = eNode.oValue.value
 			, nEnd = this.nPos + sTextRescan.length
 			, sTMP = this.sText
 			eNode.oValue.value = eNode.innerHTML = ''
-			eNode.oValue.rule = sRescan
+			eNode.oValue.rule = sRule
+			eNode.bParent = eNode.bRescan = true
 			var eParent = this.appendNode( eNode )
 			this.stack.push( eNode )
 			this.previous.set( eNode.oValue.token )
@@ -118,7 +118,8 @@ var MultiRegExpLexer =(function(){
 			return eParent
 			},
 		startParent :function(){
-			sToken=sToken.slice( 2 )
+			eNode.bParentLimit = true
+			sToken = sToken.slice( 2 )
 			eNewParent = Lexeme({
 				token: LexerRules.Translation[sToken]||sToken,
 				css: LexerRules.CSS[sToken]||'',
@@ -128,7 +129,8 @@ var MultiRegExpLexer =(function(){
 				lineStart:this.nLine,
 				parentToken:this.sSyntax
 				})
-			eNode.oValue.parentToken = eNewParent.oValue.rule
+			eNewParent.bParent = true
+			eNode.oValue.parentToken = sToken
 			if( eNode.setTitle ) eNode.setTitle()
 			eNewParent.appendChild( eNode )
 			this.previous.set( eNode.oValue.token )
@@ -138,6 +140,7 @@ var MultiRegExpLexer =(function(){
 				do{ this.readToken()}while( this.eParent==eNewParent )
 			return eNewParent
 			} 
+
 		}
 	, Previous =(function(){
 		var o =function(){
@@ -147,7 +150,9 @@ var MultiRegExpLexer =(function(){
 					return o.ofToken[sToken] && o.ofToken[sToken].indexOf(s)<0
 					},
 				set :function( sToken ){
-					if( !o.excluded[sToken]) s = LexerRules.Translation[sToken]||sToken
+					return o.excluded[sToken]
+						? false // doit impérativement retourner cette valeur
+						: s = LexerRules.Translation[sToken]||sToken
 					},
 				get :function(){ return s }
 				}
@@ -219,12 +224,12 @@ var MultiRegExpLexer =(function(){
 		Skip: Skip,
 		Stack: Stack
 		})
+
 	Lexer.prototype ={
 		end :function(){
 			if( this.sText.length ) alert("Incomplete Scanning !")
 			return this.eRoot
 			},
-
 		bSkip: 0,
 		eParent: null,
 		action :function(){
@@ -293,6 +298,7 @@ var MultiRegExpLexer =(function(){
 			return this.end()
 			}
 		}
+
 	SINGLETON = new Lexer
 	return Lexer
 	})()
