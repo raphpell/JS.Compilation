@@ -90,17 +90,17 @@ SECTION { margin-left: 1em; }
 	<h3>Etapes générales</h3><section>
 		<ol>
 			<li>Recherche de l'élément le plus profond à l'index indiquée</li>
-			<li>Suppression des éléments dans l'intervalle effacé</li>
-			<li>Initialisation du scanner:
+			<li>Suppression au moins des éléments inclus dans l'intervalle effacé...</li>
+			<li>Initialisation du scanner, détermination:
 				<ol>
-					<li>index et ligne courante</li>
-					<li>token fin d'analyse = premier élément suivant les tokens éffacés</li>
-					<li>création de la pile des parents</li>
+					<li>de l'index et la ligne courante</li>
+					<li>du token fin d'analyse = premier élément suivant les tokens éffacés</li>
+					<li>de la pile des ancêtres</li>
 				</ol>
 			</li>
 			<li>Réalisation de l'analyse lexicale incrémentielle</li>
 			<li>Mise à jour des valeurs du token fin d'analyse (concernant sa position dans le texte source), 
-				ainsi que celles des tokens suivants et des tokens parents.</li>
+				ainsi que celles des tokens suivants et des tokens ancêtres.</li>
 			<li>Retour du résultat :
 				<ul>
 					<li>Ligne où débute les modifications</li>
@@ -198,24 +198,18 @@ SECTION { margin-left: 1em; }
 				<li>... et ainsi de suite.</li>
 				<li>sinon il n'y en a pas une fois la racine atteinte.</li>
 			</ol>
+			<p>On utilise le même principe pour le token précédant.</p>
 		</section>
 		<h4>Mises à jour ?</h4><section>
 			<p>
 				Elles dépendent du décalage d'index et de ligne à appliquer,  
 				et du <b class="red">token fin analyse</b>.
 			</p>
-			
-			<p>La valeur mise à jour pour les  <b class="yellow">tokens ancêtres</b> au token fin analyse est :</p>
 			<ul>
-				<li>la ligne de fin</li>
+				<li>La seule valeur mise à jour pour les  <b class="yellow">tokens ancêtres</b> au token fin analyse est <b>la ligne de fin</b>.</li>
+				<li>Les valeurs mises à jour pour les  <b class="lime">tokens suivants</b> sont <b>l'index, la ligne de départ et de fin</b>.</li>
+				<li>Si un token suivant est aussi un token parent, ses enfants sont mises à jour.</li>
 			</ul>
-			<p>Les valeurs mises à jour pour les  <b class="lime">tokens suivants</b> sont :</p>
-			<ul>
-				<li>l'index</li>
-				<li>la ligne de départ</li>
-				<li>la ligne de fin</li>
-			</ul>
-			<p>Si un token suivant est aussi un token parent, ses enfants sont mises à jour.</p>
 			<p>
 				<div class="text yellow">
 					<div class="word length2"></div>

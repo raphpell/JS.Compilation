@@ -220,15 +220,16 @@ var AutomatonLexer =(function(){
 		return {
 			pop :function( bPartialScan ){
 				if( bPartialScan ){
+					// Cas : Un parent est stoppé plus top
 					if( that.eEndToken && that.eParent==that.eEndToken.parentNode ){
-						// Efface tous les éléments après la fin du parent dans celui-ci
+						// Efface tous les enfants du parent présent après sa nouvelle fin
 						for(var e=that.eEndToken; e;){
-							var eTMP = e
+							var eRemoved = e
 							e = e.nextSibling
-							that.eParent.removeChild( eTMP )
+							that.removeToken( eRemoved )
 							}
 						// New End Token
-						that.eEndToken = that.eParent.nextSibling
+						that.eEndToken = that.getTokenAfter( that.eParent )
 						}
 					}
 				// A faire après suppression des éléments inutiles
@@ -275,6 +276,35 @@ var AutomatonLexer =(function(){
 		if( sText!=undefined ) return SINGLETON.scan( sText, sSyntax )
 		}
 	Lexer.union({
+		NodeReuse:(function(){
+			var keys = {}
+			var nLimit = 100
+			var n = 0
+			var getKey =function( o ){ return o.token + o.value }
+			return {
+				getLength :function(){
+					return n
+					},
+				push:function( e ){
+					if( n == nLimit ) this.reset()
+					if( e.bParent ) return null
+					var sKey = getKey( e.oValue )
+					keys[ sKey ] = keys[ sKey ] || []
+					keys[ sKey ].push( e )
+					n++
+					},
+				pop :function( o ){
+					var a = keys[ getKey( o )]
+					var e = a && a.pop() || null
+					if( e ) n--
+					return e
+					},
+				reset :function(){
+					keys = {}
+					n = 0
+					}
+				}
+			})(),
 		Previous: Previous,
 		Rules: LexerRules,
 		Skip: Skip,
@@ -309,6 +339,7 @@ var AutomatonLexer =(function(){
 			},
 		
 		bSkip: 0,
+	//	nCreatedTokens: 0,
 		eParent:null,
 		action :function( bPartialScan ){
 			return Actions[
@@ -322,6 +353,20 @@ var AutomatonLexer =(function(){
 				].call( this, bPartialScan )
 			},
 		appendNode :null, // varie selon scan ou rescan
+/* 		createToken :function( o ){
+			if( this.eEndToken ){
+				var e = Lexer.NodeReuse.pop( o )
+				if( e ){
+					e.oValue = o
+			//		console.info( 'reused', e )
+					return e
+					}
+				}
+			var e = Lexeme( o )
+		//	if( this.eEndToken ) console.info( 'created', e )
+			this.nCreatedTokens++
+			return e
+			}, */
 		init :function( sText, sRule ){
 			var e = Lexeme({
 				token:sRule,
@@ -389,16 +434,23 @@ var AutomatonLexer =(function(){
 		nLineShift:null,
 		getTokenAfter :function( e ){
 			var eNext
-			do{
-				if( e===this.eRoot ) return null
+			do{ if( e===this.eRoot ) return null
 				eNext = e.nextSibling
 				e = e.parentNode
 				}while( ! eNext )
 			return eNext
 			},
+		getTokenBefore :function( e ){
+			var ePrevious
+			do{ if( e===this.eRoot ) return null
+				ePrevious = e.previousSibling
+				e = e.parentNode
+				}while( ! ePrevious )
+			return ePrevious
+			},
 		getNextEndToken :function(){
 			var eNext = this.getTokenAfter( this.eEndToken )
-			this.eEndToken.parentNode.removeChild( this.eEndToken )
+			this.removeToken( this.eEndToken )
 			this.eEndToken = eNext
 			},
 		haveNode :function( eNode ){
@@ -417,6 +469,7 @@ var AutomatonLexer =(function(){
 					this.getNextEndToken()
 				// 2. FIN ANALYSE: Met à jour les éléments suivant ( index et ligne ) 
 				else{
+				//	Lexer.NodeReuse.push( eNode )
 					this.nLineEnd = o2.lineEnd
 					this.nLineShift = o1.lineStart - o2.lineStart
 					return true
@@ -467,7 +520,7 @@ var AutomatonLexer =(function(){
 					}
 				ePrevious = e.previousSibling
 				eNext = e.nextSibling
-				return e.parentNode.removeChild( e )
+				return this.removeToken( e )
 				})
 			// Efface le premier élément à la position nPos
 			if( e ) remove( e )
@@ -491,6 +544,11 @@ var AutomatonLexer =(function(){
 				after: eNext
 				}
 			},
+		removeToken :function( e ){
+			return e.parentNode.removeChild( e )
+		//	this.nDeletedTokens++
+		//	return Lexer.NodeReuse.push( e.parentNode.removeChild( e ) )
+			},
 		rescan :function( eRoot, sSource, nPos, nDeleted, nAdded ){
 			if( ! nDeleted && ! nAdded ) return false;
 			
@@ -508,6 +566,8 @@ var AutomatonLexer =(function(){
 			var nRootOldLineEnd = eRoot.oValue.lineEnd
 			this.nShift = nAdded-nDeleted
 			this.nLineShift = this.nLineEnd = null // ! important
+		//	this.nDeletedTokens = 0
+		//	this.nCreatedTokens = 0
 
 			var oScanLimit = this.removeDeletedNodes( eRoot, nPos, nDeleted )
 			, eBefore = oScanLimit.before
@@ -515,8 +575,8 @@ var AutomatonLexer =(function(){
 			if( eBefore ){
 				var o = eBefore.oValue
 				this.eParent = eBefore.parentNode
-				this.eEndToken = eBefore.nextSibling || this.getTokenAfter( this.eParent )
-				// Calcul la position
+				this.eEndToken = this.getTokenAfter( eBefore )
+				// Calcul de la position courante
 				for(var e = eBefore; e.bParent ; e = e.lastChild );
 				this.nPos = e.oValue.index + e.oValue.value.length
 				this.nLine = o.token=='NEW_LINE' ? o.lineEnd+1 : o.lineEnd
@@ -524,7 +584,7 @@ var AutomatonLexer =(function(){
 				for(
 					var e = eBefore;
 					e && ! this.previous.set( e.oValue.token );
-					e = e.previousSibling
+					e = this.getTokenBefore( e )
 					);
 				}
 			else{ // Start from beginning
@@ -545,6 +605,13 @@ var AutomatonLexer =(function(){
 				
 			// Analyse lexicale partielle
 			while( this.readToken( true ));
+/* 			
+			console.warn(
+				'nDeletedTokens', this.nDeletedTokens,
+				'nCreatedTokens', this.nCreatedTokens,
+				'nNotUsed', Lexer.NodeReuse.getLength()
+				)
+			 */
 			this.updateValues()
 
 			this.eEndToken = null
