@@ -158,12 +158,11 @@ TH {
 				<li>PHP: Code PHP....</li>
 			</ul></li>
 	</ol>
-	<p>A noter que lorsque lexer utilise une règle d'un token parent et ne trouve plus de token , il:</p>
-	<ol>
-		<li>stoppe l'analyse du parent </li>
-		<li>retourne <code>true</code> à la place d'un token</li>
-		<li>continue l'analyse avec la règle utilisée avant la rencontre du parent</li>
-	</ol>
+	<p>A noter que les lexers retournent <code>true</code> quand:</p>
+	<ul>
+		<li>il dépile un parent après n'avoir trouvé aucun token.</li>
+		<li>un token est passé (skipped).</li>
+	</ul>
 </div>
 
 <!-- FRAMEWORK... -->
@@ -254,7 +253,7 @@ View ={
 		if( eToken = oLexer.readToken()){
 			var o = eToken.oValue
 			if( eShowStats.checked )
-				Stats.set( o ? o.token : "Pas d'token trouvé: fin parent", oChrono.stop())
+				Stats.set( o ? o.token : "--true--", oChrono.stop())
 			}
 		if( ! View.bScanning ){
 			View.setInfo( eToken )
@@ -318,7 +317,7 @@ View ={
 <script>
 
 _( 'eLexer' )
-_( 'eText,eResult,eShowResult,eStats,eShowStats' )
+_( 'eText,eResult,eBSkip,eShowResult,eStats,eShowStats' )
 _( 'eBtnReadToken,eBtnInit' )
 _( 'eTokenInfo,eIndex,eLine,eRule' )
 Events.add(
@@ -327,6 +326,7 @@ Events.add(
 		eBtnReadToken, View.readToken,
 		eBtnScan, View.scan,
 	'change',
+		eBSkip, View.reset,
 		eLexer ,View.reset,
 		eLexeme ,View.reset
 	)

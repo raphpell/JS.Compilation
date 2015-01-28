@@ -41,6 +41,10 @@ var MultiRegExpLexer =(function(){
 					}
 				},
 			Translation: {},
+			setPreviousTokenOf :function( sToken, sPreviousTokens ){
+				if( Previous.ofToken[sToken]) throw new Error ( 'Previous token of '+ sToken +' already defined !' )
+				Previous.ofToken[sToken] = sPreviousTokens
+				},
 			setTokensTranslation :function( m ){ // m = 'TOKEN1=NEWNAME1&TOKEN2=NEWNAME2'
 				var o = this.Translation
 				var aCouples = m.constructor==Array ? m : m.split('&')
@@ -51,6 +55,8 @@ var MultiRegExpLexer =(function(){
 					o[sToken] = aCouple[1]
 					}
 				},
+
+			Tokens: Tokens,
 			addRule :function( o ){
 				var a = []
 				for(var i=0; o.list[i]; i++ ){
@@ -140,7 +146,6 @@ var MultiRegExpLexer =(function(){
 				do{ this.readToken()}while( this.eParent==eNewParent )
 			return eNewParent
 			} 
-
 		}
 	, Previous =(function(){
 		var o =function(){
@@ -159,15 +164,13 @@ var MultiRegExpLexer =(function(){
 			}
 		o.union({
 			excluded :{
-				WHITE_SPACES:1,SPACES:1,SPACE:1,TAB:1,
+				WHITE_SPACES:1,SPACES:1,SPACE:1,TAB:1,// NEW_LINE:1,L_NEW_LINE:1,
 				S_SLC:1,SLC:1,SLC_IN:1,
 				S_MLC:1,MLC:1,MLC_IN:1,E_MLC:1,
 				COMMENT:1,
 				REGULAR_EXPRESSION_IN:1
 				},
-			ofToken :{
-				"R_REGULAR_EXPRESSION":"ARITHMETIC_OPERATOR|ASSIGNMENT_OPERATOR|BITWISE_OPERATOR|COMPARISON_OPERATOR|LOGICAL_OPERATOR|ELISION|DOT|LBRACK|LPAREN|LBRACE|COLON|SEMI|QUESTION|JS_KEYWORD"
-				}
+			ofToken :{}
 			})
 		return o
 		})()
@@ -224,7 +227,6 @@ var MultiRegExpLexer =(function(){
 		Skip: Skip,
 		Stack: Stack
 		})
-
 	Lexer.prototype ={
 		end :function(){
 			if( this.sText.length ) alert("Incomplete Scanning !")
