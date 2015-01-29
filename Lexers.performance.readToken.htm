@@ -244,7 +244,7 @@ View ={
 		oLexer.init( eText.value, 'JS' )
 		oLexer.skip.set( eBSkip.checked )
 		eResult.innerHTML= ''
-		if( eShowResult.checked ) eResult.appendChild( oLexer.eRoot )
+		if( eShowResult.checked && eLexeme.value=='HTMLElement' ) eResult.appendChild( oLexer.eRoot )
 		if( ! eShowStats.checked ) eStats.innerHTML = ''
 		View.setInfo()
 		},

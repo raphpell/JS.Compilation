@@ -86,67 +86,80 @@ var MultiRegExpLexer =(function(){
 			getToken :function( ID ){return Tokens.get( ID )}
 			}
 		})()
-	var aMatch, nMatchLength, sToken, eNode, eNewParent, bNoSkip
-	, Actions ={
-		add :function(){
-			this.previous.set( eNode.oValue.token )
-			return this.appendNode( eNode )
-			},
-		endParent :function(){
-			eNode.bParentLimit = true
-			this.previous.set( this.eParent.oValue.token )
-			this.appendNode( eNode )
-			this.stack.pop()
-			return eNode
-			},
-		newLine :function(){
-			this.previous.set( eNode.oValue.token )
-			this.nLine++
-			return this.appendNode( eNode )
-			},
-		rescanToken :function(){
-			this.nPos = eNode.oValue.index
-			this.nLine = eNode.oValue.lineStart
-			var sRule = sToken.slice( 2 )
-			, sTextRescan = eNode.oValue.value
-			, nEnd = this.nPos + sTextRescan.length
-			, sTMP = this.sText
-			eNode.oValue.value = eNode.innerHTML = ''
-			eNode.oValue.rule = sRule
-			eNode.bParent = eNode.bRescan = true
-			var eParent = this.appendNode( eNode )
-			this.stack.push( eNode )
-			this.previous.set( eNode.oValue.token )
-			this.sText = sTextRescan
-			do{ this.readToken()}while( this.nPos<nEnd )
-			this.sText = sTMP
-			this.stack.pop()
-			return eParent
-			},
-		startParent :function(){
-			eNode.bParentLimit = true
-			sToken = sToken.slice( 2 )
-			eNewParent = Lexeme({
-				token: LexerRules.Translation[sToken]||sToken,
-				css: LexerRules.CSS[sToken]||'',
-				rule:sToken,
-				value:'',
-				index:eNode.oValue.index,
-				lineStart:this.nLine,
-				parentToken:this.sSyntax
-				})
-			eNewParent.bParent = true
-			eNode.oValue.parentToken = sToken
-			if( eNode.setTitle ) eNode.setTitle()
-			eNewParent.appendChild( eNode )
-			this.previous.set( eNode.oValue.token )
-			this.appendNode( eNewParent )
-			this.stack.push( eNewParent )
-			if( Skip.notFor[ this.sSyntax ])
-				do{ this.readToken()}while( this.eParent==eNewParent )
-			return eNewParent
-			} 
-		}
+	var aMatch, nMatchLength, sToken, oLexeme, bNoSkip
+	, Actions =(function(){
+		var Actions={
+			add :function(){
+				this.previous.set( oLexeme.token )
+				return this.appendNode( oLexeme )
+				},
+			endParent :function(){
+				oLexeme.bParentLimit = true
+				this.previous.set( this.eParent.oValue.token )
+				var eNode = this.appendNode( oLexeme )
+				this.stack.pop()
+				return eNode
+				},
+			newLine :function(){
+				this.previous.set( oLexeme.token )
+				this.nLine++
+				return this.appendNode( oLexeme )
+				},
+			rescanToken :function(){
+				this.nPos = oLexeme.index
+				this.nLine = oLexeme.lineStart
+				var sRule = sToken.slice( 2 )
+				, sTextRescan = oLexeme.value
+				, nEnd = this.nPos + sTextRescan.length
+				, sTMP = this.sText
+				oLexeme.value = ''
+				oLexeme.rule = sRule
+				oLexeme.bParent = oLexeme.bRescan = true
+				var eParent = this.appendNode( oLexeme )
+				this.stack.push( eParent )
+				this.previous.set( oLexeme.token )
+				this.sText = sTextRescan
+				do{ this.readToken()}while( this.nPos<nEnd )
+				this.sText = sTMP
+				this.stack.pop()
+				return eParent
+				},
+			startParent :function(){
+				sToken = sToken.slice( 2 )
+				var eNewParent = Lexeme({
+					token: LexerRules.Translation[sToken]||sToken,
+					css: LexerRules.CSS[sToken]||'',
+					rule:sToken,
+					value:'',
+					index:oLexeme.index,
+					lineStart:this.nLine,
+					parentToken:this.sSyntax,
+					bParent:true
+					})
+				oLexeme.bParentLimit = true
+				oLexeme.parentToken = sToken
+				this.previous.set( oLexeme.token )
+				var bSkip = this.skip( oLexeme.token )
+				if( ! bSkip ) this.eParent.appendChild( eNewParent )
+				this.stack.push( eNewParent )
+				this.appendNode( oLexeme )
+				if( Skip.notFor[ this.sSyntax ])
+					do{ this.readToken()}while( this.eParent==eNewParent )
+				return bSkip ? true : eNewParent
+				} 
+			}
+		return function( oInstance ){
+			return Actions[
+				sToken.charAt(1)=='_'
+					? { E:'endParent',
+						L:'newLine',
+						R:'rescanToken',
+						S:'startParent'
+						}[ sToken.charAt(0)] || 'add'
+					: 'add'
+				].call( oInstance )
+			}
+		})()
 	, Previous =(function(){
 		var o =function(){
 			var s = ''
@@ -234,21 +247,10 @@ var MultiRegExpLexer =(function(){
 			},
 		bSkip: 0,
 		eParent: null,
-		action :function(){
-			return Actions[
-				sToken.charAt(1)=='_'
-					? { E:'endParent',
-						L:'newLine',
-						R:'rescanToken',
-						S:'startParent'
-						}[ sToken.charAt(0)] || 'add'
-					: 'add'
-				].call( this )
-			},
-		appendNode :function( e ){
-			return this.skip( e.oValue.token )
+		appendNode :function( oLexeme ){
+			return this.skip( oLexeme.token )
 				? true
-				: this.eParent.appendChild( e )
+				: this.eParent.appendChild( Lexeme( oLexeme ))
 			},
 		init :function( sText, sSyntax ){
 			this.union({
@@ -277,7 +279,7 @@ var MultiRegExpLexer =(function(){
 				aMatch = a[i].re.exec( this.sText )
 				if( nMatchLength = aMatch[0].length ){
 					sToken = a[i].name
-					eNode = Lexeme({
+					oLexeme ={
 						token: LexerRules.Translation[sToken]||sToken,
 						css: LexerRules.CSS[sToken]||'',
 						rule:sToken,
@@ -286,10 +288,10 @@ var MultiRegExpLexer =(function(){
 						lineStart:this.nLine,
 						lineEnd:this.nLine,
 						parentToken:this.sSyntax
-						})
+						}
 					this.sText = this.sText.substr( nMatchLength )
 					this.nPos += nMatchLength
-					return this.action()
+					return Actions(this)
 					}
 				}
 			return this.stack.pop() ? true : null

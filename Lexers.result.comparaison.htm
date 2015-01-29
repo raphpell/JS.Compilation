@@ -153,19 +153,20 @@ var TokensBridge ={
 	'SDQ':'STRING'
 	}
 var TokensLabel ={
-	'PHP':' ',
-	'MLC':' ',
-	'COMMENT':' ',
-	'STRING':' ',
+	'REGULAR_EXPRESSION':'',
+	'PHP':'',
+	'MLC':'',
+	'COMMENT':'',
+	'STRING':'',
 	'S_MLC':'/*',
 	'MLC_IN':'\u2026',
 	'E_MLC':'\u2026*/',
-	'SLC':' ',
+	'SLC':'',
 	'S_SLC':'//',
 	'SLC_IN':'\u2026',
-	'SDQ':' ',
+	'SDQ':'',
 	'SDQ_IN':'\u2026',
-	'SSQ':' ',
+	'SSQ':'',
 	'SSQ_IN':'\u2026',
 	'BACKSLASH':'\\',
 	'ARITHMETIC_OPERATOR': -1, // '\u24C4p',
@@ -215,8 +216,10 @@ var TokensLabel ={
 	'SEMI':';',
 	'COLON':':'
 	}
+
 var valueToString =function(o){ // token,css,
-	return JSON.stringify( o, 'parentToken,index,lineStart,lineEnd'.split(','), " " ).str_replace('"', '')
+//	return JSON.stringify( o, null, " " )
+	return JSON.stringify( o, 'parentToken,index,lineStart,lineEnd,bParent,bParentLimit,bRescan'.split(','), " " ).str_replace('"', '')
 	}
 var setTitle =function(){
 	var o = this.oValue
@@ -226,7 +229,6 @@ var setTitle =function(){
 		+ valueToString( o )
 	}
 var Lexeme =function( o ){
-	// alert( JSON.stringify( o ))
 	var e = document.createElement('B')
 	, sToken = TokensBridge[o.token] || o.token
 	, sValue = o.value
@@ -235,8 +237,8 @@ var Lexeme =function( o ){
 		if( Lexeme[o.parentToken]) Lexeme[o.parentToken]( e, sToken, sValue )
 			else Lexeme.parent( e, sToken, o )
 			// else e.symbol = e.title = sValue
-		if( e.symbol )
-			e.innerHTML = e.symbol.str_replace( ['&','<','>'], ['&amp;','&lt;','&gt;'])
+		if( e.symbol ) e.innerHTML = e.symbol.str_replace( ['&','<','>'], ['&amp;','&lt;','&gt;'])
+		if( sToken=='REGULAR_EXPRESSION') console.warn( e.symbol, '\u25B6'+e.innerHTML+'\u25C0', e )
 		if( o.css ) e.className = o.css + ' myNode'
 		}
 	else{
@@ -283,7 +285,7 @@ Lexeme.parent =function( e, sTokenName, oValue ){
 	e.setTitle = setTitle
 	e.setTitle()
 	var sLabel = TokensLabel[ sTokenName ]
-	e.symbol = ! sLabel ? sTokenName : ( sLabel==-1 ? e.value : sLabel )
+	e.symbol = sLabel===undefined ? sTokenName : ( sLabel==-1 ? e.value : sLabel )
 	e.token = sTokenName
 	}
 </script>
@@ -721,6 +723,7 @@ function compareResult( e1, e2 ){
 			if( e1.value===undefined || e2.value===undefined );
 			else if( e1.value.length < e2.value.length ){
 				e2.className += ' difference'
+				e2.title = JSON.stringify( e2.oValue, null, '\t'  ) + "\ndifferent de \n "+ JSON.stringify( e1.oValue, null, '\t'  )
 				while( e1 && e2 && e1.oValue.index + e1.value.length <= e2.oValue.index + e2.value.length ){
 					e1.className += ' difference'
 					e1 = e1.nextSibling
@@ -729,6 +732,7 @@ function compareResult( e1, e2 ){
 				}
 			else if( e2.value.length < e1.value.length ){
 				e1.className += ' difference'
+				e1.title = JSON.stringify( e1.oValue, null, '\t' ) + "\ndifferent de \n "+ JSON.stringify( e2.oValue, null, '\t' )
 				while( e1 && e2 && e2.oValue.index + e2.value.length <= e1.oValue.index + e1.value.length ){
 					e2.className += ' difference'
 					e2 = e2.nextSibling

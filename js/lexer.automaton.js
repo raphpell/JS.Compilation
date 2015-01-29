@@ -124,67 +124,80 @@ var AutomatonLexer =(function(){
 
 	// Données d'analyse
 	var sWSTokens ='|WHITE_SPACES|SPACES|SPACE|NEW_LINE|L_NEW_LINE|TAB|'
-	, sToken, eNode, bNoSkip
-	, Actions ={
-		add :function(){
-			this.previous.set( eNode.oValue.token )
-			return this.appendNode( eNode )
-			},
-		endParent :function(){
-			eNode.bParentLimit = true
-			this.previous.set( this.eParent.oValue.token )
-			this.appendNode( eNode )
-			this.stack.pop()
-			return eNode
-			},
-		newLine :function(){
-			this.previous.set( eNode.oValue.token )
-			this.nLine++
-			return this.appendNode( eNode )
-			},
-		rescanToken :function(){
-			this.nPos = eNode.oValue.index
-			this.nLine = eNode.oValue.lineStart
-			var sRule = sToken.slice( 2 )
-			, sTextRescan = eNode.oValue.value
-			, nEnd = this.nPos + sTextRescan.length
-			, sTMP = this.sText
-			eNode.oValue.value = eNode.innerHTML = ''
-			eNode.oValue.rule = sRule
-			eNode.bParent = eNode.bRescan = true
-			var eParent = this.appendNode( eNode )
-			this.stack.push( eNode )
-			this.previous.set( eNode.oValue.token )
-			this.sText = this.sText.slice( 0, nEnd )
-			do{ this.readToken()}while( this.nPos<nEnd )
-			this.sText = sTMP
-			this.stack.pop()
-			return eParent
-			},
-		startParent :function(){
-			eNode.bParentLimit = true
-			sToken = sToken.slice( 2 )
-			var eNewParent = Lexeme({
-				token: LexerRules.Translation[sToken]||sToken,
-				css: LexerRules.CSS[sToken]||'',
-				rule:sToken,
-				value:'',
-				index:eNode.oValue.index,
-				lineStart:this.nLine,
-				parentToken:this.sSyntax
-				})
-			eNewParent.bParent = true
-			eNode.oValue.parentToken = sToken
-			if( eNode.setTitle ) eNode.setTitle()
-			eNewParent.appendChild( eNode )
-			this.previous.set( eNode.oValue.token )
-			this.appendNode( eNewParent )
-			this.stack.push( eNewParent )
-			if( Skip.notFor[ this.sSyntax ])
-				do{ this.readToken()}while( this.eParent==eNewParent )
-			return eNewParent
+	, sToken, oLexeme, bNoSkip
+	, Actions =(function(){
+		var Actions={
+			add :function(){
+				this.previous.set( oLexeme.token )
+				return this.appendNode( oLexeme )
+				},
+			endParent :function(){
+				oLexeme.bParentLimit = true
+				this.previous.set( this.eParent.oValue.token )
+				var eNode = this.appendNode( oLexeme )
+				this.stack.pop()
+				return eNode
+				},
+			newLine :function(){
+				this.previous.set( oLexeme.token )
+				this.nLine++
+				return this.appendNode( oLexeme )
+				},
+			rescanToken :function(){
+				this.nPos = oLexeme.index
+				this.nLine = oLexeme.lineStart
+				var sRule = sToken.slice( 2 )
+				, sTextRescan = oLexeme.value
+				, nEnd = this.nPos + sTextRescan.length
+				, sTMP = this.sText
+				oLexeme.value = ''
+				oLexeme.rule = sRule
+				oLexeme.bParent = oLexeme.bRescan = true
+				var eParent = this.appendNode( oLexeme )
+				this.stack.push( eParent )
+				this.previous.set( oLexeme.token )
+				this.sText = this.sText.slice( 0, nEnd )
+				do{ this.readToken()}while( this.nPos<nEnd )
+				this.sText = sTMP
+				this.stack.pop()
+				return eParent
+				},
+			startParent :function(){
+				sToken = sToken.slice( 2 )
+				var eNewParent = Lexeme({
+					token: LexerRules.Translation[sToken]||sToken,
+					css: LexerRules.CSS[sToken]||'',
+					rule:sToken,
+					value:'',
+					index:oLexeme.index,
+					lineStart:this.nLine,
+					parentToken:this.sSyntax,
+					bParent:true
+					})
+				oLexeme.bParentLimit = true
+				oLexeme.parentToken = sToken
+				this.previous.set( oLexeme.token )
+				var bSkip = this.skip( oLexeme.token )
+				if( ! bSkip ) this.eParent.appendChild( eNewParent )
+				this.stack.push( eNewParent )
+				this.appendNode( oLexeme )
+				if( Skip.notFor[ this.sSyntax ])
+					do{ this.readToken()}while( this.eParent==eNewParent )
+				return bSkip ? true : eNewParent
+				}
 			}
-		}
+		return function( oInstance ){
+			return Actions[
+				sToken.charAt(1)=='_'
+					? { E:'endParent',
+						L:'newLine',
+						R:'rescanToken',
+						S:'startParent'
+						}[ sToken.charAt(0)] || 'add'
+					: 'add'
+				].call( oInstance )
+			}
+		})()
 	, Previous =(function(){
 		var o =function(){
 			var s = ''
@@ -309,17 +322,6 @@ var AutomatonLexer =(function(){
 		
 		bSkip: 0,
 		eParent: null,
-		action :function(){
-			return Actions[
-				sToken.charAt(1)=='_'
-					? { E:'endParent',
-						L:'newLine',
-						R:'rescanToken',
-						S:'startParent'
-						}[ sToken.charAt(0)] || 'add'
-					: 'add'
-				].call( this )
-			},
 		appendNode :null, // varie selon scan ou rescan
 		init :function( sText, sRule ){
 			var e = Lexeme({
@@ -343,10 +345,10 @@ var AutomatonLexer =(function(){
 				eParent: e
 				})
 			this.stack.push( e )
-			this.appendNode =function( e ){
-				return this.skip( e.oValue.token )
+			this.appendNode =function( oLexeme ){
+				return this.skip( oLexeme.token )
 					? true
-					: this.eParent.appendChild( e )
+					: this.eParent.appendChild( Lexeme( oLexeme ))
 				}
 			return this.eRoot
 			},
@@ -358,7 +360,7 @@ var AutomatonLexer =(function(){
 			for(var j=0; sToken=a[j]; j++){
 				if( o = this.searchToken( sToken, this.nPos )){
 					sToken = o.token
-					eNode = Lexeme({
+					oLexeme ={
 						token: LexerRules.Translation[sToken]||sToken,
 						css: LexerRules.CSS[sToken]||'',
 						rule:sParentToken,
@@ -367,10 +369,10 @@ var AutomatonLexer =(function(){
 						lineStart:this.nLine,
 						lineEnd:this.nLine,
 						parentToken:sParentToken
-						})
-					if( this.haveNode( eNode )) return false
+						}
+					if( this.haveLexeme( oLexeme )) return false
 					this.nPos = o.end
-					return this.action()
+					return Actions(this)
 					}
 				}
 			return this.stack.pop() ? true : null
@@ -407,24 +409,23 @@ var AutomatonLexer =(function(){
 			this.removeToken( this.eEndToken )
 			this.eEndToken = eNext
 			},
-		haveNode :function( eNode ){
+		haveLexeme :function( oLexeme ){
 			if( ! this.eEndToken ) return false
-			var o1 = eNode.oValue
-			// Efface les éléments dépassés par le nouveau token eNode
-			while( this.eEndToken && this.eEndToken.oValue.index + this.nShift < o1.index )
+			// Efface les éléments dépassés par le lexème trouvé
+			while( this.eEndToken && this.eEndToken.oValue.index + this.nShift < oLexeme.index )
 			// pas <= sinon autant faire une analyse totale
 			// mais... a voir
 				this.getNextEndToken()
-			var o2 = this.eEndToken && this.eEndToken.oValue
+			var o = this.eEndToken && this.eEndToken.oValue
 			// Si le nouveau token est 'identique' à eEndToken
-			if( o2 && o1.token==o2.token && o1.value==o2.value && o1.index==o2.index+this.nShift ){
+			if( o && oLexeme.token==o.token && oLexeme.value==o.value && oLexeme.index==o.index+this.nShift ){
 				// 1. Contrôle si les tokens sont bien identique = ont le même parent
 				if( this.eParent !== this.eEndToken.parentNode )
 					this.getNextEndToken()
 				// 2. FIN ANALYSE: Met à jour les éléments suivant ( index et ligne ) 
 				else{
-					this.nLineEnd = o2.lineEnd
-					this.nLineShift = o1.lineStart - o2.lineStart
+					this.nLineEnd = o.lineEnd
+					this.nLineShift = oLexeme.lineStart - o.lineStart
 					return true
 					}
 				}
@@ -433,7 +434,7 @@ var AutomatonLexer =(function(){
 		isPartOfRange :function( e, nStart, nLength ){ // Intervalle ouvert
 			var nEnd = nStart + (nLength||0) /* - 1 */
 			, nTokenStart = e.oValue.index
-			while( e.bParent ) e=e.lastChild
+			while( e.oValue.bParent ) e=e.lastChild
 			var nTokenEnd = e.oValue.index + e.oValue.value.length
 			return nStart <= nTokenStart && nTokenStart <= nEnd	// Le début du token est dans l'intervalle
 				|| nTokenStart <= nStart && nEnd <= nTokenEnd	// L'intervalle est dans le token
@@ -454,7 +455,7 @@ var AutomatonLexer =(function(){
 					nMiddle = Math.round( nStart + ( nEnd - nStart ) / 2 )
 					var e = a[nMiddle]
 					if( this.isPartOfRange( e, nPos ))
-						return e.bParent ? this.nodeAt( nPos, e ) : e
+						return e.oValue.bParent ? this.nodeAt( nPos, e ) : e
 					else if( nPos < e.oValue.index ) nEnd = nMiddle - 1
 					else nStart = nMiddle + 1
 				} while ( nStart <= nEnd )
@@ -465,7 +466,7 @@ var AutomatonLexer =(function(){
 			, ePrevious
 			, eNext 
 			, remove =CallBack( this, function( e ){
-				if( e.bParentLimit || e.parentNode.bRescan ){
+				if( e.oValue.bParentLimit || e.parentNode.oValue.bRescan ){
 					var eParent = e.parentNode
 					ePrevious = eParent.previousSibling
 					eNext = eParent.nextSibling
@@ -504,11 +505,11 @@ var AutomatonLexer =(function(){
 			if( ! nDeleted && ! nAdded ) return false;
 			
 			this.bIncremental = true
-			this.appendNode =function( eNode ){
-				if( this.skip( eNode.oValue.token )) return true
+			this.appendNode =function( oLexeme ){
+				if( this.skip( oLexeme.token )) return true
 				return this.eEndToken && this.eEndToken.parentNode==this.eParent
-					? this.eParent.insertBefore( eNode, this.eEndToken )
-					: this.eParent.appendChild( eNode )
+					? this.eParent.insertBefore( Lexeme( oLexeme ), this.eEndToken )
+					: this.eParent.appendChild( Lexeme( oLexeme ))
 				}
 			
 			this.eRoot = eRoot
@@ -526,7 +527,7 @@ var AutomatonLexer =(function(){
 				this.eParent = eBefore.parentNode
 				this.eEndToken = this.getTokenAfter( eBefore )
 				// Calcul de la position courante
-				for(var e = eBefore; e.bParent ; e = e.lastChild );
+				for(var e = eBefore; e.oValue.bParent ; e = e.lastChild );
 				this.nPos = e.oValue.index + e.oValue.value.length
 				this.nLine = o.token=='NEW_LINE' ? o.lineEnd+1 : o.lineEnd
 				// Recherche la valeur du "previous token"...
@@ -578,7 +579,7 @@ var AutomatonLexer =(function(){
 							o.lineEnd += this.nLineShift
 							o.lineStart += this.nLineShift
 							if( e.setTitle ) e.setTitle()
-							if( e.bParent ) update( e.firstChild )
+							if( e.oValue.bParent ) update( e.firstChild )
 							}
 						}
 					})
@@ -598,7 +599,7 @@ var AutomatonLexer =(function(){
 						if( o=e.oValue ){
 							o.index += this.nShift
 							if( e.setTitle ) e.setTitle()
-							if( e.bParent ) update( e.firstChild )
+							if( e.oValue.bParent ) update( e.firstChild )
 							}
 						}
 					})

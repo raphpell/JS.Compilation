@@ -250,7 +250,7 @@ var getHTMLEnd =function( o ){
 	return '</b>'
 	}
 var valueToString =function(o){
-	return JSON.stringify( o, 'token,parentToken,css,index,lineStart,lineEnd'.split(','), " " ).str_replace('"', '')
+	return JSON.stringify( o, 'token,parentToken,css,index,lineStart,lineEnd,bParentLimit,bParent,bRescan'.split(','), " " ).str_replace('"', '')
 	}
 var getElementsByLine =function( nLine ){
 	var a=[]
