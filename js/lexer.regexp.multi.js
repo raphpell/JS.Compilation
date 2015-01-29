@@ -86,24 +86,24 @@ var MultiRegExpLexer =(function(){
 			getToken :function( ID ){return Tokens.get( ID )}
 			}
 		})()
-	var aMatch, nMatchLength, sToken, oLexeme, bNoSkip
+	var sToken, oLexeme, bNoSkip, aFound, nMatchLength
 	, Actions =(function(){
 		var Actions={
 			add :function(){
 				this.previous.set( oLexeme.token )
-				return this.appendNode( oLexeme )
+				return this.appendNode( Lexeme( oLexeme ))
 				},
 			endParent :function(){
 				oLexeme.bParentLimit = true
 				this.previous.set( this.eParent.oValue.token )
-				var eNode = this.appendNode( oLexeme )
+				var eNode = this.appendNode( Lexeme( oLexeme ))
 				this.stack.pop()
 				return eNode
 				},
 			newLine :function(){
 				this.previous.set( oLexeme.token )
 				this.nLine++
-				return this.appendNode( oLexeme )
+				return this.appendNode( Lexeme( oLexeme ))
 				},
 			rescanToken :function(){
 				this.nPos = oLexeme.index
@@ -115,7 +115,7 @@ var MultiRegExpLexer =(function(){
 				oLexeme.value = ''
 				oLexeme.rule = sRule
 				oLexeme.bParent = oLexeme.bRescan = true
-				var eParent = this.appendNode( oLexeme )
+				var eParent = this.appendNode( Lexeme( oLexeme ))
 				this.stack.push( eParent )
 				this.previous.set( oLexeme.token )
 				this.sText = sTextRescan
@@ -133,20 +133,18 @@ var MultiRegExpLexer =(function(){
 					value:'',
 					index:oLexeme.index,
 					lineStart:this.nLine,
-					parentToken:this.sSyntax,
 					bParent:true
 					})
 				oLexeme.bParentLimit = true
-				oLexeme.parentToken = sToken
 				this.previous.set( oLexeme.token )
 				var bSkip = this.skip( oLexeme.token )
-				if( ! bSkip ) this.eParent.appendChild( eNewParent )
+				if( ! bSkip ) this.appendNode( eNewParent )
 				this.stack.push( eNewParent )
-				this.appendNode( oLexeme )
+				this.appendNode( Lexeme( oLexeme ))
 				if( Skip.notFor[ this.sSyntax ])
 					do{ this.readToken()}while( this.eParent==eNewParent )
 				return bSkip ? true : eNewParent
-				} 
+				}
 			}
 		return function( oInstance ){
 			return Actions[
@@ -245,14 +243,11 @@ var MultiRegExpLexer =(function(){
 			if( this.sText.length ) alert("Incomplete Scanning !")
 			return this.eRoot
 			},
+		
 		bSkip: 0,
-		eParent: null,
-		appendNode :function( oLexeme ){
-			return this.skip( oLexeme.token )
-				? true
-				: this.eParent.appendChild( Lexeme( oLexeme ))
-			},
+		appendNode: null,
 		init :function( sText, sSyntax ){
+			sSyntax = sSyntax || 'TXT'
 			this.union({
 				nLine:1,
 				nPos:0,
@@ -261,33 +256,36 @@ var MultiRegExpLexer =(function(){
 				stack:Stack(this),
 				previous:Previous()
 				})
-			sSyntax = sSyntax || 'RegExp'
 			this.eRoot = this.stack.push( Lexeme({
+				value:'',
 				token:sSyntax,
 				rule:sSyntax,
-				value:'',
 				css:sSyntax.toLowerCase(),
 				index:0,
 				lineStart:1
 				}))
+			this.appendNode =function( eNode ){
+				return this.skip( eNode.oValue.token )
+					? true
+					: this.eParent.appendChild( eNode )
+				}
 			},
 		readToken :function(){
 			var a = LexerRules.getRule( this.sSyntax )
 			bNoSkip = Skip.notFor[ this.sSyntax ]
 			for(var i=0; a[i]; i++ ){
 				if( ! a[i].re.test( this.sText ) || this.previous.invalidFor( a[i].name )) continue;
-				aMatch = a[i].re.exec( this.sText )
-				if( nMatchLength = aMatch[0].length ){
+				aFound = a[i].re.exec( this.sText )
+				if( nMatchLength = aFound[0].length ){
 					sToken = a[i].name
 					oLexeme ={
+						value:aFound[0],
 						token: LexerRules.Translation[sToken]||sToken,
 						css: LexerRules.CSS[sToken]||'',
-						rule:sToken,
-						value:aMatch[0],
+						rule:this.sSyntax,
 						index:this.nPos,
 						lineStart:this.nLine,
-						lineEnd:this.nLine,
-						parentToken:this.sSyntax
+						lineEnd:this.nLine
 						}
 					this.sText = this.sText.substr( nMatchLength )
 					this.nPos += nMatchLength
@@ -303,6 +301,22 @@ var MultiRegExpLexer =(function(){
 			}
 		}
 
+	// Analyse par défaut
+	var o = LexerRules
+	o.addTokens({ list:[
+		// Espaces blancs
+		['SPACES',/[ ]/],
+		['TAB',/\t/],
+		['L_NEW_LINE',/[\n\r]/],
+		['WHITE_SPACES',/[\t \n\r\f]+/],
+		// Tout sauf un espaces blancs
+		['NOT_WHITE_SPACES',/[^\t \n\r\f]+/]
+		]})
+	// Syntaxe par défaut
+	o.addRule({name:'TXT', list:'TAB,L_NEW_LINE,SPACES,NOT_WHITE_SPACES'.split(',')})
+	o.addCSSClass( 'space=SPACES&tab=TAB&linefeed=L_NEW_LINE&whitespaces=WHITE_SPACES&undefined=NOT_WHITE_SPACES' )
+	o.setTokensTranslation('L_NEW_LINE=NEW_LINE')
+		
 	SINGLETON = new Lexer
 	return Lexer
 	})()

@@ -20,11 +20,6 @@
 		['LOGICAL_OPERATOR',/&&|\|\|/],
 		['COMPARISON_OPERATOR',/(?:[<>]|[=!]=)=?/],
 		['ASSIGNMENT_OPERATOR',/=|\*=|\/=|\%=|\+=|\-=|<<=|>>=|>>>=|\&=|\^=|\|=/],
-		['L_NEW_LINE',/[\n\r]/],
-		['WHITE_SPACES',/[ \t]+/],
-		['TAB',/\t/],
-		['SPACES',/[ ]/],
-		['NOT_WHITE_SPACES',/[^\s]+/],
 		['BACKSLASH',/\\/],
 		['S_SSQ',/'/],
 		['SSQ_IN',/([^'\\\n\r\f \t]|\\[^\n\r\f \t])+/],
@@ -121,7 +116,6 @@
 		'function=PHP_FUNCTION'
 		])
 	o.setTokensTranslation([
-		'L_NEW_LINE=NEW_LINE',
 		'R_REGULAR_EXPRESSION=REGULAR_EXPRESSION',
 		'SSQ=STRING','S_SSQ=SINGLE_QUOTE','E_SSQ=SINGLE_QUOTE',
 		'SDQ=STRING','S_SDQ=DOUBLE_QUOTE','E_SDQ=DOUBLE_QUOTE',

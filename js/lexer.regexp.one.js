@@ -63,7 +63,7 @@ var OneRegExpLexer =(function(){
 						index: Lexer.nIndex,
 						lineStart: Lexer.nLine,
 						lineEnd: Lexer.nLine,
-						parentToken: Lexer.oCurrent.oValue.token
+						rule: Lexer.oCurrent.oValue.token
 						})
 					if( oRule.sId=="NEW_LINE" ) Lexer.nLine++
 					Lexer.oCurrent.appendChild( oNode )

@@ -2,14 +2,7 @@ if( AutomatonLexer.insert ){
 AutomatonLexer.insert(function(o,f,g,h){
 o.addCSSClass('whitespaces=WHITE_SPACES&undefined=NOT_WHITE_SPACES' )
 
-// WHITESPACES
-o.addTokens([
-	["SPACES",{A:g(" "),M:[,[2]],F:[,,1]}],
-	["TAB",{A:g("\t"),M:[,[2]],F:[,,1]}],
-	["L_NEW_LINE",{A:g("\n","\f","\r"),M:[,[3,3,2],[3]],F:[,,1,1]}]
-	])
-o.addCSSClass("space=SPACES&tab=TAB&linefeed=L_NEW_LINE")
-o.setTokensTranslation('L_NEW_LINE=NEW_LINE')
+
 
 // NUMBER
 o.addTokens([

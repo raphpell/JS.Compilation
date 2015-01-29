@@ -49,16 +49,17 @@ SimpleNode.prototype ={
 			? NS.previousSibling.nextSibling = o
 			: this.firstChild = o
 		o.parentNode = this
-	 	for(var i=0, a=[]; this.childNodes[i]; i++){
+		
+		for(var i=0, a=[]; this.childNodes[i]; i++){
 			if( this.childNodes[i]===NS ){
 				a[i]=o
 				for(; this.childNodes[i]; i++) a[i+1]=this.childNodes[i]
-				break;
+				this.childNodes = a
+				return o
 				}
 			a[i]=this.childNodes[i]
 			}
-		this.childNodes = a
-		return o
+		throw new Error ('NODE_NOT_FOUND')
 		},
 	removeChild :function( o ){
 	 	for(var i=0, a=[]; this.childNodes[i]; i++){

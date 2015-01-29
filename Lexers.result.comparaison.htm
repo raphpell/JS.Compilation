@@ -153,7 +153,9 @@ var TokensBridge ={
 	'SDQ':'STRING'
 	}
 var TokensLabel ={
+	'JS':'',
 	'REGULAR_EXPRESSION':'',
+	'SimpleRegExp':'',
 	'PHP':'',
 	'MLC':'',
 	'COMMENT':'',
@@ -218,8 +220,7 @@ var TokensLabel ={
 	}
 
 var valueToString =function(o){ // token,css,
-//	return JSON.stringify( o, null, " " )
-	return JSON.stringify( o, 'parentToken,index,lineStart,lineEnd,bParent,bParentLimit,bRescan'.split(','), " " ).str_replace('"', '')
+	return JSON.stringify( o, 'rule,index,lineStart,lineEnd,bParent,bParentLimit,bRescan'.split(','), " " ).str_replace('"', '')
 	}
 var setTitle =function(){
 	var o = this.oValue
@@ -233,17 +234,13 @@ var Lexeme =function( o ){
 	, sToken = TokensBridge[o.token] || o.token
 	, sValue = o.value
 	e.oValue = o
-	if( o.parentToken ){
-		if( Lexeme[o.parentToken]) Lexeme[o.parentToken]( e, sToken, sValue )
-			else Lexeme.parent( e, sToken, o )
-			// else e.symbol = e.title = sValue
-		if( e.symbol ) e.innerHTML = e.symbol.str_replace( ['&','<','>'], ['&amp;','&lt;','&gt;'])
-		if( sToken=='REGULAR_EXPRESSION') console.warn( e.symbol, '\u25B6'+e.innerHTML+'\u25C0', e )
-		if( o.css ) e.className = o.css + ' myNode'
-		}
-	else{
-		e.className = e.title = sToken.toLowerCase()
-		}
+	
+	if( Lexeme[o.rule]) Lexeme[o.rule]( e, sToken, sValue )
+		else Lexeme.parent( e, sToken, o )
+		// else e.symbol = e.title = sValue
+	if( e.symbol ) e.innerHTML = e.symbol.str_replace( ['&','<','>'], ['&amp;','&lt;','&gt;'])
+	if( o.css ) e.className = o.css + ' myNode'
+	
 	return e
 	}
 Lexeme.SimpleRegExp =function( e, sTokenName, sMatched ){

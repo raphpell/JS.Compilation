@@ -2,7 +2,7 @@
 
 var AutomatonLexer =(function(){
 	var SINGLETON
-	// Fonctions comprimant la taille des automates
+	// Fonctions: compression des automates ++
 	, f=function( sCharSet, bIn ){
 		var cache = {}
 		for(var i=0, ni=sCharSet.length; i<ni; i++ ) cache[ sCharSet[i]] = -1
@@ -22,7 +22,21 @@ var AutomatonLexer =(function(){
 		for(var i=0; i<nLength; i++ ) a[i] = o[i]!=undefined ? o[i] : nDefaultValue
 		return a
 		}
-	
+	, nextState =function( oFA, sStateI, sChar ){
+		var cache = oFA.cache || ( oFA.cache = [] )
+		cache = cache[sStateI] || ( cache[sStateI] = {} )
+		if( cache[sChar]) return cache[sChar]
+		var o = oFA.M[sStateI], sStateF
+		return cache[sChar] = 
+			sChar.length && o && ( o[ oFA.A[sChar]] || (function(){
+				if( oFA.R )
+					for(var i=0; a=oFA.R[i]; i++)
+						if( ( sStateF = a[1]( sChar, o[a[0]]||0 )) > 0 )
+							return sStateF
+				})())
+			|| -2 
+		}
+
 	// Données d'analyse
 	, LexerRules =(function(){
 		var Dictionary =function( sId ){
@@ -105,43 +119,27 @@ var AutomatonLexer =(function(){
 				}
 			}
 		})()
-	
-	// ...
-	, nextState =function( oFA, sStateI, sChar ){
-		var cache = oFA.cache || ( oFA.cache = [] )
-		cache = cache[sStateI] || ( cache[sStateI] = {} )
-		if( cache[sChar]) return cache[sChar]
-		var o = oFA.M[sStateI], sStateF
-		return cache[sChar] = 
-			sChar.length && o && ( o[ oFA.A[sChar]] || (function(){
-				if( oFA.R )
-					for(var i=0; a=oFA.R[i]; i++)
-						if( ( sStateF = a[1]( sChar, o[a[0]]||0 )) > 0 )
-							return sStateF
-				})())
-			|| -2 
-		}
 
 	// Données d'analyse
-	var sWSTokens ='|WHITE_SPACES|SPACES|SPACE|NEW_LINE|L_NEW_LINE|TAB|'
-	, sToken, oLexeme, bNoSkip
+	var sToken, oLexeme, bNoSkip, oFound
+	, sWSTokens ='|WHITE_SPACES|SPACES|SPACE|NEW_LINE|L_NEW_LINE|TAB|'
 	, Actions =(function(){
 		var Actions={
 			add :function(){
 				this.previous.set( oLexeme.token )
-				return this.appendNode( oLexeme )
+				return this.appendNode( Lexeme( oLexeme ))
 				},
 			endParent :function(){
 				oLexeme.bParentLimit = true
 				this.previous.set( this.eParent.oValue.token )
-				var eNode = this.appendNode( oLexeme )
+				var eNode = this.appendNode( Lexeme( oLexeme ))
 				this.stack.pop()
 				return eNode
 				},
 			newLine :function(){
 				this.previous.set( oLexeme.token )
 				this.nLine++
-				return this.appendNode( oLexeme )
+				return this.appendNode( Lexeme( oLexeme ))
 				},
 			rescanToken :function(){
 				this.nPos = oLexeme.index
@@ -153,7 +151,7 @@ var AutomatonLexer =(function(){
 				oLexeme.value = ''
 				oLexeme.rule = sRule
 				oLexeme.bParent = oLexeme.bRescan = true
-				var eParent = this.appendNode( oLexeme )
+				var eParent = this.appendNode( Lexeme( oLexeme ))
 				this.stack.push( eParent )
 				this.previous.set( oLexeme.token )
 				this.sText = this.sText.slice( 0, nEnd )
@@ -171,16 +169,14 @@ var AutomatonLexer =(function(){
 					value:'',
 					index:oLexeme.index,
 					lineStart:this.nLine,
-					parentToken:this.sSyntax,
 					bParent:true
 					})
 				oLexeme.bParentLimit = true
-				oLexeme.parentToken = sToken
 				this.previous.set( oLexeme.token )
 				var bSkip = this.skip( oLexeme.token )
-				if( ! bSkip ) this.eParent.appendChild( eNewParent )
+				if( ! bSkip ) this.appendNode( eNewParent )
 				this.stack.push( eNewParent )
-				this.appendNode( oLexeme )
+				this.appendNode( Lexeme( oLexeme ))
 				if( Skip.notFor[ this.sSyntax ])
 					do{ this.readToken()}while( this.eParent==eNewParent )
 				return bSkip ? true : eNewParent
@@ -303,75 +299,65 @@ var AutomatonLexer =(function(){
 		})
 	// SCANNING
 	Lexer.prototype ={
-		eRoot:null,
 		end :function(){
 			return this.eRoot
 			},
 		searchToken :function( sToken, nStart ){
-			var oFA=LexerRules.DFA.have( sToken ), nEnd=nStart, sState=1, oMatched=null
+			var oFA=LexerRules.DFA.have( sToken ), nEnd=nStart, sState=1, oFound=null
 			if( this.previous.invalidFor( sToken )) return false;
 			while( ( sState = nextState( oFA, sState, this.sText.charAt( nEnd++ ))) > 0 ){
 				if( oFA.F[ sState ]){
 					sToken = oFA.TokensTable[ oFA.F[ sState ]]
 					if( this.previous.invalidFor( sToken )) continue;
-					oMatched={ start:nStart, end:nEnd, token:sToken }
+					oFound={ start:nStart, end:nEnd, token:sToken }
 					}
 				}
-			return oMatched
+			return oFound
 			},
 		
 		bSkip: 0,
-		eParent: null,
-		appendNode :null, // varie selon scan ou rescan
-		init :function( sText, sRule ){
-			var e = Lexeme({
-				token:sRule,
-				rule:sRule,
-				value:'',
-				css:sRule.toLowerCase(),
-				index:0,
-				lineStart:1,
-				lineEnd:1
-				})
+		appendNode: null,
+		init :function( sText, sSyntax ){
+			sSyntax = sSyntax || 'TXT'
 			this.union({
 				nLine:1,
 				nPos:0,
 				sText:sText,
 				skip:Skip(this),
 				stack:Stack(this),
-				previous:Previous(),
-				sSyntax: sRule,
-				eRoot: e,
-				eParent: e
+				previous:Previous()
 				})
-			this.stack.push( e )
-			this.appendNode =function( oLexeme ){
-				return this.skip( oLexeme.token )
+			this.eRoot = this.stack.push( Lexeme({
+				value:'',
+				token:sSyntax,
+				rule:sSyntax,
+				css:sSyntax.toLowerCase(),
+				index:0,
+				lineStart:1
+				}))
+			this.appendNode =function( eNode ){
+				return this.skip( eNode.oValue.token )
 					? true
-					: this.eParent.appendChild( Lexeme( oLexeme ))
+					: this.eParent.appendChild( eNode )
 				}
-			return this.eRoot
 			},
 		readToken :function(){
-			var sParentToken=this.eParent.oValue.rule
-			, a=LexerRules.haveRule( sParentToken )||[sParentToken]
-			, o
-			bNoSkip = Skip.notFor[ sParentToken ]
+			var a = LexerRules.haveRule( this.sSyntax ) || [this.sSyntax]
+			bNoSkip = Skip.notFor[ this.sSyntax ]
 			for(var j=0; sToken=a[j]; j++){
-				if( o = this.searchToken( sToken, this.nPos )){
-					sToken = o.token
+				if( oFound = this.searchToken( sToken, this.nPos )){
+					sToken = oFound.token
 					oLexeme ={
+						value:this.sText.substring(oFound.start,oFound.end),
 						token: LexerRules.Translation[sToken]||sToken,
 						css: LexerRules.CSS[sToken]||'',
-						rule:sParentToken,
-						value:this.sText.substring(o.start,o.end),
+						rule:this.sSyntax,
 						index:this.nPos,
 						lineStart:this.nLine,
-						lineEnd:this.nLine,
-						parentToken:sParentToken
+						lineEnd:this.nLine
 						}
 					if( this.haveLexeme( oLexeme )) return false
-					this.nPos = o.end
+					this.nPos = oFound.end
 					return Actions(this)
 					}
 				}
@@ -505,11 +491,11 @@ var AutomatonLexer =(function(){
 			if( ! nDeleted && ! nAdded ) return false;
 			
 			this.bIncremental = true
-			this.appendNode =function( oLexeme ){
-				if( this.skip( oLexeme.token )) return true
+			this.appendNode =function( eNode ){
+				if( this.skip( eNode.oValue.token )) return true
 				return this.eEndToken && this.eEndToken.parentNode==this.eParent
-					? this.eParent.insertBefore( Lexeme( oLexeme ), this.eEndToken )
-					: this.eParent.appendChild( Lexeme( oLexeme ))
+					? this.eParent.insertBefore( eNode, this.eEndToken )
+					: this.eParent.appendChild( eNode )
 				}
 			
 			this.eRoot = eRoot
@@ -552,7 +538,7 @@ var AutomatonLexer =(function(){
 				this.stack.unshift( e )
 				if( e==eRoot ) break;
 				}
-				
+
 			// Analyse lexicale partielle
 			while( this.readToken( true ));
 
@@ -613,15 +599,21 @@ var AutomatonLexer =(function(){
 			}
 		})
 
-	// Analyse par défaut: syntaxe TXT
-	Lexer.insert(function(o,f,g,h){
-		o.addTokens([
-			['WHITE_SPACES',{A:g("[\t \n\r\f]"),R:[[0,f("\t \n\r\f",1)]],M:[[],[2],[2]],F:[,,1],TokensTable:[,'WHITE_SPACES']}],
-			['NOT_WHITE_SPACES',{A:{"[^\t \n\r\f]":0},R:[[0,f("\t \n\r\f")]],M:[[1],[1]],F:{1:1},TokensTable:[,'NOT_WHITE_SPACES']}],
-			['TXT',{A:g("\n","[^\t\n\f\r ]","\t","\f","\r"," "),R:[[1,f("\t\n\f\r ")]],M:[[],[5,3,4,5,2,6],[5],[,3]],F:[,,3,5,2,3,4],TokensTable:',,TAB,L_NEW_LINE,SPACES,TEXT'.split(',')}]
-			])
-		o.addCSSClass( 'whitespaces=WHITE_SPACES&undefined=NOT_WHITE_SPACES' )
-		})
+	// Analyse par défaut
+	var o = LexerRules
+	o.addTokens([
+		// Espaces blancs
+		['SPACES',{A:g(" "),M:[,[2]],F:[,,1]}],
+		['TAB',{A:g("\t"),M:[,[2]],F:[,,1]}],
+		['L_NEW_LINE',{A:g("\n","\f","\r"),M:[,[3,3,2],[3]],F:[,,1,1]}],
+		['WHITE_SPACES',{A:g("[\t \n\r\f]"),R:[[0,f("\t \n\r\f",1)]],M:[[],[2],[2]],F:[,,1],TokensTable:[,'WHITE_SPACES']}],
+		// Tout sauf un espaces blancs
+		['NOT_WHITE_SPACES',{A:{"[^\t \n\r\f]":0},R:[[0,f("\t \n\r\f")]],M:[[1],[1]],F:{1:1},TokensTable:[,'NOT_WHITE_SPACES']}],
+		// Syntaxe par défaut
+		['TXT',{A:g("\n","[^\t\n\f\r ]","\t","\f","\r"," "),R:[[1,f("\t\n\f\r ")]],M:[[],[5,3,4,5,2,6],[5],[,3]],F:[,,3,5,2,3,4],TokensTable:',,TAB,L_NEW_LINE,SPACES,TEXT'.split(',')}]
+		])
+	o.addCSSClass( 'space=SPACES&tab=TAB&linefeed=L_NEW_LINE&whitespaces=WHITE_SPACES&undefined=NOT_WHITE_SPACES' )
+	o.setTokensTranslation('L_NEW_LINE=NEW_LINE')
 		
 	SINGLETON = new Lexer
 	return Lexer
