@@ -1,4 +1,4 @@
-<html>
+ï»¿<html>
 <head>
 	<title>module.preview</title>
 	<link rel="stylesheet" type="text/css" href="css/syntaxes.css">
@@ -55,21 +55,17 @@
 <h1>module.preview</h1>
 
 <dl>
-	<dt>
-		<label for="eExamples">Exemples : </label>
+	<dt><label for="eExamples">Exemples : </label>
 		<select id="eExamples"></select>
 		<hr>
 	</dt>
-	<dt>
-		<label for="eRules">Régle : </label>
+	<dt><label for="eRules">RÃ©gle : </label>
 		<select id="eRules"></select>
 	</dt>
-	<dt>
-		<label for="eInput">Source : </label><br>
+	<dt><label for="eInput">Source : </label><br>
 		<textarea id="eInput"></textarea>
 	</dt>
-	<dt>
-		<input type="button" id="eBtnMatch" value="Analyser">
+	<dt><input type="button" id="eBtnMatch" value="Analyser">
 		<input type="checkbox" id="eRelief"><label for="eRelief">Relief.</label>
 		<input type="checkbox" id="eWhiteSpaces"><label for="eWhiteSpaces">Espaces blancs.</label>
 	</dt>
@@ -83,8 +79,6 @@
 <script src="js/lexer.automaton.modules.js"></script>
 
 
-
-
 <hr>
 <script><!-- Module Parenthesis -->
 AutomatonLexer.insert(function(o,f,g,h){
@@ -94,8 +88,8 @@ AutomatonLexer.insert(function(o,f,g,h){
 	});
 </script>
 <p>
-	Le module Parenthesis est un exemple simple d'une analyse lexicale créant des lexèmes parents.<br>
-	Définition du module:
+	Le module Parenthesis est un exemple simple d'une analyse lexicale crÃ©ant des lexÃ¨mes parents.<br>
+	DÃ©finition du module:
 </p>
 <pre>
 !@	Parenthesis		=	S_Parenthesis|E_Parenthesis|WORD|SPACE|TAB|L_NEW_LINE
@@ -148,9 +142,8 @@ var match =function(){
 	}
 </script>
 
-<iframe id="eTextPlain" name="_source" src="" style="display:none;"></iframe>
 <script>
-_('eTextPlain,eExamples,eInput,eRules')
+_('eExamples,eInput,eRules')
 _( 'eInput,eBtnMatch,eRelief,eWhiteSpaces,eResult' )
 
 var aRules = '|CSS|HTML|INI|JS|Parenthesis|PHP|TXT'.split('|')
@@ -168,21 +161,13 @@ Events.add(
 		eWhiteSpaces, function(){ changeClassList( eWhiteSpaces.checked, 'seeWS' )},
 	'change',
 		eExamples, function(){
-			eTextPlain.src = 'modules/preview/'+ eExamples.value +".htm"
-			eRules.value = eExamples.value
+			LoadFile( 'modules/preview/'+ eExamples.value +".htm", function( s ){
+				eRules.value = eExamples.value
+				eInput.value = s
+				match()
+				})
 			},
-		eRules, match,
-	'load', /* Chargement de fichier */
-		eTextPlain, function(){ 
-			var e = eTextPlain.contentWindow.document.firstChild
-			if( e ){
-				while( e && e.nodeType!=3 ) e = e.lastChild 
-				if( e ){
-					eInput.value = e.nodeValue
-					match()
-					}
-				}
-			}
+		eRules, match
 	)
 eRelief.onclick()
 eWhiteSpaces.onclick()

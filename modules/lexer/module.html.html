@@ -4,16 +4,16 @@
 !#@	HTML	=	{superscript}|{whitespaces}|S_HTML_COMMENT|S_CDATA|S_DOCTYPE|S_END_TAG|S_TAG|HTML_TEXT
 		(css:html)
 	
-!@	TAG				=	S_HTML_STYLE|S_HTML_SCRIPT|S_ELT|E_TAG
+!@	TAG	=	S_HTML_STYLE|S_HTML_SCRIPT|S_ELT|E_TAG
 		(css:elt)
-	S_TAG 		=	<
-	E_TAG		=	>
+	S_TAG 	=	<
+	E_TAG	=	>
 	
 // macros partagées
 	superscript 	= 	S_PHP
 	whitespaces 	= 	L_NEW_LINE|TAB|SPACES
 	htmlattribute	=	TAG_ATTR|S_TAG_ATTR_VALUE
-	strings			=	S_HTML_SDQ|S_HTML_SSQ
+	strings		=	S_HTML_SDQ|S_HTML_SSQ
 	
 // élément DOCTYPE
 !@	DOCTYPE			= 	{whitespaces}|{strings}|DOCTYPE_IN|E_DOCTYPE
@@ -34,8 +34,8 @@
 // commentaires HTML
 !#@	HTML_COMMENT		=	{whitespaces}|E_HTML_COMMENT|HTML_COMMENT_IN
 		(css:comment)
-	S_HTML_COMMENT	=	<\!\-\-
- 	E_HTML_COMMENT	=	\-+\-\>
+	S_HTML_COMMENT		=	<\!\-\-
+ 	E_HTML_COMMENT		=	\-+\-\>
 	HTML_COMMENT_IN		=	([^\n\r\f \t\-]+|\-([^\n\r\f\-]+|\-[^\n\r\f\>]+))+
 
 // texte brut
@@ -48,12 +48,12 @@
 // balise html sortante
 !#@	END_TAG			= 	END_ELT|E_END_TAG
 		(css:elt)
-	S_END_TAG	=  	<\/
-	E_END_TAG	=  	>
-	END_ELT		=  	[^>\n\r\f \t]+
+	S_END_TAG		=  	<\/
+	E_END_TAG		=  	>
+	END_ELT			=  	[^>\n\r\f \t]+
 
 // attribut d'une balise
-	TAG_ATTR	=	[a-zA-Z0-9\-]+
+	TAG_ATTR		=	[a-zA-Z0-9\-]+
 		(css:attr)
 
 // valeur d'un attribut d'une balise
@@ -81,7 +81,7 @@
 		
 // balise STYLE
 !#@	HTML_STYLE		=	{superscript}|{whitespaces}|{htmlattribute}|S_HTMLStyle
-	S_HTML_STYLE	=	[Ss][Tt][Yy][Ll][Ee]
+	S_HTML_STYLE		=	[Ss][Tt][Yy][Ll][Ee]
 		
 !#	HTMLStyle		=	E_HTMLStyle|BIG_CSS
 		(css:css)
@@ -93,13 +93,13 @@
 // balise SCRIPT
 !#@	HTML_SCRIPT		=	{superscript}|{whitespaces}|{htmlattribute}|S_HTMLScript
 		(css:elt)
-	S_HTML_SCRIPT	=	[Ss][Cc][Rr][Ii][Pp][Tt]
+	S_HTML_SCRIPT		=	[Ss][Cc][Rr][Ii][Pp][Tt]
 		
 !#	HTMLScript		=	E_HTMLScript|BIG_JS
 		(css:js)
-	S_HTMLScript	=	>
+	S_HTMLScript		=	>
 		(css:elt)
-!	E_HTMLScript	=	<\/[Ss][Cc][Rr][Ii][Pp][Tt]>
+!	E_HTMLScript		=	<\/[Ss][Cc][Rr][Ii][Pp][Tt]>
 		(css:elt, translation:END_HTML_SCRIPT)
 
 </pre></body></html>

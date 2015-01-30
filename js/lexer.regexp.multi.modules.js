@@ -1,7 +1,8 @@
 ;(function(){ // Languages definition
 	var o = MultiRegExpLexer.Rules
+	
 	// SimpleRegexp = Sample test
-	o.addTokens({ list:[
+	o.addTokens([
 		['CHARSET',/\[\^?|\]|\-/],
 		['PIPE',/\|/],
 		['PUNCTUATOR',/\(|\)/],
@@ -10,10 +11,11 @@
 		['CHAR_ESCAPED',/\\./],
 		['ANY',/\./],
 		['CHAR',/[^\(\)\\\|\.\[\]\*\+\?\{\-]/]
-		]})
-	o.addRule({name:'SimpleRegExp', list:'CHARSET,PIPE,PUNCTUATOR,QUANTIFIER1,QUANTIFIER2,CHAR_ESCAPED,ANY,CHAR'.split(',')})
+		])
+	o.addRule('SimpleRegExp','CHARSET|PIPE|PUNCTUATOR|QUANTIFIER1|QUANTIFIER2|CHAR_ESCAPED|ANY|CHAR')
+	
 	// JS + PHP LANGUAGE
-	o.addTokens({ list:[
+	o.addTokens([
 		['ELISION',/,/],
 		['UNARY_OPERATOR',/\+\+|\-\-|\~|\!/],
 		['ARITHMETIC_OPERATOR',/[\+\-\*\%\/]/],
@@ -53,39 +55,35 @@
 		['PHP_RESERVED',/(?:\@|and|or|xor|exception|as|var|class|const|declare|die|echo|empty|eval|exit|extends|function|global|isset|list|new|print|static|unset|use|__FUNCTION__|__CLASS__|__METHOD__|final|interface|implements|extends|public|private|protected|abstract|clone|\$this)\b/],
 		['PHP_IDENTIFIER',/\$[\w_][\w\d_]*\b/],
 		['PHP_FUNCTION',/\b\w[\w\d_]*\b/]
-		]})
+		])
 	o.addRules([
-		{name:'JS', list:[
-			'L_NEW_LINE','SPACES','TAB',
-			'JS_KEYWORD','JS_LITERAL','JS_IDENTIFIER',
-			'LBRACE','RBRACE','LPAREN','RPAREN','LBRACK','RBRACK',
-			'S_SSQ','S_SDQ',
-			'S_MLC','S_SLC',
+		['JS',['L_NEW_LINE|SPACES|TAB',
+			'JS_KEYWORD|JS_LITERAL|JS_IDENTIFIER',
+			'LBRACE|RBRACE|LPAREN|RPAREN|LBRACK|RBRACK',
+			'S_SSQ|S_SDQ|S_MLC|S_SLC',
 			'R_REGULAR_EXPRESSION',
 			'NUMBER',
 			'ELISION',
-			'DOT','SEMI','COLON','QUESTION',
+			'DOT|SEMI|COLON|QUESTION',
 			'S_PHP',
-			'LOGICAL_OPERATOR','COMPARISON_OPERATOR','ASSIGNMENT_OPERATOR','UNARY_OPERATOR','ARITHMETIC_OPERATOR',
+			'LOGICAL_OPERATOR|COMPARISON_OPERATOR|ASSIGNMENT_OPERATOR|UNARY_OPERATOR|ARITHMETIC_OPERATOR',
 			'NOT_WHITE_SPACES'
-			]},
-		{name:'REGULAR_EXPRESSION', list:['TAB','SPACES','REGULAR_EXPRESSION_IN']},
-		{name:'PHP', list:[
-			'L_NEW_LINE','SPACES','TAB',
+			].join('|')],
+		['REGULAR_EXPRESSION','TAB|SPACES|REGULAR_EXPRESSION_IN'],
+		['PHP',['L_NEW_LINE|SPACES|TAB',
 			'E_PHP',
-			'LBRACE','RBRACE','LPAREN','RPAREN','LBRACK','RBRACK',
+			'LBRACE|RBRACE|LPAREN|RPAREN|LBRACK|RBRACK',
 			'ELISION',
-			'S_SSQ','S_SDQ',
-			'S_MLC','S_SLC',
-			'NUMBER','SEMI',
-			'PHP_KEYWORD','PHP_RESERVED','PHP_LITERAL','PHP_SPECIAL_VARS','PHP_IDENTIFIER','PHP_FUNCTION',
-			'COMPARISON_OPERATOR','ASSIGNMENT_OPERATOR','ARITHMETIC_OPERATOR','UNARY_OPERATOR',
+			'S_SSQ|S_SDQ|S_MLC|S_SLC',
+			'NUMBER|SEMI',
+			'PHP_KEYWORD|PHP_RESERVED|PHP_LITERAL|PHP_SPECIAL_VARS|PHP_IDENTIFIER|PHP_FUNCTION',
+			'COMPARISON_OPERATOR|ASSIGNMENT_OPERATOR|ARITHMETIC_OPERATOR|UNARY_OPERATOR',
 			'NOT_WHITE_SPACES'
-			]},
-		{name:'SSQ', list:'L_NEW_LINE,TAB,SPACES,SSQ_IN,E_SSQ,BACKSLASH'.split(',')},
-		{name:'SDQ', list:'L_NEW_LINE,TAB,SPACES,SDQ_IN,E_SDQ,BACKSLASH'.split(',')},
-		{name:'MLC', list:'L_NEW_LINE,TAB,SPACES,E_MLC,MLC_IN'.split(',')},
-		{name:'SLC', list:'TAB,SPACES,SLC_IN'.split(',')}
+			].join('|')],
+		['SSQ','L_NEW_LINE|TAB|SPACES|SSQ_IN|E_SSQ|BACKSLASH'],
+		['SDQ','L_NEW_LINE|TAB|SPACES|SDQ_IN|E_SDQ|BACKSLASH'],
+		['MLC','L_NEW_LINE|TAB|SPACES|E_MLC|MLC_IN'],
+		['SLC','TAB|SPACES|SLC_IN']
 		])
 	o.setPreviousTokenOf("R_REGULAR_EXPRESSION","ARITHMETIC_OPERATOR|ASSIGNMENT_OPERATOR|BITWISE_OPERATOR|COMPARISON_OPERATOR|LOGICAL_OPERATOR|ELISION|DOT|LPAREN|LBRACE|LBRACK|COLON|SEMI|QUESTION|JS_KEYWORD")
 	// ...

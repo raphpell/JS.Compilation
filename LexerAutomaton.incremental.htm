@@ -119,6 +119,13 @@ FIELDSET DL {
 		<dt><input type="checkbox" id="eCheckDifference"><label for="eCheckDifference">Surlignage des différences</label></dt>
 	</dl>
 </fieldset>
+<fieldset><legend>Source</legend>
+	<dl>
+		<dt><label for="eSyntax">Syntaxe : </label>
+			<select id="eSyntax"></select>
+		</dt>
+	</dl>
+</fieldset>
 
 <hr style="clear:both;">
 <center style="color:#AAA;">
@@ -202,6 +209,7 @@ alert('ok')
 	<pre id="eResult2" class="result"></pre>
 </div>
 
+<script src="js/framework.js"></script>
 <script src="js/shared.js"></script>
 
 <!-- LEXER -->
@@ -250,7 +258,7 @@ var getHTMLEnd =function( o ){
 	return '</b>'
 	}
 var valueToString =function(o){
-	return JSON.stringify( o, 'token,parentToken,css,index,lineStart,lineEnd,bParentLimit,bParent,bRescan'.split(','), " " ).str_replace('"', '')
+	return JSON.stringify( o, 'token,rule,css,index,lineStart,lineEnd,bParentLimit,bParent,bRescan'.split(','), " " ).str_replace('"', '')
 	}
 var getElementsByLine =function( nLine ){
 	var a=[]
@@ -373,7 +381,7 @@ var Analyse =(function(){
 				Stats.init('local_time')
 				eResult1.innerHTML = ''
 				var oChrono = new Chrono ()
-				eRootLocal = AutomatonLexer( eText.value, 'JS' )
+				eRootLocal = AutomatonLexer( eText.value, eSyntax.value )
 				eChrono1.innerHTML = '...<br>...<br>...<br>...<br>...'
 				if( eShowResults.checked )
 					switch( nDisplayMode ){
@@ -425,7 +433,7 @@ var Analyse =(function(){
 			eTest2.removeChild( eResult2 )
 			eResult2.innerHTML = ''
 			var oChrono = new Chrono ()
-			eRootGlobal = AutomatonLexer( eText.value, 'JS' )
+			eRootGlobal = AutomatonLexer( eText.value, eSyntax.value )
 			eChrono2.innerHTML = Stats.set( 'global_time', oChrono.stop())
 			if( eShowResults.checked )
 				switch( nDisplayMode ){
@@ -457,13 +465,22 @@ _( 'eLocalAnalyse,eGlobalAnalyse' )
 _( 'eChrono1,eChrono2' )
 _( 'eLexeme,eClassName,eTitle,eInnerHTML,eByLine' )
 _( 'eIndex,eDeletedCharNumber,eAdded,eUpdate' )
+_( 'eSyntax' )
 
 
 var sMode
 var nDisplayMode
+var aRules = '|CSS|HTML|INI|JS|PHP|TXT'.split('|')
+Tag.addChildNodes( eSyntax, 'OPTION', aRules, 'JS' )
 
 Events.add(
 	'change',
+		eSyntax, function(){
+			LoadFile( 'modules/preview/'+ eSyntax.value +".htm", function( s ){
+				eText.value = s
+				Analyse.init()
+				})
+			},
 		eLexeme, function(){
 			if( this.value!='HTMLElement' && nDisplayMode==11 ) eShowResults.checked = false
 			createLexeme( eClassName.checked,eTitle.checked,eInnerHTML.checked,eByLine.checked );

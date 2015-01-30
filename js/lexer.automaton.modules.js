@@ -1,8 +1,7 @@
 if( AutomatonLexer.insert ){
 AutomatonLexer.insert(function(o,f,g,h){
+
 o.addCSSClass('whitespaces=WHITE_SPACES&undefined=NOT_WHITE_SPACES' )
-
-
 
 // NUMBER
 o.addTokens([

@@ -250,7 +250,7 @@ var setFA =function( o ){
 	if( o.test ) eInput.value = o.test
 	if( sToken ){
 		AutomatonLexer.Rules.addTokenFromString( sToken, o.automate )
-		AutomatonLexer.Rules.addRule( 'ROOT', [ sToken ])
+		AutomatonLexer.Rules.addRule( 'ROOT', sToken )
 		}
 	refreshFAHTML('FA')
 	if( eShowFAGraph.checked ) showGraph( 'FA' )

@@ -22,8 +22,12 @@ var MultiRegExpLexer =(function(){
 				}
 			}
 		, Rules=Dictionary('rule')
-		, Tokens=Dictionary('token')
+		, Tokens=Dictionary('RE')
 		return{
+			setPreviousTokenOf :function( sToken, sPreviousTokens ){
+				if( Previous.ofToken[sToken]) throw new Error ( 'Previous token of '+ sToken +' already defined !' )
+				Previous.ofToken[sToken] = sPreviousTokens
+				},
 			CSS: {},
 			addCSSClass :function( m ){ // m = 'class1=TOKEN1|TOKEN2&class2=TOKEN3'
 				var o = this.CSS
@@ -41,10 +45,6 @@ var MultiRegExpLexer =(function(){
 					}
 				},
 			Translation: {},
-			setPreviousTokenOf :function( sToken, sPreviousTokens ){
-				if( Previous.ofToken[sToken]) throw new Error ( 'Previous token of '+ sToken +' already defined !' )
-				Previous.ofToken[sToken] = sPreviousTokens
-				},
 			setTokensTranslation :function( m ){ // m = 'TOKEN1=NEWNAME1&TOKEN2=NEWNAME2'
 				var o = this.Translation
 				var aCouples = m.constructor==Array ? m : m.split('&')
@@ -55,12 +55,12 @@ var MultiRegExpLexer =(function(){
 					o[sToken] = aCouple[1]
 					}
 				},
-
-			Tokens: Tokens,
-			addRule :function( o ){
+			Rules: Rules,
+			addRule :function( sName, sTokens ){
+				var aList = sTokens.split('|')
 				var a = []
-				for(var i=0; o.list[i]; i++ ){
-					var ID = o.list[i]
+				for(var i=0; aList[i]; i++){
+					var ID = aList[i]
 					var oToken = Tokens.list[ID]
 					if( oToken ) a.push( oToken )
 					else {
@@ -68,25 +68,26 @@ var MultiRegExpLexer =(function(){
 						a = Array.merge( a, aRule )
 						}
 					}
-				return Rules.add( o.name, a )
+				return Rules.add( sName, a )
 				},
-			addRules :function( a ){
-				for(var i=0; a[i]; i++ ) LexerRules.addRule( a[i])
+			addRules :function( aRules ){
+				for(var i=0; aRules[i]; i++ )
+					this.addRule( aRules[i][0], aRules[i][1])
 				},
-			getRule :function( ID ){ return Rules.get( ID )},
-			isRule :function( ID ){ return Rules.list[ID]},
-			addTokens :function( o ){
-				for(var i=0, aToken; aToken = o.list[i]; i++ )
-					Tokens.add( aToken[0], {
-						name: aToken[0],
-						re: new RegExp ( '^(?:'+ aToken[1].source +')' ),
-						css: aToken[2]
-						})
-				},
-			getToken :function( ID ){return Tokens.get( ID )}
+			Tokens: Tokens,
+			addTokens :function( aTokens ){
+				if( aTokens.length )
+					for(var i=0; aTokens[i]; i++){
+						var sName=aTokens[i][0]
+						Tokens.add( sName, {
+							name: sName,
+							re: new RegExp ( '^(?:'+ aTokens[i][1].source +')' )
+							})
+						}
+				}
 			}
 		})()
-	var sToken, sValue, oLexeme, bNoSkip
+	var oLexeme, sToken, sValue, bNoSkip
 	, Actions =(function(){
 		var Actions={
 			add :function(){
@@ -296,26 +297,29 @@ var MultiRegExpLexer =(function(){
 			return sValue = aFound[0]
 			},
 		setSyntax :function( sSyntax ){
-			this.aRules = LexerRules.getRule( this.sSyntax = sSyntax )
+			this.aRules = LexerRules.Rules.list[ this.sSyntax = sSyntax ]
+							|| [ LexerRules.Tokens.list[sSyntax] ]
 			bNoSkip = Skip.notFor[ sSyntax ]
 			}
 		}
 
 	// Analyse par défaut
-	var o = LexerRules
-	o.addTokens({ list:[
-		// Espaces blancs
-		['SPACES',/[ ]/],
-		['TAB',/\t/],
-		['L_NEW_LINE',/[\n\r]/],
-		['WHITE_SPACES',/[\t \n\r\f]+/],
-		// Tout sauf un espaces blancs
-		['NOT_WHITE_SPACES',/[^\t \n\r\f]+/]
-		]})
-	// Syntaxe par défaut
-	o.addRule({name:'TXT', list:'TAB,L_NEW_LINE,SPACES,NOT_WHITE_SPACES'.split(',')})
-	o.addCSSClass( 'space=SPACES&tab=TAB&linefeed=L_NEW_LINE&whitespaces=WHITE_SPACES&undefined=NOT_WHITE_SPACES' )
-	o.setTokensTranslation('L_NEW_LINE=NEW_LINE')
+	;(function(){
+		var o = LexerRules
+		o.addTokens([
+			// Espaces blancs
+			['SPACES',/[ ]/],
+			['TAB',/\t/],
+			['L_NEW_LINE',/[\n\r]/],
+			['WHITE_SPACES',/[\t \n\r\f]+/],
+			// Tout sauf un espaces blancs
+			['NOT_WHITE_SPACES',/[^\t \n\r\f]+/]
+			])
+		// Syntaxe par défaut
+		o.addRule( 'TXT', 'TAB|L_NEW_LINE|SPACES|NOT_WHITE_SPACES' )
+		o.addCSSClass( 'space=SPACES&tab=TAB&linefeed=L_NEW_LINE&whitespaces=WHITE_SPACES&undefined=NOT_WHITE_SPACES' )
+		o.setTokensTranslation('L_NEW_LINE=NEW_LINE')
+		})();
 		
 	SINGLETON = new Lexer
 	return Lexer
