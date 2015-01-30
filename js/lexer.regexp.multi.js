@@ -86,7 +86,7 @@ var MultiRegExpLexer =(function(){
 			getToken :function( ID ){return Tokens.get( ID )}
 			}
 		})()
-	var sToken, oLexeme, bNoSkip, aFound, nMatchLength
+	var sToken, sValue, oLexeme, bNoSkip
 	, Actions =(function(){
 		var Actions={
 			add :function(){
@@ -108,7 +108,7 @@ var MultiRegExpLexer =(function(){
 			rescanToken :function(){
 				this.nPos = oLexeme.index
 				this.nLine = oLexeme.lineStart
-				var sRule = sToken.slice( 2 )
+				var sRule = sToken.slice(2)
 				, sTextRescan = oLexeme.value
 				, nEnd = this.nPos + sTextRescan.length
 				, sTMP = this.sText
@@ -125,7 +125,7 @@ var MultiRegExpLexer =(function(){
 				return eParent
 				},
 			startParent :function(){
-				sToken = sToken.slice( 2 )
+				sToken = sToken.slice(2)
 				var eNewParent = Lexeme({
 					token: LexerRules.Translation[sToken]||sToken,
 					css: LexerRules.CSS[sToken]||'',
@@ -146,16 +146,11 @@ var MultiRegExpLexer =(function(){
 				return bSkip ? true : eNewParent
 				}
 			}
+		var Char={E:'endParent',L:'newLine',R:'rescanToken',S:'startParent'}
 		return function( oInstance ){
-			return Actions[
-				sToken.charAt(1)=='_'
-					? { E:'endParent',
-						L:'newLine',
-						R:'rescanToken',
-						S:'startParent'
-						}[ sToken.charAt(0)] || 'add'
-					: 'add'
-				].call( oInstance )
+			return Actions[ sToken.charAt(1)=='_'
+					? Char[ sToken.charAt(0)] || 'add'
+					: 'add' ].call( oInstance )
 			}
 		})()
 	, Previous =(function(){
@@ -197,13 +192,13 @@ var MultiRegExpLexer =(function(){
 					}
 				if( n ){
 					that.eParent = a[n-1]
-					that.sSyntax = that.eParent.oValue.rule
+					that.setSyntax( that.eParent.oValue.rule )
 					}
 				return n
 				},
 			push :function( e ){
 				a[n++] = that.eParent = e
-				that.sSyntax = e.oValue.rule
+				that.setSyntax( e.oValue.rule )
 				return e
 				},
 			top :function(){ return a[n-1]},
@@ -239,13 +234,12 @@ var MultiRegExpLexer =(function(){
 		Stack: Stack
 		})
 	Lexer.prototype ={
-		end :function(){
+		bSkip: 0,
+		appendNode: null,
+		end :function(){ 
 			if( this.sText.length ) alert("Incomplete Scanning !")
 			return this.eRoot
 			},
-		
-		bSkip: 0,
-		appendNode: null,
 		init :function( sText, sSyntax ){
 			sSyntax = sSyntax || 'TXT'
 			this.union({
@@ -271,15 +265,10 @@ var MultiRegExpLexer =(function(){
 				}
 			},
 		readToken :function(){
-			var a = LexerRules.getRule( this.sSyntax )
-			bNoSkip = Skip.notFor[ this.sSyntax ]
-			for(var i=0; a[i]; i++ ){
-				if( ! a[i].re.test( this.sText ) || this.previous.invalidFor( a[i].name )) continue;
-				aFound = a[i].re.exec( this.sText )
-				if( nMatchLength = aFound[0].length ){
-					sToken = a[i].name
+			for(var i=0; this.aRules[i]; i++ ){
+				if( this.searchToken( this.aRules[i])){
 					oLexeme ={
-						value:aFound[0],
+						value: sValue,
 						token: LexerRules.Translation[sToken]||sToken,
 						css: LexerRules.CSS[sToken]||'',
 						rule:this.sSyntax,
@@ -287,8 +276,8 @@ var MultiRegExpLexer =(function(){
 						lineStart:this.nLine,
 						lineEnd:this.nLine
 						}
-					this.sText = this.sText.substr( nMatchLength )
-					this.nPos += nMatchLength
+					this.sText = this.sText.substr( sValue.length )
+					this.nPos += sValue.length
 					return Actions(this)
 					}
 				}
@@ -298,6 +287,17 @@ var MultiRegExpLexer =(function(){
 			this.init( sText, sSyntax )
 			while( this.readToken());
 			return this.end()
+			},
+		searchToken :function( oRE ){
+			if( ! oRE.re.test( this.sText ) || this.previous.invalidFor( oRE.name )) return false;
+			var aFound = oRE.re.exec( this.sText )
+			if( ! aFound[0].length ) return null
+			sToken = oRE.name
+			return sValue = aFound[0]
+			},
+		setSyntax :function( sSyntax ){
+			this.aRules = LexerRules.getRule( this.sSyntax = sSyntax )
+			bNoSkip = Skip.notFor[ sSyntax ]
 			}
 		}
 

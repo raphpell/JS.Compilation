@@ -121,7 +121,7 @@ var AutomatonLexer =(function(){
 		})()
 
 	// Données d'analyse
-	var sToken, oLexeme, bNoSkip, oFound
+	var sToken, sValue, oLexeme, bNoSkip, oFound
 	, sWSTokens ='|WHITE_SPACES|SPACES|SPACE|NEW_LINE|L_NEW_LINE|TAB|'
 	, Actions =(function(){
 		var Actions={
@@ -144,7 +144,7 @@ var AutomatonLexer =(function(){
 			rescanToken :function(){
 				this.nPos = oLexeme.index
 				this.nLine = oLexeme.lineStart
-				var sRule = sToken.slice( 2 )
+				var sRule = sToken.slice(2)
 				, sTextRescan = oLexeme.value
 				, nEnd = this.nPos + sTextRescan.length
 				, sTMP = this.sText
@@ -161,7 +161,7 @@ var AutomatonLexer =(function(){
 				return eParent
 				},
 			startParent :function(){
-				sToken = sToken.slice( 2 )
+				sToken = sToken.slice(2)
 				var eNewParent = Lexeme({
 					token: LexerRules.Translation[sToken]||sToken,
 					css: LexerRules.CSS[sToken]||'',
@@ -182,16 +182,11 @@ var AutomatonLexer =(function(){
 				return bSkip ? true : eNewParent
 				}
 			}
+		var Char={E:'endParent',L:'newLine',R:'rescanToken',S:'startParent'}
 		return function( oInstance ){
-			return Actions[
-				sToken.charAt(1)=='_'
-					? { E:'endParent',
-						L:'newLine',
-						R:'rescanToken',
-						S:'startParent'
-						}[ sToken.charAt(0)] || 'add'
-					: 'add'
-				].call( oInstance )
+			return Actions[ sToken.charAt(1)=='_'
+					? Char[ sToken.charAt(0)] || 'add'
+					: 'add' ].call( oInstance )
 			}
 		})()
 	, Previous =(function(){
@@ -247,13 +242,13 @@ var AutomatonLexer =(function(){
 					}
 				if( n ){
 					that.eParent = a[n-1]
-					that.sSyntax = that.eParent.oValue.rule
+					that.setSyntax( that.eParent.oValue.rule )
 					}
 				return n
 				},
 			push :function( e ){
 				a[n++] = that.eParent = e
-				that.sSyntax = e.oValue.rule
+				that.setSyntax( e.oValue.rule )
 				return e
 				},
 			top :function(){ return a[n-1]},
@@ -299,24 +294,11 @@ var AutomatonLexer =(function(){
 		})
 	// SCANNING
 	Lexer.prototype ={
+		bSkip: 0,
+		appendNode: null,
 		end :function(){
 			return this.eRoot
 			},
-		searchToken :function( sToken, nStart ){
-			var oFA=LexerRules.DFA.have( sToken ), nEnd=nStart, sState=1, oFound=null
-			if( this.previous.invalidFor( sToken )) return false;
-			while( ( sState = nextState( oFA, sState, this.sText.charAt( nEnd++ ))) > 0 ){
-				if( oFA.F[ sState ]){
-					sToken = oFA.TokensTable[ oFA.F[ sState ]]
-					if( this.previous.invalidFor( sToken )) continue;
-					oFound={ start:nStart, end:nEnd, token:sToken }
-					}
-				}
-			return oFound
-			},
-		
-		bSkip: 0,
-		appendNode: null,
 		init :function( sText, sSyntax ){
 			sSyntax = sSyntax || 'TXT'
 			this.union({
@@ -342,13 +324,10 @@ var AutomatonLexer =(function(){
 				}
 			},
 		readToken :function(){
-			var a = LexerRules.haveRule( this.sSyntax ) || [this.sSyntax]
-			bNoSkip = Skip.notFor[ this.sSyntax ]
-			for(var j=0; sToken=a[j]; j++){
-				if( oFound = this.searchToken( sToken, this.nPos )){
-					sToken = oFound.token
+			for(var i=0; this.aRules[i]; i++ ){
+				if( this.searchToken( this.aRules[i])){
 					oLexeme ={
-						value:this.sText.substring(oFound.start,oFound.end),
+						value: sValue,
 						token: LexerRules.Translation[sToken]||sToken,
 						css: LexerRules.CSS[sToken]||'',
 						rule:this.sSyntax,
@@ -357,7 +336,7 @@ var AutomatonLexer =(function(){
 						lineEnd:this.nLine
 						}
 					if( this.haveLexeme( oLexeme )) return false
-					this.nPos = oFound.end
+					this.nPos += sValue.length
 					return Actions(this)
 					}
 				}
@@ -367,6 +346,24 @@ var AutomatonLexer =(function(){
 			this.init( sText, sSyntax )
 			while( this.readToken());
 			return this.end()
+			},
+		searchToken :function( sDFA ){
+			var oFA=LexerRules.DFA.have( sDFA ), nEnd=this.nPos, sState=1, oFound=null
+			if( this.previous.invalidFor( sDFA )) return false;
+			while( ( sState = nextState( oFA, sState, this.sText.charAt( nEnd++ ))) > 0 ){
+				if( oFA.F[ sState ]){
+					sDFA = oFA.TokensTable[ oFA.F[ sState ]]
+					if( this.previous.invalidFor( sDFA )) continue;
+					oFound={ end:nEnd, token:sDFA }
+					}
+				}
+			if( ! oFound ) return null
+			sToken = oFound.token
+			return sValue = this.sText.substring(this.nPos,oFound.end)
+			},
+		setSyntax :function( sSyntax ){
+			this.aRules = LexerRules.haveRule( this.sSyntax = sSyntax ) || [sSyntax]
+			bNoSkip = Skip.notFor[ sSyntax ]
 			}
 		}
 	// INCREMENTAL SCANNING only
