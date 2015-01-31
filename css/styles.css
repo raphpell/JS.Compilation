@@ -44,8 +44,6 @@ TEXTAREA {
 	transition: 1s ease;
 	}
 	.myNode:hover>.myNode {
-		background: #FFF;
-		color:#000;
 		}
 
 /* AUTOMATES */
@@ -207,7 +205,7 @@ TABLE.Table {
 		}
 	.css .punctuator,
 	.js .elision ,
-	.js .punctuator 	{ background: lime; 	color: #000; }
+	.js .punctuator 	{ background: darkgreen; 	color: #FFF; }
 	.keyword		{ background: blue; 	color: #FFF; }
 	.special		{ background: blue; 	color: #FFF; }
 	.function		{ background: green; 	color: #FFF; }
