@@ -48,10 +48,10 @@
 .js .comment				{ color: #AAA; }
 .js .futureReservedWord	{ color: #C03; }
 .js .identifier			{ color: #000; }
-.js .keyword 			{ color: #006; }
+.js .keyword 			{ color: #01a; }
 .js .literal 			{ color: #069; }
 .js .punctuator ,
-.js .operator			{ color: #003; }
+.js .operator			{ color: #3a0; }
 .js .number				{ color: #F00; }
 .js .regexp 				{ color: #906; }
 .js .string				{ color: #660; }

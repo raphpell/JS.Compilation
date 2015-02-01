@@ -1477,9 +1477,7 @@ DFAToJS =function( oDFA, bWhiteSpace, bUnCompressed ){
 				}
 			}
 		})()
-	
-	
-	
+
 	TableSymbols.generateFrom( oDFA )
 	Matrice.generateFrom( oDFA.T, TableSymbols )
 	var aF = TokensTable.getFinalStatesTable( oDFA.aTokensID )

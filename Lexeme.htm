@@ -1,95 +1,115 @@
 ﻿<html>
 	<head>
-		<title>Structure de donnée: Lexeme</title>
+		<title>Lexèmes</title>
 		<style>
 CODE, PRE {
-	background: #EEE;
-	border: 1px solid #666;
+	background: #FFE;
+	border: 1px solid #DDD;
+	box-shadow: 0 0 .5em #ccc;
 	color: #000;
 	font-weight: bold;
-	padding: 0.2em .5em;
+	padding: 0 .5em;
+	}
+PRE {
+	font-size: 1.2em;
+	padding: 1em;
+	}
+SECTION {
+	margin: .5em;
 	}
 		</style>
 	</head>
 <body>
 
 <a href="index.htm">Index</a>
-<h1>Structure de donnée: <code>Lexeme</code></h1>
+<h1>Lexèmes</h1>
 
 <p>
-	Les unités lexicales et syntaxiques sont créées grâce à la fonction globale nommée <code>Lexeme</code>.<br>
-	Elle retourne un objet pouvant former une structure arborescente: cet objet peut-être un élément HTML.
+	La structure des unités lexicales et syntaxiques est créée grâce à une fonction utilisateur globale <code>function Lexeme(o){}</code>.<br>
 </p>
 
 <p><cite>
-	Leur création influe la performance des lexers et parser car elle prend du temps ! <br>
-	Plus l'objet est gros, plus le temps mis pour les créer est long.
+	La création des lexèmes <a href="Lexeme.comparaison.htm">prend du temps</a> ! 
+	Plus le temps mis pour le créer est long, plus l'analyse est longue.
 </cite></p>
 
-<h2>Syntaxe</h2>
-<pre>var oLexeme = Lexeme ( oScanResult )</pre>
-
-<h2>Argument</h2>
-<p>
-	Elle prend en argument un objet <code>oScanResult</code>, issu de l'analyse lexicale.<br>
-	Cet objet est affecté à l'attribut <code>oValue</code> de la valeur retournée.
-</p>
-
-<h2>Valeur retournée</h2>
-<p>
-	Elle retourne un objet affecté avec l'attribut <code>oValue</code> : <code>oLexeme.oValue===oScanResult</code>.<br>
-	Cet objet est au choix :
-</p>
-<ul>
-	<li><b>Un élément HTML</b>
+<section><h2>Syntaxe</h2>
+	<pre>var oNode = Lexeme ( oLexeme )</pre>
+</section>
+<section><h2>Argument</h2>
+	<p>
+		Elle prend en argument l'objet <code>oLexeme</code> issu d'une analyse.<br>
+	</p>
+</section>
+<section><h2>Valeur retournée</h2>
+	<p>
+		Elle retourne un objet devant pouvoir former une structure arborescente.<br>
+		L'attribut <code>oValue</code> de l'objet retourné est affecté avec la valeur <code>oLexeme</code>: <code>oNode.oValue === oLexeme</code>.
+	</p>
+	<p>L'objet retourné est au choix :</p>
+	<ul>
+		<li><b>Un HTMLElement</b>
+			<ul>
+				<li style="color:green;">Permet d'afficher facilement le résultat de l'analyse.</li>
+				<li style="color:green;">Pas de fichier supplémentaire à charger.</li>
+				<li>Pour l'instant mon éditeur de texte est plus rapide avec !</li>
+			</ul><br></li>
+		<li><b>Un objet JavaScript implémentant l'interface des HTMLElement</b>
+			<ul>
+				<li style="color:red;">Pas forcement plus performant: création plus rapide, méthodes plus lentes... .</li>
+			</ul></li>
+	</ul>
+	<section><h3>Implémentation requise de l'interface</h3>
 		<ul>
-			<li style="color:green;">Permet d'afficher facilement le résultat de l'analyse.</li>
-			<li style="color:green;">Pas de fichier supplémentaire à charger.</li>
-			<li>Pour l'instant mon éditeur de texte est plus rapide avec !</li>
-		</ul><br></li>
-	
-	<li><b>Un objet JavaScript implémentant l'interface des éléments HTML</b>
-		<ul>
-			<li style="color:red;">Pas forcement plus performant: création plus rapide, méthodes plus lentes... .</li>
-		</ul></li>
-</ul>
-<p>
-	Ces observations sont issues de la mesure de <a href="Lexeme.comparaison.htm">leur performances</a>.
-</p>
-
-<h2>Implémentation requise de l'interface HTMLNode</h2>
-<ul>
-	<li>appendChild(...)</li>
-	<li>hasChildNodes(...)</li>
-	<li>insertBefore(...)</li>
-	<li>removeChild(...)</li>
-	<li>firstChild</li>
-	<li>lastChild</li>
-	<li>nextSibling</li>
-	<li>parentNode</li>
-	<li>previousSibling</li>
-</ul>
-
-
-<h2>Exemple de création de la fonction</h2>
+			<li>appendChild ( eNode )</li>
+			<li>hasChildNodes ()</li>
+			<li>insertBefore ( eNode, eNextSibling )</li>
+			<li>removeChild ( eChild )</li>
+			<li>firstChild</li>
+			<li>lastChild</li>
+			<li>nextSibling</li>
+			<li>parentNode</li>
+			<li>previousSibling</li>
+			<li>... voir getElementsByTagName ( sTagName )</li>
+		</ul>
+	</section>
+</section>
+<section><h2>Exemple de fonction</h2>
 <pre>
-// Node est un objet utilisateur implémentant l'interface des éléments HTML
-
-var createLexemeFunction =function( sType ){
-	var s ={
-		HTMLElement: 'document.createElement(o.token)',
-		ObjectNode: 'new Node(o.token)'
-		}[ sType ] || '{}'
-	return new Function ( 'o', 'var m = '+ s +'; m.oValue=o; return m;' )
+var Lexeme = function ( oResult ){
+	var m = document.createElement( o.token )
+	m.oValue = o
+	m.className = o.css
+	m.title = o.token
+	if( o.value ) m.innerHTML = o.value
+	return m
 	}
-
-var Lexeme = createLexemeFunction( 'HTMLElement' )
 </pre>
+</section>
 
 <script src="js/framework.js"></script>
 <script src="js/lexer.automaton.js"></script>
 <script src="js/lexer.automaton.modules.js"></script>
+<link rel="stylesheet" type="text/css" href="css/syntaxes.css">
 <script>
+function colorize ( e ){
+	var sText = e.innerHTML
+	e.innerHTML = ''
+	e.appendChild( AutomatonLexer( sText, 'JS' ))
+	}
+var Lexeme =function( o ){
+	var m = document.createElement( o.token )
+	m.oValue = o
+	m.className = o.css
+	m.title = o.token
+	if( o.value ) m.innerHTML = o.value
+	return m
+	}
+	
+var aPRE = document.getElementsByTagName('PRE')
+for(var i=0, ni=aPRE.length; i<ni; i++ ) colorize( aPRE.item(i))
+var aCODE = document.getElementsByTagName('CODE')
+for(var i=0, ni=aCODE.length; i<ni; i++ ) colorize( aCODE.item(i))
 
 </script>
 
