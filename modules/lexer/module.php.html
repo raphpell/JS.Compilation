@@ -4,9 +4,13 @@
 !#	PHP			=	S_PHP|BIG_PHP|PHP_ID|NOT_WHITE_SPACES
 		(css:php)
 
-!@	BIG_PHP		=	E_PHP|NUMBER|{whitespaces}|{operators}|{comments}|{strings}|{punctuators}
+!@	BIG_PHP		=	E_PHP|NUMBER|{whitespaces}|{comments}|{operators}|{strings}|{punctuators}
+// Attention {comments} avant {operators} : ordre important pour le MultiRegExp Lexer
 		whitespaces		=	L_NEW_LINE|TAB|SPACES
-		operators		=	ARITHMETIC_OPERATOR|ASSIGNMENT_OPERATOR|BITWISE_OPERATOR|COMPARISON_OPERATOR|ERROR_CONTROL_OPERATOR|LOGICAL_OPERATOR|STRING_OPERATOR|TYPE_OPERATOR
+		operators		=	PHP_COMPARISON_OP|PHP_ASSIGNMENT_OP|PHP_ARITHMETIC_OP|PHP_LOGICAL_OP|PHP_BITWISE_OP|PHP_ERROR_CONTROL_OP|PHP_STRING_OP|PHP_TYPE_OP
+		// Important: pour le MultiRegExp Lexer
+		// ASSIGNMENT|ARITHMETIC, COMPARISON|ASSIGNMENT, LOGICAL|BITWISE, ...
+		// mais il va planté quand même
 		comments		=	S_SLC|S_MLC
 		strings			=	S_SSQ|S_SDQ
 		punctuators		=	ELISION|LBRACE|RBRACE|LPAREN|RPAREN|LBRACK|RBRACK|DOT|SEMI|QUESTION|COLON
@@ -18,6 +22,7 @@
 			(css:tag)
 			
 // IDENTIFIERS		
+// Attention: pour le MultiRegExp Lexer les listes de mots clés doivent être inclus entre "(?:" et ")\b"
 	PHP_FUNCTION		=	[\_a-zA-Z][\w_]*
 			(css:function)
 	PHP_IDENTIFIER		=	\$[\w_]+
@@ -32,21 +37,21 @@
 			(css:keyword)
 
 // OPERATORS
-	ARITHMETIC_OPERATOR		=	\+|\-|\*|\%|\/|\+\+|\-\-
+	PHP_ARITHMETIC_OP		=	\+\+?|\-\-?|\*|\%|\/
 			(css:operator)
-	ASSIGNMENT_OPERATOR		=	=|\+=|\-=|\*=|\/=|\.=|\%=|\&=|\|=|\^=|<<=|>>=|=>
+	PHP_ASSIGNMENT_OP		=	\+=|\-=|\*=|\/=|\.=|\%=|\&=|\|=|\^=|<<=|>>=|=>?
 			(css:operator)
-	BITWISE_OPERATOR		=	&|\||\^|\~|<<|>>
+	PHP_BITWISE_OP		=	&|\||\^|\~|<<|>>
 			(css:operator)
-	COMPARISON_OPERATOR		=	==|===|!=|<>|!==|<|>|<=|>=
+	PHP_COMPARISON_OP		=	===?|<>|!==?|<=?|>=?
 			(css:operator)
-	ERROR_CONTROL_OPERATOR	=	@
+	PHP_ERROR_CONTROL_OP	=	@
 			(css:operator)
-	LOGICAL_OPERATOR		=	and|or|xor|!|&&|\|\|
+	PHP_LOGICAL_OP		=	and|or|xor|!|&&|\|\|
 			(css:operator)
-	STRING_OPERATOR			=	\.
+	PHP_STRING_OP			=	\.
 			(css:operator)
-	TYPE_OPERATOR			=	\(int\)|\(float\)|\(string\)|\(array\)|\(object\)|\(bool\)
+	PHP_TYPE_OP			=	\(int\)|\(float\)|\(string\)|\(array\)|\(object\)|\(bool\)
 			(css:operator)
 
 // PUNCTUATORS

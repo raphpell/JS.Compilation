@@ -101,7 +101,8 @@ var AutomatonLexer =(function(){
 					if( oToken ) a.push( oToken )
 					else {
 						var aRule = Rules.list[ID]
-						a = Array.merge( a, aRule )
+						if( ! aRule ) throw Error ('Rule "'+ ID +'" Not Found !' )
+						a = a.concat( aRule )
 						}
 					}
 				return Rules.add( sName, a )

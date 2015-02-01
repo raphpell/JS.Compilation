@@ -633,7 +633,7 @@ NFAValidate =function( oNFA ){
 			return Item[symbol]={ type:'ANY_CHARACTER', symbol:symbol, toString:toString }
 		if( symbol.charAt(0)=='[' && symbol.charAt(symbol.length-1)==']' ){
 			var sValue = symbol.replace( /^\[\^?((?:a|[^a])+)\]$/gim, '$1' )
-			var bNegated = symbol.substr(0,2)=='[^'
+			var bNegated = symbol.substr(0,2)=='[^' && symbol.length>3
 			return Item[symbol]={
 				type: 'CHAR_CLASS',
 				symbol: (bNegated?'[^':'[')+ sValue+']',
@@ -647,7 +647,8 @@ NFAValidate =function( oNFA ){
 		}
 	var ItemWrapper =function( sIn ){
 		if( sIn.length==0 ) return null
-		var bAtom = /^(?:\\c[a-zA-Z]|\\x[0-9a-fA-F]{2}|\\u[0-9a-fA-F]{4}|.)$/g.test( sIn )
+		var bAtom = /^(?:\\c[a-zA-Z]|\\x[0-9a-fA-F]{2}|\\u[0-9a-fA-F]{4}|.|\^)$/g.test( sIn )
+		if( sIn.charAt(0)=='^' ) sIn = sIn.slice(1) + sIn.charAt(0) // Evite la création d'une classe négative par accident
 		if( bAtom && Transitions.getSymbol('['+ sIn +']')) return Item( '['+ sIn +']' )
 		return bAtom
 			? Item( sIn )

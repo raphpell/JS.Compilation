@@ -88,6 +88,9 @@ TH {
 </fieldset>
 <fieldset><legend>Source</legend>
 	<dl>
+		<dt><label for="eSyntax">Syntaxe : </label>
+			<select id="eSyntax"></select>
+		</dt>
 		<dt><textarea id="eText">
 /* 1 - JavaScript syntax */ aaa */
 	variable n = nInt1/4 + 4/nInt1++ || 10 
@@ -241,7 +244,7 @@ View ={
 		eStats.innerHTML = ''
 		},
 	init :function(){
-		oLexer.init( eText.value, 'JS' )
+		oLexer.init( eText.value, eSyntax.value )
 		oLexer.skip.set( eBSkip.checked )
 		eResult.innerHTML= ''
 		if( eShowResult.checked && eLexeme.value=='HTMLElement' ) eResult.appendChild( oLexer.eRoot )
@@ -320,6 +323,10 @@ _( 'eLexer' )
 _( 'eText,eResult,eBSkip,eShowResult,eStats,eShowStats' )
 _( 'eBtnReadToken,eBtnInit' )
 _( 'eTokenInfo,eIndex,eLine,eRule' )
+_( 'eSyntax' )
+var aRules = 'CSS|HTML|INI|JS|PHP|TXT'.split('|')
+Tag.addChildNodes( eSyntax, 'OPTION', aRules, 'JS' )
+
 Events.add(
 	'click',
 		eBtnInit, View.init,
@@ -328,7 +335,13 @@ Events.add(
 	'change',
 		eBSkip, View.reset,
 		eLexer ,View.reset,
-		eLexeme ,View.reset
+		eLexeme ,View.reset,
+		eSyntax, function(){
+			LoadFile( 'modules/preview/'+ eSyntax.value +".htm", function( s ){
+				eText.value = s
+				View.reset()
+				})
+			}
 	)
 eLexeme.onchange()
 eLexer.onchange()

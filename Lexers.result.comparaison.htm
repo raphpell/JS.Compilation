@@ -74,8 +74,12 @@
 <h2>JavaScript + PHP</h2>
 <h3>MULTI LEVEL LEXER</h3>
 <div class="w100">
-	<label for="eText">Source</label>
-	<textarea id="eText">
+	<dl>
+		<dt><label for="eSyntax">Syntaxe : </label>
+			<select id="eSyntax"></select>
+		</dt>
+		<dt><label for="eText">Source</label>
+<textarea id="eText">
 /* 1 - JavaScript syntax */ aaa */
 	variable n = nInt1/4 + 4/nInt1++ || 10 
 	var oEditor = new EditorSample ( eContent ,{
@@ -113,9 +117,12 @@
 	*/
 	$hiddencontent = phpSafe( $_POST[ 'content' ]);
 	?>
-	</textarea>
+</textarea>
+		</dt>
+	</dl>
+	
 	<hr>
-	<label>Benchmark sur <input type="number" id="eRepeatTest2" min="1" max="10" value="3" size="2"> exécution(s).</label><br>
+	<label>Benchmark sur <input type="number" id="eRepeatTest2" min="1" max="10" value="1" size="2"> exécution(s).</label><br>
 	<input type="button" value="Répéter automatiquement" onclick="this.value=this.value=='Arrêter'?'Lancer':'Arrêter'; benchmark2()">
 </div>
 <div class="w50"><h4>RegExp Lexer</h4>
@@ -128,12 +135,6 @@
 	<pre id="eChrono4" class="tokens">...</pre>
 	<pre id="eRegExpResult4" class="tokens"></pre>
 </div>
-<!-- 
-<div class="w100">
-	<input type="button" value="AST" onclick="getAST2()" style="width:100%;">
-	<pre id="eAST2">...</pre>
-</div>
- -->
 
 <!-- FRAMEWORK... -->
 <script src="js/framework.js"></script>
@@ -153,6 +154,7 @@ var TokensBridge ={
 	'SDQ':'STRING'
 	}
 var TokensLabel ={
+	'INI_COMMENT':'',
 	'JS':'',
 	'REGULAR_EXPRESSION':'',
 	'SimpleRegExp':'',
@@ -171,37 +173,12 @@ var TokensLabel ={
 	'SSQ':'',
 	'SSQ_IN':'\u2026',
 	'BACKSLASH':'\\',
-	'ARITHMETIC_OPERATOR': -1, // '\u24C4p',
-	'ASSIGNMENT_OPERATOR': -1,
-	'BOOLEAN_OPERATOR': -1,
-	'COMPARISON_OPERATOR': -1,
-	'EQUALITY_OPERATOR': -1,
-	'LOGICAL_OPERATOR': -1,
-	'RELATIONAL_OPERATOR': -1,
-	'UNARY_OPERATOR': -1,
 	'NEW_LINE':'\u2424',
 	'WHITE_SPACES':'\u2423',
 	'TAB':'\u2423',
 	'SPACES':'\u2420',
 	'NUMBER':'\u24C3',
-	'JS_LITERAL':"\u24C1",
-	'JS_IDENTIFIER':"\u24BE",
-	'JS_KEYWORD':"\u24C0",
 	'REGULAR_EXPRESSION_IN':"\u24C7",
-	'S_PHP':-1,
-	'E_PHP':-1,
-	'PHP_FUNCTION':"\u24BB",
-	'PHP_LITERAL':-1,
-	'PHP_RESERVED':"\u24C0",
-	'PHP_SPECIAL_VARS':"\u24C0",
-	'PHP_IDENTIFIER':"\u24BE",
-	'CSS_COMMENT':"comment",
-	'CSS_S':"w",
-	'CSS_IDENT':"ID",
-	'CSS_NUMBER':"Number",
-	'CSS_HASH':"#ID",
-	'CSS_ATKEYWORD':"@ID",
-	'CSS_DELIM':-1,
 	'NOT_WHITE_SPACES':'\u2620',
 	'UNDEFINED':'\u262F',
 	'DOUBLE_QUOTE':'"',
@@ -214,13 +191,92 @@ var TokensLabel ={
 	'LBRACE':'{',
 	'RBRACE':'}',
 	'ELISION':',',
+	'QUESTION':'?',
 	'DOT':'.',
 	'SEMI':';',
-	'COLON':':'
+	'COLON':':',
+// PHP
+	'S_PHP':-1,
+	'E_PHP':-1,
+	'PHP_FUNCTION':"\u24BB",
+	'PHP_LITERAL':-1,
+	'PHP_KEYWORD':"\u24C0",
+	'PHP_RESERVED':"\u24C0",
+	'PHP_SPECIAL_VARS':"\u24C0",
+	'PHP_IDENTIFIER':"\u24BE",
+	'PHP_ARITHMETIC_OP': -1, // '\u24C4p',
+	'PHP_ASSIGNMENT_OP': -1,
+	'PHP_BITWISE_OP': -1,
+	'PHP_COMPARISON_OP': -1,
+	'PHP_ERROR_CONTROL_OP': -1,
+	'PHP_LOGICAL_OP': -1,
+	'PHP_STRING_OP': -1,
+	'PHP_TYPE_OP': -1,
+	
+// JS
+	'JS_LITERAL':"\u24C1",
+	'JS_IDENTIFIER':"\u24BE",
+	'JS_KEYWORD':"\u24C0",
+	'JS_ARITHMETIC_OP': -1,
+	'JS_ASSIGNMENT_OP': -1,
+	'JS_COMPARISON_OP': -1,
+	'JS_LOGICAL_OP': -1,
+	'JS_UNARY_OP': -1,
+	
+// TXT
+	TXT:'',
+	
+// INI
+	INI:'',
+	INI_VAR:'\u24BE',
+	INI_KEYWORD:'\u24C0',
+	INI_SECTION:'', S_INI_SECTION:'[', E_INI_SECTION:']', SECTION_PART:'s',
+	S_INI_COMMENT:';',
+	INI_COMMENT_IN:'c',
+	INI_SSQ:'', S_INI_SSQ:'\'', E_INI_SSQ:'\'', INI_SSQ_IN:'\u2026',
+	INI_SDQ:'', S_INI_SDQ:'"', E_INI_SDQ:'"', INI_SDQ_IN:'\u2026',
+	VALUES:'', INI_VALUE_IN:'v',
+	OPERATOR:'=',
+	
+// CSS
+	CSS:'',
+	CSS_NUMBER:"\u24C3",
+	DIMENSIONS:"\u24B9",
+	PROP_VALUE:'',
+	RULE_SET:'',
+	ATTRIBUTE_SELECTOR:'',
+	PSEUDO:'', S_PSEUDO:':',
+	FUNCTION:'',S_FUNCTION:'F(',E_FUNCTION:')',
+	IDENT:"\u24BE", HASH:-1, CLASS:-1,
+	URL: '', S_URL: -1, E_URL: -1,
+	ATKEYWORD: -1,
+	COMBINATOR: -1,
+	ATTRIBUTE_OPERATOR: -1,
+	IMPORTANT:'', S_IMPORTANT:-1, E_IMPORTANT:-1,
+	
+// CSS
+	HTML:'',
+	DOCTYPE:'', S_DOCTYPE:'<!DOCTYPE', E_DOCTYPE:'>', DOCTYPE_IN:'\u24E5',
+	TAG:'', S_TAG:'<', E_TAG:'>',
+		ELT:'', S_ELT:-1,
+		TAG_ATTR:-1, TAG_ATTR_VALUE:'',
+	END_TAG:'', S_END_TAG:'</', E_END_TAG:'>',
+		END_ELT:-1,
+	HTML_COMMENT:'', S_HTML_COMMENT:'<!--', HTML_COMMENT_IN:'\u2026', E_HTML_COMMENT:"-->",
+	HTML_TEXT:'\u2026',
+	HTML_STYLE:'', S_HTML_STYLE:-1,
+		HTMLStyle:'', S_HTMLStyle:-1,
+		END_HTML_STYLE:-1,
+	HTML_SCRIPT:'', S_HTML_SCRIPT:-1,
+		HTMLScript:'', S_HTMLScript:-1,
+		END_HTML_SCRIPT:-1,
+	HTML_SDQ:'', S_HTML_SDQ:'"', E_HTML_SDQ:'"', HTML_SDQ_IN:'\u2026',
+	HTML_SSQ:'', S_HTML_SSQ:"'", E_HTML_SSQ:"'", HTML_SSQ_IN:'\u2026',
+	EQUAL:'='
 	}
 
 var valueToString =function(o){ // token,css,
-	return JSON.stringify( o, 'rule,index,lineStart,lineEnd,bParent,bParentLimit,bRescan'.split(','), " " ).str_replace('"', '')
+	return JSON.stringify( o, 'rule,index,lineStart,lineEnd,bParent,bParentLimit,bRescan,css'.split(','), " " ).str_replace('"', '')
 	}
 var setTitle =function(){
 	var o = this.oValue
@@ -364,9 +420,9 @@ var getTokens3 =function(){
 	var ni = eRepeatTest2.value
 	var oLexer = oRELexers[ eRegExpLexer.value ]
 	eRegExpResult3.innerHTML = ''
-	eRegExpResult3.appendChild( oLexer( eText.value, 'JS' ))
+	eRegExpResult3.appendChild( oLexer( eText.value, eSyntax.value ))
 	var oChrono = new Chrono
-	for(var i=0; i<ni; i++ ) oLexer( eText.value, 'JS' )
+	for(var i=0; i<ni; i++ ) oLexer( eText.value, eSyntax.value )
 	Stats.set( 3, oChrono.stop()/ni )
 	eChrono3.innerHTML = Stats.compare( 3, 4 )
 	eChrono4.innerHTML = Stats.compare( 4, 3 )
@@ -374,9 +430,9 @@ var getTokens3 =function(){
 var getTokens4 =function(){
 	var ni = eRepeatTest2.value
 	eRegExpResult4.innerHTML = ''
-	eRegExpResult4.appendChild( AutomatonLexer( eText.value, 'JS' ))
+	eRegExpResult4.appendChild( AutomatonLexer( eText.value, eSyntax.value ))
 	var oChrono = new Chrono
-	for(var i=0; i<ni; i++ ) AutomatonLexer( eText.value, 'JS' )
+	for(var i=0; i<ni; i++ ) AutomatonLexer( eText.value, eSyntax.value )
 	Stats.set( 4, oChrono.stop()/ni )
 	eChrono3.innerHTML = Stats.compare( 3, 4 )
 	eChrono4.innerHTML = Stats.compare( 4, 3 )
@@ -753,7 +809,22 @@ function compareResult( e1, e2 ){
 	}
 </script>
 
+
+<!-- DHTML -->
 <script>
+_( 'eSyntax' )
+var aRules = 'CSS|HTML|INI|JS|PHP|TXT'.split('|')
+Tag.addChildNodes( eSyntax, 'OPTION', aRules, 'JS' )
+Events.add(
+	'change',
+		eSyntax, function(){
+			LoadFile( 'modules/preview/'+ eSyntax.value +".htm", function( s ){
+				eText.value = s
+				benchmark2.fRepeated()
+				})
+			}
+	)
+
 benchmark1.fRepeated()
 benchmark2.fRepeated()
 </script>

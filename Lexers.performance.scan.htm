@@ -6,7 +6,7 @@
 	<link rel="stylesheet" type="text/css" href="css/syntaxes.css">
 	<style>
 .chrono { white-space: normal; }
-.test { float:left; margin:1em 0; position:relative; text-align: center; width:24%; z-index:2; }
+.test { float:left; margin:1em 0; position:relative; text-align: center; width:33%; z-index:2; }
 .test H2 { margin:0.5em 0 0; }
 .test .result { background:#FFF; border: 1px solid #CCC; margin:2px; padding:5px; overflow:auto; position:relative; text-align: left; }
 .test:hover {
@@ -18,9 +18,9 @@
 	}
 .test:hover .result {
 	border: 3px solid lightskyblue;
-	left:-75%;
+	left:-80%;
 	margin: -2px;
-	width:175%;
+	width:180%;
 	-moz-box-shadow: 0 0 10px #888;
 	-webkit-box-shadow: 0 0 10px #888;
 	box-shadow: 0 0 10px #888;
@@ -41,7 +41,11 @@ FIELDSET DL {
 <h1>Performance: scan</h1>
 
 <fieldset><legend>Source</legend>
-<textarea id="eText">
+	<dl>
+		<dt><label for="eSyntax">Syntaxe : </label>
+			<select id="eSyntax"></select>
+		</dt>
+		<dt><textarea id="eText">
 /* 1 - JavaScript syntax */ aaa */
 	variable n = nInt1/4 + 4/nInt1++ || 10 
 	var oEditor = new EditorSample ( eContent ,{
@@ -79,7 +83,8 @@ FIELDSET DL {
 	*/
 	$hiddencontent = phpSafe( $_POST[ 'content' ]);
 	?>
-</textarea>
+	</textarea></dt>
+	</dl>
 </fieldset>
 <fieldset><legend>Affichage</legend>
 	<dl>
@@ -120,12 +125,6 @@ FIELDSET DL {
 	<pre id="eTime1" class="chrono">...</pre>
 	<pre id="eResult1" class="result"></pre>
 </div>
-<div id="eTest2" class="test"><h2>&ldquo;1 RegExp&rdquo;</h2>
-	<input type="checkbox" id="eEnabled2"><label for="eEnabled2">Actif.</label>
-	<pre id="eChrono2" class="chrono">...</pre>
-	<pre id="eTime2" class="chrono">...</pre>
-	<pre id="eResult2" class="result"></pre>
-</div>
 <div id="eTest3" class="test"><h2>Multiple RegExp</h2>
 	<input type="checkbox" id="eEnabled3" checked><label for="eEnabled3">Actif.</label>
 	<pre id="eChrono3" class="chrono">...</pre>
@@ -139,7 +138,11 @@ FIELDSET DL {
 	<pre id="eResult4" class="result"></pre>
 </div>
 
+<!-- FRAMEWORK... -->
+<script src="js/framework.js"></script>
 <script src="js/shared.js"></script>
+<script src="widget/Stats/scripts.js"></script>
+
 <!-- PARCOURS CARACTÈRE / CARACTERE -->
 <script>
 var test_1 =function(){
@@ -253,7 +256,6 @@ var getContents =function( eRoot ){
 </script>
 
 <!-- LEXERS -->
-<script src="js/lexer.regexp.one.js"></script>
 <script src="js/lexer.regexp.multi.js"></script>
 <script src="js/lexer.regexp.multi.modules.js"></script>
 <script src="js/lexer.automaton.js"></script>
@@ -267,7 +269,7 @@ var testLexer =function( Lexer, nId ){
 		eResult.innerHTML = ''
 		if( eEnabled.checked ){
 			var oChrono = new Chrono ()
-			var eRoot = Lexer( eText.value, 'JS' )
+			var eRoot = Lexer( eText.value, eSyntax.value )
 			Stats.set( nId, oChrono.stop())
 			if( eShowResults.checked ){
 				switch( nDisplayMode ){
@@ -286,7 +288,6 @@ var testLexer =function( Lexer, nId ){
 		eResult.style.display = eEnabled.checked ? '' : 'none'
 		}
 	}
-, test_2 = testLexer( OneRegExpLexer, 2 )
 , test_3 = testLexer( MultiRegExpLexer, 3 )
 , test_4 = testLexer( AutomatonLexer, 4 )
 </script>
@@ -296,18 +297,20 @@ var testLexer =function( Lexer, nId ){
 var nDisplayMode
 </script>
 
-<!-- STATS -->
-<script src="widget/Stats/scripts.js"></script>
+<!-- DHTML -->
 <script>
 _( 'eBtnScan' )
 _( 'eText,eOnKeyUp,eShowResults' )
-_( 'eResult1,eResult2,eResult3,eResult4' )
-_( 'eTest1,eTest2,eTest3,eTest4' )
-_( 'eTime1,eTime2,eTime3,eTime4' )
-_( 'eEnabled1,eEnabled2,eEnabled3,eEnabled4' )
-_( 'eChrono1,eChrono2,eChrono3,eChrono4' )
+_( 'eResult1,eResult3,eResult4' )
+_( 'eTest1,eTest3,eTest4' )
+_( 'eTime1,eTime3,eTime4' )
+_( 'eEnabled1,eEnabled3,eEnabled4' )
+_( 'eChrono1,eChrono3,eChrono4' )
 _( 'eTestCase1,eTestCase2,eTestCase3' )
 _( 'eLexeme,eClassName,eTitle,eInnerHTML,eByLine' )
+_( 'eSyntax' )
+var aRules = 'CSS|HTML|INI|JS|PHP|TXT'.split('|')
+Tag.addChildNodes( eSyntax, 'OPTION', aRules, 'JS' )
 
 var initStats =function(){
 	Stats.init( 2 )
@@ -315,11 +318,10 @@ var initStats =function(){
 	Stats.init( 4 )
 	}
 var fTest =function(){
-	test_1(); test_2(); test_3(); test_4()
+	test_1(); test_3(); test_4()
 	eChrono1.innerHTML = eEnabled1.checked ? Stats.compare( 1 ) : '...'
-	eChrono2.innerHTML = eEnabled2.checked ? Stats.compare( 2, eEnabled3.checked?3:0, eEnabled4.checked?4:0 ) : '...'
-	eChrono3.innerHTML = eEnabled3.checked ? Stats.compare( 3, eEnabled4.checked?4:0, eEnabled2.checked?2:0 ) : '...'
-	eChrono4.innerHTML = eEnabled4.checked ? Stats.compare( 4, eEnabled2.checked?2:0 ,eEnabled3.checked?3:0 ) : '...'
+	eChrono3.innerHTML = eEnabled3.checked ? Stats.compare( 3, eEnabled4.checked?4:0 ) : '...'
+	eChrono4.innerHTML = eEnabled4.checked ? Stats.compare( 4 ,eEnabled3.checked?3:0 ) : '...'
 	eBtnScan.focus()
 	}
 var test =benchmark( fTest, 1000 )
@@ -333,6 +335,13 @@ Events.add(
 			createLexeme( eClassName.checked,eTitle.checked,eInnerHTML.checked,eByLine.checked );
 			eBtnScan.focus()
 			eBtnScan.click()
+			},
+		eSyntax, function(){
+			LoadFile( 'modules/preview/'+ eSyntax.value +".htm", function( s ){
+				eText.value = s
+				initStats()
+				fTest()
+				})
 			},
 	'click',
 		eShowResults, function(){
@@ -376,14 +385,11 @@ Events.add(
 		eTest1, function(){ if( eEnabled1.checked ){
 			test_1(); eChrono1.innerHTML = Stats.compare( 1 )
 			}},
-		eTest2, function(){ if( eEnabled2.checked ){
-			test_2(); eChrono2.innerHTML = Stats.compare( 2, eEnabled3.checked?3:0, eEnabled4.checked?4:0 )
-			}},
 		eTest3, function(){ if( eEnabled3.checked ){
-			test_3(); eChrono3.innerHTML = Stats.compare( 3, eEnabled4.checked?4:0, eEnabled2.checked?2:0 )
+			test_3(); eChrono3.innerHTML = Stats.compare( 3, eEnabled4.checked?4:0 )
 			}},
 		eTest4, function(){ if( eEnabled4.checked ){
-			test_4(); eChrono4.innerHTML = Stats.compare( 4, eEnabled2.checked?2:0 ,eEnabled3.checked?3:0 )
+			test_4(); eChrono4.innerHTML = Stats.compare( 4, eEnabled3.checked?3:0 )
 			}},
 	'keyup', eText, function(){ if( eOnKeyUp.checked ) fTest()}
 	)

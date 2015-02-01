@@ -28,7 +28,8 @@
 	E_RULE_SET	=	\}
 		(css:punctuator, translation:RBRACE)
 
-!@#	PROP_VALUE		=	{superscript}|{hspaces}|{comment}|{strings}|NUMBER|ELISION|DIMENSIONS|IDENT|E_PROP_VALUE|S_URL|S_FUNCTION|HASH|S_IMPORTANT|CSS_PHP_BUG
+	// Attention, ordre requis DIMENSIONS|CSS_NUMBER, S_URL|IDENT
+!@#	PROP_VALUE		=	{superscript}|{hspaces}|{comment}|{strings}|DIMENSIONS|CSS_NUMBER|ELISION|S_URL|IDENT|E_PROP_VALUE|S_FUNCTION|HASH|S_IMPORTANT|CSS_PHP_BUG
 		(css:value)
 	S_PROP_VALUE	=	:
 		(css:punctuator, translation:COLON)
@@ -65,7 +66,7 @@
 	S_IMPORTANT	=	!
 	E_IMPORTANT	=	important
 
-	NUMBER 		=	{num}
+	CSS_NUMBER 		=	{num}
 		(css:number)
 	DIMENSIONS 	=	{dimension}(/{dimension})*
 		(css:dimension)

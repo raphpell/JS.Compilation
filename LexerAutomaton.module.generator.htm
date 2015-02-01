@@ -90,7 +90,7 @@
 <hr>
 
 <label for="eExport">Résultat: </label>
-<textarea id="eExport" spellcheck="false"></textarea>
+<textarea id="eExport" spellcheck="false" wrap="off"></textarea>
 
 <script src="js/shared.js"></script>
 <script src="js/framework.js"></script>
@@ -474,13 +474,22 @@ function display (){
 	eResult.innerHTML = aResult.join('')
 	}
 function exportRegExp (){
-	var aResult = []
 	display()
-	for(var i=0, ni=oDefinition.DFA.length; i<ni; i++ ){
-		var sToken = oDefinition.DFA[i][0]
-		aResult.push( "['"+ sToken +"', /"+ oDefinition.DFA[i][1] +"/ ]" )
-		}
-	eExport.value = '// Expressions régulières\n'+ aResult.join( ',\n' ) +","
+	var aTokens = []
+	for(var i=0, aToken; aToken = oDefinition.DFA[i]; i++ )
+		aTokens.push( "['"+ aToken[0] +"',/"+ aToken[1] +"/]" )
+	var aRules = []
+	for(var i=0, aRule; aRule = oDefinition.aggregatesDFA[i]; i++ )
+		aRules.push( "['"+ aRule[0] +"','"+ aRule[1].join('|') +"']" )
+	for(var i=0, aRule; aRule = oDefinition.rules[i]; i++ )
+		aRules.push( "['"+ aRule[0] +"','"+ aRule[1] +"']" )
+	eExport.value = '// var o = MultiRegExpLexer.Rules'
+		+'\no.addTokens([\n\t'+ aTokens.join( ',\n\t' ) +'\n\t])'
+		+( aRules.length ? '\no.addRules([\n\t'+ aRules.join( ',\n\t' ) +'\n\t])' : '' )
+		+( oDefinition.css.length ? "\no.addCSSClass("+ JSON.stringify( oDefinition.css ) +")" : '' )
+		+( oDefinition.previousTokensOf.length ? "\n"+ oDefinition.previousTokensOf.join('\n') : '' )
+		+( oDefinition.translations.length ? "\no.setTokensTranslation('"+ oDefinition.translations.join('&') +"')" : '' )
+
 	}
 </script>
 

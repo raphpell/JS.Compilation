@@ -6,24 +6,27 @@
 	L_NEW_LINE_IN_STRING	=	\r\n|[\n\r\f]
 		( css:linefeed, previousTokens:BACKSLASH, translation:NEW_LINE )
 
-!#@	SSQ		=	{superscript}|{whitespaces_s}|BACKSLASH|SSQ_IN|E_SSQ
+!#@	SSQ		=	{superscript}|{whitespaces_s}|SSQ_IN|BACKSLASH|E_SSQ
 		( css:string, translation:STRING )
+// Attention SSQ_IN avant BACKSLASH : ordre important pour le MultiRegExp Lexer
 	S_SSQ		=	'
 		( translation:SINGLE_QUOTE )
 	E_SSQ		=	'
 		( translation:SINGLE_QUOTE )
 	SSQ_IN		=	([^'\\\n\r\f \t]|\\[^\n\r\f \t])+
 
-!#@	SDQ		=	{superscript}|{whitespaces_s}|BACKSLASH|SDQ_IN|E_SDQ
+!#@	SDQ		=	{superscript}|{whitespaces_s}|SDQ_IN|BACKSLASH|E_SDQ
 		( css:string, translation:STRING )
+// Attention SDQ_IN avant BACKSLASH : ordre important pour le MultiRegExp Lexer
 	S_SDQ		=	"
 		( translation:DOUBLE_QUOTE )
 	E_SDQ		=	"
 		( translation:DOUBLE_QUOTE )
 	SDQ_IN		=	([^"\\\n\r\f \t]|\\[^\n\r\f \t])+
 
-!#@	MLC		=	{superscript}|{whitespaces_c}|MLC_IN|E_MLC
+!#@	MLC		=	{superscript}|{whitespaces_c}|E_MLC|MLC_IN
 		( css:comment, translation:COMMENT )
+// Attention E_MLC avant MLC_IN : ordre important pour le MultiRegExp Lexer
 	S_MLC		=	\/\*
 	E_MLC		=	[^\n\r\f \t\*]*\*+\/
 	MLC_IN		=	[^\n\r\f \t\*]+\**|\*+[^\n\r\f \t\/]*

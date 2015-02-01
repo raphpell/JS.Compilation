@@ -31,6 +31,7 @@ TEXTAREA {
 	color: #000;
 	border: 1px solid #CCC;
 	display: inline-block;
+	font: 1em Verdana;
 	margin: 2px;
 	padding: 1px;
 	text-align: center;
@@ -159,7 +160,7 @@ TABLE.Table {
 		position:relative;
 		}
 	.charset 		{ background: brown; 	color: #FFF; }
-	.punctuator		{ background: red; 		}
+	.punctuator		{ background: darkred; 	color: #FFF; }
 	.pipe 			{ background: pink; 	}
 	.repetition 		{ background: yellow; 	}
 	.character 		{ background: green; 	color: #FFF; }

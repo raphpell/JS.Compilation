@@ -7,7 +7,7 @@
 !@	BIG_JS	=	S_PHP|E_HTMLScript|NUMBER|{whitespaces}|{operators}|{comments}|R_REGULAR_EXPRESSION|{strings}|{punctuators}|{words}
 		hspaces		=	TAB|SPACES
 		whitespaces	=	{hspaces}|L_NEW_LINE
-		operators	=	ARITHMETIC_OPERATOR|ASSIGNMENT_OPERATOR|COMPARISON_OPERATOR|LOGICAL_OPERATOR|UNARY_OPERATOR
+		operators	=	JS_ARITHMETIC_OP|JS_ASSIGNMENT_OP|JS_COMPARISON_OP|JS_LOGICAL_OP|JS_UNARY_OP
 		comments	=	S_SLC|S_MLC
 		strings		=	S_SSQ|S_SDQ
 		punctuators	=	ELISION|LBRACE|RBRACE|LPAREN|RPAREN|LBRACK|RBRACK|DOT|SEMI|QUESTION|COLON
@@ -20,7 +20,7 @@
 			previousTokens:{re_operators}|{re_punctuators}|JS_KEYWORD,
 			translation:REGULAR_EXPRESSION
 			)
-		re_operators		=	ARITHMETIC_OPERATOR|ASSIGNMENT_OPERATOR|BITWISE_OPERATOR|COMPARISON_OPERATOR|LOGICAL_OPERATOR
+		re_operators		=	JS_ARITHMETIC_OP|JS_ASSIGNMENT_OP|JS_BITWISE_OP|JS_COMPARISON_OP|JS_LOGICAL_OP
 		re_punctuators		=	ELISION|DOT|LPAREN|LBRACE|LBRACK|COLON|SEMI|QUESTION
 		
 		reBody			=	{reFirstChar}{reChars}
@@ -45,15 +45,15 @@
 		(css:identifier)
 
 // OPERATORS
-	ARITHMETIC_OPERATOR	=	\+|-|\*|%|/
+	JS_ARITHMETIC_OP	=	\+|-|\*|%|/
 		(css:operator)
-	ASSIGNMENT_OPERATOR	=	=|\*=|\/=|\%=|\+=|\-=|<<=|>>=|>>>=|\&=|\^=|\|=
+	JS_ASSIGNMENT_OP	=	=|\*=|\/=|\%=|\+=|\-=|<<=|>>=|>>>=|\&=|\^=|\|=
 		(css:operator)
-	COMPARISON_OPERATOR	=	([<>]|[=!]=)=?
+	JS_COMPARISON_OP	=	([<>]|[=!]=)=?
 		(css:operator)
-	LOGICAL_OPERATOR	=	&&|\|\|
+	JS_LOGICAL_OP	=	&&|\|\|
 		(css:operator)
-	UNARY_OPERATOR		=	\+\+|--|~|!
+	JS_UNARY_OP		=	\+\+|--|~|!
 		(css:operator)
 
 // PUNCTUATORS

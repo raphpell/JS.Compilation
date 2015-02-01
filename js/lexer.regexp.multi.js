@@ -9,7 +9,10 @@ var MultiRegExpLexer =(function(){
 			return {
 				list: {},
 				add :function( ID, m ){
-					if( this.list[ID]) throw new Error ( sAddError.replace( '$1', ID ))
+					if( this.list[ID]){
+						console.warn( sAddError.replace( '$1', ID ))
+						return; //throw new Error ( sAddError.replace( '$1', ID ))
+						}
 					return this.list[ID] = m
 					},
 				get :function( ID ){
@@ -65,7 +68,8 @@ var MultiRegExpLexer =(function(){
 					if( oToken ) a.push( oToken )
 					else {
 						var aRule = Rules.list[ID]
-						a = Array.merge( a, aRule )
+						if( ! aRule ) throw Error ('Rule "'+ ID +'" Not Found !' )
+						a = a.concat( aRule )
 						}
 					}
 				return Rules.add( sName, a )
@@ -313,10 +317,11 @@ var MultiRegExpLexer =(function(){
 			['L_NEW_LINE',/[\n\r]/],
 			['WHITE_SPACES',/[\t \n\r\f]+/],
 			// Tout sauf un espaces blancs
-			['NOT_WHITE_SPACES',/[^\t \n\r\f]+/]
+			['NOT_WHITE_SPACES',/[^\t \n\r\f]+/],
+			['TEXT',/[^\t \n\r\f]+/]
 			])
 		// Syntaxe par défaut
-		o.addRule( 'TXT', 'TAB|L_NEW_LINE|SPACES|NOT_WHITE_SPACES' )
+		o.addRule( 'TXT', 'TAB|L_NEW_LINE|SPACES|TEXT' )
 		o.addCSSClass( 'space=SPACES&tab=TAB&linefeed=L_NEW_LINE&whitespaces=WHITE_SPACES&undefined=NOT_WHITE_SPACES' )
 		o.setTokensTranslation('L_NEW_LINE=NEW_LINE')
 		})();
