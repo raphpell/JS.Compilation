@@ -23,28 +23,48 @@ SECTION {
 
 <a href="index.htm">Index</a>
 <h1>Lexèmes</h1>
-
+<p>Ce sont des unités lexicales ou syntaxiques (mots, phrases...).</p>
 <p>
-	La structure des unités lexicales et syntaxiques est créée grâce à une fonction utilisateur globale <code>function Lexeme(o){}</code>.<br>
+	Un des besoins consiste à pouvoir former avec les lexèmes un arbre de données.<br>
+	Pour cela, ils sont créés grâce à une fonction globale: <code>function Lexeme(o){/*...*/}</code>.<br>
+	Cette fonction retourne un objet pouvant réaliser cette tâche.
 </p>
 
-<p><cite>
+<p><b>NB</b>: <cite>
 	La création des lexèmes <a href="Lexeme.comparaison.htm">prend du temps</a> ! 
-	Plus le temps mis pour le créer est long, plus l'analyse est longue.
+	Plus le temps mis pour en créer un est long, plus l'analyse est longue.
 </cite></p>
 
 <section><h2>Syntaxe</h2>
 	<pre>var oNode = Lexeme ( oLexeme )</pre>
 </section>
 <section><h2>Argument</h2>
-	<p>
-		Elle prend en argument l'objet <code>oLexeme</code> issu d'une analyse.<br>
-	</p>
+	<p>Elle prend en argument l'objet <code>oLexeme</code> issu d'une analyse.</p>
+	<section><h3>Exemple</h3>
+		<p>Pour l'analyse lexicale, il est de la forme :</p>
+<pre>
+oLexeme={
+	token:'INCREMENT_OPERATOR', // nom du token (renommé si défini)
+	value:'++',	// valeur du token, NB: un parent n'a pas de valeur
+	css:'operator',	// classe css...
+	rule:'JS',	// Syntaxe qui à créé le lexème
+    // Position dans la source
+	index:12, 	// index du premier caractère
+	lineStart:2,	// ligne du premier caractère
+	lineEnd:2, 	// ligne du dernier caractère
+    // Propriétés parfois présentent
+	bParent:true,		// Indique si il s'agit d'un lexème parent
+	bParentLimit:true,	// Indique si il s'agit d'une limite d'un parent
+	bRescan:true		// Indique si il s'agit d'un lexème parent issu d'un double scannage
+	}
+</pre>
+		<p>Pour l'analyse syntaxique il est à définir...</p>
+	</section>
 </section>
 <section><h2>Valeur retournée</h2>
 	<p>
 		Elle retourne un objet devant pouvoir former une structure arborescente.<br>
-		L'attribut <code>oValue</code> de l'objet retourné est affecté avec la valeur <code>oLexeme</code>: <code>oNode.oValue === oLexeme</code>.
+		A cet objet est ajouté l'attribut <code>oValue</code>, affecté avec la valeur <code>oLexeme</code>: <code>oNode.oValue === oLexeme</code>.
 	</p>
 	<p>L'objet retourné est au choix :</p>
 	<ul>
@@ -59,7 +79,7 @@ SECTION {
 				<li style="color:red;">Pas forcement plus performant: création plus rapide, méthodes plus lentes... .</li>
 			</ul></li>
 	</ul>
-	<section><h3>Implémentation requise de l'interface</h3>
+	<section><h3>Interface requise</h3>
 		<ul>
 			<li>appendChild ( eNode )</li>
 			<li>hasChildNodes ()</li>
@@ -76,12 +96,13 @@ SECTION {
 </section>
 <section><h2>Exemple de fonction</h2>
 <pre>
-var Lexeme = function ( oResult ){
+var Lexeme =function( o ){
 	var m = document.createElement( o.token )
 	m.oValue = o
 	m.className = o.css
 	m.title = o.token
 	if( o.value ) m.innerHTML = o.value
+	// ou if( ! o.bParent ) m.innerHTML = o.value
 	return m
 	}
 </pre>

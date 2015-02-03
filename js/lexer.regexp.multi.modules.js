@@ -28,7 +28,7 @@
 	})()
 	;(function(){// Number
 	o.addTokens([
-		['NUMBER',/[\+\-]?(([1-9]\d*|0)|(0[xX]([0-9a-fA-F])+)|(0[0-7]+)|(0b[01]+)|(\d+\.\d*(([eE][\+\-]?\d+)?)|\.?\d+(([eE][\+\-]?\d+)?)))/ ]
+		['NUMBER',/[\+\-]?(?:(?:[1-9]\d*|0)|(?:0[xX](?:[0-9a-fA-F])+)|(?:0[0-7]+)|(?:0b[01]+)|(?:\d+\.\d*(?:[eE][\+\-]?\d+)?|\.?\d+(?:[eE][\+\-]?\d+)?))/ ]
 		])
 	})()
 	;(function(){// SUPER SCRIPT
@@ -162,22 +162,22 @@
 		['E_RULE_SET',/\}/],
 		['S_PROP_VALUE',/:/],
 		['E_PROP_VALUE',/;/],
-		['CSS_PHP_BUG',/[\-+]|((deg|rad|grad)|(px|cm|mm|in|pt|pc)|(em)|(ex)|(ms|s)|(hz|khz)|(%))/],
+		['CSS_PHP_BUG',/[\-+]|(?:deg|rad|grad|px|cm|mm|in|pt|pc|em|ex|ms|s|hz|khz|%)/],
 		['COMBINATOR',/[+>*~]/],
-		['ATKEYWORD',/@(-?([_a-zA-Z]|(é)|((\\([0-9a-fA-F]){1,6})|\\[^\r\n\f0-9a-fA-F]))([_a-zA-Z0-9\-]|(é)|((\\([0-9a-fA-F]){1,6})|\\[^\r\n\f0-9a-fA-F]))*)/],
-		['NAME',/(([_a-zA-Z0-9\-]|(é)|((\\([0-9a-fA-F]){1,6})|\\[^\r\n\f0-9a-fA-F]))+)/],
-		['HASH',/#(([_a-zA-Z0-9\-]|(é)|((\\([0-9a-fA-F]){1,6})|\\[^\r\n\f0-9a-fA-F]))+)/],
-		['IDENT',/(-?([_a-zA-Z]|(é)|((\\([0-9a-fA-F]){1,6})|\\[^\r\n\f0-9a-fA-F]))([_a-zA-Z0-9\-]|(é)|((\\([0-9a-fA-F]){1,6})|\\[^\r\n\f0-9a-fA-F]))*)/],
-		['CLASS',/\.(-?([_a-zA-Z]|(é)|((\\([0-9a-fA-F]){1,6})|\\[^\r\n\f0-9a-fA-F]))([_a-zA-Z0-9\-]|(é)|((\\([0-9a-fA-F]){1,6})|\\[^\r\n\f0-9a-fA-F]))*)/],
+		['ATKEYWORD',/@-?([_a-zA-Z]|é|(\\[0-9a-fA-F]{1,6}|\\[^\r\n\f0-9a-fA-F]))([_a-zA-Z0-9\-]|é|(\\[0-9a-fA-F]{1,6}|\\[^\r\n\f0-9a-fA-F]))*/],
+		['NAME',/([_a-zA-Z0-9\-]|é|(\\[0-9a-fA-F]{1,6}|\\[^\r\n\f0-9a-fA-F]))+/],
+		['HASH',/#([_a-zA-Z0-9\-]|é|(\\[0-9a-fA-F]{1,6}|\\[^\r\n\f0-9a-fA-F]))+/],
+		['IDENT',/-?([_a-zA-Z]|é|(\\[0-9a-fA-F]{1,6}|\\[^\r\n\f0-9a-fA-F]))([_a-zA-Z0-9\-]|é|(\\[0-9a-fA-F]{1,6}|\\[^\r\n\f0-9a-fA-F]))*/],
+		['CLASS',/\.-?([_a-zA-Z]|é|(\\[0-9a-fA-F]{1,6}|\\[^\r\n\f0-9a-fA-F]))([_a-zA-Z0-9\-]|é|(\\[0-9a-fA-F]{1,6}|\\[^\r\n\f0-9a-fA-F]))*/],
 		['S_PSEUDO',/::?/],
 		['S_IMPORTANT',/!/],
 		['E_IMPORTANT',/important/],
-		['CSS_NUMBER',/(-?([0-9]+|[0-9]*\.[0-9]+))/],
-		['DIMENSIONS',/((-?([0-9]+|[0-9]*\.[0-9]+))((deg|rad|grad)|(px|cm|mm|in|pt|pc)|(em)|(ex)|(ms|s)|(hz|khz)|(%)))(\/((-?([0-9]+|[0-9]*\.[0-9]+))((deg|rad|grad)|(px|cm|mm|in|pt|pc)|(em)|(ex)|(ms|s)|(hz|khz)|(%))))*/],
-		['PATH',/([!#$%&\*-\~]|(é)|((\\([0-9a-fA-F]){1,6})|\\[^\r\n\f0-9a-fA-F]))*/],
+		['CSS_NUMBER',/-?(?:[0-9]+|[0-9]*\.[0-9]+)/],
+		['DIMENSIONS',/-?(?:[0-9]+|[0-9]*\.[0-9]+)(?:deg|rad|grad|px|cm|mm|in|pt|pc|em|ex|ms|s|hz|khz|%)(?:\/(?:-?(?:[0-9]+|[0-9]*\.[0-9]+)(?:deg|rad|grad|px|cm|mm|in|pt|pc|em|ex|ms|s|hz|khz|%)))*/],
+		['PATH',/(?:[!#$%&\*-\~]|é|\\[0-9a-fA-F]{1,6}|\\[^\r\n\f0-9a-fA-F])*/],
 		['S_URL',/url\(/],
 		['E_URL',/\)/],
-		['S_FUNCTION',/(-?([_a-zA-Z]|(é)|((\\([0-9a-fA-F]){1,6})|\\[^\r\n\f0-9a-fA-F]))([_a-zA-Z0-9\-]|(é)|((\\([0-9a-fA-F]){1,6})|\\[^\r\n\f0-9a-fA-F]))*)\(/],
+		['S_FUNCTION',/(-?([_a-zA-Z]|é|\\[0-9a-fA-F]{1,6}|\\[^\r\n\f0-9a-fA-F])([_a-zA-Z0-9\-]|é|(\\[0-9a-fA-F]{1,6}|\\[^\r\n\f0-9a-fA-F]))*)\(/],
 		['E_FUNCTION',/\)/],
 		['FUNCTION_ARG',/[^\f\r\n \t,)}{]/]
 		])
@@ -202,13 +202,13 @@
 		['S_DOCTYPE',/<\!DOCTYPE/],
 		['E_DOCTYPE',/>/],
 		['DOCTYPE_IN',/[^\n\r\f \t"'>]+/],
-		['CDATA_IN',/([^\n\r\f \t\]]+|\]([^\n\r\f \t\]]+|\][^\n\r\f \t\>]+))+/],
+		['CDATA_IN',/(?:[^\n\r\f \t\]]+|\](?:[^\n\r\f \t\]]+|\][^\n\r\f \t\>]+))+/],
 		['S_CDATA',/<\!\[CDATA\[/],
 		['E_CDATA',/\]\]>/],
 	//	['RBRACK',/\]/],
 		['S_HTML_COMMENT',/<\!\-\-/],
 		['E_HTML_COMMENT',/\-+\-\>/],
-		['HTML_COMMENT_IN',/([^\n\r\f \t\-]+|\-([^\n\r\f\-]+|\-[^\n\r\f\>]+))+/],
+		['HTML_COMMENT_IN',/(?:[^\n\r\f \t\-]+|\-(?:[^\n\r\f\-]+|\-[^\n\r\f\>]+))+/],
 		['HTML_TEXT',/[^<\r\n\f \t]+/],
 		['S_ELT',/[a-zA-Z0-9]*/],
 		['S_END_TAG',/<\//],
@@ -218,10 +218,10 @@
 		['S_TAG_ATTR_VALUE',/\=/],
 		['S_HTML_SSQ',/'/],
 		['E_HTML_SSQ',/'/],
-		['HTML_SSQ_IN',/([^'\n\r\f \t])+/],
+		['HTML_SSQ_IN',/[^'\n\r\f \t]+/],
 		['S_HTML_SDQ',/"/],
 		['E_HTML_SDQ',/"/],
-		['HTML_SDQ_IN',/([^"\n\r\f \t])+/],
+		['HTML_SDQ_IN',/[^"\n\r\f \t]+/],
 		['S_HTML_STYLE',/[Ss][Tt][Yy][Ll][Ee]/],
 		['S_HTMLStyle',/>/],
 		['E_HTMLStyle',/<\/[Ss][Tt][Yy][Ll][Ee]>/],
@@ -250,7 +250,7 @@
 	})()
 	;(function(){// INI
 	o.addTokens([
-		['INI_KEYWORD',/(null|yes|no(ne)?|true|false|on|off)/],
+		['INI_KEYWORD',/(?:null|yes|no(ne)?|true|false|on|off)\b/],
 		['INI_VAR',/[^=!;{}"&|^~[\]()\r\n\f \t]+/],
 		['INI_TMP',/[^\r\n\f \t;=]/],
 		['S_INI_COMMENT',/;/],
@@ -262,7 +262,7 @@
 		['INI_VALUE_IN',/[^\r\n\f \t;"']+/],
 		['S_INI_SDQ',/"/],
 		['E_INI_SDQ',/"/],
-		['INI_SDQ_IN',/([^"\\\r\n\f \t]|\\[^\r\n\f \t])+/],
+		['INI_SDQ_IN',/(?:[^"\\\r\n\f \t]|\\[^\r\n\f \t])+/],
 		['S_INI_SSQ',/'/],
 		['E_INI_SSQ',/'/],
 		['INI_SSQ_IN',/[^'\r\n\f \t]+/ ]

@@ -224,6 +224,7 @@ var reduceGraph =function( sType ){
 var oLoaded
 var oFA
 var sToken
+var nID = 0
 
 var Lexeme =function( o ){
 	// alert( JSON.stringify( o ))
@@ -249,8 +250,10 @@ var setFA =function( o ){
 	oFA = o.oFA
 	if( o.test ) eInput.value = o.test
 	if( sToken ){
-		AutomatonLexer.Rules.addTokenFromString( sToken, o.automate )
-		AutomatonLexer.Rules.addRule( 'ROOT', sToken )
+		sToken = sToken+ nID++
+		try{
+			AutomatonLexer.Rules.addTokenFromString( sToken, o.automate )
+			}catch(e){ alert( e.message )}
 		}
 	refreshFAHTML('FA')
 	if( eShowFAGraph.checked ) showGraph( 'FA' )
@@ -338,7 +341,7 @@ var refreshFAHTML =function( sType ){
 var match =function(){
 	eResult.innerHTML = ''
 	try{
-		eResult.appendChild( AutomatonLexer( eInput.value, 'ROOT' ))
+		eResult.appendChild( AutomatonLexer( eInput.value, sToken ))
 	}catch(e){
 		eResult.innerHTML = e.message + '<br>'
 		if( e.fileName ) eResult.innerHTML += '<br>fichier: '+ e.fileName.split('/').pop()
