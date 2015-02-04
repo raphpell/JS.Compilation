@@ -51,7 +51,7 @@ TABLE COL {
 </fieldset>
 <fieldset><legend>Parser</legend>
 	<dl>
-		<dt>Etat: <span id="eAction">s1</span></dt>
+		<dt>Dernier  Etat: <span id="eAction">s1</span></dt>
 		<dt>Symbole: <span id="eToken">...</span></dt>
 		<dt>Piles: <span id="eStack">...</span></dt>
 	</dl>
@@ -123,6 +123,13 @@ var createLexeme =function( bClassName, bTitle, bInnerHTML, bByLine ){
 
 <!-- CODE -->
 <script>
+var eLexer, oParser, eParsed 
+
+var aStackInterval = []
+var nInterval = setInterval( function(){
+	if( aStackInterval.length ) aStackInterval.shift()()
+	}, 250 )
+
 Tables=(function(){
 	var aTables, eLastSymbol, eLastState, eLastLastState, eLastCol
 	return {
@@ -171,21 +178,22 @@ Tables=(function(){
 				eLastSymbol.className = 'highlight'
 			},
 		highlightPosition :function( nState, sSymbol ){
-			if( eLastState ) eLastState.className = ''
-			if( nState ){
-				eLastState = _('State'+ nState )
-				eLastState.className = 'highlight'
-				}
-			if( eLastCol ) eLastCol.className = ''
-			if( sSymbol ){
-				if( eLastCol = _('Col'+ sSymbol ))
-					eLastCol.className = 'highlight'
-				}
+			aStackInterval.push( function(){
+				if( eLastState ) eLastState.className = ''
+				if( nState ){
+					eLastState = _('State'+ nState )
+					eLastState.className = 'highlight'
+					}
+				if( eLastCol ) eLastCol.className = ''
+				if( sSymbol ){
+					if( eLastCol = _('Col'+ sSymbol ))
+						eLastCol.className = 'highlight'
+					}
+				})
 			}
 		}
 	})()
 	
-var eLexer, oParser, eParsed 
 var scan =function(){
 	eScanResult.innerHTML = ''
 	try{

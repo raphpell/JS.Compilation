@@ -22,10 +22,10 @@ ParserLR.prototype ={
 		this.oToken = oToken
 		do{
 			if( this.action = this.getAction( this.getState(), sSymbol )){
-				var s = this.action[0]
+				var s = this.action.charAt(0)
 				result = this[s]()
 				} else this.e()
-		}while( this.aStack.length && s=='r' )
+			}while( this.aStack.length && s=='r' )
 		return result
 		},
 	e :function(){
