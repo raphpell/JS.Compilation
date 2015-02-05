@@ -1,22 +1,20 @@
-JS.Compilation
+JS.Compilation : Lexer et Parser JavaScript.
 ===========
-Générateur de Lexer et Parser en JavaScript.
 
-[Aperçu du résultat](http://raphpell.github.io/JS.Compilation/index.htm)
+[Site du projet](http://raphpell.github.io/JS.Compilation/index.htm)
 
-
-Formulaires disponibles
+Lexers
 --------
-- [Création d'un automate depuis une expression régulière](http://raphpell.github.io/JS.Compilation/AFD.generator.htm)
-- [Aggrégation d'automates](http://raphpell.github.io/JS.Compilation/AFD.aggregator.htm)
-- [Création d'un module pour le lexer](http://raphpell.github.io/JS.Compilation/LexerAutomaton.module.generator.htm)
-- [Création d'un module pour le parser](http://raphpell.github.io/JS.Compilation/Parser.htm)
+Comparaison d'un Lexer à expressions régulières et d'un lexer à automates finis déterministes.
+- [comparaison des résultats](http://raphpell.github.io/JS.Compilation/Lexers.result.comparaison.htm)
+- [readToken](http://raphpell.github.io/JS.Compilation/Lexers.performance.readToken.htm)
+- [scan](http://raphpell.github.io/JS.Compilation/Lexers.performance.scan.htm)
 
-
-Visualisation des performances des Lexers
---------
-- [Analyse lexicale: readToken](http://raphpell.github.io/JS.Compilation/Lexers.performance.readToken.htm)
-- [Analyse lexicale: scan](http://raphpell.github.io/JS.Compilation/Lexers.performance.scan.htm)
+Vous pouvez
+- [Créer un AFN et AFD depuis une expression régulière](http://raphpell.github.io/JS.Compilation/AFD.generator.htm)
+- [Aggréger des automates finis déterministes](http://raphpell.github.io/JS.Compilation/AFD.aggregator.htm)
+- [Créer des modules pour les lexers](http://raphpell.github.io/JS.Compilation/LexerAutomaton.module.generator.htm)
+- [Créer des module pour le parser](http://raphpell.github.io/JS.Compilation/Parser.htm)
 
 
 En attente
@@ -24,5 +22,3 @@ En attente
 - L'analyse lexicale incrémentielle
 - L'analyse syntaxique incrémentielle
 
-
-_Note_: l'analyse lexicale est plus rapide avec une liste d'expressions régulières.
