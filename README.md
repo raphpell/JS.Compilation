@@ -19,12 +19,14 @@ Divers :
 - [Créer un AFN et AFD depuis une expression régulière](http://raphpell.github.io/JS.Compilation/AFD.generator.htm)
 - [Aggréger des automates finis déterministes](http://raphpell.github.io/JS.Compilation/AFD.aggregator.htm)
 - [Créer des modules pour les lexers](http://raphpell.github.io/JS.Compilation/LexerAutomaton.module.generator.htm)
-- [Créer des module pour le parser](http://raphpell.github.io/JS.Compilation/Parser.htm)
 
 
 Parser
 --------
 - Compilation de grammaire
+- [Créer des module sour le parser](http://raphpell.github.io/JS.Compilation/Parser.htm)
+- [Parser LR : readToken](http://raphpell.github.io/JS.Compilation/Parser.byStep.htm)
+
 
 En attente
 --------
