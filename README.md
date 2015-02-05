@@ -5,7 +5,7 @@ Lexer et Parser JavaScript.
 Objectif: Colorisation de code dans un éditeur de texte.
 
 
-Lexers
+Lexers ( RE vs DFA )
 --------
 Comparaison d'un Lexer à expressions régulières et d'un lexer à automates finis déterministes :
 - [Performance: scan](http://raphpell.github.io/JS.Compilation/Lexers.performance.scan.htm)
