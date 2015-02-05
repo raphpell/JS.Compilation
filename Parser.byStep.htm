@@ -31,6 +31,7 @@ TABLE COL {
 .highlight {
 	background: lightskyblue;
 	}
+#eActions { float:left; }
 </style>
 </head>
 <body spellcheck="false">
@@ -49,9 +50,14 @@ TABLE COL {
 		<dt><input type="button" id="eBtnReadToken" value="parser: readToken()"></dt>
 	</dl>
 </fieldset>
+<fieldset><legend>Divers</legend>
+	<dl>
+		<dt>Temps: <input type="text" id="eTime" value="500"></dt>
+	</dl>
+</fieldset>
 <fieldset><legend>Parser</legend>
 	<dl>
-		<dt>Dernier  Etat: <span id="eAction">s1</span></dt>
+		<dt>Etat: <span id="eAction">s1</span></dt>
 		<dt>Symbole: <span id="eToken">...</span></dt>
 		<dt>Piles: <span id="eStack">...</span></dt>
 	</dl>
@@ -60,6 +66,7 @@ TABLE COL {
 <pre id="eScanResult"></pre>
 <pre id="eParseResult"></pre>
 <pre id="eEngineTable"></pre>
+<pre id="eActions"></pre>
 
 
 <!-- FRAMEWORK... -->
@@ -126,9 +133,15 @@ var createLexeme =function( bClassName, bTitle, bInnerHTML, bByLine ){
 var eLexer, oParser, eParsed 
 
 var aStackInterval = []
-var nInterval = setInterval( function(){
-	if( aStackInterval.length ) aStackInterval.shift()()
-	}, 250 )
+Time={
+	nID : null,
+	set:function(){
+		window.clearInterval( Time.nID )
+		Time.nID = window.setInterval( function(){
+			if( aStackInterval.length ) aStackInterval.shift()()
+			}, parseInt( eTime.value ))
+		}
+	}
 
 Tables=(function(){
 	var aTables, eLastSymbol, eLastState, eLastLastState, eLastCol
@@ -177,7 +190,9 @@ Tables=(function(){
 			if( eLastSymbol = _('Symbol'+ sSymbol ))
 				eLastSymbol.className = 'highlight'
 			},
-		highlightPosition :function( nState, sSymbol ){
+		highlightPosition :function( nState, sSymbol, sAction ){
+			var sStack = oParser.aStack.toString()+','+sAction
+				
 			aStackInterval.push( function(){
 				if( eLastState ) eLastState.className = ''
 				if( nState ){
@@ -188,6 +203,20 @@ Tables=(function(){
 				if( sSymbol ){
 					if( eLastCol = _('Col'+ sSymbol ))
 						eLastCol.className = 'highlight'
+					Tables.highlightSymbol( eToken.innerHTML = sSymbol )
+					}
+				if( sAction ){
+					sReduction = ''
+					if( sAction.charAt(0)=='r' ){
+						var ProdID = sAction.substring(1)
+						, P = oParser.PRODUCTIONS[ ProdID ]
+						, sReduction = ', ('+ P[0] +' → '+ P[1].join(' ') +')'
+						}
+					eAction.innerHTML = sAction
+					eActions.innerHTML =
+						'M( '+ nState +', '+ sSymbol +' ) = '+ sAction +'    '+ sReduction +'\n'
+						+ eActions.innerHTML
+					eStack.innerHTML = sStack
 					}
 				})
 			}
@@ -200,10 +229,12 @@ var scan =function(){
 		eLexer = AutomatonLexer( eInput.value, 'RegExp' )
 		eScanResult.appendChild( eLexer )
 		oParser = new ParserLR ( RegExpParser.REGEXP )
-		oParser.getAction = 
-		oParser.getAction.suffix( function( nState, sSymbol ){
-			Tables.highlightPosition( nState, sSymbol )
-			}, oParser )
+		oParser._getAction = oParser.getAction
+		oParser.getAction = function( nState, sSymbol ){
+			var sAction = oParser._getAction( nState, sSymbol )
+			Tables.highlightPosition( nState, sSymbol, sAction )
+			return sAction
+			}
 		View.resetInfo()
 		Tables.show( RegExpParser.REGEXP )
 	}catch(e){
@@ -213,19 +244,27 @@ var scan =function(){
 		}
 	}
 var parse =function(){
-	eParseResult.innerHTML = ''
+	if( ! eLexer ) return ;
+	eScanResult.innerHTML = eParseResult.innerHTML = ''
 	eParseResult.appendChild( ParserLR.parse( to_array( eLexer.childNodes ), RegExpParser.REGEXP ))
 	}
 var readToken =function(){
+	if( aStackInterval.length || ! eLexer ) return ;
 	if( eLexer.firstChild ){
+		eActions.innerHTML = ''
 		oParser.readToken( eLexer.removeChild( eLexer.firstChild ))
+		eParseResult.innerHTML = ''
+		for(var i=0; oParser.aSymbols[i]; i++)
+			eParseResult.appendChild( oParser.aSymbols[i] )
 		}
 	else if( ! oParser.bEnd ){
 		oParser.bEnd = true
-		eParseResult.innerHTML = ''
-		eParseResult.appendChild( oParser.getResult())
+		aStackInterval.push( function(){
+			var e = oParser.getResult()
+			eParseResult.innerHTML = ''
+			eParseResult.appendChild( e )
+			})
 		}
-	View.setInfo()
 	}
 
 View ={
@@ -233,12 +272,7 @@ View ={
 		eAction.innerHTML = 's1'
 		eToken.innerHTML = '...'
 		eStack.innerHTML = '...'
-		},
-	setInfo :function(){
-		var sSymbol = oParser.oToken.oValue.token
-		eAction.innerHTML = oParser.action
-		Tables.highlightSymbol( eToken.innerHTML = sSymbol )
-		eStack.innerHTML = oParser.aStack
+		eParseResult.innerHTML = ''
 		}
 	}
 </script>
@@ -246,14 +280,18 @@ View ={
 <!-- DTHML -->
 <script>
 _( 'eInput,eLexeme,eBtnScan,eBtnParse,eBtnReadToken,eScanResult,eParseResult' )
-_( 'eAction,eToken,eStack,eEngineTable' )
+_( 'eAction,eToken,eStack,eEngineTable,eActions,eTime' )
 
 Events.add(
 	'click',
 		eBtnScan, scan,
 		eBtnParse, parse,
-		eBtnReadToken, readToken
+		eBtnReadToken, readToken,
+	'keyup',
+		eTime, Time.set
 	)
+	
+Time.set()
 </script>
 </body>
 </html>

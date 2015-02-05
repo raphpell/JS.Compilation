@@ -121,7 +121,6 @@ var RegExpParser ={
 						,css:'quantifier'
 						,n:'0'
 						,m:'1'
-					//	,value: '0,1'
 						})
 				case "(10) QUANTIFIERS -> STAR":
 					return Lexeme({
@@ -129,7 +128,6 @@ var RegExpParser ={
 						,css:'quantifier'
 						,n:'0'
 						,m:'\u221E'
-					//	,value: '0,\u221E'
 						})
 				case "(11) QUANTIFIERS -> PLUS":
 					return Lexeme({
@@ -137,7 +135,6 @@ var RegExpParser ={
 						,css:'quantifier'
 						,n:'1'
 						,m:'\u221E'
-					//	,value: '1,\u221E'
 						})
 				case "(12) QUANTIFIERS -> QUANTIFIER":
 					if( RHS[0].firstChild.nodeName=='LBRACE' ) RHS[0].removeChild( RHS[0].firstChild )
