@@ -1,7 +1,9 @@
-JS.Compilation : Lexer et Parser JavaScript.
+Lexer et Parser JavaScript.
 ===========
-
 [Site du projet](http://raphpell.github.io/JS.Compilation/index.htm)
+Objectif: Colorisation de texte source
+
+
 
 Lexers
 --------
