@@ -1,3 +1,4 @@
+/* DEPRECATED */
 // Lexeme requis
 
 var OneRegExpLexer =(function(){

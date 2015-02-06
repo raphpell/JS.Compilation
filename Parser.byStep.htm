@@ -19,7 +19,7 @@ FIELDSET DL{
 	clear: both;
 	}
 .symbolsTable, .parsingTable { float: left; }
-TABLE { float: left; }
+TABLE { float: left; margin-left: 1em; }
 TABLE TD {
 	border: 1px solid #000;
 	border-width: 1px 1px 0 0;
@@ -31,7 +31,7 @@ TABLE COL {
 .highlight {
 	background: lightskyblue;
 	}
-#eActions { float:left; }
+#eActions { float:left; margin-left: 1em; }
 </style>
 </head>
 <body spellcheck="false">
@@ -53,6 +53,12 @@ TABLE COL {
 <fieldset><legend>Divers</legend>
 	<dl>
 		<dt>Temps: <input type="text" id="eTime" value="500"></dt>
+		<dt><input type="checkbox" id="eAstRegExp">
+			<label for="eAstRegExp">RegExp AST</label></dt>
+		<dt><input type="checkbox" id="eAstCharClass">
+			<label for="eAstCharClass">CharClass AST</label></dt>
+		<dt><input type="checkbox" id="eAstQuantifier">
+			<label for="eAstQuantifier">Quantifier AST</label></dt>
 	</dl>
 </fieldset>
 <fieldset><legend>Parser</legend>
@@ -65,6 +71,7 @@ TABLE COL {
 
 <pre id="eScanResult"></pre>
 <pre id="eParseResult"></pre>
+<h2>REGEXP Tables</h2>
 <pre id="eEngineTable"></pre>
 <pre id="eActions"></pre>
 
@@ -125,7 +132,27 @@ var createLexeme =function( bClassName, bTitle, bInnerHTML, bByLine ){
 <script src="src/regexp/futurParser.js"></script>
 <script src="js/futurParser.js"></script>
 <script>
-// ParserLR.Node = Lexeme
+ParserLR.Node = Lexeme
+AST ={
+	nullify :function( s ){
+		RegExpParser[s]._AST = RegExpParser[s].AST
+		RegExpParser[s].AST = null
+		},
+	define :function( s ){
+		RegExpParser[s].AST = RegExpParser[s]._AST
+		}
+	}
+AST.nullify('REGEXP')
+AST.nullify('CHARCLASS')
+AST.nullify('QUANTIFIER')
+function switchAST ( s ){
+	return function(){
+		AST[ this.checked ? 'define' : 'nullify' ]( s )
+		var b = ! eAstRegExp.checked
+		eAstCharClass.disabled = b
+		eAstQuantifier.disabled = b
+		}
+	}
 </script>
 
 <!-- CODE -->
@@ -281,17 +308,26 @@ View ={
 <script>
 _( 'eInput,eLexeme,eBtnScan,eBtnParse,eBtnReadToken,eScanResult,eParseResult' )
 _( 'eAction,eToken,eStack,eEngineTable,eActions,eTime' )
+_( 'eAstRegExp,eAstCharClass,eAstQuantifier' )
 
 Events.add(
 	'click',
 		eBtnScan, scan,
 		eBtnParse, parse,
 		eBtnReadToken, readToken,
+	'change',
+		eAstRegExp, switchAST("REGEXP"),
+		eAstCharClass, switchAST("CHARCLASS"),
+		eAstQuantifier, switchAST("QUANTIFIER"),
 	'keyup',
 		eTime, Time.set
 	)
 	
 Time.set()
+AST[ eAstRegExp.checked ? 'define' : 'nullify' ]('REGEXP')
+AST[ eAstCharClass.checked ? 'define' : 'nullify' ]('CHARCLASS')
+AST[ eAstQuantifier.checked ? 'define' : 'nullify' ]('QUANTIFIER')
+eAstRegExp.onchange()
 </script>
 </body>
 </html>
