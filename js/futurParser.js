@@ -11,7 +11,7 @@ ParserLR.prototype ={
 		return this.MATRICE[ nState ] && this.MATRICE[ nState ][ this.SYMBOLS[ sSymbol ]]
 		},
 	getResult :function(){
-		return this.readToken( Lexeme({ token:'END_TOKEN' }))
+		return this.readToken( Lexeme({ token:'END_TOKENS' }))
 		},
 	getState :function(){
 		return this.aStack[this.aStack.length-1].substring(1)

@@ -1,6 +1,6 @@
 ﻿EPSILON = '&epsilon;'
 var ParserLR =function( aTokens, ENGINE ){
-	aTokens.push( ParserLR.Node('END_TOKEN'))
+	aTokens.push( ParserLR.Node('END_TOKENS'))
 	var aStack = ['s1']
 	, aSymbols = []
 	, TreeBuilder = ENGINE.AST || ParserLR.ParseTree

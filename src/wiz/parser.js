@@ -1,7 +1,5 @@
 var WizParserEngine={
 	ITEMS :{
-		START:"s1",
-		END:"END_TOKENS",
 		SYMBOLS:{
 				"BLOCK":1,
 				"COMPIL":2,
@@ -90,8 +88,6 @@ var WizParserEngine={
 			}
 		},
 	BLOCK :{
-		START:"s1",
-		END:"END_TOKENS",
 		SYMBOLS:{
 			"ATTRIBUTE":1,
 			"E_BLOCK":2,
