@@ -17,7 +17,7 @@
 		escape :function( s ){
 			// Bracket test 2
 			var re1 = /(\.|\?|\*|\+|\\|\(|\)|\[|\]|\}|\{|\$|\^|\|)/g
-			, re2 = /("|')/gm
+			, re2 = /'|\\/gm// test
 			return s.replace( re1 , "\\$1" )
 			}
 		})

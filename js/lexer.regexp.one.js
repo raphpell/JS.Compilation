@@ -47,34 +47,30 @@ var OneRegExpLexer =(function(){
 				aRules[i] = oRule
 				aRegExp[i] = aRules[i].re.source
 				}
-			var reResult = new RegExp ( '(?:'+aRegExp.join( '|' )+')', 'gm' )
+			var reResult = new RegExp ( '('+aRegExp.join( ')|(' )+')', 'gm' )
 			var fParse =function( sMatched, nIndex ){
 				if( ! sMatched ) return;
-				var oRule, nIndex, oNode, oLanguageRule, a
+				var oRule, nIndex, oNode, oLanguageRule
 				// Search the alternative matched
-				for(var i=0, ni=aRules.length; i<ni; i++ ){
-					oRule = aRules[i]
-					a = sMatched.match( oRule.re )
-					if( ! a || a[0] != sMatched ) continue;
-					oLanguageRule = Rules.get( oRule.sId +'_CHILD' )
-					oNode = Lexeme({
-						token: oRule.sId,
-						value: oLanguageRule ? '' : sMatched,
-						css: oRule.className,
-						index: Lexer.nIndex,
-						lineStart: Lexer.nLine,
-						lineEnd: Lexer.nLine,
-						rule: Lexer.oCurrent.oValue.token
-						})
-					if( oRule.sId=="NEW_LINE" ) Lexer.nLine++
-					Lexer.oCurrent.appendChild( oNode )
-					if( oLanguageRule ){
-						Lexer.parse( oNode, oLanguageRule, sMatched )
-						Lexer.oCurrent = oNode.parentNode
-					} else Lexer.nIndex += sMatched.length
-					return sMatched
-					}
-				throw new Error ( 'No matching RegExp for "'+ sMatched + '"?' )
+				for(var i=1; ! arguments[i]; i++ );
+				oRule = aRules[i-1]
+				oLanguageRule = Rules.get( oRule.sId +'_CHILD' )
+				oNode = Lexeme({
+					token: oRule.sId,
+					value: oLanguageRule ? '' : sMatched,
+					css: oRule.className,
+					index: Lexer.nIndex,
+					lineStart: Lexer.nLine,
+					lineEnd: Lexer.nLine,
+					rule: Lexer.oCurrent.oValue.token
+					})
+				if( oRule.sId=="NEW_LINE" ) Lexer.nLine++
+				Lexer.oCurrent.appendChild( oNode )
+				if( oLanguageRule ){
+					Lexer.parse( oNode, oLanguageRule, sMatched )
+					Lexer.oCurrent = oNode.parentNode
+				} else Lexer.nIndex += sMatched.length
+				return sMatched
 				}
 			return { type:'alternative', re:reResult, replacement:fParse }
 			},
@@ -107,11 +103,11 @@ var OneRegExpLexer =(function(){
 			var aWords = sWords.split(',')  // .sort()
 			bBoundaries = bBoundaries==undefined ? true : bBoundaries
 			for( var i=0, a=[], ni=aWords.length; i<ni; i++ )
-				a.push( RegExp.escape( aWords[ i ]))
+				a.push( RegExp.escape( aWords[i]))
 			var reResult = new RegExp(
 				bBoundaries
-					? "\\b(?:" + a.join( '|' ) + ")\\b"
-					: '(?:' + a.join( '|' ) + ')'
+					? "\\b(?:" + a.join('|') + ")\\b"
+					: '(?:' + a.join('|') + ')'
 				, 'g' )
 			return reResult
 			}
@@ -124,7 +120,7 @@ var OneRegExpLexer =(function(){
 		['CHARSET', /\[\^?|\]|\-/, 'charset' ],
 		['PIPE', /\|/, 'punctuator' ],
 		['PUNCTUATOR', /\(|\)/, 'punctuator' ],
-		['QUANTIFIER1', /\{\d+(\,\d*)?\}/, 'repetition' ],
+		['QUANTIFIER1', /\{\d+(?:\,\d*)?\}/, 'repetition' ],
 		['QUANTIFIER2', /\*|\+|\?/, 'repetition' ],
 		['CHAR_ESCAPED', /\\./, 'character' ],
 		['ANY', /\./, 'character' ],
@@ -152,10 +148,10 @@ var OneRegExpLexer =(function(){
 		['SPACES', /[ ]/, 'space' ],
 	// STRING
 		['BACKSLASH', /\\/, 'undefined' ],
-		['SSQ', /'([^'\\\n\r]|\\(.|\r|\n))*'/g, 'string' ],
-		['SSQ_IN', /([^'\\\n\r\f \t]|\\[^\n\r\f \t])+/, '' ],
-		['SDQ', /"([^"\\\n\r]|\\(.|\r|\n))*"/g, 'string' ],
-		['SDQ_IN', /([^"\\\n\r\f \t]|\\[^\n\r\f \t])+/, '' ],
+		['SSQ', /'(?:[^'\\\n\r]|\\(?:.|\r|\n))*'/g, 'string' ],
+		['SSQ_IN', /(?:[^'\\\n\r\f \t]|\\[^\n\r\f \t])+/, '' ],
+		['SDQ', /"(?:[^"\\\n\r]|\\(?:.|\r|\n))*"/g, 'string' ],
+		['SDQ_IN', /(?:[^"\\\n\r\f \t]|\\[^\n\r\f \t])+/, '' ],
 	// COMMENT
 		['SLC', /\/\/[^\n\r]*/g, 'comment' ],
 		['S_SLC', /^\/\//, '' ],

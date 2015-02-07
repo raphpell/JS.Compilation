@@ -103,7 +103,7 @@
 		['JS_LOGICAL_OP',/&&|\|\|/],
 		['JS_COMPARISON_OP',/(?:[<>]|[=!]=)=?/],
 		['JS_ASSIGNMENT_OP',/=|\*=|\/=|\%=|\+=|\-=|<<=|>>=|>>>=|\&=|\^=|\|=/],
-		['R_REGULAR_EXPRESSION',/\/(?:\\\/|[^\s\*\/])(?:\\\/| |	|[^\s\/])*\/[gim]*/],
+		['R_REGULAR_EXPRESSION',/\/(([^\n\r\f\*\\\/\[]|(\\[^\n\r\f])|(\[(([^\n\r\f\]\\]|(\\[^\n\r\f]))*)\]))(([^\n\r\f\\\/\[]|(\\[^\n\r\f])|(\[(([^\n\r\f\]\\]|(\\[^\n\r\f]))*)\]))*))\/(([a-zA-Z])*)/],
 		['REGULAR_EXPRESSION_IN',/[^\t ]+/],
 		['JS_KEYWORD',/(?:break|c(?:ase|atch|ontinue)|d(?:efault|elete|o)|else|f(?:inally|or|unction)|i(?:f|n|nstanceof)|new|return|switch|t(?:his|hrow|ry|ypeof)|v(?:ar|oid)|w(?:hile|ith))\b/],
 		['JS_LITERAL',/(?:true|false|null|undefined|Infinity|NaN)\b/],
