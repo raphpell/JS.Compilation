@@ -12,12 +12,28 @@
 			width: 250px;
 			}
 		#ePhraseInput {
-			width: 100%;
+			width: 300px;
 			}
 		#eExport {
 			font-size: 0.8em;
 			height: 200px;
-			width: 100%;
+			width: 90%;
+			margin: 1em;
+			}
+		FIELDSET {
+			float: left;
+			margin: 0 0 1em 1em;
+			}
+		FIELDSET DL {
+			margin: 0;
+			}
+		#eResultTable,
+		#eResultTree {
+			float: left;
+			margin: 0 0 1em 1em;
+			}
+		HR {
+			clear: left;
 			}
 	</style>
 </head>
@@ -26,52 +42,75 @@
 
 <h1>Création de module Parser</h1>
 
-<label for="eTest">Grammaire : </label>
-<select id="eTest"></select>
-<label for="eParser">Parser : </label>
-<select id="eParser">
-	<option value="LL1">LL(1)</option>
-	<option value="LR0" selected>LR(0)</option>
-	<option value="SLR">SLR</option>
-	<option value="LR1">LR(1)</option>
-</select>
-<a href="#" onclick="grammarSyntax()">syntaxe</a>
-<hr>
+<h2>Grammaire</h2>
+<fieldset><legend>Entrée</legend>
+	<dl>
+		<dt><label for="eTest">Exemple: </label>
+			<select id="eTest"></select></dt>
+		<dt><label for="eParser">Parser: </label>
+			<select id="eParser">
+				<option value="LL1">LL(1)</option>
+				<option value="LR0" selected>LR(0)</option>
+				<option value="SLR">SLR</option>
+				<option value="LR1">LR(1)</option>
+			</select>
+			<a href="#" onclick="grammarSyntax()">syntaxe</a>
+		</dt>
+		<dt><label for="eGrammarInput">Règles: </label>
 <textarea id="eGrammarInput" style="width:100%;">E -> E + T | T
 T -> T * F | F
 F -> ( E ) | id
 </textarea>
-<input type="button" value="Analyser" onclick="getGrammar( document.getElementById('eGrammarInput').value )">
+		</dt>
+		<dt><input type="button" value="Analyser" onclick="getGrammar( document.getElementById('eGrammarInput').value )"></dt>
+	</dl>
+</fieldset>
+<fieldset><legend>Résultat</legend>
+	<dl>
+		<dt><input id="eShowParsingTable" type="checkbox" checked>
+			<label for="eShowParsingTable">Parsing table.</label></dt>
+		<dt><input id="eShowFFTable" type="checkbox">
+			<label for="eShowFFTable">First / Follow table.</label></dt>
+		<dt><input id="eShowGrammar" type="checkbox">
+			<label for="eShowGrammar">Grammaire.</label></dt>
+		<dt><input id="eShowDFA" type="checkbox">
+			<label for="eShowDFA">Automate.</label></dt>
+	</dl>
+</fieldset>
 
-<hr>
-<input id="eShowGrammar" type="checkbox"><label for="eShowGrammar">Grammaire.</label>
-<input id="eShowDFA" type="checkbox"><label for="eShowDFA">Automate.</label>
-<input id="eShowFFTable" type="checkbox"><label for="eShowFFTable">First / Follow table.</label>
-<input id="eShowParsingTable" type="checkbox" checked><label for="eShowParsingTable">Parsing table.</label>
-<hr>
-
+<div id="eParsingTable"></div>
+<div id="eFFTable"></div>
 <div id="eGrammar"></div>
 <div id="eDFA"></div>
-<div id="eFFTable"></div>
-<div id="eParsingTable"></div>
 
-<hr style="clear:both">
+<hr>
+<h2>Test</h2>
 
-<input type="text" id="ePhraseInput" value="id * id + id">
-<input type="button" value="Analyser" onclick="parsePhrase()">
-<hr>
-<input id="eShowResultTable" type="checkbox" checked><label for="eShowResultTable">Analyse.</label>
-<input id="eShowResultTree" type="checkbox"><label for="eShowResultTree">Arbre complet.</label>
-<hr>
+<fieldset><legend>Entrée</legend>
+	<dl>
+		<dt><input type="text" id="ePhraseInput" value="id * id + id"></dt>
+		<dt><input type="button" value="Analyser" onclick="parsePhrase()"></dt>
+	</dl>
+</fieldset>
+<fieldset><legend>Résultat</legend>
+	<dl>
+		<dt><input id="eShowResultTree" type="checkbox">
+			<label for="eShowResultTree">Arbre de syntaxe (CST).</label></dt>
+		<dt><input id="eShowResultTable" type="checkbox" checked>
+			<label for="eShowResultTable">Analyse décriptée.</label></dt>
+	</dl>
+</fieldset>
+
 <pre id="eResultTree"></pre>
 <pre id="eResultTable"></pre>
 
-<hr style="clear:both">
-
+<hr>
+<h2>Export JavaScript</h2>
 <input type="button" value="Exporter" onclick="exportEngine( ENGINE, eWhiteSpaces.checked )">
 <input id="eWhiteSpaces" type="checkbox"><label for="eWhiteSpaces">Espaces blanc.</label>
-<textarea id="eExport"></textarea>
-<PRE id="eExportPreview"></PRE>
+<textarea id="eExport" wrap="off"></textarea>
+<pre id="eExportPreview"></pre>
+
 
 <!-- FRAMEWORK... -->
 <script src="js/framework.js"></script>
@@ -104,6 +143,7 @@ var ENGINE
 
 var exportEngine =function( ENGINE, bWhiteSpaces ){
 	if( ! ENGINE ) return eExport.innerHTML = 'Pas de machine...'
+	if( eParser.value=='LL1' ) return eExport.innerHTML = "TODO: y créer..."
 	
 	var tmp = []
 	ENGINE.PRODUCTIONS.every( function( P, i ){
@@ -111,7 +151,7 @@ var exportEngine =function( ENGINE, bWhiteSpaces ){
 		})
 	tmp.shift()
 	var sProductions = bWhiteSpaces
-		? '{\n\t\t\t'+ tmp.join(',\n\t\t\t') +'\n\t\t\t}'
+		? '{\n\t\t'+ tmp.join(',\n\t\t') +'\n\t\t}'
 		: '{'+ tmp.join(',') +'}'
 
 	var SYMBOLS = ENGINE.T_and_N.concat( ENGINE.end )
@@ -132,7 +172,7 @@ var exportEngine =function( ENGINE, bWhiteSpaces ){
 				},
 			toString :function( bWhiteSpaces ){
 				var a = []
-				var s = bWhiteSpaces ? '\n\t\t\t' : ''
+				var s = bWhiteSpaces ? '\n\t\t' : ''
 				for( var i=1; i<nIndex; i++ )
 					a.push( JSON.stringify( oByIndex[i])+':'+i )
 				return '{'+ s + a.join(','+ s ) + s + '}'
@@ -165,7 +205,7 @@ var exportEngine =function( ENGINE, bWhiteSpaces ){
 		return 1
 		})
 	var sMatrice = bWhiteSpaces
-		? '{\n\t\t\t'+ tmp.join(',\n\t\t\t') +'\n\t\t\t}'
+		? '{\n\t\t'+ tmp.join(',\n\t\t') +'\n\t\t}'
 		: '{'+ tmp.join(',') +'}'
 	var fPartialTree = function( esuParent, aeChild ){
 		var e = ! esuParent
@@ -195,8 +235,6 @@ var exportEngine =function( ENGINE, bWhiteSpaces ){
 	eExportPreview.innerHTML = ''
 	eExport.value =
 		'var ENGINE = {'+
-		'\n\tSTART:'+ JSON.stringify( ENGINE.s ) +','+
-		'\n\tEND:'+ JSON.stringify( ENGINE.end ) +','+
 		'\n\tSYMBOLS:'+ TableSymbols.toString( bWhiteSpaces ) +','+
 		'\n\tPRODUCTIONS:'+ sProductions +','+
 		'\n\tMATRICE:'+ sMatrice +','+
@@ -207,7 +245,6 @@ var exportEngine =function( ENGINE, bWhiteSpaces ){
 
 var getGrammar =function( sText ){
 	ENGINE = Grammar( sText, eParser.value )
-	if( eParser.value=='SLR' ) exportEngine( ENGINE )
 	eGrammar.innerHTML = showGrammar( ENGINE )
 	eDFA.innerHTML = showDFA( ENGINE )
 	eFFTable.innerHTML = showFFTable( ENGINE )
@@ -363,7 +400,6 @@ aExamples.every( function( a, i ){
 	e.selected = a[4]
 	return eTest.appendChild( e )
 	})
-
 </script>
 
 </body>

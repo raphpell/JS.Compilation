@@ -1,7 +1,7 @@
 EPSILON = '&epsilon;'
 var ParserLR =function( ENGINE ){
 	this.union( ENGINE )
-	this.aStack = [ this.START ]
+	this.aStack = ['s1']
 	this.aSymbols = []
 	this.TreeBuilder = this.AST || ParserLR.ParseTree
 	}
@@ -11,7 +11,7 @@ ParserLR.prototype ={
 		return this.MATRICE[ nState ] && this.MATRICE[ nState ][ this.SYMBOLS[ sSymbol ]]
 		},
 	getResult :function(){
-		return this.readToken( Lexeme({ token:this.END }))
+		return this.readToken( Lexeme({ token:'END_TOKEN' }))
 		},
 	getState :function(){
 		return this.aStack[this.aStack.length-1].substring(1)
