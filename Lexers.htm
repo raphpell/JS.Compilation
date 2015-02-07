@@ -2,6 +2,7 @@
 	<head>
 		<title>Les Lexers</title>
 		<style>
+SECTION { margin-left: 1em; }
 UL {
 	list-style-position: inside;
 	padding: 0 1em;
@@ -19,7 +20,7 @@ LI {
 	padding: .5em 1em;
 	white-space: nowrap;
 	}
-UL + P {
+H2, H3 {
 	clear: left;
 	}
 		</style>
@@ -36,99 +37,99 @@ UL + P {
 	L'<a href="LexerAutomaton.incremental.htm">analyse partielle</a> n'est pas implémenté pour le lexer à ER pour qu'il reste le plus performant.
 </p>
 
-<h2>Performance</h2>
-<p>Elle est mesurée sur deux méthodes :</p>
-<ul>
-	<li><b>readToken</b>: <a href="Lexers.performance.readToken.htm">vitesse de lecture des tokens</a> pour un lexer.</li>
-	<li><b>scan</b>: comparaison de la <a href="Lexers.performance.scan.htm">vitesse de lecture totale</a> des lexers.</li>
-</ul>
-<p>
-	L'<a href="Lexers.result.comparaison.htm">équivalence des résultats</a> des analyses lexicales est comparée 
-	afin d'assurer des mesures dans des conditions identiques.
-</p>
-<p>La performance est dependante de l'objet retourné par la fonction <a href="Lexeme.htm">Lexeme</a>.</p>
+<h2>Performance</h2><section>
+	<p>Elle est mesurée sur deux méthodes :</p>
+	<ul>
+		<li><b>readToken</b>: <a href="Lexers.performance.readToken.htm">vitesse de lecture des tokens</a> pour un lexer.</li>
+		<li><b>scan</b>: comparaison de la <a href="Lexers.performance.scan.htm">vitesse de lecture totale</a> des lexers.</li>
+	</ul>
+	<p>
+		L'<a href="Lexers.result.comparaison.htm">équivalence des résultats</a> des analyses lexicales est comparée 
+		afin d'assurer des mesures dans des conditions identiques.
+	</p>
+	<p>La performance est dependante de l'objet retourné par la fonction <a href="Lexeme.htm">Lexeme</a>.</p>
+	</section>
+<h2>Description</h2><section>
+	<p style="margin-bottom:0;">
+		Ils réalisent tous une analyse à <a href="Lexers.result.comparaison.htm">plusieurs niveaux</a>: un <i>arbre lexicale</i> est créé.<br>
+	</p>
 
-
-<h2>Description</h2>
-<p style="margin-bottom:0;">
-	Ils réalisent tous une analyse à <a href="Lexers.result.comparaison.htm">plusieurs niveaux</a>: un <i>arbre lexicale</i> est créé.<br>
-</p>
-
-
-<h3>Les deux lexers à privilégier</h3>
-<ul>
-	<li>Parcourent le texte une et une seule fois...</li>
-	<li>Permettent de:
-		<ol>
-			<li>réaliser un double scannage d'un token (à éviter si possible !): il en fait un token parent.</li>
-			<li>détecter le début et la fin d'un token parent.</li>
-		</ol>
-	</li>
-	<li>Utilisent une liste d'<i>objet</i> pour reconnaître des tokens.<br>
-		<small><b>ATTENTION</b></small>: Premier objet arrivé, premier servi.
-		<ol>
-			<li>Un ordre est requis (mots clés avant identifiant, ...)</li>
-			<li>Les objets trouvés le plus souvant doivent être classés en tête :
-				<i>amélioration des performances</i>.</li>
-		</ol>
-	</li>
-</ul>
-
-<p>Comparaisons des deux lexers :</p>
-<ul>
-	<li class="lexer"><b>Automaton Lexer</b>. <br>
-		Utilise des AFD : Il reconnaisse 1 à plusieurs tokens.
+	<h3>Les deux lexers à privilégier</h3><section>
 		<ul>
-			<li style="color:red;">Lexer plus lent.</li>
-			<li style="color:red;">Code source très grand.</li>
-			<li style="color:green;">Analyse partielle implémenté (<a href="LexerAutomaton.incremental.htm">aperçu</a>).</li>
-			<li style="color:green;">Le plus long token trouvé est toujours retourné.</li>
-		</ul></li>
-	<li class="lexer"><b>Multiple RegExp Lexer</b>. <br>
-		Utilise des ER : Elle reconnaisse 1 et 1 seul token.
+			<li>Parcourent le texte une et une seule fois...</li>
+			<li>Permettent de:
+				<ol>
+					<li>réaliser un double scannage d'un token (à éviter si possible !): il en fait un token parent.</li>
+					<li>détecter le début et la fin d'un token parent.</li>
+				</ol>
+			</li>
+			<li>Utilisent une liste d'<i>objet</i> pour reconnaître des tokens.<br>
+				<small><b>ATTENTION</b></small>: Premier objet arrivé, premier servi.
+				<ol>
+					<li>Un ordre est requis (mots clés avant identifiant, ...)</li>
+					<li>Les objets trouvés le plus souvant doivent être classés en tête :
+						<i>amélioration des performances</i>.</li>
+				</ol>
+			</li>
+		</ul>
+		<p>Comparaisons des deux lexers :</p>
 		<ul>
-			<li style="color:green;">Lexer plus rapide.</li>
-			<li style="color:green;">Code source beaucoup plus petit.</li>
-			<li style="color:red;">Analyse partielle non implémentée.</li>
-			<li style="color:red;">Premier arrivé, premier servi.</li>
-		</ul></li>
-</ul>
+			<li class="lexer"><b>Automaton Lexer</b>. <br>
+				Utilise des AFD : Il reconnaisse 1 à plusieurs tokens.
+				<ul>
+					<li style="color:red;">Lexer plus lent.</li>
+					<li style="color:red;">Code source très grand.</li>
+					<li style="color:green;">Analyse partielle implémenté (<a href="LexerAutomaton.incremental.htm">aperçu</a>).</li>
+					<li style="color:green;">Le plus long token trouvé est toujours retourné.</li>
+				</ul></li>
+			<li class="lexer"><b>Multiple RegExp Lexer</b>. <br>
+				Utilise des ER : Elle reconnaisse 1 et 1 seul token.
+				<ul>
+					<li style="color:green;">Lexer plus rapide.</li>
+					<li style="color:green;">Code source beaucoup plus petit.</li>
+					<li style="color:red;">Analyse partielle non implémentée.</li>
+					<li style="color:red;">Premier arrivé, premier servi.</li>
+				</ul></li>
+		</ul>
+		</section>
 
-<p></p>
-<h3>Le dernier à éviter impérativement</h3>
-<ul>
-	<li class="lexer"><b>"1 RegExp" Lexer</b> <sup style="color:red;">deprecated</sup>
+	<h3>Le dernier à éviter impérativement</h3><section>
 		<ul>
-			<li>Une seule grande expression régulière est créée pour parcourir le texte.</li>
-			<li>Le défaut: quand un mot est trouvé il faut déterminé son type.</li>
-			<li>Pour cela il faut parcourir toutes les expressions régulières (celles utilisées pour créer la grande).</li>
-			<li>Les expressions régulières utilisées pour créer la grande ont une organisation spéciale... (voir ci-dessus!)</li>
-			<li>J'ai abandonné son utilisation.</li>
-		</ul></li>
-</ul>
-
-<p></p>
-<h2>Considérations techniques</h2>
-
-
-<p>Les Automates Finis Déterministes doivent-être précalculés :</p>
-<ol>
-	<li>Chaque <a href="AFD.generator.htm">ER transformé en AFD</a></li>
-	<li>Chaque <a href="AFD.aggregator.htm">AFD aggrégé entre eux</a> afin d'en obtenir plus qu'un !</li>
-</ol>
-<p>Malheureusement il est parfois préférable d'en utiliser plusieurs à la place :</p>
-<ul>
-	<li>La taille de l'automate résultat pouvant-être trop volumineuse, </li>
-	<li>ou sa création prennant beaucoup trop de temps.</li>
-</ul>
-<p>L'analyse lexicale se fait ensuite avec un ou plusieurs AFD :</p>
-<ul>
-	<li>Performance (calcul) = 1 AFD.</li>
-	<li>Maintenance / Evolution = Plusieurs AFDs.</li>
-	<li>Performance téléchargement = Fonction de la taille des AFDs.</li>
-</ul>
-<p>Vous pouvez <a href="LexerAutomaton.module.generator.htm">créer des modules pour le Lexer Automaton</a>.</p>
-
+			<li class="lexer"><b>"1 RegExp" Lexer</b> <sup style="color:red;">deprecated</sup>
+				<ul>
+					<li>Une seule grande expression régulière est créée pour parcourir le texte.</li>
+					<li>Le défaut: quand un mot est trouvé il faut déterminé son type. 
+						Pour cela il faut réaliser une boucle !</li>
+					<li>J'ai abandonné son utilisation.</li>
+				</ul></li>
+		</ul>
+		</section>
+	</section>
+<h2>Considérations techniques</h2><section>
+	<p>Les Automates Finis Déterministes doivent-être précalculés :</p>
+	<ol>
+		<li>Chaque <a href="AFD.generator.htm">ER transformé en AFD</a></li>
+		<li>Chaque <a href="AFD.aggregator.htm">AFD aggrégé entre eux</a> afin d'en obtenir plus qu'un !</li>
+	</ol>
+	<p>Malheureusement il est parfois préférable d'en utiliser plusieurs à la place :</p>
+	<ul>
+		<li>La taille de l'automate résultat pouvant-être trop volumineuse, </li>
+		<li>ou sa création prennant beaucoup trop de temps.</li>
+	</ul>
+	<p>L'analyse lexicale se fait ensuite avec un ou plusieurs AFD :</p>
+	<ul>
+		<li>Performance (calcul) = 1 AFD.</li>
+		<li>Maintenance / Evolution = Plusieurs AFDs.</li>
+		<li>Performance téléchargement = Fonction de la taille des AFDs.</li>
+	</ul>
+	<p>Vous pouvez <a href="LexerAutomaton.module.generator.htm">créer des modules pour le Lexer Automaton</a>.</p>
+	</section>
+<h2>Liens utiles</h2><section>
+	<ul>
+		<li>http://eli.thegreenplace.net/2013/06/25/regex-based-lexical-analysis-in-python-and-javascript</li>
+		<li>http://eli.thegreenplace.net/2013/07/16/hand-written-lexer-in-javascript-compared-to-the-regex-based-ones</li>
+	</ul>
+	</section>
 
 	</body>
 </html>

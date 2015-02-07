@@ -135,11 +135,12 @@ var createLexeme =function( bClassName, bTitle, bInnerHTML, bByLine ){
 ParserLR.Node = Lexeme
 AST ={
 	nullify :function( s ){
-		RegExpParser[s]._AST = RegExpParser[s].AST
+		if( RegExpParser[s].AST ) RegExpParser[s]._AST = RegExpParser[s].AST
 		RegExpParser[s].AST = null
 		},
 	define :function( s ){
-		RegExpParser[s].AST = RegExpParser[s]._AST
+		if( ! RegExpParser[s].AST )
+			RegExpParser[s].AST = RegExpParser[s]._AST
 		}
 	}
 AST.nullify('REGEXP')
