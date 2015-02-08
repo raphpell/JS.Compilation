@@ -312,7 +312,7 @@ function scan (){
 		//try{
 			eRoot = AutomatonLexer( sSource, 'WIZ' )
 		//	eTest.appendChild( eRoot )
-			eTest.appendChild( ParserLR.parse( to_array( eRoot.childNodes ), WizParserEngine.ITEMS ))
+			eTest.appendChild( ParserLR.parse( eRoot, WizParserEngine.ITEMS ))
 		//	}catch( e ){ alert( e.message )}
 	
 		var aItems = eTest.getElementsByTagName('ITEM')

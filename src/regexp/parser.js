@@ -139,21 +139,18 @@ var RegExpParser ={
 				case "(12) QUANTIFIERS -> QUANTIFIER":
 					if( RHS[0].firstChild.nodeName=='LBRACE' ) RHS[0].removeChild( RHS[0].firstChild )
 					if( RHS[0].lastChild.nodeName=='RBRACE' ) RHS[0].removeChild( RHS[0].lastChild )
-					var aTokens = to_array( RHS[0].childNodes )
-					return ParserLR.parse( aTokens, RegExpParser.QUANTIFIER )
+					return ParserLR.parse( RHS[0], RegExpParser.QUANTIFIER )
 				case "(13) CHAR_CLASS_EXP -> CHARSET":
 					o = Lexeme({token:'CHARCLASS',css:'charclass'})
 					if( RHS[0].firstChild.nodeName=='LBRACK' ) RHS[0].removeChild( RHS[0].firstChild )
 					if( RHS[0].lastChild.nodeName=='RBRACK' ) RHS[0].removeChild( RHS[0].lastChild )
-					var aTokens = to_array( RHS[0].childNodes )
-					o.appendChild( ParserLR.parse( aTokens, RegExpParser.CHARCLASS ))
+					o.appendChild( ParserLR.parse( RHS[0], RegExpParser.CHARCLASS ))
 					return o
 				case "(14) CHAR_CLASS_EXP -> NEGATED_CHARSET":
 					o = Lexeme({token:'NEGATED_CHARCLASS',css:'charclass negated'})
 					if( RHS[0].firstChild.nodeName=='NLBRACK' ) RHS[0].removeChild( RHS[0].firstChild )
 					if( RHS[0].lastChild.nodeName=='NRBRACK' ) RHS[0].removeChild( RHS[0].lastChild )
-					var aTokens = to_array( RHS[0].childNodes )
-					o.appendChild( ParserLR.parse( aTokens, RegExpParser.CHARCLASS ))
+					o.appendChild( ParserLR.parse( RHS[0], RegExpParser.CHARCLASS ))
 					return o
 				case "(15) CHAR_CLASS_EXP -> SIMPLE_EXP":
 					return RHS[0];
@@ -164,8 +161,7 @@ var RegExpParser ={
 				case "(19) SIMPLE_EXP -> SUB_REGEXP":
 					if( RHS[0].firstChild.nodeName=='LPAREN' ) RHS[0].removeChild( RHS[0].firstChild )
 					if( RHS[0].lastChild.nodeName=='RPAREN' ) RHS[0].removeChild( RHS[0].lastChild )
-					var aTokens = to_array( RHS[0].childNodes )
-					return ParserLR.parse( aTokens, RegExpParser.REGEXP )
+					return ParserLR.parse( RHS[0], RegExpParser.REGEXP )
 				case "(20) SIMPLE_EXP -> MINUS":
 					return RHS[0];
 				}

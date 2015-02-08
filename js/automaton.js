@@ -251,7 +251,7 @@ searchDeadState =function( oFA ){
 
 RegExp2Tree =function( sRegExp ){
 	return ParserLR.parse(
-		to_array( AutomatonLexer( sRegExp, 'RegExp' ).childNodes ),
+		AutomatonLexer( sRegExp, 'RegExp' ),
 		RegExpParser.REGEXP
 		)
 	}

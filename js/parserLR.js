@@ -1,4 +1,4 @@
-EPSILON = '&epsilon;'
+﻿EPSILON = '&epsilon;'
 var ParserLR =function( ENGINE ){
 	this.union( ENGINE )
 	this.SYMBOLS.END_TOKENS = 0
@@ -29,7 +29,7 @@ ParserLR.prototype ={
 		return result
 		},
 	e :function(){
-		throw new Error ( 'Erreur de syntaxe\n token: "'+ JSON.stringify( this.oToken.oValue ) +'"\n �tat: '+ this.getState())
+		throw new Error ( 'Erreur de syntaxe\n token: "'+ JSON.stringify( this.oToken.oValue ) +'"\n état: '+ this.getState())
 		},
 	s :function(){
 		this.aStack.push( this.action )
@@ -61,8 +61,10 @@ ParserLR.prototype ={
 	}
 	
 ParserLR.sIgnored = '|WHITE_SPACES|NEW_LINE|TAB|SPACES|SPACE|COMMENT|'
-ParserLR.parse =function( aTokens, ENGINE ){
+ParserLR.parse =function( eScanResult, ENGINE ){
 	var o = new ParserLR( ENGINE )
+	var M = eScanResult.childNodes
+	for(var i=0, aTokens=[]; M[i]; i++) aTokens.push( M[i])
 	for(var i=0; aTokens[i]; i++ ) o.readToken( aTokens[i])
 	return o.getResult()
 	}

@@ -26,16 +26,16 @@ var GrammarParserEngine={
 				case "(2) GRAMMAR -> &epsilon;": return false;
 				case "(3) PRODUCTIONS -> PRODUCTION PRODUCTIONS":
 					o = document.createDocumentFragment()
-					var aTokens = to_array( RHS[0].childNodes )
-					RHS[0].innerHTML = ''
-					RHS[0].appendChild( ParserLR.parse( aTokens, GrammarParserEngine.PRODUCTION ))
+					var o1 = document.createDocumentFragment()
+					while( RHS[0].firstChild ) o1.appendChild( RHS[0].firstChild )
+					RHS[0].appendChild( ParserLR.parse( o1, GrammarParserEngine.PRODUCTION ))
 					o.appendChild( RHS[0])
 					o.appendChild( RHS[1])
 					return o;
 				case "(4) PRODUCTIONS -> PRODUCTION":
-					var aTokens = to_array( RHS[0].childNodes )
-					RHS[0].innerHTML = ''
-					RHS[0].appendChild( ParserLR.parse( aTokens, GrammarParserEngine.PRODUCTION ))
+					var o1 = document.createDocumentFragment()
+					while( RHS[0].firstChild ) o1.appendChild( RHS[0].firstChild )
+					RHS[0].appendChild( ParserLR.parse( o1, GrammarParserEngine.PRODUCTION ))
 					return RHS[0]
 				}
 			}
@@ -65,10 +65,7 @@ var GrammarParserEngine={
 					o.appendChild( RHS[0])
 					if( RHS[1].firstChild.nodeName=='RARROW' ) RHS[1].removeChild( RHS[1].firstChild )
 					if( RHS[1].lastChild.nodeName=='NEW_LINE' ) RHS[1].removeChild( RHS[1].lastChild )
-					var aTokens = to_array( RHS[1].childNodes )
-					RHS[1].innerHTML = ''
-				//	RHS[1].appendChild( )
-					o.appendChild( ParserLR.parse( aTokens, GrammarParserEngine.RHS ))
+					o.appendChild( ParserLR.parse( RHS[1], GrammarParserEngine.RHS ))
 					return o;
 				case "(2) PRODUCTION -> &epsilon;": return false;
 				}
@@ -114,6 +111,7 @@ var GrammarParserEngine={
 				case "(2) RHS -> &epsilon;": return false;
 				case "(3) UNION -> CONCAT PIPE UNION":
 					if( RHS[0] && RHS[2] ){
+						RHS[1].parentNode.removeChild( RHS[1])
 						o = Lexeme({token:'PIPE',css:'alternation'})
 						var addPipeChild =function( eChild ){
 							if( eChild.nodeName=='PIPE' ){

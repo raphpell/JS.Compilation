@@ -137,9 +137,8 @@ var Lexeme =function( o ){
 var match =function(){
 	eResult.innerHTML = ''
 	try{
-		var eLexer = AutomatonLexer( eInput.value, 'WIZ' )
-		var aTokens = to_array( eLexer.childNodes )
-		eResult.appendChild( ParserLR.parse( aTokens, WizParserEngine.ITEMS ))
+		var eScanResult = AutomatonLexer( eInput.value, 'WIZ' )
+		eResult.appendChild( ParserLR.parse( eScanResult, WizParserEngine.ITEMS ))
 	//	eResult.appendChild( eLexer )
 	}catch(e){
 		eResult.innerHTML = e.message + '<br>'

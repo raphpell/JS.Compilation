@@ -78,10 +78,10 @@ var WizParserEngine={
 							: ''
 						})
 					oFragment.appendChild( oRule )
-					if( RHS[1]) oFragment.appendChild( ParserLR.parse( to_array( RHS[1].childNodes ), WizParserEngine.BLOCK ))
+					if( RHS[1]) oFragment.appendChild( ParserLR.parse( RHS[1], WizParserEngine.BLOCK ))
 					return oFragment
 				case "(10) OBJECT -> BLOCK":
-					return ParserLR.parse( to_array( RHS[1].childNodes ), WizParserEngine.BLOCK );
+					return ParserLR.parse( RHS[1], WizParserEngine.BLOCK );
 				case "(11) OBJECT -> &epsilon;": return false;
 				}
 			}

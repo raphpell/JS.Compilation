@@ -278,7 +278,7 @@ var scan =function(){
 var parse =function(){
 	if( ! eLexer ) return ;
 	eScanResult.innerHTML = eParseResult.innerHTML = ''
-	eParseResult.appendChild( ParserLR.parse( to_array( eLexer.childNodes ), RegExpParser.REGEXP ))
+	eParseResult.appendChild( ParserLR.parse( eLexer, RegExpParser.REGEXP ))
 	}
 var readToken =function(){
 	if( aStackInterval.length || ! eLexer ) return ;
