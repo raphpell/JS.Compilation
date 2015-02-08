@@ -202,7 +202,7 @@ var scan =function( bDisplay, sText ){
 	return to_array( _scan().childNodes )
 	}
 var parse =function( bDisplay, sText ){
-	var _parse =function(){ return ParserLR( scan( false, sText ), ENGINE )}
+	var _parse =function(){ return ParserLR.parse( scan( false, sText ), ENGINE )}
 	if( bDisplay ) displayResult( _parse )
 	return _parse()
 	}

@@ -83,7 +83,7 @@ var parse =function(){
 	try{
 		var eLexer = AutomatonLexer( eInput.value, 'GRAMMAR' )
 		var aTokens = to_array( eLexer.childNodes )
-		eResult.appendChild( ParserLR( aTokens, GrammarParserEngine.GRAMMAR ))
+		eResult.appendChild( ParserLR.parse( aTokens, GrammarParserEngine.GRAMMAR ))
 	}catch(e){
 		eResult.innerHTML = e.message + '<br>'
 		if( e.fileName ) eResult.innerHTML += '<br>fichier: '+ e.fileName.split('/').pop()

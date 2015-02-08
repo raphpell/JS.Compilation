@@ -16,7 +16,7 @@
 			}
 		#eExport {
 			font-size: 0.8em;
-			height: 200px;
+			height: 500px;
 			width: 90%;
 			margin: 1em;
 			}
@@ -107,7 +107,7 @@ F -> ( E ) | id
 <hr>
 <h2>Export JavaScript</h2>
 <input type="button" value="Exporter" onclick="exportEngine( ENGINE, eWhiteSpaces.checked )">
-<input id="eWhiteSpaces" type="checkbox"><label for="eWhiteSpaces">Espaces blanc.</label>
+<input id="eWhiteSpaces" type="checkbox" checked><label for="eWhiteSpaces">Espaces blanc.</label>
 <textarea id="eExport" wrap="off"></textarea>
 <pre id="eExportPreview"></pre>
 
@@ -116,7 +116,6 @@ F -> ( E ) | id
 <script src="js/framework.js"></script>
 <script src="js/lexer.automaton.js"></script>
 <script src="js/lexer.automaton.modules.js"></script>
-<script src="js/parserLR.js"></script>
 <!-- TODO: Rajouter les '
 <script src="src/grammar/node.js"></script>
 <script src="src/grammar/lexer.js"></script>
@@ -154,27 +153,26 @@ var exportEngine =function( ENGINE, bWhiteSpaces ){
 		? '{\n\t\t'+ tmp.join(',\n\t\t') +'\n\t\t}'
 		: '{'+ tmp.join(',') +'}'
 
-	var SYMBOLS = ENGINE.T_and_N.concat( ENGINE.end )
+	var SYMBOLS = ['END_TOKENS'].concat( ENGINE.T_and_N )
 	var TableSymbols=(function(){
-		var nIndex = 1
-		var oByIndex ={}
-		var oBySymbol ={}
+		var nIndex = 0
+		var aByIndex = []
+		var oBySymbol = {}
 		return {
 			indexOf :function( symbol ){ return oBySymbol[symbol] },
-			symbolAt :function( index ){ return oByIndex[index] },
+			symbolAt :function( index ){ return aByIndex[index] },
 			push :function( symbol ){
-				var n = this.indexOf( symbol )
-				if( n ) return n
+				if( oBySymbol[symbol]!==undefined ) return false
 				oBySymbol[symbol] = nIndex
-				oByIndex[nIndex] = symbol
+				aByIndex[nIndex] = symbol
 				nIndex++
-				return nIndex-1
+				return true
 				},
 			toString :function( bWhiteSpaces ){
 				var a = []
 				var s = bWhiteSpaces ? '\n\t\t' : ''
-				for( var i=1; i<nIndex; i++ )
-					a.push( JSON.stringify( oByIndex[i])+':'+i )
+				for(var i=1; i<nIndex; i++)
+					a.push( JSON.stringify( aByIndex[i])+':'+i )
 				return '{'+ s + a.join(','+ s ) + s + '}'
 				},
 			}
@@ -186,13 +184,13 @@ var exportEngine =function( ENGINE, bWhiteSpaces ){
 	ENGINE.STATES.every( function( S, i ){
 		i = i + 1
 		SYMBOLS.every( function( TorN ){
-			if( ENGINE.M[ i ]){
-				var action = ENGINE.M[ i ][ TorN ]
+			if( ENGINE.M[i]){
+				var action = ENGINE.M[i][ TorN ]
 				if( action ){
-					M[ i ] = M[ i ] || []
+					M[i] = M[i] || []
 					action = action.constructor==String ? action : action[0]
 					action = action.constructor==Array ? action[0] : action
-					M[ i ][TableSymbols.indexOf( TorN )]="'"+action+"'"
+					M[i][ TableSymbols.indexOf( TorN ) ]="'"+action+"'"
 					}
 				}
 			return 1
@@ -239,7 +237,6 @@ var exportEngine =function( ENGINE, bWhiteSpaces ){
 		'\n\tMATRICE:'+ sMatrice +','+
 		'\n\tAST:'+ sASTFunction.replace( '{options}', aOptions.join('\n')).split('\n').join('\n\t') +
 		'\n\t}'
-		
 	}	
 
 var getGrammar =function( sText ){

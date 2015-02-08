@@ -1,64 +1,71 @@
-﻿EPSILON = '&epsilon;'
-var ParserLR =function( aTokens, ENGINE ){
-	aTokens.push( ParserLR.Node('END_TOKENS'))
-	var aStack = ['s1']
-	, aSymbols = []
-	, TreeBuilder = ENGINE.AST || ParserLR.ParseTree
-	, i=0, nState1, nState2, Token, o, action
-	, M = ENGINE.MATRICE
-	, ACTIONS={
-		s :function(){
-			aStack.push( action )
-			aSymbols.push( Token )
-			i++
-			return false
-			},
-		r :function(){
-			var prodID = action.substring(1)
-			, p = ENGINE.PRODUCTIONS[ prodID ]
-			, LHS = p[0], RHS = p[1]
-			, nPop = RHS.length==1 && RHS[0]==EPSILON ? 0 : RHS.length
-			if( nPop ) aStack = aStack.slice( 0, -nPop )
-			if( aStack.length ){
-				nState2 = aStack[ aStack.length-1 ].substring(1)
-				var goto_ = M[ nState2 ] ? M[ nState2 ][ ENGINE.SYMBOLS[ LHS ]] : null
-				if( goto_ ){
-					aStack.push( goto_.replace( 'g', 's' ))
-					aSymbols.push(
-						TreeBuilder(
-							'('+ prodID +') '+ LHS +' -> '+ RHS.join(' '),
-							LHS,
-							aSymbols.splice( aSymbols.length-nPop, nPop )
-							)
-						)
-					}
-				}
-			return false
-			},
-		a :function(){
-			return aSymbols.pop() /* || document.createElement(ERROR_PARSING) */
-			}
-		}
-	do{
-		nState1 = aStack[aStack.length-1].substring(1)
-		Token = aTokens[i]
-		var sTokenName = Token.nodeName.toUpperCase()
-		while( ParserLR.sIgnoredToken.indexOf( '|'+sTokenName+'|' )> -1 ){
-			i++
-			Token = aTokens[i]
-			var sTokenName = Token.nodeName.toUpperCase()
-			}
-		action = M[ nState1 ] ? M[ nState1 ][ ENGINE.SYMBOLS[ sTokenName ]] : null
-		if( ! action ) throw new Error ( 'Erreur de syntaxe\n token: "'+ sTokenName +'"\n index: '+ i +'\n état: '+ nState1 )
-		var f = ACTIONS[ action[0]]
-		if( f ){
-			var result = f()
-			if( result ) return result
-			} else throw new Error ( "Erreur parsing ... action "+ action )
-	}while( i < aTokens.length && aStack.length )
-	throw new Error ( 'Phrase incomplète...' )
+EPSILON = '&epsilon;'
+var ParserLR =function( ENGINE ){
+	this.union( ENGINE )
+	this.SYMBOLS.END_TOKENS = 0
+	this.aStack = ['s1']
+	this.aSymbols = []
+	this.TreeBuilder = this.AST || ParserLR.ParseTree
 	}
-ParserLR.sIgnoredToken = '|WHITE_SPACES|NEW_LINE|TAB|SPACES|SPACE|COMMENT|'
+ParserLR.prototype ={
+	getAction :function( nState, sSymbol ){
+		return this.MATRICE[ nState ] && this.MATRICE[ nState ][ this.SYMBOLS[ sSymbol ]]
+		},
+	getResult :function(){
+		return this.readToken( Lexeme({ token:'END_TOKENS' }))
+		},
+	getState :function(){
+		return this.aStack[this.aStack.length-1].substring(1)
+		},
+	readToken :function( oToken ){
+		var sSymbol = oToken.nodeName.toUpperCase(), result
+		if( ParserLR.sIgnored.indexOf( '|'+sSymbol+'|' )> -1 ) return null
+		this.oToken = oToken
+		do{
+			if( this.action = this.getAction( this.getState(), sSymbol )){
+				var s = this.action.charAt(0)
+				result = this[s]()
+				} else this.e()
+			}while( this.aStack.length && s=='r' )
+		return result
+		},
+	e :function(){
+		throw new Error ( 'Erreur de syntaxe\n token: "'+ JSON.stringify( this.oToken.oValue ) +'"\n �tat: '+ this.getState())
+		},
+	s :function(){
+		this.aStack.push( this.action )
+		this.aSymbols.push( this.oToken )
+		},
+	r :function(){
+		var ProdID = this.action.substring(1)
+		, P = this.PRODUCTIONS[ ProdID ]
+		, LHS = P[0], RHS = P[1]
+		, nPop = RHS.length==1 && RHS[0]==EPSILON ? 0 : RHS.length
+		if( nPop ) this.aStack = this.aStack.slice( 0, -nPop )
+		if( this.aStack.length ){
+			var goto_ = this.getAction( this.getState(), LHS )
+			if( goto_ ){
+				this.aStack.push( goto_.replace('g','s'))
+				this.aSymbols.push(
+					this.TreeBuilder(
+						'('+ ProdID +') '+ LHS +' -> '+ RHS.join(' '),
+						LHS,
+						this.aSymbols.splice( this.aSymbols.length-nPop, nPop )
+						)
+					)
+				}
+			}
+		},
+	a :function(){
+		return this.aSymbols.pop()
+		}
+	}
+	
+ParserLR.sIgnored = '|WHITE_SPACES|NEW_LINE|TAB|SPACES|SPACE|COMMENT|'
+ParserLR.parse =function( aTokens, ENGINE ){
+	var o = new ParserLR( ENGINE )
+	for(var i=0; aTokens[i]; i++ ) o.readToken( aTokens[i])
+	return o.getResult()
+	}
 ParserLR.Node =function ( X ){
 	var e = document.createElement( X )
 	e.className = 'myNode'

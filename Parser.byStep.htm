@@ -52,7 +52,7 @@ TABLE COL {
 </fieldset>
 <fieldset><legend>Divers</legend>
 	<dl>
-		<dt>Temps: <input type="text" id="eTime" value="500"></dt>
+		<dt>Temps: <input type="text" id="eTime" value="250"></dt>
 		<dt><input type="checkbox" id="eAstRegExp">
 			<label for="eAstRegExp">RegExp AST</label></dt>
 		<dt><input type="checkbox" id="eAstCharClass">
@@ -129,8 +129,8 @@ var createLexeme =function( bClassName, bTitle, bInnerHTML, bByLine ){
 <script src="js/lexer.automaton.js"></script>
 <script src="js/lexer.automaton.modules.js"></script>
 <script src="src/regexp/lexer.js"></script>
-<script src="src/regexp/futurParser.js"></script>
-<script src="js/futurParser.js"></script>
+<script src="src/regexp/parser.js"></script>
+<script src="js/parserLR.js"></script>
 <script>
 ParserLR.Node = Lexeme
 AST ={
@@ -187,9 +187,11 @@ Tables=(function(){
 			Bufferize( '<thead>' )
 			Bufferize( '<tr><td></td>' )
 			var o = ENGINE.SYMBOLS
+			var nSymbolsCount = 0
 			for( sSymbol in o )
 				if( o[sSymbol].constructor==Number ){
 					Bufferize( "<th>"+ o[sSymbol] +"</th>" )
+					nSymbolsCount++
 					}
 			Bufferize( '</tr>' )
 			Bufferize( '</thead>' )
@@ -197,8 +199,10 @@ Tables=(function(){
 			var o = ENGINE.MATRICE
 			for( sState in o )
 				if( o[sState].constructor==Array ){
+					var a = o[sState].concat([])
+					a.length = nSymbolsCount
 					Bufferize( '<tr id="State'+ sState +'"><th>'+ sState +"</th>" )
-					Bufferize( "<td>"+ o[sState].slice(1).join('</td><td>') +"</td>" )
+					Bufferize( "<td>"+ a.join('</td><td>') +"</td>" )
 					Bufferize( "</tr>" )
 					}
 			Bufferize( '</tbody></table>' )

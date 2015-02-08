@@ -105,7 +105,7 @@ var parse =function(){
 	try{
 		var eLexer = AutomatonLexer( eInput.value, 'RegExp' )
 		var aTokens = to_array( eLexer.childNodes )
-		eResult.appendChild( ParserLR( aTokens, RegExpParser.REGEXP ))
+		eResult.appendChild( ParserLR.parse( aTokens, RegExpParser.REGEXP ))
 	}catch(e){
 		eResult.innerHTML = e.message + '<br>'
 		if( e.fileName ) eResult.innerHTML += '<br>fichier: '+ e.fileName.split('/').pop()

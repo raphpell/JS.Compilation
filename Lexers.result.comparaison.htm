@@ -15,6 +15,7 @@
 	.tokens { white-space: normal; }
 	.w50 {
 		float: left;
+		margin-bottom: 2em;
 		text-align: center; 
 		width: 49.8%;
 		}
@@ -25,7 +26,7 @@
 	TEXTAREA {
 		width: 100%;
 		}
-	h2, h3 { text-align: center; }
+	h2, h3 { text-align: center; clear: both; }
 	h2, h3 { margin:0; padding:0.25em 0 0 0; background: #000; color: #FFF; }
 	h3 { color: #FF0; font:normal 1em Verdana; padding:0 0 0.5em 0; }
 	h4 { margin:0 0 1em 0; }
@@ -65,10 +66,6 @@
 	<input type="button" value="Benchmark" onclick="getTokens2()">
 	<pre id="eChrono2" class="tokens">...</pre>
 	<pre id="eRegExpResult2" class="tokens"></pre>
-</div>
-<div class="w100">
-	<input type="button" value="AST" onclick="getAST1()">
-	<pre id="eAST1">...</pre>
 </div>
 
 <h2>JavaScript + PHP</h2>
@@ -381,16 +378,14 @@ Events.add(
 		eRegExp.value = eRegExpList.value
 		getTokens1()
 		getTokens2()
-		getAST1()
-		getTokens1()
 		}
 	)
 </script>
 
 <!-- TESTS -->
 <script>
-_('eRepeatTest1,eRegExp,eRegExpList,eAST1')
-_('eRepeatTest2,eText,eAST2')
+_('eRepeatTest1,eRegExp,eRegExpList')
+_('eRepeatTest2,eText')
 _('eRegExpResult1,eChrono1')
 _('eRegExpResult2,eChrono2')
 _('eRegExpResult3,eChrono3')
@@ -439,332 +434,6 @@ var getTokens4 =function(){
 	}
 </script>
 
-<!-- AST -->
-<script>
-EPSILON = '&epsilon;'
-var REParser =Parser =(function(){
-		var ENGINE = {
-			START:"s1",
-			END:"END_TOKENS",
-			SYMBOLS:{
-
-				"'|'":1,
-				"(":2,
-				")":3,
-				"*":4,
-				"+":5,
-				"-":6,
-				"?":7,
-				"ANY":8,
-				"[":9,
-				"[^":10,
-				"\\":11,
-				"]":12,
-				"c":13,
-				"{n,m}":14,
-				"{n,}":15,
-				"{n}":16,
-				"REGEXP":17,
-				"UNION":18,
-				"CONCAT":19,
-				"REPEAT":20,
-				"CHAR_CLASS_EXP":21,
-				"CHAR_CLASSES":22,
-				"CHAR_CLASS":23,
-				"SIMPLE_EXP":24,
-				"CHAR":25,
-				"END_TOKENS":26
-				},
-			PRODUCTIONS:{
-				1:["REGEXP",["UNION"]],
-				2:["REGEXP",["&epsilon;"]],
-				3:["UNION",["CONCAT","'|'","UNION"]],
-				4:["UNION",["CONCAT"]],
-				5:["CONCAT",["REPEAT","CONCAT"]],
-				6:["CONCAT",["REPEAT"]],
-				7:["REPEAT",["REPEAT","?"]],
-				8:["REPEAT",["REPEAT","*"]],
-				9:["REPEAT",["REPEAT","+"]],
-				10:["REPEAT",["REPEAT","{n}"]],
-				11:["REPEAT",["REPEAT","{n,}"]],
-				12:["REPEAT",["REPEAT","{n,m}"]],
-				13:["REPEAT",["CHAR_CLASS_EXP"]],
-				14:["CHAR_CLASS_EXP",["[","CHAR_CLASSES","]"]],
-				15:["CHAR_CLASS_EXP",["[^","CHAR_CLASSES","]"]],
-				16:["CHAR_CLASS_EXP",["SIMPLE_EXP"]],
-				17:["CHAR_CLASSES",["CHAR_CLASS","CHAR_CLASSES"]],
-				18:["CHAR_CLASSES",["CHAR_CLASS"]],
-				19:["CHAR_CLASS",["CHAR","-","CHAR"]],
-				20:["CHAR_CLASS",["CHAR"]],
-				21:["SIMPLE_EXP",["CHAR"]],
-				22:["SIMPLE_EXP",["ANY"]],
-				23:["SIMPLE_EXP",["(",")"]],
-				24:["SIMPLE_EXP",["(","UNION",")"]],
-				25:["SIMPLE_EXP",["-"]],
-				26:["CHAR",["c"]],
-				27:["CHAR",["\\","c"]]
-				},
-			MATRICE:{
-				1:[,,'s12',,,,'s13',,'s11','s7','s8','s15',,'s14',,,,'g2','g3','g4','g5','g6',,,'g9','g10','r2'],
-
-
-
-				2:[,,,,,,,,,,,,,,,,,,,,,,,,,,'a'],
-				3:[,,,,,,,,,,,,,,,,,,,,,,,,,,'r1'],
-				4:[,'s16',,'r4',,,,,,,,,,,,,,,,,,,,,,,'r4'],
-				5:[,'r6','s12','r6','s19','s20','s13','s18','s11','s7','s8','s15',,'s14','s23','s22','s21',,,'g17','g5','g6',,,'g9','g10','r6'],
-				6:[,'r13','r13','r13','r13','r13','r13','r13','r13','r13','r13','r13',,'r13','r13','r13','r13',,,,,,,,,,'r13'],
-
-
-				7:[,,,,,,,,,,,'s15',,'s14',,,,,,,,,'g24','g25',,'g26'],
-				8:[,,,,,,,,,,,'s15',,'s14',,,,,,,,,'g27','g25',,'g26'],
-				9:[,'r16','r16','r16','r16','r16','r16','r16','r16','r16','r16','r16',,'r16','r16','r16','r16',,,,,,,,,,'r16'],
-				10:[,'r21','r21','r21','r21','r21','r21','r21','r21','r21','r21','r21',,'r21','r21','r21','r21',,,,,,,,,,'r21'],
-				11:[,'r22','r22','r22','r22','r22','r22','r22','r22','r22','r22','r22',,'r22','r22','r22','r22',,,,,,,,,,'r22'],
-				12:[,,'s12','s28',,,'s13',,'s11','s7','s8','s15',,'s14',,,,,'g29','g4','g5','g6',,,'g9','g10'],
-				13:[,'r25','r25','r25','r25','r25','r25','r25','r25','r25','r25','r25',,'r25','r25','r25','r25',,,,,,,,,,'r25'],
-				14:[,'r26','r26','r26','r26','r26','r26','r26','r26','r26','r26','r26','r26','r26','r26','r26','r26',,,,,,,,,,'r26'],
-
-				15:[,,,,,,,,,,,,,'s30'],
-				16:[,,'s12',,,,'s13',,'s11','s7','s8','s15',,'s14',,,,,'g31','g4','g5','g6',,,'g9','g10'],
-
-				17:[,'r5',,'r5',,,,,,,,,,,,,,,,,,,,,,,'r5'],
-				18:[,'r7','r7','r7','r7','r7','r7','r7','r7','r7','r7','r7',,'r7','r7','r7','r7',,,,,,,,,,'r7'],
-				19:[,'r8','r8','r8','r8','r8','r8','r8','r8','r8','r8','r8',,'r8','r8','r8','r8',,,,,,,,,,'r8'],
-				20:[,'r9','r9','r9','r9','r9','r9','r9','r9','r9','r9','r9',,'r9','r9','r9','r9',,,,,,,,,,'r9'],
-				21:[,'r10','r10','r10','r10','r10','r10','r10','r10','r10','r10','r10',,'r10','r10','r10','r10',,,,,,,,,,'r10'],
-				22:[,'r11','r11','r11','r11','r11','r11','r11','r11','r11','r11','r11',,'r11','r11','r11','r11',,,,,,,,,,'r11'],
-				23:[,'r12','r12','r12','r12','r12','r12','r12','r12','r12','r12','r12',,'r12','r12','r12','r12',,,,,,,,,,'r12'],
-
-				24:[,,,,,,,,,,,,'s32'],
-				25:[,,,,,,,,,,,'s15','r18','s14',,,,,,,,,'g33','g25',,'g26'],
-				26:[,,,,,,'s34',,,,,'r20','r20','r20'],
-
-				27:[,,,,,,,,,,,,'s35'],
-				28:[,'r23','r23','r23','r23','r23','r23','r23','r23','r23','r23','r23',,'r23','r23','r23','r23',,,,,,,,,,'r23'],
-
-				29:[,,,'s36'],
-				30:[,'r27','r27','r27','r27','r27','r27','r27','r27','r27','r27','r27','r27','r27','r27','r27','r27',,,,,,,,,,'r27'],
-
-				31:[,,,'r3',,,,,,,,,,,,,,,,,,,,,,,'r3'],
-				32:[,'r14','r14','r14','r14','r14','r14','r14','r14','r14','r14','r14',,'r14','r14','r14','r14',,,,,,,,,,'r14'],
-
-
-				33:[,,,,,,,,,,,,'r17'],
-				34:[,,,,,,,,,,,'s15',,'s14',,,,,,,,,,,,'g37'],
-				35:[,'r15','r15','r15','r15','r15','r15','r15','r15','r15','r15','r15',,'r15','r15','r15','r15',,,,,,,,,,'r15'],
-				36:[,'r24','r24','r24','r24','r24','r24','r24','r24','r24','r24','r24',,'r24','r24','r24','r24',,,,,,,,,,'r24'],
-				37:[,,,,,,,,,,,'r19','r19','r19']
-				}
-			}
-		var Parser =function ( aTokens ){
-			aTokens.push( Parser.Node( ENGINE.END ))
-			var aStack = [ ENGINE.START ]
-			, aSymbols = [ ]
-			, TreeBuilder = Parser.AST || Parser.ParseTree
-			, i=0, nState1, nState2, Token, o, action
-			, M = ENGINE.MATRICE
-			, ACTIONS={
-				's':function(){
-					aStack.push( action )
-					aSymbols.push( Token )
-					i++
-					return false
-					},
-				'r':function(){
-					var prodID = action.substring(1)
-					, p = ENGINE.PRODUCTIONS[ prodID ]
-					, LHS = p[0], RHS = p[1]
-					, nPop = RHS.length==1 && RHS[0]==EPSILON ? 0 : RHS.length
-					if( nPop ) aStack = aStack.slice( 0, -nPop )
-					if( aStack.length ){
-						nState2 = aStack[ aStack.length-1 ].substring(1)
-						var goto_ = M[ nState2 ] ? M[ nState2 ][ ENGINE.SYMBOLS[ LHS ]] : null
-						if( goto_ ){
-							aStack.push( goto_.replace( 'g', 's' ))
-							aSymbols.push(
-								TreeBuilder(
-									'('+ prodID +') '+ LHS +' -> '+ RHS.join(' '),
-									LHS,
-									aSymbols.splice( aSymbols.length-nPop, nPop )
-									)
-								)
-							}
-						}
-					return false
-					},
-				'a':function(){
-					return aSymbols.pop()
-					}
-				}
-			do{
-				nState1 = aStack[aStack.length-1].substring(1)
-				Token = aTokens[i]
-				action = M[ nState1 ] ? M[ nState1 ][ ENGINE.SYMBOLS[ Token.symbol ]] : null
-				if( ! action ) throwError( 'Erreur de syntaxe \n index:'+ i +'\n token:'+ Token.symbol )
-				var f = ACTIONS[ action[0]]
-				if( f ){
-					var result = f()
-					if( result ) return result
-					} else throwError( "Erreur parsing ... action "+ action )
-			}while( i<aTokens.length && aStack.length )
-			throwError( 'Phrase incomplète...' )
-			}
-		Parser.Node =function ( X ){
-			var e = document.createElement('B')
-			e.getChildNodes =function(){
-				var a = []
-				for(var eChild=e.firstChild; eChild ;  ){
-					var eSibling = eChild
-					eChild=eChild.nextSibling
-					if( eSibling.nodeName=="B" ) a.push( eSibling )
-					}
-				return a
-				}
-			e.toString =function(){ return 'Node:'+ X }
-			e.className = 'myNode'
-			e.innerHTML = '<DIV class="symbol">' + X + '</DIV>'
-			e.symbol = X
-			return e
-			}
-		Parser.ParseTree =function ( sProd, LHS, RHS ){
-			var o = Parser.Node(LHS)
-			for(var i=0, ni=RHS.length; i<ni; i++) o.appendChild( oNode )
-			return o
-			}
-		return Parser
-		})()
-REParser.AST =function( sProd, LHS, RHS ){
-		var newNode = Parser.Node
-		var o
-		switch( sProd ){
-			case '(1) REGEXP -> UNION': return RHS[0]
-		//	case '(2) REGEXP -> epsilon':
-			case "(3) UNION -> CONCAT '|' UNION":
-				if( RHS[0] && RHS[2] ){
-					o = newNode( '|' ) // RHS[1]
-					o.appendChild( RHS[0])
-					if( RHS[2].symbol == '|' ){
-						for(var e=RHS[2].firstChild; e ;  ){
-							var oNode = e
-							e=e.nextSibling
-							if( oNode.nodeName=="B" ) o.appendChild( oNode )
-							}
-						} else o.appendChild( RHS[2])
-					return o
-					}
-				return RHS[0] || RHS[2]
-			case '(4) UNION -> CONCAT': return RHS[0]
-			case '(5) CONCAT -> REPEAT CONCAT':
-				if( RHS[0] && RHS[1] ){
-					o = newNode( '.' )
-					o.appendChild( RHS[0])
-					if( RHS[1].symbol == '.' ){
-						for(var e=RHS[1].firstChild; e ;  ){
-							var oNode = e
-							e=e.nextSibling
-							if( oNode.nodeName=="B" ) o.appendChild( oNode )
-							}
-						} else o.appendChild( RHS[1])
-					return o
-					}
-				return RHS[0] || RHS[1]
-			case '(6) CONCAT -> REPEAT': return RHS[0]
-			case '(7) REPEAT -> REPEAT ?':
-			case '(8) REPEAT -> REPEAT *':
-			case '(9) REPEAT -> REPEAT +':
-			case '(10) REPEAT -> REPEAT {n}':
-			case '(11) REPEAT -> REPEAT {n,}':
-			case '(12) REPEAT -> REPEAT {n,m}':
-				if( RHS[0]){
-					o = RHS[1]
-					o.appendChild( RHS[0])
-					return o
-					}
-				return null
-			case '(13) REPEAT -> CHAR_CLASS_EXP': return RHS[0]
-			case '(14) CHAR_CLASS_EXP -> [ CHAR_CLASSES ]':
-				o = newNode( 'CHAR_SET' )
-				if( RHS[1].symbol == 'CHAR_CLASSES' ){
-					for(var e=RHS[1].firstChild; e ;  ){
-						var oNode = e
-						e=e.nextSibling
-						if( oNode.nodeName=="B" ) o.appendChild( oNode )
-						}
-					} else o.appendChild( RHS[1])
-				return o
-			case '(15) CHAR_CLASS_EXP -> [^ CHAR_CLASSES ]':
-				o = newNode( 'NEGATED_CHAR_SET' )
-				if( RHS[1].symbol == 'CHAR_CLASSES' ){
-					for(var e=RHS[1].firstChild; e ;  ){
-						var oNode = e
-						e=e.nextSibling
-						if( oNode.nodeName=="B" ) o.appendChild( oNode )
-						}
-					} else o.appendChild( RHS[1])
-				return o
-			case '(16) CHAR_CLASS_EXP -> SIMPLE_EXP': return RHS[0]
-			case '(17) CHAR_CLASSES -> CHAR_CLASS CHAR_CLASSES':
-				o = newNode( LHS )
-				o.appendChild( RHS[0])
-				if( RHS[1].symbol == 'CHAR_CLASSES' ){
-					for(var e=RHS[1].firstChild; e ;  ){
-						var oNode = e
-						e=e.nextSibling
-						if( oNode.nodeName=="B" ) o.appendChild( oNode )
-						}
-					} else o.appendChild( RHS[1])
-				return o
-			case '(18) CHAR_CLASSES -> CHAR_CLASS': return RHS[0]
-			case '(19) CHAR_CLASS -> CHAR - CHAR':
-				o = RHS[1]
-				o.appendChild( RHS[0])
-				o.appendChild( RHS[2])
-				return o
-			case '(20) CHAR_CLASS -> CHAR':
-			case '(21) SIMPLE_EXP -> CHAR':
-			case '(22) SIMPLE_EXP -> ANY': return RHS[0]
-			case '(23) SIMPLE_EXP -> ( )': return null
-			case '(24) SIMPLE_EXP -> ( UNION )': return RHS[1]
-			case "(25) SIMPLE_EXP -> -":
-				o = RHS[0]
-				o.oValue.token = 'CHAR'
-				o.oValue.css = 'character'
-				o.innerHTML = o.symbol = 'c'
-				o.className = o.className.replace( 'charset', 'character' )
-		//	{"oValue":{"token":"CHARSET","value":"-"},"value":"-","symbol":"-"}
-		//		alert( JSON.stringify( ))
-				return RHS[0]
-			case '(26) CHAR -> c':
-		//	{"oValue":{"token":"CHAR","value":">"},"value":">","symbol":"c"}
-		//		alert( JSON.stringify( RHS[0]))
-				return RHS[0]
-			case '(27) CHAR -> \\ c':
-				o = RHS[0]
-				o.appendChild( RHS[1])
-				return o
-			default:
-				o = newNode( LHS )
-				for(var i=0, ni=RHS.length; i<ni; i++ )
-					o.appendChild( RHS[i])
-				return o
-			}
-		}
-
-var getAST1 =function(){
-	getTokens1()
-	getTokens2()
-	eAST1.innerHTML = ''
-	eAST1.appendChild( REParser( to_array( eRegExpResult1.firstChild.childNodes )))
-	}
-var getAST2 =function(){
-	getTokens3()
-	getTokens4()
-	eAST2.innerHTML = ''
-//	eAST2.appendChild( REParser( to_array( eRegExpResult3.firstChild.childNodes )))
-	}
-</script>
-
 <!-- COMPARAISON -->
 <script>
 function compareResult( e1, e2 ){
@@ -808,7 +477,6 @@ function compareResult( e1, e2 ){
 	return aNodes
 	}
 </script>
-
 
 <!-- DHTML -->
 <script>

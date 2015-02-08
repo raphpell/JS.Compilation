@@ -5,13 +5,6 @@ var Grammar =function( sGrammar, sType ){
 	, sSeparator = s.indexOf('->')>-1 ? '->' : String.fromCharCode( 8594 )
 	, sEpsilonChar = String.fromCharCode( 949 )
 	, aGrammar = []
-	/* PRÊT A ÊTRE INCLUS
-	var eGrammar = document.createElement( 'GRAMMAR')
-	eGrammar.appendChild( ParserLR(
-		to_array( AutomatonLexer( sGrammar, 'GRAMMAR' ).childNodes ),
-		GrammarParserEngine.GRAMMAR
-		))
-	*/
 	s = s.replace( /(?:\r\n|[\r\n\f])/g, "\n" )
 	s = s.replace( /\bepsilon\b/gi, EPSILON )
 	if( s.indexOf( sEpsilonChar )>-1 )

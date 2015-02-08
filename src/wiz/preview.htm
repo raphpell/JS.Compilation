@@ -139,7 +139,7 @@ var match =function(){
 	try{
 		var eLexer = AutomatonLexer( eInput.value, 'WIZ' )
 		var aTokens = to_array( eLexer.childNodes )
-		eResult.appendChild( ParserLR( aTokens, WizParserEngine.ITEMS ))
+		eResult.appendChild( ParserLR.parse( aTokens, WizParserEngine.ITEMS ))
 	//	eResult.appendChild( eLexer )
 	}catch(e){
 		eResult.innerHTML = e.message + '<br>'

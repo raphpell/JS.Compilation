@@ -99,14 +99,14 @@
 var Lexeme =(function(){
 	var setValue =function( sValue ){
 		this.oValue.value = sValue
-		this.innerHTML = sValue.str_replace( ['&','<','>'], ['&amp;','&lt;','&gt;'])
+		if( sValue ) this.innerHTML = sValue.str_replace( ['&','<','>'], ['&amp;','&lt;','&gt;'])
 		this.title = this.oValue.token
 		return sValue
 		}
 	return function( o ){
 		var e = document.createElement( o.token )
 		e.oValue = o
-		if( o.css.trim()) e.className = o.css
+		if( o.css && o.css.trim()) e.className = o.css
 		e.setValue = setValue
 		e.setValue( o.token=='S_WIZ_VALUE'?'':o.value )
 		return e
@@ -309,11 +309,11 @@ function scan (){
 		}
 	var sSource = document.getElementById( 'eSource' ).value
 	if( sSource ){
-		try{
+		//try{
 			eRoot = AutomatonLexer( sSource, 'WIZ' )
 		//	eTest.appendChild( eRoot )
-			eTest.appendChild( ParserLR( to_array( eRoot.childNodes ), WizParserEngine.ITEMS ))
-			}catch( e ){ alert( e.message )}
+			eTest.appendChild( ParserLR.parse( to_array( eRoot.childNodes ), WizParserEngine.ITEMS ))
+		//	}catch( e ){ alert( e.message )}
 	
 		var aItems = eTest.getElementsByTagName('ITEM')
 		var aCSS_Classes = []

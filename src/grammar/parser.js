@@ -1,93 +1,23 @@
 var GrammarParserEngine={
-	GRAMMARS :{ // INUTILISABLE
-		START:"s1",
-		END:"END_TOKENS",
-		SYMBOLS:{
-				"LHS":1,
-				"PIPE":2,
-				"SYMBOL":3,
-				"SYMBOL_EPSILON":4,
-				"GRAMMAR":5,
-				"PRODUCTIONS":6,
-				"PRODUCTION":7,
-				"RHS":8,
-				"UNION":9,
-				"CONCAT":10,
-				"SYMBOLS":11,
-				"END_TOKENS":12
-				},
-		PRODUCTIONS:{
-				1:["GRAMMAR",["PRODUCTIONS"]],
-				2:["GRAMMAR",["&epsilon;"]],
-				3:["PRODUCTIONS",["PRODUCTION","PRODUCTIONS"]],
-				4:["PRODUCTIONS",["PRODUCTION"]],
-				5:["PRODUCTION",["LHS","RHS"]],
-				6:["RHS",["UNION"]],
-				7:["UNION",["CONCAT","PIPE","UNION"]],
-				8:["UNION",["CONCAT"]],
-				9:["CONCAT",["SYMBOLS","CONCAT"]],
-				10:["CONCAT",["SYMBOLS"]],
-				11:["SYMBOLS",["SYMBOL"]],
-				12:["SYMBOLS",["SYMBOL_EPSILON"]]
-				},
-		MATRICE:{
-				1:[,'s5',,,,'g2','g3','g4',,,,,'r2'],
-				2:[,,,,,,,,,,,,'a'],
-				3:[,,,,,,,,,,,,'r1'],
-				4:[,'s5',,,,,'g6','g4',,,,,'r4'],
-				5:[,,,'s11','s12',,,,'g7','g8','g9','g10'],
-				6:[,,,,,,,,,,,,'r3'],
-				7:[,'r5',,,,,,,,,,,'r5'],
-				8:[,'r6',,,,,,,,,,,'r6'],
-				9:[,'r8','s13',,,,,,,,,,'r8'],
-				10:[,'r10','r10','s11','s12',,,,,,'g14','g10','r10'],
-				11:[,'r11','r11','r11','r11',,,,,,,,'r11'],
-				12:[,'r12','r12','r12','r12',,,,,,,,'r12'],
-				13:[,,,'s11','s12',,,,,'g15','g9','g10'],
-				14:[,'r9','r9',,,,,,,,,,'r9'],
-				15:[,'r7',,,,,,,,,,,'r7']
-				},
-		AST:function( sProd, LHS, RHS ){
-			var o
-			switch( sProd ){
-				case "(0) GRAMMAR' -> GRAMMAR END_TOKENS": return RHS[0];
-				case "(1) GRAMMAR -> PRODUCTIONS": return RHS[0];
-				case "(2) GRAMMAR -> &epsilon;": return RHS[0];
-				case "(3) PRODUCTIONS -> PRODUCTION PRODUCTIONS": return RHS[0];
-				case "(4) PRODUCTIONS -> PRODUCTION": return RHS[0];
-				case "(5) PRODUCTION -> LHS RHS": return RHS[0];
-				case "(6) RHS -> UNION": return RHS[0];
-				case "(7) UNION -> CONCAT PIPE UNION": return RHS[0];
-				case "(8) UNION -> CONCAT": return RHS[0];
-				case "(9) CONCAT -> SYMBOLS CONCAT": return RHS[0];
-				case "(10) CONCAT -> SYMBOLS": return RHS[0];
-				case "(11) SYMBOLS -> SYMBOL": return RHS[0];
-				case "(12) SYMBOLS -> SYMBOL_EPSILON": return RHS[0];
-				}
-			}
-		},
 	GRAMMAR :{
-		START:"s1",
-		END:"END_TOKENS",
 		SYMBOLS:{
-				"PRODUCTION":1,
-				"GRAMMAR":2,
-				"PRODUCTIONS":3,
-				"END_TOKENS":4
-				},
+			"PRODUCTION":1,
+			"GRAMMAR":2,
+			"PRODUCTIONS":3
+			},
 		PRODUCTIONS:{
-				1:["GRAMMAR",["PRODUCTIONS"]],
-				2:["GRAMMAR",["&epsilon;"]],
-				3:["PRODUCTIONS",["PRODUCTION","PRODUCTIONS"]],
-				4:["PRODUCTIONS",["PRODUCTION"]]
-				},
+			1:["GRAMMAR",["PRODUCTIONS"]],
+			2:["GRAMMAR",["&epsilon;"]],
+			3:["PRODUCTIONS",["PRODUCTION","PRODUCTIONS"]],
+			4:["PRODUCTIONS",["PRODUCTION"]]
+			},
 		MATRICE:{
-				1:[,'s4','g2','g3','r2'],
-				2:[,,,,'a'],
-				3:[,,,,'r1'],
-				4:[,'s4',,'g5','r4'],
-				5:[,,,,'r3']
-				},
+			1:['r2','s4','g2','g3'],
+			2:['a'],
+			3:['r1'],
+			4:['r4','s4',,'g5'],
+			5:['r3']
+			},
 		AST:function( sProd, LHS, RHS ){
 			var o
 			switch( sProd ){
@@ -98,37 +28,34 @@ var GrammarParserEngine={
 					o = document.createDocumentFragment()
 					var aTokens = to_array( RHS[0].childNodes )
 					RHS[0].innerHTML = ''
-					RHS[0].appendChild( ParserLR( aTokens, GrammarParserEngine.PRODUCTION ))
+					RHS[0].appendChild( ParserLR.parse( aTokens, GrammarParserEngine.PRODUCTION ))
 					o.appendChild( RHS[0])
 					o.appendChild( RHS[1])
 					return o;
 				case "(4) PRODUCTIONS -> PRODUCTION":
 					var aTokens = to_array( RHS[0].childNodes )
 					RHS[0].innerHTML = ''
-					RHS[0].appendChild( ParserLR( aTokens, GrammarParserEngine.PRODUCTION ))
+					RHS[0].appendChild( ParserLR.parse( aTokens, GrammarParserEngine.PRODUCTION ))
 					return RHS[0]
 				}
 			}
 		},
 	PRODUCTION :{
-		START:"s1",
-		END:"END_TOKENS",
 		SYMBOLS:{
-				"LHS":1,
-				"RHS":2,
-				"PRODUCTION":3,
-				"END_TOKENS":4
-				},
+			"LHS":1,
+			"RHS":2,
+			"PRODUCTION":3
+			},
 		PRODUCTIONS:{
-				1:["PRODUCTION",["LHS","RHS"]],
-				2:["PRODUCTION",["&epsilon;"]]
-				},
+			1:["PRODUCTION",["LHS","RHS"]],
+			2:["PRODUCTION",["&epsilon;"]]
+			},
 		MATRICE:{
-				1:[,'s3',,'g2','r2'],
-				2:[,,,,'a'],
-				3:[,,'s4'],
-				4:[,,,,'r1']
-				},
+			1:['r2','s3',,'g2'],
+			2:['a'],
+			3:[,,'s4'],
+			4:['r1']
+			},
 		AST:function( sProd, LHS, RHS ){
 			var o
 			switch( sProd ){
@@ -141,48 +68,44 @@ var GrammarParserEngine={
 					var aTokens = to_array( RHS[1].childNodes )
 					RHS[1].innerHTML = ''
 				//	RHS[1].appendChild( )
-					o.appendChild( ParserLR( aTokens, GrammarParserEngine.RHS ))
+					o.appendChild( ParserLR.parse( aTokens, GrammarParserEngine.RHS ))
 					return o;
 				case "(2) PRODUCTION -> &epsilon;": return false;
 				}
 			}
-		
 		},
 	RHS:{
-		START:"s1",
-		END:"END_TOKENS",
 		SYMBOLS:{
-				"PIPE":1,
-				"SYMBOL":2,
-				"SYMBOL_EPSILON":3,
-				"RHS":4,
-				"UNION":5,
-				"CONCAT":6,
-				"SYMBOLS":7,
-				"END_TOKENS":8
-				},
+			"PIPE":1,
+			"SYMBOL":2,
+			"SYMBOL_EPSILON":3,
+			"RHS":4,
+			"UNION":5,
+			"CONCAT":6,
+			"SYMBOLS":7
+			},
 		PRODUCTIONS:{
-				1:["RHS",["UNION"]],
-				2:["RHS",["&epsilon;"]],
-				3:["UNION",["CONCAT","PIPE","UNION"]],
-				4:["UNION",["CONCAT"]],
-				5:["CONCAT",["SYMBOLS","CONCAT"]],
-				6:["CONCAT",["SYMBOLS"]],
-				7:["SYMBOLS",["SYMBOL"]],
-				8:["SYMBOLS",["SYMBOL_EPSILON"]]
-				},
+			1:["RHS",["UNION"]],
+			2:["RHS",["&epsilon;"]],
+			3:["UNION",["CONCAT","PIPE","UNION"]],
+			4:["UNION",["CONCAT"]],
+			5:["CONCAT",["SYMBOLS","CONCAT"]],
+			6:["CONCAT",["SYMBOLS"]],
+			7:["SYMBOLS",["SYMBOL"]],
+			8:["SYMBOLS",["SYMBOL_EPSILON"]]
+			},
 		MATRICE:{
-				1:[,,'s6','s7','g2','g3','g4','g5','r2'],
-				2:[,,,,,,,,'a'],
-				3:[,,,,,,,,'r1'],
-				4:[,'s8',,,,,,,'r4'],
-				5:[,'r6','s6','s7',,,'g9','g5','r6'],
-				6:[,'r7','r7','r7',,,,,'r7'],
-				7:[,'r8','r8','r8',,,,,'r8'],
-				8:[,,'s6','s7',,'g10','g4','g5'],
-				9:[,'r5',,,,,,,'r5'],
-				10:[,,,,,,,,'r3']
-				},
+			1:['r2',,'s6','s7','g2','g3','g4','g5'],
+			2:['a'],
+			3:['r1'],
+			4:['r4','s8'],
+			5:['r6','r6','s6','s7',,,'g9','g5'],
+			6:['r7','r7','r7','r7'],
+			7:['r8','r8','r8','r8'],
+			8:[,,'s6','s7',,'g10','g4','g5'],
+			9:['r5','r5'],
+			10:['r3']
+			},
 		AST:function( sProd, LHS, RHS ){
 			var o
 			switch( sProd ){
@@ -226,6 +149,5 @@ var GrammarParserEngine={
 				case "(8) SYMBOLS -> SYMBOL_EPSILON": return RHS[0];
 				}
 			}
-		
 		}
 	}
