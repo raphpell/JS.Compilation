@@ -207,18 +207,17 @@ var exportEngine =function( ENGINE, bWhiteSpaces ){
 	var sMatrice = bWhiteSpaces
 		? '{\n\t\t'+ tmp.join(',\n\t\t') +'\n\t\t}'
 		: '{'+ tmp.join(',') +'}'
-	var fPartialTree = function( esuParent, aeChild ){
-		var e = ! esuParent
+	var fPartialTree = function( mParent, mChild ){
+		var e = ! mParent
 			? document.createDocumentFragment()
-			:( esuParent.appendChild ? esuParent : document.createElement( esuParent ) 
+			:( mParent.appendChild ? mParent : document.createElement( mParent ) 
 			)
 		if( ! e.className ) e.className = 'myNode '+ e.nodeName.toLowerCase()
 		if( ! e.title ) e.title = e.nodeName
-		if( aeChild.constructor==Array ){
-			for(var i=0, ni=aeChild.length; i<ni; i++ )
-				if( aeChild[i]) e.appendChild( aeChild[i])
-			}
-		else e.appendChild( aeChild )
+		if( mChild.constructor==Array )
+			for(var i=0, ni=mChild.length; i<ni; i++ )
+				if( mChild[i]) e.appendChild( mChild[i])
+		else e.appendChild( mChild )
 		return e
 		}
 	var sASTFunction = 'function( sProd, LHS, RHS ){\n\
