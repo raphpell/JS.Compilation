@@ -18,7 +18,7 @@ ParserLR.prototype ={
 		},
 	readToken :function( oToken ){
 		var sSymbol = oToken.nodeName.toUpperCase(), result
-		if( ParserLR.sIgnored.indexOf( '|'+sSymbol+'|' )> -1 ) return null
+		if( ParserLR.Ignore[ sSymbol ]) return null
 		this.oToken = oToken
 		do{
 			if( this.action = this.getAction( this.getState(), sSymbol )){
@@ -60,7 +60,7 @@ ParserLR.prototype ={
 		}
 	}
 	
-ParserLR.sIgnored = '|WHITE_SPACES|NEW_LINE|TAB|SPACES|SPACE|COMMENT|'
+ParserLR.Ignore = {WHITE_SPACES:1,NEW_LINE:1,TAB:1,SPACES:1,SPACE:1,COMMENT:1}
 ParserLR.parse =function( eScanResult, ENGINE ){
 	var o = new ParserLR( ENGINE )
 	var M = eScanResult.childNodes
