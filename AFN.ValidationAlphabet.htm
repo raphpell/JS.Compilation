@@ -48,7 +48,10 @@
 
 <a name="toc1"></a>
 <h2>Préambule</h2>
-<p>Un alphabet &sum; est un ensemble de symbole. Il est composé :</p>
+<p>
+	Un alphabet &sum; est normalement un ensemble de caractère. 
+	Mais pour réduire la taille des automates vis à vis des ensembles de caractères négatifs (considérés comme infini...), il sera composé:
+</p>
 <ul>
 	<li>d'atome &isin; A , A = { a, \n, \t, +, ... } </li>
 	<li>d'ensemble de caractères &isin; CC , CC = { [a-z], \w, \d, ... }</li>
@@ -57,10 +60,10 @@
 </ul>
 
 <p>
-	Pour rendre déterministe un automate, 
+	Pour rendre déterministe les automates, 
 	il est nécessaire qu'un caractère soit présent que dans un et un seul symbole de l'alphabet : 
 	<b>les symboles doivent être distinct</b>. <br>
-	Cette opération s'appelle la validation de l'alphabet (il faut bien que je lui donne un nom!).
+	Cette opération est appellée ici la validation de l'alphabet (il faut bien que je lui donne un nom!).
 </p>
 <p>Lorsqu'un symbole est remplacé par plusieurs autres :</p>
 <ol>

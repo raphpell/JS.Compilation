@@ -86,8 +86,10 @@ throwError =function( s ){
 	throw new Error ( s )
 	}
 
+	
 /* TODO: Les 3 fonctions suivantes doivent-être reconstruite ! */
-// construit la matrice M de l'automate oFA
+
+// construit la matrice M de l'automate oFA : Dans ce fichier + AFD.(aggregator|generator).htm + AF.preview.htm
 buildTable =function( oFA ){
 	var aSpecial=[]
 	var M={
@@ -142,7 +144,7 @@ buildTable =function( oFA ){
 		}
 	return oFA.M = M
 	}
-/* renomme les états de l'automate oFA
+/* renomme les états de l'automate oFA : Dans ce fichier + AFD.(aggregator|generator).htm
 		Note: les états puits sont égale à '0' ou 0 au départ
 	arguments ( oFA [, nStateIDCounter [, bAll [, aOrder ]]])
 		par défaut ( 0: état puit, 1: état initial , les autres états commencent à 2 )
@@ -223,9 +225,10 @@ renameStates =function( oFA, nStateIDCounter, bAll, aOrder ){
 	searchDeadState( oFA )
 	return oFA
 	}
-/* Recherche les états puits d'un DFA
+/* Recherche les états puits d'un DFA : Que dans ce fichier
 	-> ils sont renommé 0
-	-> les états chaine 'entier' sont transformés en nombre entier si il y un état puits !
+	-> les états chaine 'entier' sont transformés en nombre entier ! et si il y un état puits !
+		TODO: y réfléchir !
 */
 searchDeadState =function( oFA ){
 	if( oFA.type != 'DFA' ) return ;
