@@ -86,6 +86,8 @@ throwError =function( s ){
 	throw new Error ( s )
 	}
 
+/* TODO: Les 3 fonctions suivantes doivent-être reconstruite ! */
+// construit la matrice M de l'automate oFA
 buildTable =function( oFA ){
 	var aSpecial=[]
 	var M={
@@ -140,6 +142,16 @@ buildTable =function( oFA ){
 		}
 	return oFA.M = M
 	}
+/* renomme les états de l'automate oFA
+		Note: les états puits sont égale à '0' ou 0 au départ
+	arguments ( oFA [, nStateIDCounter [, bAll [, aOrder ]]])
+		par défaut ( 0: état puit, 1: état initial , les autres états commencent à 2 )
+		sinon si bAll==false ils commencent à nStateIDCounter sauf ( 0: état puit, 1: état initial )
+		sinon si bAll==true ils commencent à nStateIDCounter 
+		si ! aOrder
+			calcul le poids? et organise les états en fonction
+			sinon respect l'ordre des états aOrder
+*/
 renameStates =function( oFA, nStateIDCounter, bAll, aOrder ){
 	searchDeadState( oFA )
 	var NEW_ID = {} // NEW STATES ID
@@ -161,7 +173,7 @@ renameStates =function( oFA, nStateIDCounter, bAll, aOrder ){
 		TMP.sortBy('1','DESC')
 		} else TMP = aOrder
 	
-	// Construction des nouveaux identifiants (  0: état puit, 1: état initial )
+	// Construction des nouveaux identifiants ( 0: état puit, 1: état initial )
 	for(var i=0, ni=TMP.length; i<ni; i++){
 		var state = TMP[i][0], nNewID
 		if( bAll ) nNewID = nCounter++
@@ -179,7 +191,9 @@ renameStates =function( oFA, nStateIDCounter, bAll, aOrder ){
 	var Cache = {}
 	for(var i=0, ni=oFA.T.length; i<ni; i++){
 		var a = oFA.T[i]
-		var aNewTransition = a[3] ? [ NEW_ID[ a[0]], a[1], NEW_ID[ a[2]], a[3] ] : [ NEW_ID[ a[0]], a[1], NEW_ID[ a[2]] ] 
+		var aNewTransition = a[3]
+			? [ NEW_ID[ a[0]], a[1], NEW_ID[ a[2]], a[3] ]
+			: [ NEW_ID[ a[0]], a[1], NEW_ID[ a[2]] ]
 		var sCacheID = aNewTransition.toString()
 		if( ! Cache[ sCacheID ]){
 			Cache[ sCacheID ]=1
@@ -209,6 +223,10 @@ renameStates =function( oFA, nStateIDCounter, bAll, aOrder ){
 	searchDeadState( oFA )
 	return oFA
 	}
+/* Recherche les états puits d'un DFA
+	-> ils sont renommé 0
+	-> les états chaine 'entier' sont transformés en nombre entier si il y un état puits !
+*/
 searchDeadState =function( oFA ){
 	if( oFA.type != 'DFA' ) return ;
 	var D = []
@@ -225,26 +243,24 @@ searchDeadState =function( oFA ){
 		if( isDeadState( oFA, state )) D.push( state )
 		}
 	oFA.D = D
-	switch( D.length ){
-		case 0: return; 
-		default:
-			oFA.D = 0
-			for(var j=0,nj=D.length; j<nj; j++){
-				for(var i=0, ni=oFA.S.length; i<ni; i++){
-					var state = oFA.S[i]
-					if( state==D[j] ) oFA.S[i] = 0
-					else if( /^\d+$/.test( state )) oFA.S[i] = parseInt( state )
-					}
-				oFA.S.sortBy('','ASC')
-				for(var i=0, ni=oFA.T.length; i<ni; i++){
-					var state = oFA.T[i][0]
-					if( state==D[j] ) oFA.T[i][0] = 0
-					else if( /^\d+$/.test( state )) oFA.T[i][0] = parseInt( state )
-					var state = oFA.T[i][2]
-					if( state==D[j] ) oFA.T[i][2] = 0
-					else if( /^\d+$/.test( state )) oFA.T[i][2] = parseInt( state )
-					}
-				}
+	if( ! D.length ) return; 
+	oFA.D = 0
+	// renomme les états puits en 0, et transforme les noms des états en entier
+	for(var j=0,nj=D.length; j<nj; j++){
+		for(var i=0, ni=oFA.S.length; i<ni; i++){
+			var state = oFA.S[i]
+			if( state==D[j] ) oFA.S[i] = 0
+			else if( /^\d+$/.test( state )) oFA.S[i] = parseInt( state )
+			}
+		oFA.S.sortBy('','ASC')
+		for(var i=0, ni=oFA.T.length; i<ni; i++){
+			var state = oFA.T[i][0]
+			if( state==D[j] ) oFA.T[i][0] = 0
+			else if( /^\d+$/.test( state )) oFA.T[i][0] = parseInt( state )
+			var state = oFA.T[i][2]
+			if( state==D[j] ) oFA.T[i][2] = 0
+			else if( /^\d+$/.test( state )) oFA.T[i][2] = parseInt( state )
+			}
 		}
 	buildTable( oFA )
 	}
