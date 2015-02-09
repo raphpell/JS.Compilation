@@ -174,7 +174,7 @@ eBtnAddToken.onclick =function(){
 	eRegExpList.insertBefore( eNewOption, eRegExpList.firstChild )
 	}
 eBtnToRE.onclick =function(){
-	eDFAToRE.value = DFAToRE( oDFA )
+	eDFAToRE.value = DFA.toRE( oDFA )
 	}
 	
 var exportBasic =function(){ exportDFA( eExportWhiteSpace.checked, !eExportCompressed.checked )}
@@ -218,13 +218,13 @@ var init =function(){
 var parseRE =function( sToken, sRegExp ){
 	var oTree = RegExp2Tree( sRegExp )
 	oNFA = NFA( oTree )
-	NFAValidate( oNFA )
-	oDFA = DFAMinimization( DFA( oNFA ))
+	NFA.validateAlphabet( oNFA )
+	oDFA = DFA.minimize( DFA( oNFA ))
 	renameStates( oDFA, nStateIDCounter, true )
 	Automate.setUniqueID( oDFA.S[ oDFA.S.length-1 ]+1 )
 
 	oDFA.aTokensID = [[ sToken, oDFA.F ]]
-	oDFAAggregated = oDFA = DFAAggregation( oDFAAggregated, oDFA )
+	oDFAAggregated = oDFA = DFA.aggregate( oDFAAggregated, oDFA )
 	nStateIDCounter = oDFAAggregated.S[ oDFAAggregated.S.length-1 ]+1
 	exportBasic()
 	previewDFA.refresh()
@@ -294,7 +294,7 @@ var clearExport =function(){
 	}
 var exportDFA =function( bWhiteSpace, bUnCompressed ){
 	clearExport()
-	var sResult = DFAToJS( oDFAAggregated, bWhiteSpace, bUnCompressed )
+	var sResult = DFA.toJS( oDFAAggregated, bWhiteSpace, bUnCompressed )
 	eExportResult.value = sResult
 	eExportSize.innerHTML = sResult.length
 	if( aParentItemCalcul && window.parent ){
@@ -329,7 +329,7 @@ var addDFA =function( sToken, oDFAAdded ){
 	renameStates( oDFAAdded, nStateIDCounter, true )
 	Automate.setUniqueID( oDFAAdded.S[ oDFAAdded.S.length-1 ]+1 )
 	oDFAAdded.aTokensID = [[ sToken, oDFAAdded.F ]]
-	oDFAAggregated = oDFA = DFAAggregation( oDFAAggregated, oDFAAdded )
+	oDFAAggregated = oDFA = DFA.aggregate( oDFAAggregated, oDFAAdded )
 	nStateIDCounter = oDFAAggregated.S[ oDFAAggregated.S.length-1 ]+1
 	exportDFA()
 	previewDFA.refresh()

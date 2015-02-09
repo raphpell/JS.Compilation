@@ -173,7 +173,7 @@ eBtnCreate.onclick =function(){
 eBtnRenameNFA.onclick =function(){
 	oNFA = renameStates( oNFA )
 	oDFA = DFA( oNFA )
-	if( eAutoMinimization.checked ) oDFA = DFAMinimization( oDFA )
+	if( eAutoMinimization.checked ) oDFA = DFA.minimize( oDFA )
 	refreshWindows()
 	}
 eBtnValidate.onclick =function(){
@@ -185,12 +185,12 @@ eBtnRenameDFA.onclick =function(){
 	refreshWindows()
 	}
 eBtnMinimize.onclick =function(){
-	oDFA = DFAMinimization( oDFA )
+	oDFA = DFA.minimize( oDFA )
 	refreshWindows()
 	}
 eBtnMatch.onclick =function(){ match()}
 eBtnToRE.onclick =function(){
-	eDFAToRE.value = DFAToRE( oDFA )
+	eDFAToRE.value = DFA.toRE( oDFA )
 	}
 
 var exportBasic =function(){ exportDFA( eExportWhiteSpace.checked, !eExportCompressed.checked )}
@@ -251,11 +251,11 @@ var parseRE =function( bValidate, bMinimize, bMatch, bExport ){
 	var oTree = RegExp2Tree( eRE.value )
 	oNFA = NFA( oTree )
 	if( bValidate ){
-		NFAValidate( oNFA )
+		NFA.validateAlphabet( oNFA )
 		oNFA = renameStates( oNFA )
 		}
 	oDFA = DFA( oNFA )
-	if( bMinimize ) oDFA = DFAMinimization( oDFA )
+	if( bMinimize ) oDFA = DFA.minimize( oDFA )
 	if( bMatch ) match()
 		else clearTest()
 	if( bExport ) exportBasic()
@@ -322,7 +322,7 @@ var match =function( s, n ){
 	}
 var exportDFA =function( bWhiteSpace, bUnCompressed ){
 	clearExport()
-	var sResult = DFAToJS( oDFA, bWhiteSpace, bUnCompressed )
+	var sResult = DFA.toJS( oDFA, bWhiteSpace, bUnCompressed )
 	eExportResult.value = sResult
 	eExportSize.innerHTML = sResult.length
 	if( aItemCalcul && window.parent ){
