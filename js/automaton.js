@@ -10,7 +10,7 @@ throwError =function( s ){
 
 /* TODO: Les 2 fonctions suivantes doivent-être reconstruite ! */
 
-// construit la matrice M de l'automate oFA : Dans ce fichier + AFD.(aggregator|generator).htm + AF.preview.htm
+// Construit la matrice M de l'automate oFA : Dans ce fichier + AFD.(aggregator|generator).htm + AF.preview.htm
 buildTable =function( oFA ){
 	var aSpecial=[]
 	var M={
@@ -64,7 +64,7 @@ buildTable =function( oFA ){
 		}
 	return oFA.M = M
 	}
-/* renomme les états de l'automate oFA : Dans ce fichier + AFD.(aggregator|generator).htm
+/* Renomme les états de l'automate oFA : Dans ce fichier + AFD.(aggregator|generator).htm
 		Note: les états puits sont égale à '0' ou 0 au départ
 	arguments ( oFA [, nStateIDCounter [, bAll [, aOrder ]]])
 		par défaut ( 0: état puit, 1: état initial , les autres états commencent à 2 )
@@ -1110,7 +1110,7 @@ DFA.union({
 			- RECREER LES TRANSITIONS 
 			- UN SYMBOLE PEUT ÊTRE un CHARCLASS !
 		*/
-		if( 1 ){ // MINIMISATION DE LALPHABET
+		if( 1 ){
 			var aID = []
 			for(var j=0, nj=oDFA.A.length; j<nj ; j++ ){
 				var symb=oDFA.A[j] // ATTENTION au symbole espace !
@@ -1212,7 +1212,6 @@ DFA.union({
 		return oDFA
 		},
 	toJS :function( oDFA, bWhiteSpace, bUnCompressed ){
-		
 		// ???
 		if( oDFA.S.length > 10 ){
 			stats =(function(){
@@ -1233,11 +1232,11 @@ DFA.union({
 			renameStates( oDFA, 2, false, stats )
 			}
 		renameStates( oDFA )
-		
+
 		var oCharClass = {size:0}
 		var oNegatedCharClass = {size:0}
 		var aCharacters = []
-		
+
 		// Compression d'un tableau [15,0,0,0,0] devient {0:15} ou [15] selon la taille du résultat
 		var compress =function( a ){
 			var nLength = a.length
@@ -1407,7 +1406,7 @@ DFA.union({
 		TableSymbols.generateFrom( oDFA )
 		Matrice.generateFrom( oDFA.T, TableSymbols )
 		var aF = TokensTable.getFinalStatesTable( oDFA.aTokensID )
-		
+
 		// index R : traitement des charsets
 		var aSpecial =(function(){
 			var aSpecial = []
@@ -1432,7 +1431,6 @@ DFA.union({
 			return aSpecial
 			})()
 
-
 		var s = bWhiteSpace ? '\n' : ''
 		var sResult = '{'+
 			s+'A:'+ TableSymbols.toString() +','+
@@ -1441,7 +1439,7 @@ DFA.union({
 			( aSpecial.length ? ','+ s +'R:'+ aSpecial.toString() : '' )+
 			( TokensTable.isDefined() ? ','+ s +'TokensTable:'+ TokensTable.toString() : '' )+
 			s+'}'
-			
+
 		// Tentative de réduction de la taille du résultat
 		if( /^\{A\:g/.test( sResult )){
 			var aStringsRepeated = []
