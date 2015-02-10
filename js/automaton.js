@@ -1187,6 +1187,7 @@ DFA.union({
 		var oNFA =Automate.PIPE( null, oDFA1, oDFA2 )
 		NFA.validateAlphabet( oNFA )
 		var oDFA = DFA( oNFA )
+	//	console.info( oDFA.M )
 		// NB: Ne détecte pas la reconnaissance d'une chaine par 2 tokens: premier arrivée, ...
 		if( oNFA.aTokensID.length != oDFA.aTokensID.length )
 			alert( 'Erreur perte de donnée dans l\'aggrégation.\n'+
