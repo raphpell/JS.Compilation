@@ -137,7 +137,6 @@ var showGraph =function( sType ){
 				var a = []
 				oFA.S.every( function( S ){
 					if( S == 0 ) return 1
-					if( oFA.D && oFA.D.have( S )) return 1
 					var bI = S==oFA.I, bF = oFA.F.have( S )
 					var sBgColor = bI && bF ? '#0C0'
 						: ( bI ? '#6FB1FC'
@@ -154,7 +153,6 @@ var showGraph =function( sType ){
 				var a = []
 				oFA.T.every( function( T ){
 					if( T[2] == 0 ) return 1
-					if( oFA.D && oFA.D.have( T[2] )) return 1
 					var sSymbol = T[1]==EPSILON ? '' : T[1]
 					var bCharClass = sSymbol.length > 1
 					var sSymbolLabel = JSON.stringify( bCharClass ? sSymbol.substring(0,5)+(sSymbol.length>5?'...':'') : sSymbol ).slice(1,-1)
@@ -262,7 +260,6 @@ var setFA =function( o ){
 	}
 var refreshFAHTML =function( sType ){	
 	var getHTMLTable =function( sTitle, oAutomaton ){
-		var D = oAutomaton.D && oAutomaton.D.length ? oAutomaton.D[0] : ''
 		var A = []
 		for(var i=0, ni=oAutomaton.A.length; i<ni; i++ )
 			A[i] = '<b style="background:lime; color:purple; padding:1px;">'+ JSON.stringify(oAutomaton.A[i]).slice(1,-1).replace( /\\"/g, '"' ) +'</b>'
@@ -282,8 +279,7 @@ var refreshFAHTML =function( sType ){
 			Bufferize( '</table>' )
 			Bufferize( '</td></tr>' )
 			}
-		if( D===0 ) Bufferize( '<tr><th style="background:red;">D</th><td>0</td></tr>' )
-	//	Bufferize( '<tr><th style="background:red;">D</th><td>0</td></tr>' )
+
 		Bufferize( '<tr><th valign="top">&delta; ('+oAutomaton.T.length+')</th><td>' )
 		
 		var M = oAutomaton.M || buildTable( oAutomaton )
@@ -318,6 +314,7 @@ var refreshFAHTML =function( sType ){
 			})
 		Bufferize( '</tr>' )
 		oAutomaton.S.every( function( state ){
+			if( ! state ) return 1 // Etat puits == 0
 			var sBg = state==oAutomaton.I
 				? '#6FB1FC'
 				: ( oAutomaton.F.have( state )
@@ -327,7 +324,7 @@ var refreshFAHTML =function( sType ){
 			Bufferize( '<tr><th style="background:'+sBg+';">'+ state +'</th>' )
 			oAutomaton.A.every( function( symbol ){
 				var stateEnd = nextState( state, symbol )
-				return Bufferize( '<td style="text-align:center;'+( stateEnd==D ? 'background:red; opacity:0.25;' : '')+'">'+ stateEnd +'</td>' )
+				return Bufferize( '<td style="text-align:center;'+( ! stateEnd ? 'background:red; opacity:0.25;' : '')+'">'+ stateEnd +'</td>' )
 				})
 			return Bufferize( '</tr>' )
 			})

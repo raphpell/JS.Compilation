@@ -271,9 +271,8 @@ var match =function( s, n ){
 	
 	var sWordChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_'
 	var isWordChar = function( sChar ){ return sWordChars.indexOf( sChar ) > -1 }
-	
-	var D = oDFA.D[0]
-	, sInput = s || eInput.value
+
+	var sInput = s || eInput.value
 	, sError = false
 	, nIndex= n || 0
 	, nStart = nIndex
@@ -294,7 +293,7 @@ var match =function( s, n ){
 			
 			sChar = sInput[ nIndex ]
 			nIndex++ 
-			sNextState = oDFA.M.nextState( sState, sChar, D )
+			sNextState = oDFA.M.nextState( sState, sChar )
 			Bufferize( '('+ sState +') "'+ sChar +'" &rarr; ('+ sNextState +')\n' )
 			sState = sNextState
 			if( nIndex==sInput.length ) break;

@@ -210,7 +210,7 @@ previewDFA = (function(){
 	})()
 
 var init =function(){
-	oDFA = oDFAAggregated = { D:0, I:1, F:[], A:[], S:[0,1], T:[] }
+	oDFA = oDFAAggregated = { I:1, F:[], A:[], S:[0,1], T:[] }
 	nStateIDCounter = 2
 	clearExport()
 	previewDFA.refresh()
@@ -241,8 +241,7 @@ var match =function( s, n ){
 	var oChrono = new Chrono()
 	oDFA.M = oDFA.M || buildTable( oDFA.T )
 
-	var D = oDFA.D[0]
-	, sInput = s || eInput.value
+	var sInput = s || eInput.value
 	, sError = false
 	, nIndex= n || 0
 	, nStart = nIndex
@@ -256,7 +255,7 @@ var match =function( s, n ){
 			
 			sChar = sInput[ nIndex ]
 			nIndex++ 
-			sNextState = oDFA.M.nextState( sState, sChar, D )
+			sNextState = oDFA.M.nextState( sState, sChar )
 			Bufferize( '('+ sState +') "'+ sChar +'" &rarr; ('+ sNextState +')\n' )
 			sState = sNextState
 			if( nIndex==sInput.length ) break;

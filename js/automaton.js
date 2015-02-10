@@ -3,97 +3,18 @@
 EPSILON = '&epsilon;'
 EMPTY = '&empty;'
 
-/*
-var Automaton =function(){
-	aSymbols
-	oStates
-	oTransitions =(function(){
-		var oBySymbols = {}
-		for(var i=0, ni=oNFA.T.length; i<ni; i++ ){
-			var a = oNFA.T[i]
-			var sSymbol = a[1]
-			if( ! oBySymbols[ sSymbol ]) oBySymbols[ sSymbol ] = []
-			oBySymbols[ sSymbol ].push( a )
-			}
-		var T ={
-			deleteSymbol :function( sSymbol ){
-				delete oBySymbols[ sSymbol ]
-				oNFA.A.remove( sSymbol )
-				},
-			change :function( sSymbol, aNewItems, sMessage, bInfo ){
-				var aNewItems = Array.unique( aNewItems )
-				if( aNewItems.length==1 && sSymbol==aNewItems[0].symbol ) return ;
-				var addTransition =function( oItem, aBase ){
-					var I=Automate.getUniqueID(), F=Automate.getUniqueID()
-					oNFA.S = oNFA.S.concat([I,F])
-					var a = oBySymbols[ oItem.symbol ]
-					if( ! a.push ) throwError( Erreur pas de transition trouvée pour le symbole + oItem.symbol + \n+ JSON.stringify( a ))
-					a.push( oItem.action ? [ I, oItem.symbol, F, oItem.action ] : [ I, oItem.symbol, F ])
-					var a = oBySymbols[ EPSILON ]
-					if( ! a ){
-						a = oBySymbols[ EPSILON ] = []
-						oNFA.A.push( EPSILON )
-						}
-					a.push([ aBase[0], EPSILON, I ])
-					a.push([ F, EPSILON, aBase[2] ])
-					}
-				// Ajoute les nouveaux symboles dans lalphabet
-				for(var i=0, ni=aNewItems.length; i<ni; i++ ){
-					if( ! aNewItems[i]) continue;
-					var sNewSymbol = aNewItems[i].symbol
-					if( ! oBySymbols[ sNewSymbol ]){
-						oBySymbols[ sNewSymbol ] = []
-						oNFA.A.push( sNewSymbol )
-						}
-					}
-				// Ajoute les nouvelles transitions
-				if( oBySymbols[sSymbol]){
-					for(var i=0, ni=oBySymbols[sSymbol].length; i<ni; i++ ){
-						var aTransition = oBySymbols[sSymbol][i]
-						for(var j=0, nj=aNewItems.length; j<nj; j++ ){
-							var oItem = aNewItems[j]
-							if( oItem && oItem.symbol!=sSymbol )
-								addTransition( oItem, aTransition.concat([]))
-							}
-						}
-					}
-				T.deleteSymbol( sSymbol )
-				},
-			getSymbol: function( sSymbol ){ return oBySymbols[sSymbol] },
-			getSymbols: function(){ return oBySymbols },
-			get: function(){
-				var T = []
-				oNFA.A.sort()
-				for(var i=0, ni=oNFA.A.length; i<ni; i++ )
-					T = T.concat( oBySymbols[ oNFA.A[i]] || [])
-				return T
-				}
-			}
-		return T
-		})()
-	}
-Automaton.prototype={
-	buildTable :function(){},
-	renameStates :function( nStateIDCounter, bAll ){},
-	searchDeadState :function(){}
-	}
-Automaton.fromAST =function( eTree ){
-	
-	}
-*/
 throwError =function( s ){
 	alert( s )
 	throw new Error ( s )
 	}
 
-	
-/* TODO: Les 3 fonctions suivantes doivent-être reconstruite ! */
+/* TODO: Les 2 fonctions suivantes doivent-être reconstruite ! */
 
 // construit la matrice M de l'automate oFA : Dans ce fichier + AFD.(aggregator|generator).htm + AF.preview.htm
 buildTable =function( oFA ){
 	var aSpecial=[]
 	var M={
-		nextState :function( sState, sChar, D ){
+		nextState :function( sState, sChar ){
 			var o = this[sState]
 			var nextState=function(){
 				if( ! o ) return -2
@@ -109,7 +30,7 @@ buildTable =function( oFA ){
 				return -2
 				}
 			var checkState =function( sState ){
-				if( sState==D ) return -3
+				if( ! sState ) return -3
 				return sState
 				}
 			return checkState( nextState())
@@ -126,7 +47,6 @@ buildTable =function( oFA ){
 		, symb = a[1]
 		, stateF = a[2]
 		, o = M[stateI] = M[stateI] || {}
-	//	o.list.push( stateF || '0' )
 		o[symb] = o[symb] || []
 		o[symb].push( a[3] ? [ a[3], stateF ] : stateF )
 		o[symb] = Array.unique( o[symb])
@@ -155,7 +75,6 @@ buildTable =function( oFA ){
 			sinon respect l'ordre des états aOrder
 */
 renameStates =function( oFA, nStateIDCounter, bAll, aOrder ){
-	searchDeadState( oFA )
 	var NEW_ID = {} // NEW STATES ID
 	, S = []
 	, T = []
@@ -175,7 +94,7 @@ renameStates =function( oFA, nStateIDCounter, bAll, aOrder ){
 		TMP.sortBy('1','DESC')
 		} else TMP = aOrder
 	
-	// Construction des nouveaux identifiants ( 0: état puit, 1: état initial )
+	// Construction des nouveaux identifiants
 	for(var i=0, ni=TMP.length; i<ni; i++){
 		var state = TMP[i][0], nNewID
 		if( bAll ) nNewID = nCounter++
@@ -205,7 +124,7 @@ renameStates =function( oFA, nStateIDCounter, bAll, aOrder ){
 	for(var i=0, ni=oFA.F.length; i<ni; i++){
 		F[i]= NEW_ID[ oFA.F[i]]
 		}
-
+	// màj les états des identifiants de token
 	var a = oFA.aTokensID
 	if( a && a.length ){
 		for(var i=0, ni=a.length; i<ni; i++){
@@ -222,50 +141,8 @@ renameStates =function( oFA, nStateIDCounter, bAll, aOrder ){
 	oFA.F = F.sortBy('','ASC')
 	oFA.S = S
 	oFA.T = T
-	searchDeadState( oFA )
+	buildTable( oFA )
 	return oFA
-	}
-/* Recherche les états puits d'un DFA : Que dans ce fichier
-	-> ils sont renommé 0
-	-> les états chaine 'entier' sont transformés en nombre entier ! et si il y un état puits !
-		TODO: y réfléchir !
-*/
-searchDeadState =function( oFA ){
-	if( oFA.type != 'DFA' ) return ;
-	var D = []
-	, isDeadState =function( oFA, state ){
-		oFA.M = oFA.M || buildTable( oFA )
-		if( oFA.F.have(state) || state==oFA.I ) return false
-		if( ! oFA.M[state]) return false
-		var a = Array.unique( oFA.M[state].list )
-		return a.length==1 && a[0]==state
-		}
-	buildTable( oFA )
-	for(var i=0, ni=oFA.S.length; i<ni; i++){
-		var state = oFA.S[i]
-		if( isDeadState( oFA, state )) D.push( state )
-		}
-	oFA.D = D
-	if( ! D.length ) return; 
-	oFA.D = 0
-	// renomme les états puits en 0, et transforme les noms des états en entier
-	for(var j=0,nj=D.length; j<nj; j++){
-		for(var i=0, ni=oFA.S.length; i<ni; i++){
-			var state = oFA.S[i]
-			if( state==D[j] ) oFA.S[i] = 0
-			else if( /^\d+$/.test( state )) oFA.S[i] = parseInt( state )
-			}
-		oFA.S.sortBy('','ASC')
-		for(var i=0, ni=oFA.T.length; i<ni; i++){
-			var state = oFA.T[i][0]
-			if( state==D[j] ) oFA.T[i][0] = 0
-			else if( /^\d+$/.test( state )) oFA.T[i][0] = parseInt( state )
-			var state = oFA.T[i][2]
-			if( state==D[j] ) oFA.T[i][2] = 0
-			else if( /^\d+$/.test( state )) oFA.T[i][2] = parseInt( state )
-			}
-		}
-	buildTable( oFA )
 	}
 
 RegExp2Tree =function( sRegExp ){
@@ -1111,7 +988,7 @@ DFA =(function(){
 			}
 		var oDFA = Automate( I.id, F, A, S, T, aTokensID )
 		oDFA.type = 'DFA'
-		searchDeadState( oDFA )
+		buildTable( oDFA )
 		return oDFA
 		}
 	})()
@@ -1142,8 +1019,6 @@ DFA.union({
 				oTokens = Tokens().init( oDFA.aTokensID )
 				}
 			
-			// Renomme "les états puits"
-			for(var i=0, a=oDFA.D, ni=a.length; i<ni; i++) a[i] = getID(a[i])
 			// Renomme les états dans les transitions
 			var T = []
 			for(var i=0, a=oDFA.T, ni=a.length; i<ni; i++){
@@ -1178,6 +1053,8 @@ DFA.union({
 				}
 			}
 		var oTokens = Tokens().init( oDFA.aTokensID )
+		
+	//	if( ! oDFA.M ) buildTable( oDFA )
 
 		// MINIMISATION du nombre détats
 		if( 1 ){
@@ -1310,8 +1187,9 @@ DFA.union({
 		var oNFA =Automate.PIPE( null, oDFA1, oDFA2 )
 		NFA.validateAlphabet( oNFA )
 		var oDFA = DFA( oNFA )
+		// NB: Ne détecte pas la reconnaissance d'une chaine par 2 tokens: premier arrivée, ...
 		if( oNFA.aTokensID.length != oDFA.aTokensID.length )
-			console.warn( 'Erreur perte de donnée dans l\'aggrégation.\n'+
+			alert( 'Erreur perte de donnée dans l\'aggrégation.\n'+
 				'NFA Tokens ID ('+ oNFA.aTokensID.length +'):\n\t'+oNFA.aTokensID.join('\n\t')+'\n\n'+
 				'DFA Tokens ID ('+ oDFA.aTokensID.length +'):\n\t'+oDFA.aTokensID.join('\n\t')
 				)
@@ -1334,9 +1212,6 @@ DFA.union({
 		return oDFA
 		},
 	toJS :function( oDFA, bWhiteSpace, bUnCompressed ){
-		// Normalement un seul état mort existe et est égale 0
-		if( oDFA.D.length > 1 ) throwError( 'More than one dead state ['+ oDFA.D +'].' )
-		else if( oDFA.D.length && oDFA.D[0]!==0 ) throwError( 'The dead state is not 0 (='+ oDFA.D[0] +').' )
 		
 		// ???
 		if( oDFA.S.length > 10 ){
