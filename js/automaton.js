@@ -11,36 +11,33 @@ throwError =function( s ){
 /* TODO: Les 2 fonctions suivantes doivent-être reconstruite ! */
 
 // Construit la matrice M de l'automate oFA : Dans ce fichier + AFD.(aggregator|generator).htm + AF.preview.htm
+// + préparation à la minimisation du DFA
+// + possibilité de teste de l'automate (DFA)
 buildTable =function( oFA ){
-	var aSpecial=[]
+	var aCharClasses=[]
 	var M={
 		nextState :function( sState, sChar ){
+			if( ! sState ) return 0
 			var o = this[sState]
-			var nextState=function(){
-				if( ! o ) return -2
-				if( o[ sChar ]) return o[ sChar ][0]
-				var state = -2
-				for(var i=0, ni=aSpecial.length; i<ni; i++){
-					var Special=aSpecial[i]
-					if( ! o[ Special ]) continue;
-					state = o[ Special ][0][0]( sChar, o[ Special ][0][1] )
-					if( state>'0' ) break;
-					}
-				if( state>'0' ) return state // BRICOLAGE
-				return -2
+			if( o[ sChar ]) return o[ sChar ][0]
+			sState = 0
+			for(var i=0, ni=aCharClasses.length; i<ni; i++){
+				var sCharClass = aCharClasses[i]
+				// o[ sCharClass ] défini que pour les états > 0
+				if( ! o[ sCharClass ]) continue;
+				var a = o[ sCharClass ][0]
+				sState = a[0]( sChar, a[1]) // ( sState == -1 )-> sChar not in charclass !
+				if( sState >= 0 ) break;
 				}
-			var checkState =function( sState ){
-				if( ! sState ) return -3
-				return sState
-				}
-			return checkState( nextState())
+			return sState > 0 ? sState : 0
 			}
 		}
-	var T = {}
+	// Enumération des charclass
 	for(var j=0, nj=oFA.A.length; j<nj; j++){
 		var symb = oFA.A[j]
-		if( symb.length>2 && symb.charAt(0)=='[' ) aSpecial.push( symb )
+		if( symb.length>2 && symb.charAt(0)=='[' ) aCharClasses.push( symb )
 		}
+	// Construction de la matrice
 	for(var i=0, ni=oFA.T.length; i<ni; i++){
 		var a = oFA.T[i]
 		, stateI = a[0]
@@ -52,6 +49,7 @@ buildTable =function( oFA ){
 		o[symb] = Array.unique( o[symb])
 		o[symb].stateF = stateF
 		}
+	// Construction des listes utilisées dans la minimization d'un DFA
 	for(var i=0, ni=oFA.S.length; i<ni; i++){
 		var stateI = oFA.S[i]
 		, o = M[stateI] = M[stateI] || {}
@@ -1113,9 +1111,9 @@ DFA.union({
 		if( 1 ){
 			var aID = []
 			for(var j=0, nj=oDFA.A.length; j<nj ; j++ ){
-				var symb=oDFA.A[j] // ATTENTION au symbole espace !
+				var symb=oDFA.A[j]
 				var sID
-				if( symb.length == 1 ){
+				if( symb.length == 1 ){ // ATTENTION au symbole espace !
 					var a = []
 					for(var i=0, ni=oDFA.S.length; i<ni; i++){
 						var state = oDFA.S[i]
@@ -1178,13 +1176,7 @@ DFA.union({
 		return renameStates( oDFA )
 		},
 	aggregate :function( oDFA1, oDFA2 ){
-		/*
-		var aStatesIntersection = Array.intersect( oDFA1.S, oDFA2.S )
-		aStatesIntersection.remove( 0 )
-		aStatesIntersection.remove( 1 )
-		if( aStatesIntersection.length ) alert( 'Erreur intersection des états lors de l\'aggrégation.\n'+aStatesIntersection )
-		*/
-		var oNFA =Automate.PIPE( null, oDFA1, oDFA2 )
+		var oNFA = Automate.PIPE( null, oDFA1, oDFA2 )
 		NFA.validateAlphabet( oNFA )
 		var oDFA = DFA( oNFA )
 	//	console.info( oDFA.M )

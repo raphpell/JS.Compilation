@@ -273,7 +273,6 @@ var match =function( s, n ){
 	var isWordChar = function( sChar ){ return sWordChars.indexOf( sChar ) > -1 }
 
 	var sInput = s || eInput.value
-	, sError = false
 	, nIndex= n || 0
 	, nStart = nIndex
 	, sChar
@@ -284,13 +283,6 @@ var match =function( s, n ){
 
 	if( sInput.length!=0 )
 		while( true ){
-			/*
-			TODO
-			Save backup states at each choice point
-			Look-ahead in the input before making choice
-			Pursue alternatives in parallel
-			*/
-			
 			sChar = sInput[ nIndex ]
 			nIndex++ 
 			sNextState = oDFA.M.nextState( sState, sChar )
@@ -302,13 +294,7 @@ var match =function( s, n ){
 			}
 	if( oDFA.F.have( sState )) LongestMatch = { matched: sInput.substring( nStart, nIndex )}
 
-	switch( sState ){
-		case -1: sError = 'NOT_IN_CHAR_CLASS'; break
-		case -2: sError = 'INVALID_CHARACTER'; break
-		case -3: sError = 'DEAD_NODE'; break
-		default:
-		}
-	if( sError ) Bufferize( '<small style="color:blue;">'+sError+'</small>\n' )
+	if( ! sState ) Bufferize( '<small style="color:blue;">DEAD_NODE</small>\n' )
 	eResult.innerHTML = Bufferize(
 					'<b style="color:'+
 					( LongestMatch
