@@ -8,148 +8,6 @@ throwError =function( s ){
 	throw new Error ( s )
 	}
 
-/* TODO: Les 2 fonctions suivantes doivent-être reconstruite ! */
-
-// Construit la matrice M de l'automate oFA : Dans ce fichier + AFD.(aggregator|generator).htm + AF.preview.htm
-// + préparation à la minimisation du DFA
-// + possibilité de teste de l'automate (DFA)
-buildTable =function( oFA ){
-	var aCharClasses=[]
-	var M={
-		nextState :function( sState, sChar ){
-			if( ! sState ) return 0
-			var o = this[sState]
-			if( o[ sChar ]) return o[ sChar ][0]
-			sState = 0
-			for(var i=0, ni=aCharClasses.length; i<ni; i++){
-				var sCharClass = aCharClasses[i]
-				// o[ sCharClass ] défini que pour les états > 0
-				if( ! o[ sCharClass ]) continue;
-				var a = o[ sCharClass ][0]
-				sState = a[0]( sChar, a[1]) // ( sState == -1 )-> sChar not in charclass !
-				if( sState >= 0 ) break;
-				}
-			return sState > 0 ? sState : 0
-			}
-		}
-	// Enumération des charclass
-	for(var j=0, nj=oFA.A.length; j<nj; j++){
-		var symb = oFA.A[j]
-		if( symb.length>2 && symb.charAt(0)=='[' ) aCharClasses.push( symb )
-		}
-	// Construction de la matrice
-	for(var i=0, ni=oFA.T.length; i<ni; i++){
-		var a = oFA.T[i]
-		, stateI = a[0]
-		, symb = a[1]
-		, stateF = a[2]
-		, o = M[stateI] = M[stateI] || {}
-		o[symb] = o[symb] || []
-		o[symb].push( a[3] ? [ a[3], stateF ] : stateF )
-		o[symb] = Array.unique( o[symb])
-		o[symb].stateF = stateF
-		}
-	// Construction des listes utilisées dans la minimization d'un DFA
-	for(var i=0, ni=oFA.S.length; i<ni; i++){
-		var stateI = oFA.S[i]
-		, o = M[stateI] = M[stateI] || {}
-		, aList = []
-		for(var j=0, nj=oFA.A.length; j<nj; j++){
-			var symb = oFA.A[j]
-			aList.push( o[symb] ? o[symb].stateF : 0 )
-			}
-		o.list = aList  // list used in DFA Minimization
-		}
-	return oFA.M = M
-	}
-/* Renomme les états de l'automate oFA : Dans ce fichier + AFD.(aggregator|generator).htm
-		Note: les états puits sont égale à '0' ou 0 au départ
-	arguments ( oFA [, nStateIDCounter [, bAll [, aOrder ]]])
-		par défaut ( 0: état puit, 1: état initial , les autres états commencent à 2 )
-		sinon si bAll==false ils commencent à nStateIDCounter sauf ( 0: état puit, 1: état initial )
-		sinon si bAll==true ils commencent à nStateIDCounter 
-		si ! aOrder
-			calcul le poids? et organise les états en fonction
-			sinon respect l'ordre des états aOrder
-*/
-renameStates =function( oFA, nStateIDCounter, bAll, aOrder ){
-	var NEW_ID = {} // NEW STATES ID
-	, S = []
-	, T = []
-	, F = []
-	, nCounter = nStateIDCounter || 2
-	, calculWeight =function( a ){
-		var n=0
-		for(var i=0, ni=a.length; i<ni; i++) if( a[i]) n++
-		return n
-		}
-	var TMP = []
-	if( ! aOrder ){
-		for(var i=0, ni=oFA.S.length; i<ni; i++){
-			var o = oFA.M ? oFA.M[ oFA.S[i]] : null	// Plante pour des gros automates !
-			TMP.push([ oFA.S[i], o ? calculWeight( o.list ) : 0 ])
-			}
-		TMP.sortBy('1','DESC')
-		} else TMP = aOrder
-	
-	// Construction des nouveaux identifiants
-	for(var i=0, ni=TMP.length; i<ni; i++){
-		var state = TMP[i][0], nNewID
-		if( bAll ) nNewID = nCounter++
-		else {
-			if( state=='0' || state==0 ) nNewID = 0
-			else if( state==oFA.I ) nNewID = 1
-			else nNewID = nCounter++
-			}
-		S.push( NEW_ID[state] = nNewID )
-		}
-	S = Array.unique( S )
-	S.sortBy('','ASC')
-	
-	// Renomme les états
-	var Cache = {}
-	for(var i=0, ni=oFA.T.length; i<ni; i++){
-		var a = oFA.T[i]
-		var aNewTransition = a[3]
-			? [ NEW_ID[ a[0]], a[1], NEW_ID[ a[2]], a[3] ]
-			: [ NEW_ID[ a[0]], a[1], NEW_ID[ a[2]] ]
-		var sCacheID = aNewTransition.toString()
-		if( ! Cache[ sCacheID ]){
-			Cache[ sCacheID ]=1
-			T.push( aNewTransition )
-			}
-		}
-	for(var i=0, ni=oFA.F.length; i<ni; i++){
-		F[i]= NEW_ID[ oFA.F[i]]
-		}
-	// màj les états des identifiants de token
-	var a = oFA.aTokensID
-	if( a && a.length ){
-		for(var i=0, ni=a.length; i<ni; i++){
-			var aStates = a[i][1]
-			for(var j=0, nj=aStates.length; j<nj; j++)
-				aStates[j]= NEW_ID[ aStates[j]]
-			a[i][1] = Array.unique( aStates )
-			a[i][1].sortBy('','ASC')
-			}
-		}
-		
-	oFA.type = oFA.type=='DFA' ? 'DFA' : 'NFA'
-	oFA.I = NEW_ID[ oFA.I ]
-	oFA.F = F.sortBy('','ASC')
-	oFA.S = S
-	oFA.T = T
-	buildTable( oFA )
-	return oFA
-	}
-
-RegExp2Tree =function( sRegExp ){
-	return ParserLR.parse(
-		AutomatonLexer( sRegExp, 'RegExp' ),
-		RegExpParser.REGEXP
-		)
-	}
-
 Automate =(function(){
 	// UTILITAIRES
 	var ID = 1
@@ -166,25 +24,59 @@ Automate =(function(){
 			T: T,		// Transitions
 			aTokensID: aTokensID
 			}
-		oAutomate.renameState =function( nOldName, nNewName ){
-			if( this.S.have( nNewName ))
-				throwError( "Erreur renommage d'état, un état à déjà le nom  "+ nNewName +"." )
-			if( this.I == nOldName ) this.I = nNewName
-			for(var i=0, a=this.F, ni=a.length; i<ni; i++){
-				if( a[i]!=nOldName ) continue;
-				a[i] = nNewName
-				break;
+		
+		// Construit la matrice M de l'automate
+		// + préparation à la minimisation du DFA
+		// + possibilité de teste de l'automate (DFA)
+		oAutomate.buildTable =function(){
+			var oFA = this
+			var aCharClasses=[]
+			var M={
+				nextState :function( sState, sChar ){
+					if( ! sState ) return 0
+					var o = this[sState]
+					if( o[ sChar ]) return o[ sChar ][0]
+					sState = 0
+					for(var i=0, ni=aCharClasses.length; i<ni; i++){
+						var sCharClass = aCharClasses[i]
+						// o[ sCharClass ] défini que pour les états > 0
+						if( ! o[ sCharClass ]) continue;
+						var a = o[ sCharClass ][0]
+						sState = a[0]( sChar, a[1]) // ( sState == -1 )-> sChar not in charclass !
+						if( sState >= 0 ) break;
+						}
+					return sState > 0 ? sState : 0
+					}
 				}
-			for(var i=0, a=this.S, ni=a.length; i<ni; i++){
-				if( a[i]!=nOldName ) continue;
-				a[i] = nNewName
-				break;
+			// Enumération des charclass
+			for(var j=0, nj=oFA.A.length; j<nj; j++){
+				var symb = oFA.A[j]
+				if( symb.length>2 && symb.charAt(0)=='[' ) aCharClasses.push( symb )
 				}
-			for(var i=0, a=this.T, ni=a.length; i<ni; i++){
-				var t = a[i]
-				if( t[0]==nOldName ) t[0] = nNewName
-				if( t[2]==nOldName ) t[2] = nNewName
+			// Construction de la matrice
+			for(var i=0, ni=oFA.T.length; i<ni; i++){
+				var a = oFA.T[i]
+				, stateI = a[0]
+				, symb = a[1]
+				, stateF = a[2]
+				, o = M[stateI] = M[stateI] || {}
+				o[symb] = o[symb] || []
+				o[symb].push( a[3] ? [ a[3], stateF ] : stateF )
+				o[symb] = Array.unique( o[symb])
+				o[symb].stateF = stateF
 				}
+			// Construction des listes utilisées dans la minimization d'un DFA
+			for(var i=0, ni=oFA.S.length; i<ni; i++){
+				var stateI = oFA.S[i]
+				, o = M[stateI] = M[stateI] || {}
+				, aList = []
+				for(var j=0, nj=oFA.A.length; j<nj; j++){
+					var symb = oFA.A[j]
+					aList.push( o[symb] ? o[symb].stateF : 0 )
+					}
+				o.list = aList  // list used in DFA Minimization
+				}
+			return oFA.M = M
 			}
 		oAutomate.clone =function(){
 			var NEW_ID = {}
@@ -206,6 +98,107 @@ Automate =(function(){
 				renameState: oAutomate.renameState,
 				clone: oAutomate.clone
 				}
+			}
+		oAutomate.renameState =function( nOldName, nNewName ){
+			if( this.S.have( nNewName ))
+				throwError( "Erreur renommage d'état, un état à déjà le nom  "+ nNewName +"." )
+			if( this.I == nOldName ) this.I = nNewName
+			for(var i=0, a=this.F, ni=a.length; i<ni; i++){
+				if( a[i]!=nOldName ) continue;
+				a[i] = nNewName
+				break;
+				}
+			for(var i=0, a=this.S, ni=a.length; i<ni; i++){
+				if( a[i]!=nOldName ) continue;
+				a[i] = nNewName
+				break;
+				}
+			for(var i=0, a=this.T, ni=a.length; i<ni; i++){
+				var t = a[i]
+				if( t[0]==nOldName ) t[0] = nNewName
+				if( t[2]==nOldName ) t[2] = nNewName
+				}
+			}
+		/* Renomme les états de l'automate
+			Note: les états puits sont égale à '0' ou 0 au départ
+			arguments ( oFA [, nStateIDCounter [, bAll [, aOrder ]]])
+				par défaut ( 0: état puit, 1: état initial , les autres états commencent à 2 )
+				sinon si bAll==false ils commencent à nStateIDCounter sauf ( 0: état puit, 1: état initial )
+				sinon si bAll==true ils commencent à nStateIDCounter 
+				si ! aOrder
+					calcul le poids? et organise les états en fonction
+					sinon respect l'ordre des états aOrder
+		*/
+		oAutomate.renameStates =function( nStateIDCounter, bAll, aOrder ){
+			var oFA = this
+			var NEW_ID = {} // NEW STATES ID
+			, S = []
+			, T = []
+			, F = []
+			, nCounter = nStateIDCounter || 2
+			, calculWeight =function( a ){
+				var n=0
+				for(var i=0, ni=a.length; i<ni; i++) if( a[i]) n++
+				return n
+				}
+			var TMP = []
+			if( ! aOrder ){
+				for(var i=0, ni=oFA.S.length; i<ni; i++){
+					var o = oFA.M ? oFA.M[ oFA.S[i]] : null	// Plante pour des gros automates !
+					TMP.push([ oFA.S[i], o ? calculWeight( o.list ) : 0 ])
+					}
+				TMP.sortBy('1','DESC')
+				} else TMP = aOrder
+			
+			// Construction des nouveaux identifiants
+			for(var i=0, ni=TMP.length; i<ni; i++){
+				var state = TMP[i][0], nNewID
+				if( bAll ) nNewID = nCounter++
+				else {
+					if( state=='0' || state==0 ) nNewID = 0
+					else if( state==oFA.I ) nNewID = 1
+					else nNewID = nCounter++
+					}
+				S.push( NEW_ID[state] = nNewID )
+				}
+			S = Array.unique( S )
+			S.sortBy('','ASC')
+			
+			// Renomme les états
+			var Cache = {}
+			for(var i=0, ni=oFA.T.length; i<ni; i++){
+				var a = oFA.T[i]
+				var aNewTransition = a[3]
+					? [ NEW_ID[ a[0]], a[1], NEW_ID[ a[2]], a[3] ]
+					: [ NEW_ID[ a[0]], a[1], NEW_ID[ a[2]] ]
+				var sCacheID = aNewTransition.toString()
+				if( ! Cache[ sCacheID ]){
+					Cache[ sCacheID ]=1
+					T.push( aNewTransition )
+					}
+				}
+			for(var i=0, ni=oFA.F.length; i<ni; i++){
+				F[i]= NEW_ID[ oFA.F[i]]
+				}
+			// màj les états des identifiants de token
+			var a = oFA.aTokensID
+			if( a && a.length ){
+				for(var i=0, ni=a.length; i<ni; i++){
+					var aStates = a[i][1]
+					for(var j=0, nj=aStates.length; j<nj; j++)
+						aStates[j]= NEW_ID[ aStates[j]]
+					a[i][1] = Array.unique( aStates )
+					a[i][1].sortBy('','ASC')
+					}
+				}
+				
+			oFA.type = oFA.type=='DFA' ? 'DFA' : 'NFA'
+			oFA.I = NEW_ID[ oFA.I ]
+			oFA.F = F.sortBy('','ASC')
+			oFA.S = S
+			oFA.T = T
+			oFA.buildTable()
+			return oFA
 			}
 		return oAutomate
 		}
@@ -488,6 +481,13 @@ Automate =(function(){
 		}
 	return Automate
 	})()
+
+RegExp2AST =function( sRegExp ){
+	return ParserLR.parse(
+		AutomatonLexer( sRegExp, 'RegExp' ),
+		RegExpParser.REGEXP
+		)
+	}
 
 NFA =function( eAST ){ // Transformation de l'AST d'une expression régulière en automate
 	var S = eAST.nodeName
@@ -986,7 +986,7 @@ DFA =(function(){
 			}
 		var oDFA = Automate( I.id, F, A, S, T, aTokensID )
 		oDFA.type = 'DFA'
-		buildTable( oDFA )
+		oDFA.buildTable()
 		return oDFA
 		}
 	})()
@@ -995,7 +995,7 @@ DFA.union({
 		// MINIMISATION DU NOMBRE D'ETATS
 		var COUNTER = 2
 		var STATES_COUNT = -1
-		renameStates( oDFA )
+		oDFA.renameStates()
 
 		var mergeStates =function( NEW_ID ){
 			var getID =function( sState ){ return NEW_ID[sState] || sState }
@@ -1099,7 +1099,7 @@ DFA.union({
 				}while( nPartitionSize != aPartition.length )
 			
 			mergeStates( oStates )
-			buildTable( oDFA )
+			oDFA.buildTable()
 			oTokens = Tokens().init( oDFA.aTokensID )
 			}
 
@@ -1173,7 +1173,7 @@ DFA.union({
 			oDFA.A = Array.unique( A )
 			}
 
-		return renameStates( oDFA )
+		return oDFA.renameStates()
 		},
 	aggregate :function( oDFA1, oDFA2 ){
 		var oNFA = Automate.PIPE( null, oDFA1, oDFA2 )
@@ -1222,9 +1222,9 @@ DFA.union({
 				aStats.sortBy( '1', 'DESC' )
 				return aStats
 				})()
-			renameStates( oDFA, 2, false, stats )
+			oDFA.renameStates( 2, false, stats )
 			}
-		renameStates( oDFA )
+		oDFA.renameStates()
 
 		var oCharClass = {size:0}
 		var oNegatedCharClass = {size:0}

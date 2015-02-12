@@ -282,7 +282,7 @@ var refreshFAHTML =function( sType ){
 
 		Bufferize( '<tr><th valign="top">&delta; ('+oAutomaton.T.length+')</th><td>' )
 		
-		var M = oAutomaton.M || buildTable( oAutomaton )
+		var M = oAutomaton.M || oAutomaton.buildTable()
 		
 		var aSpecialSymbol = []
 		oAutomaton.A.every( function( symbol ){

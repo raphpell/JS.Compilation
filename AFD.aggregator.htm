@@ -216,11 +216,11 @@ var init =function(){
 	previewDFA.refresh()
 	}
 var parseRE =function( sToken, sRegExp ){
-	var oTree = RegExp2Tree( sRegExp )
+	var oTree = RegExp2AST( sRegExp )
 	oNFA = NFA( oTree )
 	NFA.validateAlphabet( oNFA )
 	oDFA = DFA.minimize( DFA( oNFA ))
-	renameStates( oDFA, nStateIDCounter, true )
+	oDFA.renameStates( nStateIDCounter, true )
 	Automate.setUniqueID( oDFA.S[ oDFA.S.length-1 ]+1 )
 
 	oDFA.aTokensID = [[ sToken, oDFA.F ]]
@@ -238,7 +238,7 @@ var clearTest =function(){
 var match =function( s, n ){
 	var oDFA = oDFAAggregated
 	clearTest()
-	oDFA.M = oDFA.M || buildTable( oDFA.T )
+	if( ! oDFA.M ) return ;
 
 	var sInput = s || eInput.value
 	, nIndex= n || 0
@@ -315,7 +315,7 @@ if( $_GET['calcul']){
 	}
 	
 var addDFA =function( sToken, oDFAAdded ){
-	renameStates( oDFAAdded, nStateIDCounter, true )
+	oDFAAdded.renameStates( nStateIDCounter, true )
 	Automate.setUniqueID( oDFAAdded.S[ oDFAAdded.S.length-1 ]+1 )
 	oDFAAdded.aTokensID = [[ sToken, oDFAAdded.F ]]
 	oDFAAggregated = oDFA = DFA.aggregate( oDFAAggregated, oDFAAdded )

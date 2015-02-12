@@ -146,13 +146,13 @@ _( 'eBtnToRE,eAutoToRE,eDFAToRE' )
 _( 'eLexersTest' )
 
 previewRE = (function(){
-	var f = function(){ if( ! oNFA.M ) buildTable( oNFA ); previewREScanning({type:'RE',re:eRE.value }) }
-	f.refresh = function(){ if( ! oNFA.M ) buildTable( oNFA ); previewREScanning.refresh({type:'RE',re:eRE.value}) }
+	var f = function(){ if( ! oNFA.M ) oNFA.buildTable(); previewREScanning({type:'RE',re:eRE.value }) }
+	f.refresh = function(){ if( ! oNFA.M ) oNFA.buildTable(); previewREScanning.refresh({type:'RE',re:eRE.value}) }
 	return f
 	})()
 previewNFA = (function(){
-	var f = function(){ if( ! oNFA.M ) buildTable( oNFA ); previewFA({type:'NFA',re:eRE.value, oFA:oNFA}) }
-	f.refresh = function(){ if( ! oNFA.M ) buildTable( oNFA ); previewFA.refresh({type:'NFA',re:eRE.value, oFA:oNFA}) }
+	var f = function(){ if( ! oNFA.M ) oNFA.buildTable(); previewFA({type:'NFA',re:eRE.value, oFA:oNFA}) }
+	f.refresh = function(){ if( ! oNFA.M ) oNFA.buildTable(); previewFA.refresh({type:'NFA',re:eRE.value, oFA:oNFA}) }
 	return f
 	})()
 previewDFA = (function(){
@@ -171,8 +171,7 @@ eBtnCreate.onclick =function(){
 	refreshWindows()
 	}
 eBtnRenameNFA.onclick =function(){
-	oNFA = renameStates( oNFA )
-	oDFA = DFA( oNFA )
+	oDFA = DFA( oNFA.renameStates())
 	if( eAutoMinimization.checked ) oDFA = DFA.minimize( oDFA )
 	refreshWindows()
 	}
@@ -181,7 +180,7 @@ eBtnValidate.onclick =function(){
 	refreshWindows()
 	}
 eBtnRenameDFA.onclick =function(){
-	oDFA = renameStates( oDFA )
+	oDFA.renameStates()
 	refreshWindows()
 	}
 eBtnMinimize.onclick =function(){
@@ -248,11 +247,11 @@ var calcul =function( item ){
 var oDFA, oNFA
 
 var parseRE =function( bValidate, bMinimize, bMatch, bExport ){
-	var oTree = RegExp2Tree( eRE.value )
+	var oTree = RegExp2AST( eRE.value )
 	oNFA = NFA( oTree )
 	if( bValidate ){
 		NFA.validateAlphabet( oNFA )
-		oNFA = renameStates( oNFA )
+		oNFA.renameStates()
 		}
 	oDFA = DFA( oNFA )
 	if( bMinimize ) oDFA = DFA.minimize( oDFA )
@@ -267,7 +266,7 @@ var clearExport =function(){ eExportResult.value = '' }
 
 var match =function( s, n ){
 	clearTest()
-	oDFA.M = oDFA.M || buildTable( oDFA.T )
+	// oDFA.buildTable()
 	
 	var sWordChars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_'
 	var isWordChar = function( sChar ){ return sWordChars.indexOf( sChar ) > -1 }
