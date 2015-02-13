@@ -30,9 +30,24 @@ Automate =(function(){
 		// + possibilité de teste de l'automate (DFA)
 		oAutomate.buildTable =function(){
 			var oFA = this
-			var aCharClasses=[]
-			var M={
-				nextState :function( sState, sChar ){
+			var M = oFA.M = {}
+			
+			// Construction de la matrice
+			for(var i=0, ni=oFA.T.length; i<ni; i++){
+				var a = oFA.T[i]
+				, stateI = a[0]
+				, symb = a[1]
+				, stateF = a[2]
+				, o = M[stateI] = M[stateI] || {}
+				o[symb] = o[symb] || []
+				o[symb].push( a[3] ? [ a[3], stateF ] : stateF )
+				o[symb] = Array.unique( o[symb])
+				o[symb].stateF = stateF
+				}
+
+			if( oFA.type=='DFA' ){
+				var aCharClasses=[]
+				M.nextState =function( sState, sChar ){
 					if( ! sState ) return 0
 					var o = this[sState]
 					if( o[ sChar ]) return o[ sChar ][0]
@@ -47,36 +62,26 @@ Automate =(function(){
 						}
 					return sState > 0 ? sState : 0
 					}
-				}
-			// Enumération des charclass
-			for(var j=0, nj=oFA.A.length; j<nj; j++){
-				var symb = oFA.A[j]
-				if( symb.length>2 && symb.charAt(0)=='[' ) aCharClasses.push( symb )
-				}
-			// Construction de la matrice
-			for(var i=0, ni=oFA.T.length; i<ni; i++){
-				var a = oFA.T[i]
-				, stateI = a[0]
-				, symb = a[1]
-				, stateF = a[2]
-				, o = M[stateI] = M[stateI] || {}
-				o[symb] = o[symb] || []
-				o[symb].push( a[3] ? [ a[3], stateF ] : stateF )
-				o[symb] = Array.unique( o[symb])
-				o[symb].stateF = stateF
-				}
-			// Construction des listes utilisées dans la minimization d'un DFA
-			for(var i=0, ni=oFA.S.length; i<ni; i++){
-				var stateI = oFA.S[i]
-				, o = M[stateI] = M[stateI] || {}
-				, aList = []
+				
+				// Enumération des charclass
 				for(var j=0, nj=oFA.A.length; j<nj; j++){
 					var symb = oFA.A[j]
-					aList.push( o[symb] ? o[symb].stateF : 0 )
+					if( symb.length>2 && symb.charAt(0)=='[' ) aCharClasses.push( symb )
 					}
-				o.list = aList  // list used in DFA Minimization
+					
+				// Construction des listes utilisées dans la minimization d'un DFA
+				for(var i=0, ni=oFA.S.length; i<ni; i++){
+					var stateI = oFA.S[i]
+					, o = M[stateI] = M[stateI] || {}
+					, aList = []
+					for(var j=0, nj=oFA.A.length; j<nj; j++){
+						var symb = oFA.A[j]
+						aList.push( o[symb] ? o[symb].stateF : 0 )
+						}
+					o.list = aList  // list used in DFA Minimization
+					}
 				}
-			return oFA.M = M
+			return oFA
 			}
 		oAutomate.clone =function(){
 			var NEW_ID = {}
