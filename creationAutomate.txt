@@ -1,12 +1,12 @@
+ï»¿
 
-
-Un automate possède :
-	- I : un état initial
-	- F : un ou plusieurs états finaux
+Un automate possÃ¨de :
+	- I : un Ã©tat initial
+	- F : un ou plusieurs Ã©tats finaux
 	- A : un alphabet
-	- S : des états
+	- S : des Ã©tats
 	- T : des transitions
-	- Une liste de nom de token pour les états finaux.
+	- Une liste de nom de token pour les Ã©tats finaux.
 	
 I: Etat initial
 	Un nombre
@@ -16,8 +16,8 @@ F: Etats finaux
 
 A: Alphabet
 	Tableau contenant :
-		- des caractères
-		- des ensembles de caractère négatif ou non
+		- des caractÃ¨res
+		- des ensembles de caractÃ¨re nÃ©gatif ou non
 		- le symbole EPSILON
 		- le symbole ANY
 		
@@ -25,54 +25,71 @@ S : Etats ( states en anglais)
 	Tableau de nombre unique.
 
 T: Transitions
-	Implémentation la plus simple d'une transition : un tableau de 3 à 4 éléments.
-		[0] un état initial
-		[1] un caractère, ou un ensemble négatif ou non; de l'alphabet
-		[2] un état final
-		[3] une fonction permettant de transiter (cas ensemble de caractère)
+	ImplÃ©mentation la plus simple d'une transition : un tableau de 3 Ã  4 Ã©lÃ©ments.
+		[0] un Ã©tat initial
+		[1] un caractÃ¨re, ou un ensemble nÃ©gatif ou non; de l'alphabet
+		[2] un Ã©tat final
+		[3] une fonction permettant de transiter (cas ensemble de caractÃ¨re)
 				var f =function( caractere, etatFinal )
 
 		
-IMPLÉMENTATION DES AUTOMATES
+IMPLÃ‰MENTATION DES AUTOMATES
 
 oAutomate = new Automate ( I, F, A, S, T, aTokensID )
 
 Automate =function( I, F, A, S, T, aTokensID )
 
 Instance(s) Automate
-	renameState
+	buildTable		
+		Construit la matrice M de l'automate
+		Pour les DFAs:
+			+ prÃ©paration Ã  la minimisation du DFA
+			+ possibilitÃ© de teste de l'automate (DFA)
 	clone
+		Duplique un automate en renommant les Ã©tats pour que leur nom soit unique.
+	renameState
+		Renomme un Ã©tat
+	renameStates
+		Renomme les Ã©tats de l'automate
+			Note: les Ã©tats puits sont Ã©gale Ã  '0' ou 0 au dÃ©part
+			arguments ([ nStateIDCounter [, bAll [, aOrder ]]])
+				par dÃ©faut ( 0: Ã©tat puit, 1: Ã©tat initial , les autres Ã©tats commencent Ã  2 )
+				sinon si bAll==false ils commencent Ã  nStateIDCounter sauf ( 0: Ã©tat puit, 1: Ã©tat initial )
+				sinon si bAll==true ils commencent Ã  nStateIDCounter 
+				si ! aOrder
+					calcul le poids? et organise les Ã©tats en fonction
+					sinon respect l'ordre des Ã©tats aOrder
 
 	
 Objet Automate
 
-	Fonctions spéciales
+	Fonctions spÃ©ciales
 		action ( sSymbols, bNegated ) -> Function
 			...
 		getUniqueID -> Number
-			retourne un nombre unique (état)
+			retourne un nombre unique (Ã©tat)
 		setUniqueID -> void
-			utilisé dans aggrégation de DFA ?
+			utilisÃ© dans aggrÃ©gation de DFA ?
 		wrapper ( s ) -> Automate
-			créé un automate depuis une chaine
+			crÃ©Ã© un automate depuis une chaine
 				Choix possible
 					CARACTERES SPECIAUX: '\\n', '\\t', '\\f', '\\r', '\\v'
 					ENSEMBLE DE CARACTERES: '\\d', '\\D', '\\s', '\\S', '\\w', '\\W'
-				Si chaine.length = 1 : automate à une transition (à un caractère)
+				Si chaine.length = 1 : automate Ã  une transition (Ã  un caractÃ¨re)
 
-	Fonctions retournant une fonction générant un automate unique
+	Fonctions retournant une fonction gÃ©nÃ©rant un automate unique
 		fromChar ( s ) -> Function
-			Automate contenant une seule transition (à un caractère).
+			Automate contenant une seule transition (Ã  un caractÃ¨re).
 		fromCharClass ( aSet, bNegated ) -> Function
-			Automate contenant une seule transition (à un ensemble de caractère négatif ou non).
+			Automate contenant une seule transition (Ã  un ensemble de caractÃ¨re nÃ©gatif ou non).
 
-	Fonctions générant un automate unique
+	Fonctions gÃ©nÃ©rant un automate unique
 		Elles ont pour nom :
 			CARACTERES SPECIAUX: '\\n', '\\t', '\\f', '\\r', '\\v'
 			ENSEMBLE DE CARACTERES: '\\d', '\\D', '\\s', '\\S', '\\w', '\\W'
 		Elles n'ont pas d'argument.
 	
-	Fonctions générant un automate unique depuis des noeuds d'un arbre du DOM...
+	Fonctions gÃ©nÃ©rant un automate unique depuis un AST...
 		...
 
 

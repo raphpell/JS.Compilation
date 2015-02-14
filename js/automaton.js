@@ -16,7 +16,7 @@ Automate =(function(){
 
 	// Objet Automate
 	var Automate =function( I, F, A, S, T, aTokensID ){
-		var oAutomate ={
+		var oFA ={
 			I: I, 		// Etat initial
 			F: F, 		// Etats finaux
 			A: A, 		// Alphabet
@@ -24,11 +24,7 @@ Automate =(function(){
 			T: T,		// Transitions
 			aTokensID: aTokensID
 			}
-		
-		// Construit la matrice M de l'automate
-		// + préparation à la minimisation du DFA
-		// + possibilité de teste de l'automate (DFA)
-		oAutomate.buildTable =function(){
+		oFA.buildTable =function(){
 			var oFA = this
 			var M = oFA.M = {}
 			
@@ -83,7 +79,7 @@ Automate =(function(){
 				}
 			return oFA
 			}
-		oAutomate.clone =function(){
+		oFA.clone =function(){
 			var NEW_ID = {}
 			var F=[], S=[], T=[]
 			for(var i=0, a=this.S, ni=a.length; i<ni; i++)
@@ -98,13 +94,15 @@ Automate =(function(){
 				I: NEW_ID[ this.I ],
 				F: F,
 				A: this.A.concat([]),
-				S:S,
-				T:T,
-				renameState: oAutomate.renameState,
-				clone: oAutomate.clone
+				S: S,
+				T: T,
+				buildTable: oFA.buildTable,
+				clone: oFA.clone,
+				renameState: oFA.renameState,
+				renameStates: oFA.renameStates
 				}
 			}
-		oAutomate.renameState =function( nOldName, nNewName ){
+		oFA.renameState =function( nOldName, nNewName ){
 			if( this.S.have( nNewName ))
 				throwError( "Erreur renommage d'état, un état à déjà le nom  "+ nNewName +"." )
 			if( this.I == nOldName ) this.I = nNewName
@@ -124,17 +122,7 @@ Automate =(function(){
 				if( t[2]==nOldName ) t[2] = nNewName
 				}
 			}
-		/* Renomme les états de l'automate
-			Note: les états puits sont égale à '0' ou 0 au départ
-			arguments ( oFA [, nStateIDCounter [, bAll [, aOrder ]]])
-				par défaut ( 0: état puit, 1: état initial , les autres états commencent à 2 )
-				sinon si bAll==false ils commencent à nStateIDCounter sauf ( 0: état puit, 1: état initial )
-				sinon si bAll==true ils commencent à nStateIDCounter 
-				si ! aOrder
-					calcul le poids? et organise les états en fonction
-					sinon respect l'ordre des états aOrder
-		*/
-		oAutomate.renameStates =function( nStateIDCounter, bAll, aOrder ){
+		oFA.renameStates =function( nStateIDCounter, bAll, aOrder ){
 			var oFA = this
 			var NEW_ID = {} // NEW STATES ID
 			, S = []
@@ -205,7 +193,7 @@ Automate =(function(){
 			oFA.buildTable()
 			return oFA
 			}
-		return oAutomate
+		return oFA
 		}
 	Automate.action =function( sSymbols, bNegated ){
 		var f
