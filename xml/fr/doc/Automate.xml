@@ -11,15 +11,17 @@
 				<desc><![CDATA[ ]]></desc>
 			</arg>
 		</arguments>
-		<note><![CDATA[
-Un automate possède :
-	- I : un état initial
-	- F : un ou plusieurs états finaux
-	- A : un alphabet
-	- S : des états
-	- T : des transitions
-	- Une liste de nom de token pour les états finaux.
-		]]></note>
+		<note>
+			<p>Un automate possède :</p>
+			<ul>
+				<li> I : un état initial</li>
+				<li> F : un ou plusieurs états finaux</li>
+				<li> A : un alphabet</li>
+				<li> S : des états</li>
+				<li> T : des transitions</li>
+				<li> Une liste de nom de token des états finaux.</li>
+			</ul>
+		</note>
 	</syntax>
 <!--
 	<group name="privée">
@@ -38,31 +40,45 @@ Un automate possède :
 		</properties>
 		<methods name="Méthodes">
 			<function name="renameState">
-				<desc>...</desc>
+				<desc>Renomme un état.</desc>
 				<arguments>
 					<arg type="Number" name="nOldName">
-						<desc>.</desc>
+						<desc>Nom de l'état à renommer.</desc>
 					</arg>
 					<arg type="Number" name="nNewName">
-						<desc>.</desc>
+						<desc>Nouveau nom de l'état.</desc>
 					</arg>
 				</arguments>
-				<returnValue type="ColorCMYK"></returnValue>
+				<returnValue type="ColorHSV">
+					<desc>
+						<p>1</p>
+						<p>2</p>
+					</desc>
+				</returnValue>
 			</function>
 		</methods>
 	</group>
-<!--
+
 	<group name="Objet">
-		<methods name="Méthodes">
-			<function name="hex">
-				<arguments>
-					<arg type="Number" name="c">
-						<desc>.</desc>
-					</arg>
-				</arguments>
-				<returnValue type="ColorCMYK"></returnValue>
+		<methods name="Fonctions spéciales">
+			<function name="action"></function>
+			<function name="getUniqueID">
+				<desc>...</desc>
+				<returnValue type="Number">
+					<desc>...</desc>
+				</returnValue>
 			</function>
+			<function name="setUniqueID"></function>
+			<function name="wrapper"></function>
+		</methods>
+		<methods name="Générateur de contructeur d'automate unique">
+			<function name="fromChar"></function>
+			<function name="fromCharClass"></function>
+		</methods>
+		<methods name="Générateur d'automate unique">
+			<function name="['\\n']"></function>
+			<function name="['\\d']"></function>
 		</methods>
 	</group>
--->
+
 </class>

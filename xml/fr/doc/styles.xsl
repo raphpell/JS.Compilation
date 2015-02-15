@@ -9,41 +9,73 @@
 <head>
 	<title><xsl:value-of select="@name"/></title>
 	<style>
-h1 { color: red ;}
+.desc { margin: 0 0 1em 2em ;}
+.arguments,
+.returnValue { margin: 1em ;}
+.arguments DL,
+SECTION { margin-left: 1em ;}
 	</style>
 </head>
 <body>
 	<h1><xsl:value-of select="@name"/></h1>
+	<div class="desc"><xsl:copy-of select="desc"/></div>
 	<xsl:for-each select="syntax/note">
-		<pre class="note"><xsl:value-of select="."/></pre>
+		<div class="note"><xsl:copy-of select="current()"/></div>
 	</xsl:for-each>
 	<dl>
 	<xsl:for-each select="group">
 	<section><h2><xsl:value-of select="@name"/></h2>
-		<dl>
+
 		<xsl:for-each select="methods">
-			<dt><xsl:value-of select="@name"/></dt>
-			<dd>
+			<section><h3><xsl:value-of select="@name"/></h3>
 				<dl>
 				<xsl:for-each select="function">
-					<dt><xsl:value-of select="@name"/></dt>
-					<dd>
-						<dl>
-						<xsl:for-each select="arguments/arg">
-							<dt><xsl:value-of select="@name"/></dt>
-							<dd><xsl:value-of select="desc"/></dd>
-						</xsl:for-each>
-						</dl>
-					</dd>
+					<dt>
+						<code><xsl:value-of select="@name"/>
+							(<xsl:text> </xsl:text>
+							<xsl:for-each select="arguments/arg">
+								<xsl:if test="@opt"> [</xsl:if>
+								<xsl:if test="position()>1">, </xsl:if>
+								<xsl:value-of select="@name"/>
+							</xsl:for-each>
+							<xsl:text> </xsl:text>
+							<xsl:for-each select="arguments/arg">
+								<xsl:if test="@opt">]</xsl:if>
+							</xsl:for-each>)
+						</code>
+						<div class="desc"><xsl:copy-of select="desc"/></div>
+						<xsl:if test="arguments">
+							<div class="arguments">
+								<b>Argument(s)</b>
+								<dl>
+								<xsl:for-each select="arguments/arg">
+									<dt><code><xsl:value-of select="@name"/></code></dt>
+									<dd><xsl:copy-of select="desc"/></dd>
+								</xsl:for-each>
+								</dl>
+							</div>
+						</xsl:if>
+						<xsl:if test="returnValue">
+							<div class="returnValue">
+								<b>Valeur retournée</b>
+								<xsl:for-each select="returnValue/desc">
+									<p><xsl:copy-of select="current()"/></p>
+								</xsl:for-each>
+							</div>
+						</xsl:if>
+					</dt>
 				</xsl:for-each>
 				</dl>
-			</dd>
+			</section>
 		</xsl:for-each>
-		</dl>
+
 	</section>
 	</xsl:for-each>
 	</dl>
 
+	<script>
+
+	</script>
 </body>
 </html>
 </xsl:template>
