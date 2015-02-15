@@ -1,1 +1,68 @@
-﻿
+﻿<?xml version='1.0' encoding='UTF-8'?>
+<?xml-stylesheet type="text/xsl" href="_test.xsl"?> 
+<class name="Automate" language="JavaScript">
+	<desc><![CDATA[ 
+	...
+	]]></desc>
+	<syntax>
+		<code><![CDATA[ ]]></code>
+		<arguments>
+			<arg type="mixte" name="m">
+				<desc><![CDATA[ ]]></desc>
+			</arg>
+		</arguments>
+		<note><![CDATA[
+Un automate possède :
+	- I : un état initial
+	- F : un ou plusieurs états finaux
+	- A : un alphabet
+	- S : des états
+	- T : des transitions
+	- Une liste de nom de token pour les états finaux.
+		]]></note>
+	</syntax>
+<!--
+	<group name="privée">
+		<properties name="">
+			<variable name="NUMBERS" type="Array">
+				<desc>...</desc>
+			</variable>
+		</properties>
+	</group>
+-->
+	<group name="Instance(s)">
+		<properties name="">
+			<variable name="NUMBERS" type="Array">
+				<desc>...</desc>
+			</variable>
+		</properties>
+		<methods name="Méthodes">
+			<function name="renameState">
+				<desc>...</desc>
+				<arguments>
+					<arg type="Number" name="nOldName">
+						<desc>.</desc>
+					</arg>
+					<arg type="Number" name="nNewName">
+						<desc>.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="ColorCMYK"></returnValue>
+			</function>
+		</methods>
+	</group>
+<!--
+	<group name="Objet">
+		<methods name="Méthodes">
+			<function name="hex">
+				<arguments>
+					<arg type="Number" name="c">
+						<desc>.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="ColorCMYK"></returnValue>
+			</function>
+		</methods>
+	</group>
+-->
+</class>
