@@ -1,44 +1,72 @@
 ﻿<?xml version='1.0' encoding='UTF-8'?>
 <?xml-stylesheet type="text/xsl" href="styles.xsl"?> 
 <class name="Automate" language="JavaScript">
-	<desc><![CDATA[ 
-	...
-	]]></desc>
+	<desc>Fonction générant des automates.</desc>
 	<syntax>
-		<code><![CDATA[ ]]></code>
+		<code><![CDATA[ oAutomate = Automate ( I, F, A, S, T, aTokensID ) ]]></code>
 		<arguments>
-			<arg type="mixte" name="m">
-				<desc><![CDATA[ ]]></desc>
+			<arg name="I" type="Number">
+				<desc>État initial.</desc>
+			</arg>
+			<arg name="F" type="Array">
+				<desc>Un ou plusieurs états finaux.</desc>
+			</arg>
+			<arg name="A" type="Array">
+				<desc>Alphabet.</desc>
+			</arg>
+			<arg name="S" type="Array">
+				<desc>États.</desc>
+			</arg>
+			<arg name="T" type="Array">
+				<desc>Transitions.</desc>
+			</arg>
+			<arg name="aTokensID" type="Array">
+				<desc>Liste des noms de token associée aux états finaux.</desc>
 			</arg>
 		</arguments>
-		<note>
-			<p>Un automate possède :</p>
-			<ul>
-				<li> I : un état initial</li>
-				<li> F : un ou plusieurs états finaux</li>
-				<li> A : un alphabet</li>
-				<li> S : des états</li>
-				<li> T : des transitions</li>
-				<li> Une liste de nom de token des états finaux.</li>
-			</ul>
-		</note>
 	</syntax>
-<!--
-	<group name="privée">
-		<properties name="">
-			<variable name="NUMBERS" type="Array">
-				<desc>...</desc>
+
+	<group name="'Instance(s) Automate'">
+		<properties name="Attribut(s)">
+			<variable name="I" type="Number">
+				<desc>État initial.</desc>
 			</variable>
-		</properties>
-	</group>
--->
-	<group name="Instance(s)">
-		<properties name="">
-			<variable name="NUMBERS" type="Array">
-				<desc>...</desc>
+			<variable name="F" type="Array">
+				<desc>Un ou plusieurs états finaux: tableau de nombre unique.</desc>
+			</variable>
+			<variable name="A" type="Array">
+				<desc>Alphabet. Tableau contenant :
+					<ul>
+						<li>des caractères</li>
+						<li>des ensembles de caractère négatif ou non</li>
+						<li>le symbole EPSILON</li>
+						<li>le symbole ANY</li>
+					</ul>
+				</desc>
+			</variable>
+			<variable name="S" type="Array">
+				<desc>États: tableau de nombre unique.</desc>
+			</variable>
+			<variable name="T" type="Array">
+				<desc>Transitions. Implémentation d'une transition : un tableau de 3 à 4 éléments.
+					<dl>
+						<dt>[0] un état initial</dt>
+						<dt>[1] un symbole de l'alphabet</dt>
+						<dt>[2] un état final</dt>
+						<dt>[3] une fonction permettant de transiter d'un état à un autre (cas ensemble de caractère)
+								<pre>	var f =function( caractere, etatFinal ){...}</pre></dt>
+					</dl>
+				</desc>
+			</variable>
+			<variable name="aTokensID" type="Array">
+				<desc>Liste des noms de token associée aux états finaux.</desc>
 			</variable>
 		</properties>
 		<methods name="Méthodes">
+			<function name="buildTable">
+			</function>
+			<function name="clone">
+			</function>
 			<function name="renameState">
 				<desc>Renomme un état.</desc>
 				<arguments>
@@ -49,35 +77,203 @@
 						<desc>Nouveau nom de l'état.</desc>
 					</arg>
 				</arguments>
-				<returnValue type="ColorHSV">
-					<desc>
-						<p>1</p>
-						<p>2</p>
-					</desc>
-				</returnValue>
+			</function>
+			<function name="renameStates">
 			</function>
 		</methods>
 	</group>
 
-	<group name="Objet">
+	<group name="Objet Automate">
 		<methods name="Fonctions spéciales">
-			<function name="action"></function>
-			<function name="getUniqueID">
+			<function name="action">
 				<desc>...</desc>
-				<returnValue type="Number">
-					<desc>...</desc>
-				</returnValue>
+				<arguments>
+					<arg type="String" name="sSymbols">
+						<desc>Liste de caractères.</desc>
+					</arg>
+					<arg type="Boolean" name="bNegated" opt="1">
+						<desc>Indique si l'ensemble de caractères est négatif.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="Function"></returnValue>
 			</function>
-			<function name="setUniqueID"></function>
-			<function name="wrapper"></function>
+			<function name="getUniqueID">
+				<desc>Retourne un nombre unique.</desc>
+				<returnValue type="Number"></returnValue>
+			</function>
+			<function name="setUniqueID">
+				<desc>Défini le nombre de base utilisé pour définir le numéro d'un état.</desc>
+			</function>
+			<function name="wrapper">
+				<desc>Créé un automate depuis une chaine. Choix possible:
+					<ul>
+						<li>Caractères spéciaux: '\\n', '\\t', '\\f', '\\r', '\\v'</li>
+						<li>Ensemble de caractères: '\\d', '\\D', '\\s', '\\S', '\\w', '\\W'</li>
+					</ul>
+					<p>Si la chaine est un caractère: automate à une transition est créé.</p>
+				</desc>
+				<arguments>
+					<arg type="String" name="s">
+						<desc>Une chaîne.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="Automate"></returnValue>
+			</function>
 		</methods>
-		<methods name="Générateur de contructeur d'automate unique">
-			<function name="fromChar"></function>
-			<function name="fromCharClass"></function>
+		<methods name="Générateur de contructeur d'automates spéciaux">
+			<function name="fromChar">
+				<desc>Créé un automate contenant une seule transition à un caractère.</desc>
+				<arguments>
+					<arg type="String" name="s">
+						<desc>Un caractère.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="Automate"></returnValue>
+			</function>
+			<function name="fromCharClass">
+				<desc>Créé un automate contenant une seule transition à un ensemble de caractère négatif ou non.</desc>
+				<arguments>
+					<arg type="Array" name="aSet">
+						<desc>Liste de caractères.</desc>
+					</arg>
+					<arg type="Boolean" name="bNegated" opt="1">
+						<desc>Indique si l'ensemble de caractères est négatif.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="Automate"></returnValue>
+			</function>
 		</methods>
-		<methods name="Générateur d'automate unique">
+		<methods name="Constructeur d'automates spéciaux">
 			<function name="['\\n']"></function>
+			<function name="['\\t']"></function>
+			<function name="['\\f']"></function>
+			<function name="['\\r']"></function>
+			<function name="['\\v']"></function>
 			<function name="['\\d']"></function>
+			<function name="['\\D']"></function>
+			<function name="['\\s']"></function>
+			<function name="['\\S']"></function>
+			<function name="['\\w']"></function>
+			<function name="['\\W']"></function>
+		</methods>
+		<methods name="Fonctions générant un automate depuis des éléments de l'AST...">
+			<desc>...</desc>
+			<function name="CHARCLASS">
+				<desc>.</desc>
+				<arguments>
+					<arg type="Object" name="oToken">
+						<desc>.</desc>
+					</arg>
+				</arguments>
+			</function>
+			<function name="NEGATED_CHARCLASS">
+				<desc>.</desc>
+				<arguments>
+					<arg type="Object" name="oToken">
+						<desc>.</desc>
+					</arg>
+				</arguments>
+			</function>
+			<function name="DOT">
+				<desc>.</desc>
+			</function>
+			<function name="RANGE">
+				<desc>.</desc>
+				<arguments>
+					<arg type="Object" name="oToken">
+						<desc>...</desc>
+					</arg>
+					<arg type="?" name="LEFT">
+						<desc>.</desc>
+					</arg>
+					<arg type="?" name="RIGHT">
+						<desc>.</desc>
+					</arg>
+				</arguments>
+			</function>
+			<function name="CONCAT">
+				<desc>.</desc>
+			</function>
+			<function name="PIPE">
+				<desc>.</desc>
+			</function>
+			<function name="QUANTIFIER">
+				<desc>.</desc>
+				<arguments>
+					<arg type="Object" name="oToken">
+						<desc>...</desc>
+					</arg>
+					<arg type="?" name="LEFT">
+						<desc>.</desc>
+					</arg>
+				</arguments>
+			</function>
+			<function name="['+']">
+				<desc>.</desc>
+				<arguments>
+					<arg type="Object" name="oToken">
+						<desc>...</desc>
+					</arg>
+					<arg type="?" name="LEFT">
+						<desc>.</desc>
+					</arg>
+				</arguments>
+			</function>
+			<function name="['*']">
+				<desc>.</desc>
+				<arguments>
+					<arg type="Object" name="oToken">
+						<desc>...</desc>
+					</arg>
+					<arg type="?" name="LEFT">
+						<desc>.</desc>
+					</arg>
+				</arguments>
+			</function>
+			<function name="['?']">
+				<desc>.</desc>
+				<arguments>
+					<arg type="Object" name="oToken">
+						<desc>...</desc>
+					</arg>
+					<arg type="?" name="LEFT">
+						<desc>.</desc>
+					</arg>
+				</arguments>
+			</function>
+			<function name="['{n}']">
+				<desc>.</desc>
+				<arguments>
+					<arg type="Object" name="oToken">
+						<desc>...</desc>
+					</arg>
+					<arg type="?" name="LEFT">
+						<desc>.</desc>
+					</arg>
+				</arguments>
+			</function>
+			<function name="['{n,}']">
+				<desc>.</desc>
+				<arguments>
+					<arg type="Object" name="oToken">
+						<desc>...</desc>
+					</arg>
+					<arg type="?" name="LEFT">
+						<desc>.</desc>
+					</arg>
+				</arguments>
+			</function>
+			<function name="['{n,m}']">
+				<desc>.</desc>
+				<arguments>
+					<arg type="Object" name="oToken">
+						<desc>...</desc>
+					</arg>
+					<arg type="?" name="LEFT">
+						<desc>.</desc>
+					</arg>
+				</arguments>
+			</function>
 		</methods>
 	</group>
 
