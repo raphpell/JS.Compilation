@@ -47,8 +47,6 @@ Instance(s) Automate
 			+ possibilité de teste de l'automate (DFA)
 	clone
 		Duplique un automate en renommant les états pour que leur nom soit unique.
-	renameState
-		Renomme un état
 	renameStates
 		Renomme les états de l'automate
 			Note: les états puits sont égale à '0' ou 0 au départ

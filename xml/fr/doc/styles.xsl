@@ -9,8 +9,10 @@
 <head>
 	<title><xsl:value-of select="@name"/></title>
 	<style>
-.desc { margin: .5em 1em ;}
+.block { background: #FFE; border: 1px solid #EEE; }
+.desc { margin: 0 1em ;}
 .arguments,
+.note,
 .syntaxe,
 .returnValue { margin: .5em 1em ;}
 DL,
@@ -21,11 +23,16 @@ CODE {
 	color: yellow;
 	padding: 0 .5em;
 	}
-.arguments-inline,
 .type {
 	background: #FFF;
 	color: green;
-	margin: 0 .5em;
+	margin: 0;
+	padding: 0 .5em;
+	}
+.arguments-inline {
+	background: #FF0;
+	color: #000;
+	margin: 0;
 	padding: 0;
 	}
 LABEL { cursor: pointer; display:block; }
@@ -33,11 +40,15 @@ INPUT[type=checkbox] { float: left; display: none; }
 INPUT ~ DL,
 INPUT ~ DIV {
 	height: 0px;
+	margin: 0;
 	overflow: hidden;
+	padding: 0;
 	}
 INPUT:checked ~ DL,
 INPUT:checked ~ DIV {
 	height: auto;
+	margin: .5em;
+	padding: .25em 0;
 	}
 .menu {
 	float: right;
@@ -45,9 +56,11 @@ INPUT:checked ~ DIV {
 	</style>
 </head>
 <body>
+	<a href="../../../index.htm">Index</a>
+	
 	<div class="menu">
-		<input type="button" id="eShowAll" value="Tout voir" />
-		<input type="button" id="eHideAll" value="Tout cacher" />
+		<input type="button" id="eShowAll" value="+" />
+		<input type="button" id="eHideAll" value="-" />
 	</div>
 
 	<h1><xsl:value-of select="@name"/></h1>
@@ -72,7 +85,9 @@ INPUT:checked ~ DIV {
 							<xsl:text> </xsl:text>
 							<xsl:if test="@opt"><small>(optionnel)</small></xsl:if>
 						</label>
-						<div><xsl:copy-of select="desc"/></div>
+						<div class="block">
+							<div class="desc"><xsl:copy-of select="desc"/></div>
+						</div>
 					</dt>
 					</xsl:for-each>
 				</dl>
@@ -99,7 +114,7 @@ INPUT:checked ~ DIV {
 							<code><xsl:value-of select="@name"/></code>
 							<code class="type"><xsl:value-of select="@type"/></code>
 						</label>
-						<div>
+						<div class="block">
 							<div class="desc"><xsl:copy-of select="desc"/></div>
 						</div>
 					</dt>
@@ -121,8 +136,9 @@ INPUT:checked ~ DIV {
 									<xsl:if test="@opt">]</xsl:if>
 								</xsl:for-each>)
 							</code>
+							<code class="type"><xsl:value-of select="returnValue/@type"/></code>
 						</label>
-						<div>
+						<div class="block">
 							<div class="desc"><xsl:copy-of select="desc"/></div>
 							<xsl:if test="arguments">
 							<div class="arguments">
@@ -139,7 +155,9 @@ INPUT:checked ~ DIV {
 											<xsl:text> </xsl:text>
 											<xsl:if test="@opt"><small>(optionnel)</small></xsl:if>
 										</label>
-										<div><xsl:copy-of select="desc"/></div>
+										<div class="block">
+											<div class="desc"><xsl:copy-of select="desc"/></div>
+										</div>
 									</dt>
 									</xsl:for-each>
 								</dl>

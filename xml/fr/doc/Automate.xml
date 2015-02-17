@@ -3,38 +3,15 @@
 <class name="Automate" language="JavaScript">
 	<desc>Fonction générant des automates.</desc>
 	<syntax>
-		<code><![CDATA[ oAutomate = Automate ( I, F, A, S, T, aTokensID ) ]]></code>
+		<code><![CDATA[ oAutomate = new Automate ( I, F, A, S, T [, aTokensID ]) ]]></code>
 		<arguments>
 			<arg name="I" type="Number">
 				<desc>État initial.</desc>
 			</arg>
 			<arg name="F" type="Array">
-				<desc>Un ou plusieurs états finaux.</desc>
+				<desc>Un ou plusieurs états finaux (tableau de nombre).</desc>
 			</arg>
 			<arg name="A" type="Array">
-				<desc>Alphabet.</desc>
-			</arg>
-			<arg name="S" type="Array">
-				<desc>États.</desc>
-			</arg>
-			<arg name="T" type="Array">
-				<desc>Transitions.</desc>
-			</arg>
-			<arg name="aTokensID" type="Array">
-				<desc>Liste des noms de token associée aux états finaux.</desc>
-			</arg>
-		</arguments>
-	</syntax>
-
-	<group name="'Instance(s) Automate'">
-		<properties name="Attribut(s)">
-			<variable name="I" type="Number">
-				<desc>État initial.</desc>
-			</variable>
-			<variable name="F" type="Array">
-				<desc>Un ou plusieurs états finaux: tableau de nombre unique.</desc>
-			</variable>
-			<variable name="A" type="Array">
 				<desc>Alphabet. Tableau contenant :
 					<ul>
 						<li>des caractères</li>
@@ -43,11 +20,11 @@
 						<li>le symbole ANY</li>
 					</ul>
 				</desc>
-			</variable>
-			<variable name="S" type="Array">
-				<desc>États: tableau de nombre unique.</desc>
-			</variable>
-			<variable name="T" type="Array">
+			</arg>
+			<arg name="S" type="Array">
+				<desc>États (tableau de nombre).</desc>
+			</arg>
+			<arg name="T" type="Array">
 				<desc>Transitions. Implémentation d'une transition : un tableau de 3 à 4 éléments.
 					<dl>
 						<dt>[0] un état initial</dt>
@@ -57,36 +34,98 @@
 								<pre>	var f =function( caractere, etatFinal ){...}</pre></dt>
 					</dl>
 				</desc>
+			</arg>
+			<arg name="aTokensID" type="Array" opt="1">
+				<desc>Liste des noms de token associée aux états finaux (voir DFA).</desc>
+			</arg>
+		</arguments>
+		<!-- <note>...</note> -->
+	</syntax>
+
+	<group name="'Instance(s) Automate'">
+		<properties name="">
+			<variable name="I" type="Number">
+				<desc>État initial.</desc>
+			</variable>
+			<variable name="F" type="Array">
+				<desc>Un ou plusieurs états finaux.</desc>
+			</variable>
+			<variable name="A" type="Array">
+				<desc>Alphabet.</desc>
+			</variable>
+			<variable name="S" type="Array">
+				<desc>États: tableau de nombre unique.</desc>
+			</variable>
+			<variable name="T" type="Array">
+				<desc>Transitions.</desc>
 			</variable>
 			<variable name="aTokensID" type="Array">
 				<desc>Liste des noms de token associée aux états finaux.</desc>
 			</variable>
 		</properties>
-		<methods name="Méthodes">
+	</group>
+	<group name="Automate.prototype">
+		<methods name="">
 			<function name="buildTable">
+				<desc>Construit la matrice M de l'automate. Si l'automate est un DFA, ajout:
+					<ul>
+						<li>préparation à la minimisation du DFA</li>
+						<li>possibilité de test du DFA</li>
+					</ul>
+				</desc>
+				<returnValue type="this"></returnValue>
 			</function>
 			<function name="clone">
-			</function>
-			<function name="renameState">
-				<desc>Renomme un état.</desc>
-				<arguments>
-					<arg type="Number" name="nOldName">
-						<desc>Nom de l'état à renommer.</desc>
-					</arg>
-					<arg type="Number" name="nNewName">
-						<desc>Nouveau nom de l'état.</desc>
-					</arg>
-				</arguments>
+				<desc>Duplique un automate en renommant les états pour que leur nom soit unique.<br/>...</desc>
+				<returnValue type="Automate"></returnValue>
 			</function>
 			<function name="renameStates">
+				<desc>Renomme les états de l'automate. 
+					<ul>
+						<li>L'état puit doit-être égale à 0.</li>
+						<li>Par défaut: 0=état puit, 1=état initial, les autres états commencent à partir de 2.</li>
+					</ul>
+				</desc>
+				<arguments>
+					<arg type="Number" name="nStateIDCounter" opt="1">
+						<desc>Premier nombre utilisé pour renuméroter les états.</desc>
+					</arg>
+					<arg type="Boolean" name="bAll" opt="1">
+						<desc>Indique si l'état initial et l'état puit doivent-être renumérotés aussi.</desc>
+					</arg>
+					<arg type="Array" name="aOrder" opt="1">
+						<desc>
+							Liste de tableau contenant un état et son poids, classée par poids décroissant.
+						</desc>
+					</arg>
+				</arguments>
+				<returnValue type="this"></returnValue>
 			</function>
 		</methods>
 	</group>
-
 	<group name="Objet Automate">
 		<methods name="Fonctions spéciales">
 			<function name="action">
-				<desc>...</desc>
+				<desc>
+					Créé une fonction <code>f</code> capable de savoir si un caractère fait partie d'un ensemble de caractère.
+					<dl>
+						<dt>Arguments de la fonction <code>f</code> retournée:</dt>
+						<dd>
+							<ol>
+								<li><code>sChar</code>: un caractère</li>
+								<li><code>nState</code>: un numéro d'état.</li>
+							</ol>
+						</dd>
+						<dt>Valeur retournée:</dt>
+						<dd>
+							<ul>
+								<li>si le caractère <code>sChar</code> fait partie de l'ensemble, elle retourne <code>nState</code>.</li>
+								<li>Elle retourne <code>-1</code> sinon.</li>
+							</ul>
+						</dd>
+						<dt><code>f.toString()</code> retourne l'ensemble de caractère sous forme d'expression régulière.</dt>
+					</dl>
+				</desc>
 				<arguments>
 					<arg type="String" name="sSymbols">
 						<desc>Liste de caractères.</desc>
@@ -98,23 +137,30 @@
 				<returnValue type="Function"></returnValue>
 			</function>
 			<function name="getUniqueID">
-				<desc>Retourne un nombre unique.</desc>
+				<desc>Retourne un nombre unique utilisé pour numéroter un état.</desc>
 				<returnValue type="Number"></returnValue>
 			</function>
 			<function name="setUniqueID">
 				<desc>Défini le nombre de base utilisé pour définir le numéro d'un état.</desc>
 			</function>
 			<function name="wrapper">
-				<desc>Créé un automate depuis une chaine. Choix possible:
-					<ul>
-						<li>Caractères spéciaux: '\\n', '\\t', '\\f', '\\r', '\\v'</li>
-						<li>Ensemble de caractères: '\\d', '\\D', '\\s', '\\S', '\\w', '\\W'</li>
-					</ul>
-					<p>Si la chaine est un caractère: automate à une transition est créé.</p>
+				<desc>
+					Créé un automate depuis une chaine représentant un caractère.
+					<dl>
+						<dt>Choix spéciaux possibles:</dt>
+						<dd>
+							<ul>
+								<li>Caractères spéciaux: '\\n', '\\t', '\\f', '\\r', '\\v'</li>
+								<li>Ensemble de caractères: '\\d', '\\D', '\\s', '\\S', '\\w', '\\W'</li>
+							</ul>
+						</dd>
+						<dt>Si la chaine est un caractère simple ou caractère "échappé" non reconnu, un automate à une transition est créé.</dt>
+					</dl>
+					Une erreur est lancé sinon...
 				</desc>
 				<arguments>
 					<arg type="String" name="s">
-						<desc>Une chaîne.</desc>
+						<desc>Une chaîne de longueur égale à 1 ou 2 ('\\n' à pour longueur 2).</desc>
 					</arg>
 				</arguments>
 				<returnValue type="Automate"></returnValue>
@@ -122,16 +168,16 @@
 		</methods>
 		<methods name="Générateur de contructeur d'automates spéciaux">
 			<function name="fromChar">
-				<desc>Créé un automate contenant une seule transition à un caractère.</desc>
+				<desc>Créé une fonction retournant un automate à une transition pour un caractère.</desc>
 				<arguments>
-					<arg type="String" name="s">
+					<arg type="String" name="sChar">
 						<desc>Un caractère.</desc>
 					</arg>
 				</arguments>
-				<returnValue type="Automate"></returnValue>
+				<returnValue type="Function"></returnValue>
 			</function>
 			<function name="fromCharClass">
-				<desc>Créé un automate contenant une seule transition à un ensemble de caractère négatif ou non.</desc>
+				<desc>Créé une fonction retournant un automate à une transition pour un ensemble de caractère négatif ou non.</desc>
 				<arguments>
 					<arg type="Array" name="aSet">
 						<desc>Liste de caractères.</desc>
@@ -140,21 +186,43 @@
 						<desc>Indique si l'ensemble de caractères est négatif.</desc>
 					</arg>
 				</arguments>
-				<returnValue type="Automate"></returnValue>
+				<returnValue type="Function"></returnValue>
 			</function>
 		</methods>
 		<methods name="Constructeur d'automates spéciaux">
-			<function name="['\\n']"></function>
-			<function name="['\\t']"></function>
-			<function name="['\\f']"></function>
-			<function name="['\\r']"></function>
-			<function name="['\\v']"></function>
-			<function name="['\\d']"></function>
-			<function name="['\\D']"></function>
-			<function name="['\\s']"></function>
-			<function name="['\\S']"></function>
-			<function name="['\\w']"></function>
-			<function name="['\\W']"></function>
+			<function name="['\\n']">
+				<returnValue type="Automate"></returnValue>
+			</function>
+			<function name="['\\t']">
+				<returnValue type="Automate"></returnValue>
+			</function>
+			<function name="['\\f']">
+				<returnValue type="Automate"></returnValue>
+			</function>
+			<function name="['\\r']">
+				<returnValue type="Automate"></returnValue>
+			</function>
+			<function name="['\\v']">
+				<returnValue type="Automate"></returnValue>
+			</function>
+			<function name="['\\d']">
+				<returnValue type="Automate"></returnValue>
+			</function>
+			<function name="['\\D']">
+				<returnValue type="Automate"></returnValue>
+			</function>
+			<function name="['\\s']">
+				<returnValue type="Automate"></returnValue>
+			</function>
+			<function name="['\\S']">
+				<returnValue type="Automate"></returnValue>
+			</function>
+			<function name="['\\w']">
+				<returnValue type="Automate"></returnValue>
+			</function>
+			<function name="['\\W']">
+				<returnValue type="Automate"></returnValue>
+			</function>
 		</methods>
 		<methods name="Fonctions générant un automate depuis des éléments de l'AST...">
 			<desc>...</desc>
@@ -165,6 +233,7 @@
 						<desc>.</desc>
 					</arg>
 				</arguments>
+				<returnValue type="Automate"></returnValue>
 			</function>
 			<function name="NEGATED_CHARCLASS">
 				<desc>.</desc>
@@ -173,9 +242,11 @@
 						<desc>.</desc>
 					</arg>
 				</arguments>
+				<returnValue type="Automate"></returnValue>
 			</function>
 			<function name="DOT">
 				<desc>.</desc>
+				<returnValue type="Automate"></returnValue>
 			</function>
 			<function name="RANGE">
 				<desc>.</desc>
@@ -190,12 +261,15 @@
 						<desc>.</desc>
 					</arg>
 				</arguments>
+				<returnValue type="Automate"></returnValue>
 			</function>
 			<function name="CONCAT">
 				<desc>.</desc>
+				<returnValue type="Automate"></returnValue>
 			</function>
 			<function name="PIPE">
 				<desc>.</desc>
+				<returnValue type="Automate"></returnValue>
 			</function>
 			<function name="QUANTIFIER">
 				<desc>.</desc>
@@ -207,6 +281,7 @@
 						<desc>.</desc>
 					</arg>
 				</arguments>
+				<returnValue type="Automate"></returnValue>
 			</function>
 			<function name="['+']">
 				<desc>.</desc>
@@ -218,6 +293,7 @@
 						<desc>.</desc>
 					</arg>
 				</arguments>
+				<returnValue type="Automate"></returnValue>
 			</function>
 			<function name="['*']">
 				<desc>.</desc>
@@ -229,6 +305,7 @@
 						<desc>.</desc>
 					</arg>
 				</arguments>
+				<returnValue type="Automate"></returnValue>
 			</function>
 			<function name="['?']">
 				<desc>.</desc>
@@ -240,6 +317,7 @@
 						<desc>.</desc>
 					</arg>
 				</arguments>
+				<returnValue type="Automate"></returnValue>
 			</function>
 			<function name="['{n}']">
 				<desc>.</desc>
@@ -251,6 +329,7 @@
 						<desc>.</desc>
 					</arg>
 				</arguments>
+				<returnValue type="Automate"></returnValue>
 			</function>
 			<function name="['{n,}']">
 				<desc>.</desc>
@@ -262,6 +341,7 @@
 						<desc>.</desc>
 					</arg>
 				</arguments>
+				<returnValue type="Automate"></returnValue>
 			</function>
 			<function name="['{n,m}']">
 				<desc>.</desc>
@@ -273,8 +353,8 @@
 						<desc>.</desc>
 					</arg>
 				</arguments>
+				<returnValue type="Automate"></returnValue>
 			</function>
 		</methods>
 	</group>
-
 </class>
