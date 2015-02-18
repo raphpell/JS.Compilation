@@ -1,1 +1,76 @@
-﻿
+﻿<?xml version='1.0' encoding='UTF-8'?>
+<?xml-stylesheet type="text/xsl" href="Doc.xsl"?> 
+<class name="DFA" language="JavaScript">
+	<desc>Fonction générant un AFD depuis un AFN.</desc>
+	<syntax>
+		<code><![CDATA[ oDFA = DFA( oNFA ) ]]></code>
+		<arguments>
+			<arg name="oNFA" type="Automate">
+				<desc>AFN.</desc>
+			</arg>
+		</arguments>
+	</syntax>
+	<group name="'Instance(s) DFA'">
+		<properties name="">
+			<variable name="type" type="String">
+				<desc>Valeur par défaut: "DFA".</desc>
+			</variable>
+			<variable name="M" type="Object">
+				<desc>Matrice de transition.</desc>
+			</variable>
+		</properties>
+	</group>
+	
+	<group name="Objet DFA">
+		<methods name="">
+			<function name="minimize">
+				<desc>.</desc>
+				<arguments>
+					<arg type="Automate" name="oDFA">
+						<desc>Un AFD.</desc>
+					</arg>
+					<arg type="Boolean" name="bPreserveFinalState">
+						<desc>.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="Automate"></returnValue>
+			</function>
+			<function name="aggregate">
+				<desc>.</desc>
+				<arguments>
+					<arg type="Automate" name="oDFA1">
+						<desc>Un AFD.</desc>
+					</arg>
+					<arg type="Automate" name="oDFA2">
+						<desc>Un autre AFD.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="Automate"></returnValue>
+			</function>
+			<function name="toJS">
+				<desc>.</desc>
+				<arguments>
+					<arg type="Automate" name="oDFA">
+						<desc>Un AFD.</desc>
+					</arg>
+					<arg type="Boolean" name="bWhiteSpace">
+						<desc>.</desc>
+					</arg>
+					<arg type="Boolean" name="bUnCompressed">
+						<desc>.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="String"></returnValue>
+			</function>
+			<function name="toRE">
+				<desc>.</desc>
+				<arguments>
+					<arg type="Automate" name="oDFA">
+						<desc>Un AFD.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="String"></returnValue>
+			</function>
+		</methods>
+	</group>
+</class>

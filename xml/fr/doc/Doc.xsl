@@ -57,6 +57,7 @@ INPUT:checked ~ DIV {
 </head>
 <body>
 	<a href="../../../index.htm">Index</a>
+	 - <a href="index.htm">Documentation</a>
 	
 	<div class="menu">
 		<input type="button" id="eShowAll" value="+" />

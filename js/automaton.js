@@ -1448,77 +1448,77 @@ DFA.union({
 		return sResult
 		},
 	toRE :function( oDFA ){
-	if( oDFA.I !== 1 ) throwError( "DFA.toRE: L'état initial doit être égale à 1." )
+		if( oDFA.I !== 1 ) throwError( "DFA.toRE: L'état initial doit être égale à 1." )
 
-	var group =function( s ){
-		return s.length == 1 ? s : '('+ s +')'
-		}
-	var star =function( s ){
-		if( s==EMPTY ) return EPSILON
-		if( s==EPSILON ) return EPSILON
-		var sStar = new String( '('+ s +')*' )
-		sStar.isStar = true
-		sStar.repeated = s
-		return s ? sStar : ''
-		}
-	var union =function( s1, s2 ){
-		if( s1==EMPTY ) return s2
-		if( s2==EMPTY ) return s1
-		if( s1==EPSILON ) return s2 +'?'
-		if( s2==EPSILON ) return s1 +'?'
-		if( s1==s2 ) return s1
-		if( s1.isUnion ) s1 = s1.slice(1,-1)
-		if( s2.isUnion ) s2 = s2.slice(1,-1)
-		var s = new String( '('+ s1 +'|'+ s2 +')' )
-		s.isUnion = true
-		return s
-		}
-	var concat =function( s1, s2 ){
-		if( s1==EMPTY || s2==EMPTY ) return EMPTY
-		if( s1==EPSILON ) return s2
-		if( s2==EPSILON ) return s1
-		if( s1.isStar && s1.repeated==s2 ) return '('+ s2 +')+'
-		if( s2.isStar && s2.repeated==s1 ) return '('+ s1 +')+'
-		return s1 + s2
-		}
-	
-	var A=(function(){
-		var A =[]
-		var get =function( i, j ){
-			return A[i] && A[i][j] || EMPTY
+		var group =function( s ){
+			return s.length == 1 ? s : '('+ s +')'
 			}
-		get.set =function( i, j, sValue ){
-			A[i] = A[i]||[]
-			A[i][j] = A[i][j]
-				? union( A[i][j], sValue )
-				: sValue
+		var star =function( s ){
+			if( s==EMPTY ) return EPSILON
+			if( s==EPSILON ) return EPSILON
+			var sStar = new String( '('+ s +')*' )
+			sStar.isStar = true
+			sStar.repeated = s
+			return s ? sStar : ''
 			}
-		get.toString =function(){ return A.join('\n' ) }
-		return get
-		})()
-	
-	var m = oDFA.S.length
-	
-	var B =[]
-	for(var i=0; i<m; i++ )
-		B[i] = oDFA.F.have( oDFA.S[i]) ? EPSILON : EMPTY
+		var union =function( s1, s2 ){
+			if( s1==EMPTY ) return s2
+			if( s2==EMPTY ) return s1
+			if( s1==EPSILON ) return s2 +'?'
+			if( s2==EPSILON ) return s1 +'?'
+			if( s1==s2 ) return s1
+			if( s1.isUnion ) s1 = s1.slice(1,-1)
+			if( s2.isUnion ) s2 = s2.slice(1,-1)
+			var s = new String( '('+ s1 +'|'+ s2 +')' )
+			s.isUnion = true
+			return s
+			}
+		var concat =function( s1, s2 ){
+			if( s1==EMPTY || s2==EMPTY ) return EMPTY
+			if( s1==EPSILON ) return s2
+			if( s2==EPSILON ) return s1
+			if( s1.isStar && s1.repeated==s2 ) return '('+ s2 +')+'
+			if( s2.isStar && s2.repeated==s1 ) return '('+ s1 +')+'
+			return s1 + s2
+			}
 		
-	for(var i=0, ni=oDFA.T.length; i<ni; i++ ){
-		var t = oDFA.T[i]
-		A.set( t[0]-1, t[2]-1, t[1])
-		}
-
-	for(var n=m-1; n>-1; n-- ){
-		B[n] = concat( star( A(n,n)), B[n] )
-		for(var j=0; j<n; j++ )
-			A.set( n, j, concat( star( A(n,n)), A(n,j) ))
-		for(var i=0; i<n; i++ ){
-			B[i] = union( B[i], concat( A(i,n), B[n]) )
-			for(var j=0; j<n; j++ )
-				A.set( i, j, union( A(i,j), concat( A(i,n), A(n,j) )))
+		var A=(function(){
+			var A =[]
+			var get =function( i, j ){
+				return A[i] && A[i][j] || EMPTY
+				}
+			get.set =function( i, j, sValue ){
+				A[i] = A[i]||[]
+				A[i][j] = A[i][j]
+					? union( A[i][j], sValue )
+					: sValue
+				}
+			get.toString =function(){ return A.join('\n' ) }
+			return get
+			})()
+		
+		var m = oDFA.S.length
+		
+		var B =[]
+		for(var i=0; i<m; i++ )
+			B[i] = oDFA.F.have( oDFA.S[i]) ? EPSILON : EMPTY
+			
+		for(var i=0, ni=oDFA.T.length; i<ni; i++ ){
+			var t = oDFA.T[i]
+			A.set( t[0]-1, t[2]-1, t[1])
 			}
+
+		for(var n=m-1; n>-1; n-- ){
+			B[n] = concat( star( A(n,n)), B[n] )
+			for(var j=0; j<n; j++ )
+				A.set( n, j, concat( star( A(n,n)), A(n,j) ))
+			for(var i=0; i<n; i++ ){
+				B[i] = union( B[i], concat( A(i,n), B[n]) )
+				for(var j=0; j<n; j++ )
+					A.set( i, j, union( A(i,j), concat( A(i,n), A(n,j) )))
+				}
+			}
+		
+		return JSON.stringify( B[0]).slice(1,-1)
 		}
-	
-	return JSON.stringify( B[0]).slice(1,-1)
-	}
 	})

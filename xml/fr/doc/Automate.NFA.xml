@@ -1,1 +1,32 @@
-﻿
+﻿<?xml version='1.0' encoding='UTF-8'?>
+<?xml-stylesheet type="text/xsl" href="Doc.xsl"?> 
+<class name="NFA" language="JavaScript">
+	<desc>Fonction générant un AFN depuis un AST.</desc>
+	<syntax>
+		<code><![CDATA[ oNFA = NFA( eAST ) ]]></code>
+		<arguments>
+			<arg name="eAST" type="HTMLElement">
+				<desc>Résultat de l'analyse syntaxique d'une ER.</desc>
+			</arg>
+		</arguments>
+	</syntax>
+	<group name="'Instance(s) NFA'">
+		<properties name="">
+			<variable name="type" type="String">
+				<desc>Valeur par défaut: "NFA".</desc>
+			</variable>
+		</properties>
+	</group>
+	<group name="Objet NFA">
+		<methods name="">
+			<function name="validateAlphabet">
+				<desc>Transforme l'alphabet d'un NFA en le rendant déterministe...</desc>
+				<arguments>
+					<arg type="Automate" name="oNFA">
+						<desc>Un AFN.</desc>
+					</arg>
+				</arguments>
+			</function>
+		</methods>
+	</group>
+</class>
