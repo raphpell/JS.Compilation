@@ -39,11 +39,11 @@
 				<desc>Liste des noms de token associée aux états finaux (voir DFA).</desc>
 			</arg>
 		</arguments>
-		<!-- <note>...</note> -->
+		<note>...le constructeur ne contrôle pas si les données entrantes sont correctes...</note>
 	</syntax>
 
-	<group name="'Instance(s) Automate'">
-		<properties name="">
+	<group name="Instance(s) Automate">
+		<properties name="Attributs">
 			<variable name="I" type="Number">
 				<desc>État initial.</desc>
 			</variable>
@@ -63,9 +63,7 @@
 				<desc>Liste des noms de token associée aux états finaux.</desc>
 			</variable>
 		</properties>
-	</group>
-	<group name="Automate.prototype">
-		<methods name="">
+		<methods name="Méthodes">
 			<function name="buildTable">
 				<desc>Construit la matrice M de l'automate. Si l'automate est un DFA, ajout:
 					<ul>
@@ -76,7 +74,10 @@
 				<returnValue type="this"></returnValue>
 			</function>
 			<function name="clone">
-				<desc>Duplique un automate en renommant les états pour que leur nom soit unique.<br/>...</desc>
+				<desc>
+					Duplique un automate en renommant les états pour que leur nom soit unique.<br/>
+					Voir la fonction <code>Automate.setUniqueID</code>.
+				</desc>
 				<returnValue type="Automate"></returnValue>
 			</function>
 			<function name="renameStates">

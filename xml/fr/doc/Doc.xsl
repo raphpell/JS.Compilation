@@ -16,7 +16,7 @@
 .syntaxe,
 .returnValue { margin: .5em 1em ;}
 DL,
-SECTION { margin-left: 1em ;}
+SECTION { margin: .5em 0 1.5em 1em ;}
 H2, H3 { margin: 0; }
 CODE {	
 	background: #000;

@@ -1,0 +1,142 @@
+﻿<?xml version='1.0' encoding='UTF-8'?>
+<?xml-stylesheet type="text/xsl" href="UnitTest.xsl"?> 
+
+<truth name="Instance(s) Automate">
+	<script src="../../../js/framework.js"></script>
+	<script src="../../../js/automaton.js"></script>
+	<desc>Elles sont créées par le programme...</desc>
+	<test name="new Automate">
+		<assertions>
+			<desc>Comportement par défaut: pas de validation de données.</desc>
+			<value><![CDATA[
+var I = F = A = S = T = {}
+var oFA = new Automate ( I, F, A, S, T )
+			]]></value>
+			<assert><![CDATA[ oFA.I===I && oFA.F===F && oFA.A===A && oFA.S===S && oFA.T===T ]]></assert>
+			<assert><![CDATA[ oFA.aTokensID.length == 0 ]]></assert>
+		</assertions>
+		<assertions>
+			<desc>Utilisation 'normale'</desc>
+			<value><![CDATA[
+var I = 1
+var F = [2]
+var A = ["¤"]
+var S = [1,2]
+var T = [[1,"¤",2]]
+var aTokensID = []
+var oFA = new Automate ( I, F, A, S, T, aTokensID )
+			]]></value>
+			<assert><![CDATA[ oFA.I===I && oFA.F===F && oFA.A===A && oFA.S===S && oFA.T===T ]]></assert>
+			<assert><![CDATA[ oFA.aTokensID == aTokensID ]]></assert>
+			<assert><![CDATA[ ! oFA.M ]]></assert>
+		</assertions>
+	</test>
+	<test name="prototype.clone">
+		<assertions>
+			<value><![CDATA[
+Automate.setUniqueID( 3 )
+var oClone = oFA.clone()
+			]]></value>
+			<assert><![CDATA[ oClone.I === 3 ]]></assert>
+			<assert><![CDATA[ oClone.F.toString() == "4"]]></assert>
+			<assert><![CDATA[ oClone.A.toString() === "¤" ]]></assert>
+			<assert><![CDATA[ oClone.S.toString() === "3,4" ]]></assert>
+			<assert><![CDATA[ oClone.T.length === 1 ]]></assert>
+			<assert><![CDATA[ oClone.T[0].toString() === "3,¤,4" ]]></assert>
+			<assert><![CDATA[ oClone.aTokensID.length === 0 ]]></assert>
+			<assert><![CDATA[ ! oClone.M ]]></assert>
+		</assertions>
+	</test>
+	<test name="prototype.buildTable">
+		<assertions>
+			<value><![CDATA[
+oFA.buildTable()
+oClone.buildTable()
+			]]></value>
+			<assert><![CDATA[ JSON.stringify( oFA.M ) === '{"1":{"¤":[2]}}' ]]></assert>
+			<assert><![CDATA[ JSON.stringify( oClone.M ) === '{"3":{"¤":[4]}}' ]]></assert>
+		</assertions>
+	</test>
+	<test name="prototype.renameStates">
+		<assertions>
+			<desc>Etat initial = 1, les autres commencent à 2.</desc>
+			<value><![CDATA[
+var o = oClone.renameStates()
+			]]></value>
+			<assert><![CDATA[ o === oClone ]]></assert>
+			<assert><![CDATA[ o.I === 1 ]]></assert>
+			<assert><![CDATA[ o.F.toString() == "2"]]></assert>
+			<assert><![CDATA[ o.A.toString() === "¤" ]]></assert>
+			<assert><![CDATA[ o.S.toString() === "1,2" ]]></assert>
+			<assert><![CDATA[ o.T.length === 1 ]]></assert>
+			<assert><![CDATA[ o.T[0].toString() === "1,¤,2" ]]></assert>
+			<assert><![CDATA[ o.aTokensID.length === 0 ]]></assert>
+			<assert><![CDATA[ JSON.stringify( o.M ) === '{"1":{"¤":[2]}}' ]]></assert>
+		</assertions>
+		<assertions>
+			<desc>Les états commencent à 10.</desc>
+			<value><![CDATA[
+oClone.renameStates( 10, true )
+			]]></value>
+			<assert><![CDATA[ o.I === 10 ]]></assert>
+			<assert><![CDATA[ o.F.toString() == "11"]]></assert>
+			<assert><![CDATA[ o.A.toString() === "¤" ]]></assert>
+			<assert><![CDATA[ o.S.toString() === "10,11" ]]></assert>
+			<assert><![CDATA[ o.T.length === 1 ]]></assert>
+			<assert><![CDATA[ o.T[0].toString() === "10,¤,11" ]]></assert>
+			<assert><![CDATA[ o.aTokensID.length === 0 ]]></assert>
+			<assert><![CDATA[ JSON.stringify( o.M ) === '{"10":{"¤":[11]}}' ]]></assert>
+		</assertions>
+		<assertions>
+			<desc>Etat initial = 1, les autres commencent à 20.</desc>
+			<value><![CDATA[
+oClone.renameStates( 20 )
+			]]></value>
+			<assert><![CDATA[ o.I === 1 ]]></assert>
+			<assert><![CDATA[ o.F.toString() == "20"]]></assert>
+			<assert><![CDATA[ o.A.toString() === "¤" ]]></assert>
+			<assert><![CDATA[ o.S.toString() === "1,20" ]]></assert>
+			<assert><![CDATA[ o.T.length === 1 ]]></assert>
+			<assert><![CDATA[ o.T[0].toString() === "1,¤,20" ]]></assert>
+			<assert><![CDATA[ o.aTokensID.length === 0 ]]></assert>
+			<assert><![CDATA[ JSON.stringify( o.M ) === '{"1":{"¤":[20]}}' ]]></assert>
+		</assertions>
+		<assertions>
+			<desc>Organisation des états</desc>
+			<value><![CDATA[
+var I = 10
+var F = [15,20]
+var A = ["a","b"]
+var S = [10,15,20]
+var T = [[10,"a",20],[20,"a",10],[20,"b",15]]
+oFA = new Automate ( I, F, A, S, T )
+oFA.renameStates( 2, false, [[10,50],[15,0],[20,100]] )
+			]]></value>
+			<assert><![CDATA[ oFA.I === 1 ]]></assert>
+			<assert><![CDATA[ oFA.F.toString() == "2,3"]]></assert>
+			<assert><![CDATA[ oFA.A.toString() === "a,b" ]]></assert>
+			<assert><![CDATA[ oFA.S.toString() === "1,2,3" ]]></assert>
+			<assert><![CDATA[ oFA.T.length === 3 ]]></assert>
+			<assert><![CDATA[ JSON.stringify( oFA.T ) === '[[1,"a",2],[2,"a",1],[2,"b",3]]' ]]></assert>
+			<assert><![CDATA[ JSON.stringify( oFA.M ) === '{"1":{"a":[2]},"2":{"a":[1],"b":[3]}}' ]]></assert>
+		</assertions>
+		<assertions>
+			<desc>Pas utilisé</desc>
+			<value><![CDATA[
+var I = 10
+var F = [15,20]
+var A = ["a","b"]
+var S = [10,15,20]
+var T = [[10,"a",20],[20,"a",10],[20,"b",15]]
+oFA = new Automate ( I, F, A, S, T )
+oFA.renameStates( 2, true, [[10,50],[15,0],[20,100]] )
+			]]></value>
+			<assert><![CDATA[ oFA.I === 3 ]]></assert>
+			<assert><![CDATA[ oFA.F.toString() == "2,4"]]></assert>
+			<assert><![CDATA[ oFA.A.toString() === "a,b" ]]></assert>
+			<assert><![CDATA[ oFA.S.toString() === "2,3,4" ]]></assert>
+			<assert><![CDATA[ JSON.stringify( oFA.T ) === '[[3,"a",2],[2,"a",3],[2,"b",4]]' ]]></assert>
+			<assert><![CDATA[ JSON.stringify( oFA.M ) === '{"2":{"a":[3],"b":[4]},"3":{"a":[2]}}' ]]></assert>
+		</assertions>
+	</test>
+</truth>

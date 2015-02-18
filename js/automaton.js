@@ -90,7 +90,9 @@ Automate =(function(){
 				F[i] = NEW_ID[ a[i]]
 			for(var i=0, a=this.T, ni=a.length; i<ni; i++){
 				var t = a[i]
-				T[i] = [ NEW_ID[ t[0]], t[1], NEW_ID[ t[2]], t[3]]
+				T[i] = t[3]
+					? [ NEW_ID[ t[0]], t[1], NEW_ID[ t[2]], t[3] ]
+					: [ NEW_ID[ t[0]], t[1], NEW_ID[ t[2]] ]
 				}
 			return new Automate(
 				NEW_ID[ this.I ],
@@ -117,10 +119,10 @@ Automate =(function(){
 			if( ! aOrder ){
 				for(var i=0, ni=oFA.S.length; i<ni; i++){
 					var o = oFA.M ? oFA.M[ oFA.S[i]] : null	// Plante pour des gros automates !
-					TMP.push([ oFA.S[i], o ? calculWeight( o.list ) : 0 ])
+					TMP.push([ oFA.S[i], o && o.list ? calculWeight( o.list ) : 0 ])
 					}
-				TMP.sortBy('1','DESC')
 				} else TMP = aOrder
+			TMP.sortBy('1','DESC')
 			
 			// Construction des nouveaux identifiants
 			for(var i=0, ni=TMP.length; i<ni; i++){
@@ -195,7 +197,7 @@ Automate =(function(){
 		}
 	Automate.getUniqueID = getUniqueID
 	Automate.setUniqueID =function( nUniqueID ){
-		ID = nUniqueID
+		if( nUniqueID ) ID = nUniqueID
 		}
 	Automate.wrapper =function( s ){
 		if( s.length==1 ) return Automate.fromChar(s)()
@@ -1191,7 +1193,6 @@ DFA.union({
 						}
 					}
 				for(var i=0, t ; t=oDFA.T[i]; i++) if( t[2]>0 ) checkState( t[2])
-				aStats.sortBy( '1', 'DESC' )
 				return aStats
 				})()
 			oDFA.renameStates( 2, false, stats )
