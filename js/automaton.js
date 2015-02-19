@@ -249,25 +249,30 @@ Automate =(function(){
 			})
 	})()
 
-	// ELEMENT DE L'AST
-	// premier argument, l'element parent, le reste, ses enfants
+	// TRANSFORMATION ELEMENT DE L'AST en NFA
+	// Premier argument des fonctions, un élement de l'AST, le reste, ses enfants transformés en NFA
+	// Il y a une correspondance non validée entre le premier argument et le nom de fonction
 	var _getCharSet =function( a ){
 		var A = []
 		for(var i=1, ni=a.length; i<ni; i++ ){
 			var symbol = a[i].A[0]
-			if( symbol.charAt(0)=='[' && symbol.charAt(symbol.length-1)==']' )
-				A = A.concat( symbol.replace( /^\[\^?((?:a|[^a])+)\]$/g, '$1' ).toArray())
-			else A.push( symbol )
+			if( symbol.charAt(0)=='[' && symbol.charAt(symbol.length-1)==']' ){
+				// ATTENTION: zap les ensembles de caractère négatif proscrites
+				if( symbol.charAt(1)!='^' )
+					A = A.concat( symbol.replace( /^\[\^?((?:a|[^a])+)\]$/g, '$1' ).toArray())
+				continue; 
+				}
+			A.push( symbol )
 			}
 		A = Array.unique( A )
 		A.sort() // SUPER IMPORTANT ! mais je ne sais pas pourquoi...
 		return A
 		}
 	Automate.union({
-		CHARCLASS :function( oToken /* , AST childnodes  */){
+		CHARCLASS :function(){
 			return Automate.fromCharClass( _getCharSet( arguments ), 0 )()
 			},
-		NEGATED_CHARCLASS :function( oToken /* , AST childnodes  */){
+		NEGATED_CHARCLASS :function(){
 			return Automate.fromCharClass( _getCharSet( arguments ), 1 )()
 			},
 		DOT :Automate.fromChar( 'ANY' ),
@@ -463,16 +468,17 @@ RegExp2AST =function( sRegExp ){
 		)
 	}
 
-NFA =function( eAST ){ // Transformation de l'AST d'une expression régulière en automate
-	var S = eAST.nodeName
+NFA =function( eASTNode ){ // Transformation de l'AST d'une expression régulière en automate
+	var S = eASTNode.nodeName
 	if( Automate[S]){
-		for(var a=to_array( eAST.childNodes ), i=0, eChild; eChild=a[i]; i++ ) a[i]=NFA(a[i])
-		a.unshift( eAST )
+		for(var a=to_array( eASTNode.childNodes ), i=0, eChild; eChild=a[i]; i++ )
+			a[i] = NFA(a[i])
+		a.unshift( eASTNode )
 		return Automate[S].apply( null, a )
 		}
-	if( ! eAST.oValue ) return false
-	if( ! eAST.oValue.value ) throwError( 'Error: symbol='+ eAST.nodeName )
-	return Automate.wrapper( eAST.oValue.value )
+	if( ! eASTNode.oValue ) return false
+	if( ! eASTNode.oValue.value ) throwError( 'Error: symbol='+ eASTNode.nodeName )
+	return Automate.wrapper( eASTNode.oValue.value )
 	}
 NFA.validateAlphabet =function( oNFA ){
 	var aAtoms=[], aGroups=[], aNegativeGroups=[]

@@ -1,0 +1,238 @@
+﻿<?xml version='1.0' encoding='UTF-8'?>
+<?xml-stylesheet type="text/xsl" href="UnitTest.xsl"?> 
+
+<truth name="Objet Automate">
+	<script src="../../../js/framework.js"></script>
+	<script src="../../../js/automaton.js"></script>
+	<desc>...</desc>
+	<test name="Automate.action">
+		<assertions>
+			<desc>Ensemble de caractère.</desc>
+			<value><![CDATA[
+var f = Automate.action( 'abc' )
+			]]></value>
+			<assert><![CDATA[ f.toString() === '[abc]' ]]></assert>
+			<assert><![CDATA[ f('D', 10 ) === -1 ]]></assert>
+			<assert><![CDATA[ f('a', 10 ) === 10 ]]></assert>
+			<assert><![CDATA[ f('b', 10 ) === 10 ]]></assert>
+			<assert><![CDATA[ f('c', 10 ) === 10 ]]></assert>
+		</assertions>
+		<assertions>
+			<desc>Ensemble de caractère négatif.</desc>
+			<value><![CDATA[
+var f = Automate.action( 'abc', true )
+			]]></value>
+			<assert><![CDATA[ f.toString() === '[^abc]' ]]></assert>
+			<assert><![CDATA[ f('D', 10 ) === 10 ]]></assert>
+			<assert><![CDATA[ f('a', 10 ) === -1 ]]></assert>
+			<assert><![CDATA[ f('b', 10 ) === -1 ]]></assert>
+			<assert><![CDATA[ f('c', 10 ) === -1 ]]></assert>
+		</assertions>
+	</test>
+	<test name="Automate.getUniqueID">
+		<assertions>
+			<assert><![CDATA[ Automate.getUniqueID() === 1 ]]></assert>
+			<assert><![CDATA[ Automate.getUniqueID() === 2 ]]></assert>
+			<assert><![CDATA[ Automate.getUniqueID() === 3 ]]></assert>
+		</assertions>
+	</test>
+	<test name="Automate.setUniqueID">
+		<assertions>
+			<value><![CDATA[
+Automate.setUniqueID( 1 )
+			]]></value>
+			<assert><![CDATA[ Automate.getUniqueID() === 1 ]]></assert>
+		</assertions>
+		<assertions>
+			<value><![CDATA[
+Automate.setUniqueID( 0 )
+			]]></value>
+			<assert><![CDATA[ Automate.getUniqueID() === 2 ]]></assert>
+		</assertions>
+	</test>
+	<test name="Automate.wrapper">
+		<assertions>
+			<value><![CDATA[
+
+			]]></value>
+			<assert><![CDATA[ true ]]></assert>
+		</assertions>
+	</test>
+	<test name="Automate.fromChar">
+			<desc>
+Méthodes créées avec <code>Automate.fromChar</code>:
+<ul>
+	<li>Automate['\\n'] = Automate.fromChar('\n')</li>
+	<li>Automate['\\t'] ...</li>
+	<li>Automate['\\f'] ...</li>
+	<li>Automate['\\r'] ...</li>
+	<li>Automate['\\v'] ...</li>
+</ul>
+			</desc>
+		<assertions>
+			<value><![CDATA[
+Automate.setUniqueID( 1 )
+var f = Automate['\\n']
+			]]></value>
+		</assertions>
+		<assertions>
+			<value><![CDATA[
+var oFA1 = f()
+			]]></value>
+			<assert><![CDATA[ oFA1.I === 1 ]]></assert>
+			<assert><![CDATA[ oFA1.F.toString() === "2" ]]></assert>
+			<assert><![CDATA[ oFA1.A.toString() === "\n" ]]></assert>
+			<assert><![CDATA[ oFA1.S.toString() === "1,2" ]]></assert>
+			<assert><![CDATA[ oFA1.T.length === 1 ]]></assert>
+			<assert><![CDATA[ oFA1.T[0].toString() === "1,\n,2" ]]></assert>
+			<assert><![CDATA[ oFA1.aTokensID.length === 0 ]]></assert>
+			<assert><![CDATA[ ! oFA1.M ]]></assert>
+		</assertions>
+		<assertions>
+			<value><![CDATA[
+var oFA2 = f()
+			]]></value>
+			<assert><![CDATA[ oFA2.I === 3 ]]></assert>
+			<assert><![CDATA[ oFA2.F.toString() === "4" ]]></assert>
+			<assert><![CDATA[ oFA2.A.toString() === "\n" ]]></assert>
+			<assert><![CDATA[ oFA2.S.toString() === "3,4" ]]></assert>
+			<assert><![CDATA[ oFA2.T.length === 1 ]]></assert>
+			<assert><![CDATA[ oFA2.T[0].toString() === "3,\n,4" ]]></assert>
+			<assert><![CDATA[ oFA2.aTokensID.length === 0 ]]></assert>
+			<assert><![CDATA[ ! oFA2.M ]]></assert>
+		</assertions>
+	</test>
+	<test name="Automate.fromCharClass">
+		<desc>
+Méthodes créées avec <code>Automate.fromCharClass</code>:
+<ul>
+	<li><b>Ensemble de caractère.</b>
+		<ul>
+			<li>Automate['\\d'] = Automate.fromCharClass( NUMBERS, 0)</li>
+			<li>Automate['\\s'] ...</li>
+			<li>Automate['\\w'] ...</li>
+		</ul></li>
+	<li><b>Ensemble de caractère négatif.</b>
+		<ul>
+			<li>Automate['\\D'] = Automate.fromCharClass( NUMBERS, 1)</li>
+			<li>Automate['\\S']</li>
+			<li>Automate['\\W']</li>
+		</ul></li>
+</ul>
+avec NUMBERS = '0123456789'.split('')
+		</desc>
+		<assertions>
+			<desc>Ensemble de caractère.</desc>
+			<value><![CDATA[
+Automate.setUniqueID( 5 )
+var f = Automate.fromCharClass( ['a','b','c'] )
+var oFA3 = f()
+			]]></value>
+			<assert><![CDATA[ oFA3.I === 5 ]]></assert>
+			<assert><![CDATA[ oFA3.F.toString() === "6" ]]></assert>
+			<assert><![CDATA[ oFA3.A.length === 1 ]]></assert>
+			<assert><![CDATA[ oFA3.A.toString() === "[abc]" ]]></assert>
+			<assert><![CDATA[ oFA3.S.toString() === "5,6" ]]></assert>
+			<assert><![CDATA[ oFA3.T.length === 1 ]]></assert>
+			<assert><![CDATA[ oFA3.T[0].toString() === "5,[abc],6,[abc]" ]]></assert>
+			<assert><![CDATA[ oFA3.T[0][3]('b', 10 ) === 10 ]]></assert>
+			<assert><![CDATA[ oFA3.T[0][3]('D', 10 ) === -1 ]]></assert>
+			<assert><![CDATA[ oFA3.aTokensID.length === 0 ]]></assert>
+			<assert><![CDATA[ ! oFA3.M ]]></assert>
+		</assertions>
+		<assertions>
+			<desc>Ensemble de caractère négatif.</desc>
+			<value><![CDATA[
+var f = Automate.fromCharClass( ['a','b','c'], true )
+var oFA4 = f()
+			]]></value>
+			<assert><![CDATA[ oFA4.I === 7 ]]></assert>
+			<assert><![CDATA[ oFA4.F.toString() === "8" ]]></assert>
+			<assert><![CDATA[ oFA4.A.length === 1 ]]></assert>
+			<assert><![CDATA[ oFA4.A.toString() === "[^abc]" ]]></assert>
+			<assert><![CDATA[ oFA4.S.toString() === "7,8" ]]></assert>
+			<assert><![CDATA[ oFA4.T.length === 1 ]]></assert>
+			<assert><![CDATA[ oFA4.T[0].toString() === "7,[^abc],8,[^abc]" ]]></assert>
+			<assert><![CDATA[ oFA4.T[0][3]('b', 10 ) === -1 ]]></assert>
+			<assert><![CDATA[ oFA4.T[0][3]('D', 10 ) === 10 ]]></assert>
+			<assert><![CDATA[ oFA4.aTokensID.length === 0 ]]></assert>
+			<assert><![CDATA[ ! oFA4.M ]]></assert>
+		</assertions>
+	</test>
+	<test name="Automate...">
+		<assertions name="Automate.CHARCLASS">
+			<desc>
+Un automate 'CHARCLASS' est généré depuis les éléments:
+<ul>
+	<li>RANGE -> Automate.fromCharClass</li>
+	<li>CHAR -> Automate.fromChar</li>
+	<li>ENSEMBLE DE CARACTÈRES ( \d, ... ) -> Automate.fromCharClass</li>
+	<li>Les ensembles de caractères négatifs ( \D, ... ) sont proscrite</li>
+</ul>
+			</desc>
+			<value><![CDATA[
+Automate.setUniqueID( 9 )
+var oFA5 = Automate.CHARCLASS( null, Automate['\\d'](), Automate['\\D'](), Automate.fromChar('A')())
+			]]></value>
+			<assert><![CDATA[ oFA5 ]]></assert>
+			<assert><![CDATA[ oFA5.I === 15 ]]></assert>
+			<assert><![CDATA[ oFA5.F.toString() === "16" ]]></assert>
+			<assert><![CDATA[ oFA5.A.length === 1 ]]></assert>
+			<assert><![CDATA[ oFA5.A.toString() === "[0123456789A]" ]]></assert>
+			<assert><![CDATA[ oFA5.S.toString() === "15,16" ]]></assert>
+		</assertions>
+		<assertions name="Automate.NEGATED_CHARCLASS">
+			<desc>
+Un automate 'NEGATED_CHARCLASS' est généré depuis les éléments:
+<ul>
+	<li>RANGE -> Automate.fromCharClass</li>
+	<li>CHAR -> Automate.fromChar</li>
+	<li>ENSEMBLE DE CARACTÈRES ( \d, ... ) -> Automate.fromCharClass</li>
+	<li>Les ensembles de caractères négatifs ( \D, ... ) sont proscrite</li>
+</ul>
+			</desc>
+			<value><![CDATA[
+Automate.setUniqueID( 9 )
+var oFA6 = Automate.NEGATED_CHARCLASS( null, Automate['\\d'](), Automate['\\D'](), Automate.fromChar('A')())
+			]]></value>
+			<assert><![CDATA[ oFA6 ]]></assert>
+			<assert><![CDATA[ oFA6.I === 15 ]]></assert>
+			<assert><![CDATA[ oFA6.F.toString() === "16" ]]></assert>
+			<assert><![CDATA[ oFA6.A.length === 1 ]]></assert>
+			<assert><![CDATA[ oFA6.A.toString() === "[^0123456789A]" ]]></assert>
+			<assert><![CDATA[ oFA6.S.toString() === "15,16" ]]></assert>
+		</assertions>
+		<assertions name="Automate.DOT">
+			<value><![CDATA[
+Automate.setUniqueID( 17 )
+var oFA7 = Automate.DOT()
+			]]></value>
+			<assert><![CDATA[ oFA7 ]]></assert>
+			<assert><![CDATA[ oFA7.I === 17 ]]></assert>
+			<assert><![CDATA[ oFA7.F.toString() === "18" ]]></assert>
+			<assert><![CDATA[ oFA7.A.toString() === "ANY" ]]></assert>
+			<assert><![CDATA[ oFA7.S.toString() === "17,18" ]]></assert>
+			<assert><![CDATA[ oFA7.T.length === 1 ]]></assert>
+			<assert><![CDATA[ oFA7.T[0].toString() === "17,ANY,18" ]]></assert>
+		</assertions>
+		<assertions name="Automate.RANGE">
+			<desc>
+			<ul>
+				<li>??? un automate est créé pour récupérer un caractère ?</li>
+				<li>drôle de résultat !</li>
+			</ul>
+			</desc>
+			<value><![CDATA[
+Automate.setUniqueID( 19 )
+var oFA8 = Automate.RANGE( null, Automate.fromChar('c')(), Automate.fromChar('a')() )
+			]]></value>
+			<assert><![CDATA[ oFA8 ]]></assert>
+			<assert><![CDATA[ oFA8.I === 23 ]]></assert>
+			<assert><![CDATA[ oFA8.F.toString() === "24" ]]></assert>
+			<assert><![CDATA[ oFA8.A.toString() === "abc" ]]></assert>
+			<assert><![CDATA[ oFA8.S.toString() === "23,24" ]]></assert>
+			<assert><![CDATA[ oFA8.T.length === 1 ]]></assert>
+			<assert><![CDATA[ oFA8.T[0].toString() === "23,abc,24" ]]></assert>
+		</assertions>
+	</test>
+</truth>

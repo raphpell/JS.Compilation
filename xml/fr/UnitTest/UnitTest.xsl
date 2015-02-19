@@ -36,7 +36,7 @@
 		<div class="desc"><xsl:copy-of select="desc"/></div>
 	</xsl:if>
 	
-	<script>var aUnitTest = []</script>
+	<script>var aUnitTest = [], aEval = []</script>
 	
 	<xsl:for-each select="test">
 	<div class="test">
@@ -57,7 +57,14 @@
 			</xsl:if>
 			<xsl:if test="value">
 				<pre class="value"><xsl:value-of select="value" /></pre>
-				<script><xsl:value-of select="value"/></script>
+				<script>try{
+					<xsl:value-of select="value"/>
+					}catch( e){
+						aEval.push( e.message )
+					}finally{
+						aEval.push( 0 )
+						}
+				</script>
 			</xsl:if>
 			<dl>
 				<xsl:for-each select="assert">
@@ -91,6 +98,13 @@
 		for(var i=0; i<3; i++ ){
 			if( aDD[i].count !== undefined )
 				aDD[i].innerHTML += ' '+ aDD[i].count
+			}
+		var aPRE = document.getElementsByTagName('PRE')
+		for(var i=0; aPRE[i]; i++ ){
+			if( aEval[i]){
+				aPRE[i].className += ' red'
+				aPRE[i].title = aEval[i]
+				}
 			}
 	]]></script>
 
