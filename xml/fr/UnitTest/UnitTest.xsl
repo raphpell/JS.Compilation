@@ -14,6 +14,9 @@
 	<xsl:for-each select="script"><xsl:copy-of select="current()"/></xsl:for-each>
 </head>
 <body>
+	<a href="../../../index.htm">Index</a>
+	 - <a href="../doc/index.htm">Documentation</a>
+	 
 	<dl class="legend">
 		<dd class="red">Erreur</dd>
 		<dd class="orange">Echec</dd>
