@@ -4,13 +4,13 @@
 	<desc>.</desc>
 	<syntax name="Syntaxe 1">
 		<desc>Récupération direct du résultat d'un scanne.</desc>
-		<code><![CDATA[ var eScanResult = MultiRegExpLexer( sText, sSyntax ) ]]></code>
+		<code><![CDATA[ var eScanResult = MultiRegExpLexer( sText [, sSyntax ]) ]]></code>
 		<arguments>
-			<arg name="sText" type="Number">
-				<desc>Texte à scanner.</desc>
+			<arg name="sText" type="String">
+				<desc>Texte scanné.</desc>
 			</arg>
-			<arg name="sSyntax" type="Number">
-				<desc>Syntaxe à utiliser.</desc>
+			<arg name="sSyntax" type="String" opt="1" default="'TXT'">
+				<desc>Syntaxe utilisée.</desc>
 			</arg>
 		</arguments>
 	</syntax>
@@ -54,7 +54,7 @@ eScanResult = oLexer.scan( sText, sSyntax )
 					<arg type="String" name="sText">
 						<desc>.</desc>
 					</arg>
-					<arg type="String" name="sSyntax">
+					<arg type="String" name="sSyntax" opt="1" default="'TXT'">
 						<desc>.</desc>
 					</arg>
 				</arguments>
@@ -70,7 +70,7 @@ eScanResult = oLexer.scan( sText, sSyntax )
 					<arg type="String" name="sText">
 						<desc>.</desc>
 					</arg>
-					<arg type="String" name="sSyntax">
+					<arg type="String" name="sSyntax" opt="1" default="'TXT'">
 						<desc>.</desc>
 					</arg>
 				</arguments>
@@ -96,5 +96,21 @@ eScanResult = oLexer.scan( sText, sSyntax )
 		</methods>
 	</group>
 	<group name="MultiRegExpLexer.Rules">
+		<properties name="Attributs">
+			<variable name="CSS" type="Object">
+				<desc>.</desc>
+			</variable>
+			<variable name="Rules" type="Dictionary">
+				<desc>.</desc>
+			</variable>
+			<variable name="Tokens" type="Dictionary">
+				<desc>.</desc>
+			</variable>
+			<variable name="Translation" type="Object">
+				<desc>.</desc>
+			</variable>
+		</properties>
+		<methods name="Méthodes">
+		</methods>
 	</group>
 </class>

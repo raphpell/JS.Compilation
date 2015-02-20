@@ -93,6 +93,7 @@ INPUT:checked ~ DIV {
 							<code class="type"><xsl:value-of select="@type"/></code>
 							<xsl:text> </xsl:text>
 							<xsl:if test="@opt"><small>(optionnel)</small></xsl:if>
+							<xsl:if test="@default"><code class="type"><xsl:value-of select="@default"/></code></xsl:if>
 						</label>
 						<div class="block">
 							<div class="desc"><xsl:copy-of select="desc"/></div>
@@ -163,6 +164,7 @@ INPUT:checked ~ DIV {
 											<code class="type"><xsl:value-of select="@type"/></code>
 											<xsl:text> </xsl:text>
 											<xsl:if test="@opt"><small>(optionnel)</small></xsl:if>
+											<xsl:if test="@default"><code class="type"><xsl:value-of select="@default"/></code></xsl:if>
 										</label>
 										<div class="block">
 											<div class="desc"><xsl:copy-of select="desc"/></div>
