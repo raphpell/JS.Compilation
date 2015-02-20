@@ -471,7 +471,8 @@ RegExp2AST =function( sRegExp ){
 NFA =function( eASTNode ){ // Transformation de l'AST d'une expression régulière en automate
 	var S = eASTNode.nodeName
 	if( Automate[S]){
-		for(var a=to_array( eASTNode.childNodes ), i=0, eChild; eChild=a[i]; i++ )
+		var a=to_array( eASTNode.childNodes )
+		for(var i=0, eChild; eChild=a[i]; i++ )
 			a[i] = NFA(a[i])
 		a.unshift( eASTNode )
 		return Automate[S].apply( null, a )

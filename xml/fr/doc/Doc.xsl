@@ -13,8 +13,9 @@
 .desc { margin: 0 1em ;}
 .arguments,
 .note,
-.syntaxe,
+.syntaxe PRE,
 .returnValue { margin: .5em 1em ;}
+.syntaxe { margin: .5em 1em 1em ;}
 DL,
 SECTION { margin: .5em 0 1.5em 1em ;}
 H2, H3 { margin: 0; }
@@ -70,7 +71,14 @@ INPUT:checked ~ DIV {
 	<xsl:for-each select="syntax">
 		<xsl:if test="code">
 		<div class="syntaxe">
-			<b>Syntaxe</b>
+			<b>
+			<xsl:choose>
+				<xsl:when test="@name"><xsl:value-of select="@name"/></xsl:when>
+				<xsl:otherwise>Syntaxe</xsl:otherwise>
+			</xsl:choose>
+			</b>
+			<xsl:if test="desc"><div class="desc"><xsl:copy-of select="desc"/></div></xsl:if>
+			
 			<pre><xsl:value-of select="code"/></pre>
 			<xsl:if test="arguments">
 			<div class="arguments">
