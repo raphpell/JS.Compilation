@@ -262,9 +262,9 @@ Automate =(function(){
 			var symbol = aDFA[i].A[0]
 			if( symbol.charAt(0)=='[' && symbol.charAt(symbol.length-1)==']' ){
 				if( symbol.charAt(1)!='^' )
-					aCS = aCS.concat( symbol.replace( /^\[\^?((?:a|[^a])+)\]$/g, '$1' ).toArray())
+					aCS = aCS.concat( symbol.replace( /^\[((?:a|[^a])+)\]$/g, '$1' ).toArray())
 				else
-					aNCS = aNCS.concat( symbol.replace( /^\[\^?((?:a|[^a])+)\]$/g, '$1' ).toArray())
+					aNCS = aNCS.concat( symbol.replace( /^\[\^((?:a|[^a])+)\]$/g, '$1' ).toArray())
 				continue; 
 				}
 			aCS.push( symbol )
@@ -281,9 +281,13 @@ Automate =(function(){
 			var o = _getCharSet( arguments )
 			var I=getUniqueID(), F=getUniqueID()
 			var f1 = Automate.action( o.charset.join(''), 0 )
-			var f2 = Automate.action( o.negatedcharset.join(''), 1 )
-			var T = [[ I, f1.toString(), F, f1 ],[ I, f2.toString(), F, f2 ]]
-			return new Automate( I, [F], [f1.toString(),f2.toString()], [I,F], T )
+			if(	o.negatedcharset.length ){
+				var f2 = Automate.action( o.negatedcharset.join(''), 1 )
+				var T = [[ I, f1.toString(), F, f1 ],[ I, f2.toString(), F, f2 ]]
+				return new Automate( I, [F], [f1.toString(),f2.toString()], [I,F], T )
+				}
+			var T = [[ I, f1.toString(), F, f1 ]]
+			return new Automate( I, [F], [f1.toString()], [I,F], T )
 			},
 		NEGATED_CHARCLASS :function(){
 			var o = _getCharSet( arguments )
@@ -353,7 +357,8 @@ Automate =(function(){
 			for(var i=1,ni=arguments.length; i<ni; i++){
 				var o = arguments[i]
 				A = A.concat( o.A )
-				var aIntersection = Array.diff( Array.intersect( S, o.S ), [0,1])
+				var aIntersection = Array.intersect( S, o.S )
+			//	var aIntersection = Array.diff( Array.intersect( S, o.S ), [0,1])
 				if( aIntersection.length )
 					throwError( 'Error: Automate "|" intersection between automaton states.\n'+ aIntersection )
 				S = S.concat( o.S )
@@ -363,6 +368,7 @@ Automate =(function(){
 				T = T.concat( o.T )
 				if( o.aTokensID ) aTokensID = aTokensID.concat( o.aTokensID )
 				}
+			console.info( aTokensID )
 			A = Array.unique(A)
 			A.sort()
 			return new Automate( I, [F], A, S, T, aTokensID )
@@ -987,32 +993,33 @@ DFA =(function(){
 			var s = aTokensName[i]
 			aTokensID.push([ s, oTokensState[ s ]])
 			}
-		var oDFA = new Automate( I.id, F, A, S, T, aTokensID )
-		oDFA.type = 'DFA'
-		oDFA.buildTable()
-		return oDFA
+	//	var oDFA = new Automate( I.id, F, A, S, T, aTokensID )
+		
+		Automate.call( this, I.id, F, A, S, T, aTokensID )
+		this.type = 'DFA'
+		this.buildTable()
 		}
 	})()
-DFA.prototype.union({
-	})
-DFA.union({
-	test :function( oDFA, s, n ){
+DFA.inheritFrom( Automate ).union({
+	test :function( s, n ){
 		var nIndex = n || 0
 		, nStart = nIndex
 		, sChar
-		, sState=oDFA.I
+		, sState=this.I
 		, sLongestMatch = null
 		if( s.length!=0 )
 			while( true ){
 				sChar = s[ nIndex ]
 				nIndex++ 
-				sState = oDFA.M.nextState( sState, sChar )
+				sState = this.M.nextState( sState, sChar )
 				if( sState<=0 ) break;
-				if( oDFA.F.have( sState )) sLongestMatch = s.substring( nStart, nIndex )
+				if( this.F.have( sState )) sLongestMatch = s.substring( nStart, nIndex )
 				if( nIndex==s.length ) break;
 				}
 		return sLongestMatch
-		},
+		}
+	})
+DFA.union({
 	minimize :function( oDFA, bPreserveFinalState ){
 		// MINIMISATION DU NOMBRE D'ETATS
 		var COUNTER = 2
@@ -1200,8 +1207,7 @@ DFA.union({
 	aggregate :function( oDFA1, oDFA2 ){
 		var oNFA = Automate.PIPE( null, oDFA1, oDFA2 )
 		NFA.validateAlphabet( oNFA )
-		var oDFA = DFA( oNFA )
-	//	console.info( oDFA.M )
+		var oDFA = new DFA( oNFA )
 		// NB: Ne détecte pas la reconnaissance d'une chaine par 2 tokens: premier arrivée, ...
 		if( oNFA.aTokensID.length != oDFA.aTokensID.length )
 			alert( 'Erreur perte de donnée dans l\'aggrégation.\n'+

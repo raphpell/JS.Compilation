@@ -21,7 +21,7 @@
 	ATTRIBUTE_SELECTOR_ERROR	=	[^\]\t\n\r\u000b\f          ]
 		(css:undefined)
 
-!@#	RULE_SET	=	{superscript}|{whitespaces}|{comment}|IDENT|S_PROP_VALUE|E_RULE_SET
+!@#	RULE_SET	=	S_PHP|{whitespaces}|{comment}|IDENT|S_PROP_VALUE|E_RULE_SET
 		(css:ruleset)
 	S_RULE_SET	=	\{
 		(css:punctuator, translation:LBRACE)
@@ -29,7 +29,7 @@
 		(css:punctuator, translation:RBRACE)
 
 	// Attention, ordre requis DIMENSIONS|CSS_NUMBER, S_URL|IDENT
-!@#	PROP_VALUE		=	{superscript}|{hspaces}|{comment}|{strings}|DIMENSIONS|CSS_NUMBER|ELISION|S_URL|IDENT|E_PROP_VALUE|S_FUNCTION|HASH|S_IMPORTANT|CSS_PHP_BUG
+!@#	PROP_VALUE		=	S_PHP|{hspaces}|{comment}|{strings}|DIMENSIONS|CSS_NUMBER|ELISION|S_URL|IDENT|E_PROP_VALUE|S_FUNCTION|HASH|S_IMPORTANT|CSS_PHP_BUG
 		(css:value)
 	S_PROP_VALUE	=	:
 		(css:punctuator, translation:COLON)
@@ -73,7 +73,7 @@
 
 	PATH 		=	([!#$%&\*-\~]|{nonascii}|{escape})*
 
-@!#	URL		=	{whitespaces}|{strings}|E_URL|S_PHP|PATH|{superscript}
+@!#	URL		=	{whitespaces}|{strings}|E_URL|S_PHP|PATH
 		(css:url)
 	S_URL	=	url\(
 		(css:url_delimiter)
@@ -81,7 +81,7 @@
 		(css:url_delimiter)
 
 	FUNCTION_OLD	=	IDENT
-!@#	FUNCTION	=	{whitespaces}|ELISION|S_PHP|IDENT|NAME|FUNCTION_ARG|E_FUNCTION|{superscript}
+!@#	FUNCTION	=	{whitespaces}|ELISION|S_PHP|IDENT|NAME|FUNCTION_ARG|E_FUNCTION
 		(css:function)
 	S_FUNCTION	=	{ident}\(
 	E_FUNCTION	=	\)
@@ -90,7 +90,6 @@
 
 // Macros
 	dimension 	=	{num}{units}
-	superscript	=	S_PHP
 	comment		=	S_MLC
 	strings		=	S_SDQ|S_SSQ
 	hspaces		=	TAB|SPACES

@@ -3,14 +3,14 @@
 <class name="DFA" language="JavaScript">
 	<desc>Fonction générant un AFD depuis un AFN.</desc>
 	<syntax>
-		<code><![CDATA[ oDFA = DFA( oNFA ) ]]></code>
+		<code><![CDATA[ oDFA = new DFA( oNFA ) ]]></code>
 		<arguments>
 			<arg name="oNFA" type="Automate">
 				<desc>AFN.</desc>
 			</arg>
 		</arguments>
 	</syntax>
-	<group name="'Instance(s) DFA'">
+	<group name="Instance(s) DFA">
 		<properties name="">
 			<variable name="type" type="String">
 				<desc>Valeur par défaut: "DFA".</desc>
@@ -19,6 +19,20 @@
 				<desc>Matrice de transition.</desc>
 			</variable>
 		</properties>
+		<methods name="">
+			<function name="test">
+				<desc>.</desc>
+				<arguments>
+					<arg type="String" name="sText">
+						<desc>.</desc>
+					</arg>
+					<arg type="Number" name="nIndex">
+						<desc>.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="String"></returnValue>
+			</function>
+		</methods>
 	</group>
 	
 	<group name="Objet DFA">
@@ -50,9 +64,6 @@
 			<function name="toJS">
 				<desc>.</desc>
 				<arguments>
-					<arg type="Automate" name="oDFA">
-						<desc>Un AFD.</desc>
-					</arg>
 					<arg type="Boolean" name="bWhiteSpace">
 						<desc>.</desc>
 					</arg>

@@ -87,7 +87,16 @@ Object.prototype.union = function( o, b ){
 		else for( n in o ) this[n]=o[n]
 	return this
 	}
-
+Object.prototype.inheritFrom =function( fClass ){
+	var F = function(){}
+	F.prototype = fClass.prototype
+	this.prototype = new F
+	this.prototype.constructor = this
+	this.superclass = fClass
+	if( fClass.prototype ) fClass.prototype.constructor = fClass
+	return this.prototype
+	}
+	
 Array.prototype.have =function(m,b){
 	if(b){ for(var i=0,n=this.length;i<n;i++) if(this[i]===m )	return true }
 	else { for(var i=0,n=this.length;i<n;i++) if(this[i]==m)	return true }

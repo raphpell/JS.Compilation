@@ -174,7 +174,7 @@ eBtnAddToken.onclick =function(){
 	eRegExpList.insertBefore( eNewOption, eRegExpList.firstChild )
 	}
 eBtnToRE.onclick =function(){
-	eDFAToRE.value = DFA.toRE( oDFA )
+	eDFAToRE.value = DFA.toRE( oDFA)
 	}
 	
 var exportBasic =function(){ exportDFA( eExportWhiteSpace.checked, !eExportCompressed.checked )}
@@ -219,7 +219,7 @@ var parseRE =function( sToken, sRegExp ){
 	var oTree = RegExp2AST( sRegExp )
 	oNFA = NFA( oTree )
 	NFA.validateAlphabet( oNFA )
-	oDFA = DFA.minimize( DFA( oNFA ))
+	oDFA = DFA.minimize( new DFA( oNFA ))
 	oDFA.renameStates( nStateIDCounter, true )
 	Automate.setUniqueID( oDFA.S[ oDFA.S.length-1 ]+1 )
 

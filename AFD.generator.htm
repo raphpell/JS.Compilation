@@ -171,7 +171,7 @@ eBtnCreate.onclick =function(){
 	refreshWindows()
 	}
 eBtnRenameNFA.onclick =function(){
-	oDFA = DFA( oNFA.renameStates())
+	oDFA = new DFA( oNFA.renameStates())
 	if( eAutoMinimization.checked ) oDFA = DFA.minimize( oDFA )
 	refreshWindows()
 	}
@@ -253,7 +253,7 @@ var parseRE =function( bValidate, bMinimize, bMatch, bExport ){
 		NFA.validateAlphabet( oNFA )
 		oNFA.renameStates()
 		}
-	oDFA = DFA( oNFA )
+	oDFA = new DFA( oNFA )
 	if( bMinimize ) oDFA = DFA.minimize( oDFA )
 	if( bMatch ) match()
 		else clearTest()

@@ -78,7 +78,7 @@ var f = Automate['\\n']
 		<assertions>
 			<value><![CDATA[
 var oFA1 = f()
-var oDFA1 = DFA( oFA1 )
+var oDFA1 = new DFA( oFA1 )
 			]]></value>
 			<assert><![CDATA[ oFA1.I === 1 ]]></assert>
 			<assert><![CDATA[ oFA1.F.toString() === "2" ]]></assert>
@@ -88,8 +88,8 @@ var oDFA1 = DFA( oFA1 )
 			<assert><![CDATA[ oFA1.T[0].toString() === "1,\n,2" ]]></assert>
 			<assert><![CDATA[ oFA1.aTokensID.length === 0 ]]></assert>
 			<assert><![CDATA[ ! oFA1.M ]]></assert>
-			<assert><![CDATA[ DFA.test( oDFA1, '\naaa' ) === '\n' ]]></assert>
-			<assert><![CDATA[ DFA.test( oDFA1, '\naaa',1 ) === null ]]></assert>
+			<assert><![CDATA[ oDFA1.test( '\naaa' ) === '\n' ]]></assert>
+			<assert><![CDATA[ oDFA1.test( '\naaa', 2 ) === null ]]></assert>
 		</assertions>
 		<assertions>
 			<value><![CDATA[
@@ -175,7 +175,7 @@ Un automate 'CHARCLASS' est généré depuis les éléments:
 			<value><![CDATA[
 Automate.setUniqueID( 9 )
 var oFA5 = Automate.CHARCLASS( null, Automate['\\d'](), Automate['\\D'](), Automate.fromChar('A')())
-var oDFA5 = DFA( oFA5 )
+var oDFA5 = new DFA( oFA5 )
 			]]></value>
 			<assert><![CDATA[ oFA5 ]]></assert>
 			<assert><![CDATA[ oFA5.I === 15 ]]></assert>
@@ -183,8 +183,8 @@ var oDFA5 = DFA( oFA5 )
 			<assert><![CDATA[ oFA5.A.length === 2 ]]></assert>
 			<assert><![CDATA[ oFA5.A.toString() === "[0123456789A],[^0123456789]" ]]></assert>
 			<assert><![CDATA[ oFA5.S.toString() === "15,16" ]]></assert>
-			<assert><![CDATA[ DFA.test( oDFA5, '0aa' ) === '0' ]]></assert>
-			<assert><![CDATA[ DFA.test( oDFA5, '0aa',1 ) === 'a' ]]></assert>
+			<assert><![CDATA[ oDFA5.test( '0aa' ) === '0' ]]></assert>
+			<assert><![CDATA[ oDFA5.test( '0aa', 2 ) === 'a' ]]></assert>
 		</assertions>
 		<assertions name="Automate.NEGATED_CHARCLASS">
 			<desc>
