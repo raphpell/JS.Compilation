@@ -1017,10 +1017,9 @@ DFA.inheritFrom( Automate ).union({
 				if( nIndex==s.length ) break;
 				}
 		return sLongestMatch
-		}
-	})
-DFA.union({
-	minimize :function( oDFA, bPreserveFinalState ){
+		},
+	minimize :function( bPreserveFinalState ){
+		var oDFA = this
 		// MINIMISATION DU NOMBRE D'ETATS
 		var COUNTER = 2
 		var STATES_COUNT = -1
@@ -1204,35 +1203,8 @@ DFA.union({
 
 		return oDFA.renameStates()
 		},
-	aggregate :function( oDFA1, oDFA2 ){
-		var oNFA = Automate.PIPE( null, oDFA1, oDFA2 )
-		NFA.validateAlphabet( oNFA )
-		var oDFA = new DFA( oNFA )
-		// NB: Ne détecte pas la reconnaissance d'une chaine par 2 tokens: premier arrivée, ...
-		if( oNFA.aTokensID.length != oDFA.aTokensID.length )
-			alert( 'Erreur perte de donnée dans l\'aggrégation.\n'+
-				'NFA Tokens ID ('+ oNFA.aTokensID.length +'):\n\t'+oNFA.aTokensID.join('\n\t')+'\n\n'+
-				'DFA Tokens ID ('+ oDFA.aTokensID.length +'):\n\t'+oDFA.aTokensID.join('\n\t')
-				)
-		oDFA = DFA.minimize( oDFA, true )
-		var a = oDFA.aTokensID
-		if( a && a.length ){
-			var oSTATES = {}
-			for(var i=0, ni=a.length; i<ni; i++){
-				var aStates = a[i][1], sToken = a[i][0]
-				for(var j=0, nj=aStates.length; j<nj; j++){
-					var nState = aStates[j]
-					if( oSTATES[ nState ]){ // throwError( 'State '+ nState +' recognize '+ oSTATES[ nState ] +' and '+ sToken )
-						if( oSTATES[ nState ].charAt ) oSTATES[ nState ] = [ oSTATES[ nState ]]
-						oSTATES[ nState ].push( sToken )
-						}
-					else oSTATES[ nState ] = sToken
-					}
-				}
-			}
-		return oDFA
-		},
-	toJS :function( oDFA, bWhiteSpace, bUnCompressed ){
+	toJS :function( bWhiteSpace, bUnCompressed ){
+		var oDFA = this
 		// ???
 		if( oDFA.S.length > 10 ){
 			stats =(function(){
@@ -1370,7 +1342,7 @@ DFA.union({
 						M[a[0]] = M[a[0]] || []
 						var nSymbolIndex = TableSymbols.indexOf( a[1])
 						if( M[a[0]][ nSymbolIndex ])
-							throwError( 'DFA.toJS:\n Duplicate entry for \n state='+ a[0] +' \n Symbol index='+ nSymbolIndex +' ,value='+ a[1])
+							throwError( 'DFA.prototype.toJS:\n Duplicate entry for \n state='+ a[0] +' \n Symbol index='+ nSymbolIndex +' ,value='+ a[1])
 						M[a[0]][ nSymbolIndex ] = a[2]
 						}
 					},
@@ -1502,8 +1474,8 @@ DFA.union({
 			}
 		return sResult
 		},
-	toRE :function( oDFA ){
-		if( oDFA.I !== 1 ) throwError( "DFA.toRE: L'état initial doit être égale à 1." )
+	toRE :function(){
+		if( this.I !== 1 ) throwError( "DFA.prototype.toRE: L'état initial doit être égale à 1." )
 
 		var group =function( s ){
 			return s.length == 1 ? s : '('+ s +')'
@@ -1552,14 +1524,14 @@ DFA.union({
 			return get
 			})()
 		
-		var m = oDFA.S.length
+		var m = this.S.length
 		
 		var B =[]
 		for(var i=0; i<m; i++ )
-			B[i] = oDFA.F.have( oDFA.S[i]) ? EPSILON : EMPTY
+			B[i] = this.F.have( this.S[i]) ? EPSILON : EMPTY
 			
-		for(var i=0, ni=oDFA.T.length; i<ni; i++ ){
-			var t = oDFA.T[i]
+		for(var i=0, ni=this.T.length; i<ni; i++ ){
+			var t = this.T[i]
 			A.set( t[0]-1, t[2]-1, t[1])
 			}
 
@@ -1575,5 +1547,35 @@ DFA.union({
 			}
 		
 		return JSON.stringify( B[0]).slice(1,-1)
+		}
+	})
+DFA.union({
+	aggregate :function( oDFA1, oDFA2 ){
+		var oNFA = Automate.PIPE( null, oDFA1, oDFA2 )
+		NFA.validateAlphabet( oNFA )
+		var oDFA = new DFA( oNFA )
+		// NB: Ne détecte pas la reconnaissance d'une chaine par 2 tokens: premier arrivée, ...
+		if( oNFA.aTokensID.length != oDFA.aTokensID.length )
+			alert( 'Erreur perte de donnée dans l\'aggrégation.\n'+
+				'NFA Tokens ID ('+ oNFA.aTokensID.length +'):\n\t'+oNFA.aTokensID.join('\n\t')+'\n\n'+
+				'DFA Tokens ID ('+ oDFA.aTokensID.length +'):\n\t'+oDFA.aTokensID.join('\n\t')
+				)
+		oDFA.minimize( true )
+		var a = oDFA.aTokensID
+		if( a && a.length ){
+			var oSTATES = {}
+			for(var i=0, ni=a.length; i<ni; i++){
+				var aStates = a[i][1], sToken = a[i][0]
+				for(var j=0, nj=aStates.length; j<nj; j++){
+					var nState = aStates[j]
+					if( oSTATES[ nState ]){ // throwError( 'State '+ nState +' recognize '+ oSTATES[ nState ] +' and '+ sToken )
+						if( oSTATES[ nState ].charAt ) oSTATES[ nState ] = [ oSTATES[ nState ]]
+						oSTATES[ nState ].push( sToken )
+						}
+					else oSTATES[ nState ] = sToken
+					}
+				}
+			}
+		return oDFA
 		}
 	})
