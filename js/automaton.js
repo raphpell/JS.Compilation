@@ -252,28 +252,42 @@ Automate =(function(){
 	// TRANSFORMATION ELEMENT DE L'AST en NFA
 	// Premier argument des fonctions, un élement de l'AST, le reste, ses enfants transformés en NFA
 	// Il y a une correspondance non validée entre le premier argument et le nom de fonction
-	var _getCharSet =function( a ){
-		var A = []
-		for(var i=1, ni=a.length; i<ni; i++ ){
-			var symbol = a[i].A[0]
+	var _getCharSet =function( aDFA ){
+		var aCS = [], aNCS = []
+		for(var i=1; aDFA[i]; i++ ){
+			var symbol = aDFA[i].A[0]
 			if( symbol.charAt(0)=='[' && symbol.charAt(symbol.length-1)==']' ){
 				// ATTENTION: zap les ensembles de caractère négatif proscrites
 				if( symbol.charAt(1)!='^' )
-					A = A.concat( symbol.replace( /^\[\^?((?:a|[^a])+)\]$/g, '$1' ).toArray())
+					aCS = aCS.concat( symbol.replace( /^\[\^?((?:a|[^a])+)\]$/g, '$1' ).toArray())
+				else
+					aNCS = aNCS.concat( symbol.replace( /^\[\^?((?:a|[^a])+)\]$/g, '$1' ).toArray())
 				continue; 
 				}
-			A.push( symbol )
+			aCS.push( symbol )
 			}
-		A = Array.unique( A )
-		A.sort() // SUPER IMPORTANT ! mais je ne sais pas pourquoi...
-		return A
+		aCS = Array.unique( aCS )
+		aCS.sort() // SUPER IMPORTANT ! mais je ne sais pas pourquoi...
+		aNCS = Array.unique( aNCS )
+		aNCS.sort() // SUPER IMPORTANT ! mais je ne sais pas pourquoi...
+		return { charset:aCS, negatedcharset:aNCS }
 		}
 	Automate.union({
 		CHARCLASS :function(){
-			return Automate.fromCharClass( _getCharSet( arguments ), 0 )()
+			var o = _getCharSet( arguments )
+			var I=getUniqueID(), F=getUniqueID()
+			var f1 = Automate.action( o.charset.join(''), 0 )
+			var f2 = Automate.action( o.negatedcharset.join(''), 1 )
+			var T = [[ I, f1.toString(), F, f1 ],[ I, f2.toString(), F, f2 ]]
+			return new Automate( I, [F], [f1.toString(),f2.toString()], [I,F], T )
 			},
 		NEGATED_CHARCLASS :function(){
-			return Automate.fromCharClass( _getCharSet( arguments ), 1 )()
+			var o = _getCharSet( arguments )
+			var I=getUniqueID(), F=getUniqueID()
+			var f1 = Automate.action( o.charset.join(''), 1 )
+			var f2 = Automate.action( o.negatedcharset.join(''), 0 )
+			var T = [[ I, f1.toString(), F, f1 ],[ I, f2.toString(), F, f2 ]]
+			return new Automate( I, [F], [f1.toString(),f2.toString()], [I,F], T )
 			},
 		DOT :Automate.fromChar( 'ANY' ),
 		RANGE :function( oToken, LEFT, RIGHT ){
@@ -296,7 +310,7 @@ Automate =(function(){
 				}
 			var a=[]
 			for(var i=nCode1, ni=nCode2+1; i<ni; i++ ) a.push( i )
-			return Automate.fromChar( String.fromCharCode.apply( null, a ))()
+			return Automate.fromCharClass( String.fromCharCode.apply( null, a ).toArray() )()
 			},
 		CONCAT :function(){
 			var o = arguments[1]
@@ -836,6 +850,7 @@ NFA.validateAlphabet =function( oNFA ){
 
 	oNFA.A = Array.unique( A )
 	oNFA.T = Transitions.get()
+	return oNFA
 	}
 
 DFA =(function(){
