@@ -11,7 +11,7 @@
 		</arguments>
 	</syntax>
 	<group name="Instance(s) DFA">
-		<properties name="">
+		<properties name="Attributs">
 			<variable name="type" type="String">
 				<desc>Valeur par défaut: "DFA".</desc>
 			</variable>
@@ -19,7 +19,16 @@
 				<desc>Matrice de transition.</desc>
 			</variable>
 		</properties>
-		<methods name="">
+		<methods name="Méthodes prototype">
+			<function name="minimize">
+				<desc>.</desc>
+				<arguments>
+					<arg type="Boolean" name="bPreserveFinalState">
+						<desc>.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="Automate"></returnValue>
+			</function>
 			<function name="test">
 				<desc>.</desc>
 				<arguments>
@@ -31,35 +40,6 @@
 					</arg>
 				</arguments>
 				<returnValue type="String"></returnValue>
-			</function>
-		</methods>
-	</group>
-	
-	<group name="Objet DFA">
-		<methods name="">
-			<function name="minimize">
-				<desc>.</desc>
-				<arguments>
-					<arg type="Automate" name="oDFA">
-						<desc>Un AFD.</desc>
-					</arg>
-					<arg type="Boolean" name="bPreserveFinalState">
-						<desc>.</desc>
-					</arg>
-				</arguments>
-				<returnValue type="Automate"></returnValue>
-			</function>
-			<function name="aggregate">
-				<desc>.</desc>
-				<arguments>
-					<arg type="Automate" name="oDFA1">
-						<desc>Un AFD.</desc>
-					</arg>
-					<arg type="Automate" name="oDFA2">
-						<desc>Un autre AFD.</desc>
-					</arg>
-				</arguments>
-				<returnValue type="Automate"></returnValue>
 			</function>
 			<function name="toJS">
 				<desc>.</desc>
@@ -75,12 +55,24 @@
 			</function>
 			<function name="toRE">
 				<desc>.</desc>
+				<returnValue type="String"></returnValue>
+			</function>
+		</methods>
+	</group>
+	
+	<group name="Objet DFA">
+		<methods name="">
+			<function name="aggregate">
+				<desc>.</desc>
 				<arguments>
-					<arg type="Automate" name="oDFA">
+					<arg type="Automate" name="oDFA1">
 						<desc>Un AFD.</desc>
 					</arg>
+					<arg type="Automate" name="oDFA2">
+						<desc>Un autre AFD.</desc>
+					</arg>
 				</arguments>
-				<returnValue type="String"></returnValue>
+				<returnValue type="Automate"></returnValue>
 			</function>
 		</methods>
 	</group>

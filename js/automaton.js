@@ -358,7 +358,6 @@ Automate =(function(){
 				var o = arguments[i]
 				A = A.concat( o.A )
 				var aIntersection = Array.intersect( S, o.S )
-			//	var aIntersection = Array.diff( Array.intersect( S, o.S ), [0,1])
 				if( aIntersection.length )
 					throwError( 'Error: Automate "|" intersection between automaton states.\n'+ aIntersection )
 				S = S.concat( o.S )
