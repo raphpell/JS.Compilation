@@ -43,8 +43,8 @@ Instance(s) Automate
 	buildTable		
 		Construit la matrice M de l'automate
 		Pour les DFAs:
-			+ préparation à la minimisation du DFA
-			+ possibilité de teste de l'automate (DFA)
+			+ préparation à la minimisation de l'AFD
+			+ possibilité de teste de l'automate (AFD)
 	clone
 		Duplique un automate en renommant les états pour que leur nom soit unique.
 	renameStates
@@ -67,7 +67,7 @@ Objet Automate
 		getUniqueID -> Number
 			retourne un nombre unique (état)
 		setUniqueID -> void
-			utilisé dans aggrégation de DFA ?
+			utilisé dans aggrégation d'AFD ?
 		wrapper ( s ) -> Automate
 			créé un automate depuis une chaine
 				Choix possible

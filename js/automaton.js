@@ -67,7 +67,7 @@ Automate =(function(){
 					if( symb.length>2 && symb.charAt(0)=='[' ) aCharClasses.push( symb )
 					}
 					
-				// Construction des listes utilisées dans la minimization d'un DFA
+				// Construction des listes utilisées dans la minimization d'un AFD
 				for(var i=0, ni=oFA.S.length; i<ni; i++){
 					var stateI = oFA.S[i]
 					, o = M[stateI] = M[stateI] || {}
@@ -208,7 +208,11 @@ Automate =(function(){
 			}
 		throwError( 'Automate '+ s +'?' )
 		}
-
+	Automate.empty =function( I, F ){
+		var I=I||getUniqueID(), F=F||getUniqueID()
+		return new Automate( I, [F], [EPSILON], [I,F], [ epsilonTransition( I, F )] )
+		}
+		
 	Automate.fromChar =function( sChar ){
 		return function(){
 			var I=getUniqueID(), F=getUniqueID()
@@ -287,7 +291,7 @@ Automate =(function(){
 			if(	o.negatedcharset.length ){
 				var aCS = Array.diff( o.negatedcharset, o.charset )
 				// Aucun caractère valide... TODO: lancer une erreur ?
-				if( ! aCS.length ) return new Automate( I, [F], [EPSILON], [I,F], [ I, EPSILON, F ])
+				if( ! aCS.length ) return Automate.empty(I,F)
 				var f1 = Automate.action( aCS.join(''), 0 )
 				var T = [[ I, f1.toString(), F, f1 ]]
 				return new Automate( I, [F], [f1.toString()], [I,F], T )
@@ -323,7 +327,7 @@ Automate =(function(){
 			var o = arguments[1]
 			, I = o.I
 			, F = o.F
-			, A = o.A.concat( [EPSILON])
+			, A = [EPSILON].concat( o.A )
 			, S = o.S
 			, T = o.T
 			for(var i=2, ni=arguments.length; i<ni; i++){
@@ -335,7 +339,9 @@ Automate =(function(){
 					T.push( epsilonTransition( F[j], o.I ))
 				F = o.F
 				}
-			return new Automate( I, F, Array.unique(A), S, T )
+			A = Array.unique(A)
+			A.sort()
+			return new Automate( I, F, A, S, T )
 			},
 		PIPE :function(){
 			var I = getUniqueID()
@@ -357,12 +363,14 @@ Automate =(function(){
 				T = T.concat( o.T )
 				if( o.aTokensID ) aTokensID = aTokensID.concat( o.aTokensID )
 				}
-			return new Automate( I, [F], Array.unique(A), S, T, aTokensID )
+			A = Array.unique(A)
+			A.sort()
+			return new Automate( I, [F], A, S, T, aTokensID )
 			},
 		QUANTIFIER :function( oToken, LEFT ){
 			var o = oToken.oValue
 			oToken.n = o.n
-			oToken.m = o.m
+			oToken.m = o.m || ''
 			switch( o.m ){
 				case '':
 					return Automate['{n}']( oToken, LEFT )
@@ -407,15 +415,7 @@ Automate =(function(){
 			},
 		'{n}' :function( oToken, LEFT ){
 			switch( oToken.n ){
-				case '0':
-					var I=getUniqueID(), F=getUniqueID()
-					return new Automate(
-						I,
-						[F],
-						[EPSILON],
-						[I,F],
-						[ epsilonTransition( I, F )]
-						)
+				case '0': return Automate.empty()
 				case '1': return LEFT
 				default:
 					var oAutomate = LEFT
@@ -993,7 +993,26 @@ DFA =(function(){
 		return oDFA
 		}
 	})()
+DFA.prototype.union({
+	})
 DFA.union({
+	test :function( oDFA, s, n ){
+		var nIndex = n || 0
+		, nStart = nIndex
+		, sChar
+		, sState=oDFA.I
+		, sLongestMatch = null
+		if( s.length!=0 )
+			while( true ){
+				sChar = s[ nIndex ]
+				nIndex++ 
+				sState = oDFA.M.nextState( sState, sChar )
+				if( sState<=0 ) break;
+				if( oDFA.F.have( sState )) sLongestMatch = s.substring( nStart, nIndex )
+				if( nIndex==s.length ) break;
+				}
+		return sLongestMatch
+		},
 	minimize :function( oDFA, bPreserveFinalState ){
 		// MINIMISATION DU NOMBRE D'ETATS
 		var COUNTER = 2

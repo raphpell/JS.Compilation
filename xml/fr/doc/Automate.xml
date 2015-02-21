@@ -36,7 +36,7 @@
 				</desc>
 			</arg>
 			<arg name="aTokensID" type="Array" opt="1">
-				<desc>Liste des noms de token associée aux états finaux (voir DFA).</desc>
+				<desc>Liste des noms de token associée aux états finaux (voir AFD).</desc>
 			</arg>
 		</arguments>
 		<note>...le constructeur ne contrôle pas si les données entrantes sont correctes...</note>
@@ -65,7 +65,7 @@
 		</properties>
 		<methods name="Méthodes">
 			<function name="buildTable">
-				<desc>Construit la matrice M de l'automate. Si l'automate est un DFA, ajout:
+				<desc>Construit la matrice M de l'automate. Si l'automate est un AFD, ajout:
 					<ul>
 						<li>préparation à la minimisation du DFA</li>
 						<li>possibilité de test du DFA</li>

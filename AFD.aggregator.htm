@@ -1,7 +1,7 @@
 ﻿<!DOCTYPE HTML>
 <html>
 <head>
-	<title>Aggrégation de DFA</title>
+	<title>Aggrégation d'AFD</title>
 	<link rel="stylesheet" type="text/css" href="css/styles.css">
 	<style>
 		#eRETree {
@@ -36,7 +36,7 @@
 <body spellcheck="false">
 <div id="eTITLE">
 	<a href="index.htm">Index</a>
-	<h1>Aggrégation de DFA</h1>
+	<h1>Aggrégation d'AFD</h1>
 </div>
 
 <div id="eMenu">
@@ -54,7 +54,7 @@
 
 <hr style="clear:both;">
 
-<input type="button" value="Visualiser le DFA" onclick="previewDFA()" title="Matrice et graphe du DFA.">
+<input type="button" value="Visualiser l'AFD" onclick="previewDFA()" title="Matrice et graphe de l'AFD.">
 <input type="button" id="eBtnExport" value="Exporter">
 <input type="checkbox" id="eExportWhiteSpace"><label for="eExportWhiteSpace">Espaces blancs.</label>
 <input type="checkbox" id="eExportCompressed"><label for="eExportCompressed">Compressé.</label>
@@ -77,7 +77,7 @@
 		<dt><pre id="eResult"></pre></dt>
 	</dl>
 </fieldset>
-<fieldset><legend>DFA en RE <sup style="color:red;">experimental</sup></legend>
+<fieldset><legend>AFD en RE <sup style="color:red;">experimental</sup></legend>
 	<dl>
 		<dt><input type="button" id="eBtnToRE" value="Analyser"></dt>
 		<dt><textarea id="eDFAToRE"></textarea></dt>
