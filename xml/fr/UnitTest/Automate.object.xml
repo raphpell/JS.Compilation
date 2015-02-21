@@ -167,7 +167,6 @@ Un automate 'CHARCLASS' est généré depuis les éléments:
 	<li>RANGE -> Automate.fromCharClass</li>
 	<li>CHAR -> Automate.fromChar</li>
 	<li>ENSEMBLE DE CARACTÈRES ( \d, ... ) -> Automate.fromCharClass</li>
-	<li>Les ensembles de caractères négatifs ( \D, ... ) sont proscrite</li>
 </ul>
 			</desc>
 			<value><![CDATA[
@@ -177,8 +176,8 @@ var oFA5 = Automate.CHARCLASS( null, Automate['\\d'](), Automate['\\D'](), Autom
 			<assert><![CDATA[ oFA5 ]]></assert>
 			<assert><![CDATA[ oFA5.I === 15 ]]></assert>
 			<assert><![CDATA[ oFA5.F.toString() === "16" ]]></assert>
-			<assert><![CDATA[ oFA5.A.length === 1 ]]></assert>
-			<assert><![CDATA[ oFA5.A.toString() === "[0123456789A]" ]]></assert>
+			<assert><![CDATA[ oFA5.A.length === 2 ]]></assert>
+			<assert><![CDATA[ oFA5.A.toString() === "[0123456789A],[^0123456789]" ]]></assert>
 			<assert><![CDATA[ oFA5.S.toString() === "15,16" ]]></assert>
 		</assertions>
 		<assertions name="Automate.NEGATED_CHARCLASS">
@@ -188,7 +187,6 @@ Un automate 'NEGATED_CHARCLASS' est généré depuis les éléments:
 	<li>RANGE -> Automate.fromCharClass</li>
 	<li>CHAR -> Automate.fromChar</li>
 	<li>ENSEMBLE DE CARACTÈRES ( \d, ... ) -> Automate.fromCharClass</li>
-	<li>Les ensembles de caractères négatifs ( \D, ... ) sont proscrite</li>
 </ul>
 			</desc>
 			<value><![CDATA[
@@ -198,8 +196,8 @@ var oFA6 = Automate.NEGATED_CHARCLASS( null, Automate['\\d'](), Automate['\\D'](
 			<assert><![CDATA[ oFA6 ]]></assert>
 			<assert><![CDATA[ oFA6.I === 15 ]]></assert>
 			<assert><![CDATA[ oFA6.F.toString() === "16" ]]></assert>
-			<assert><![CDATA[ oFA6.A.length === 1 ]]></assert>
-			<assert><![CDATA[ oFA6.A.toString() === "[^0123456789A]" ]]></assert>
+			<assert><![CDATA[ oFA6.A.length === 2 ]]></assert>
+			<assert><![CDATA[ oFA6.A.toString() === "[^0123456789A],[0123456789]" ]]></assert>
 			<assert><![CDATA[ oFA6.S.toString() === "15,16" ]]></assert>
 		</assertions>
 		<assertions name="Automate.DOT">
@@ -229,10 +227,10 @@ var oFA8 = Automate.RANGE( null, Automate.fromChar('c')(), Automate.fromChar('a'
 			<assert><![CDATA[ oFA8 ]]></assert>
 			<assert><![CDATA[ oFA8.I === 23 ]]></assert>
 			<assert><![CDATA[ oFA8.F.toString() === "24" ]]></assert>
-			<assert><![CDATA[ oFA8.A.toString() === "abc" ]]></assert>
+			<assert><![CDATA[ oFA8.A.toString() === "[abc]" ]]></assert>
 			<assert><![CDATA[ oFA8.S.toString() === "23,24" ]]></assert>
 			<assert><![CDATA[ oFA8.T.length === 1 ]]></assert>
-			<assert><![CDATA[ oFA8.T[0].toString() === "23,abc,24" ]]></assert>
+			<assert><![CDATA[ oFA8.T[0].toString() === "23,[abc],24,[abc]" ]]></assert>
 		</assertions>
 	</test>
 </truth>

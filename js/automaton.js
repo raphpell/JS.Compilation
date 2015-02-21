@@ -257,7 +257,6 @@ Automate =(function(){
 		for(var i=1; aDFA[i]; i++ ){
 			var symbol = aDFA[i].A[0]
 			if( symbol.charAt(0)=='[' && symbol.charAt(symbol.length-1)==']' ){
-				// ATTENTION: zap les ensembles de caractère négatif proscrites
 				if( symbol.charAt(1)!='^' )
 					aCS = aCS.concat( symbol.replace( /^\[\^?((?:a|[^a])+)\]$/g, '$1' ).toArray())
 				else
@@ -267,9 +266,10 @@ Automate =(function(){
 			aCS.push( symbol )
 			}
 		aCS = Array.unique( aCS )
-		aCS.sort() // SUPER IMPORTANT ! mais je ne sais pas pourquoi...
+		aCS.sort() // SUPER IMPORTANT !
 		aNCS = Array.unique( aNCS )
-		aNCS.sort() // SUPER IMPORTANT ! mais je ne sais pas pourquoi...
+		aNCS.sort() // SUPER IMPORTANT !
+	//	if( Array.intersect( aCS, aNCS ).length ){}
 		return { charset:aCS, negatedcharset:aNCS }
 		}
 	Automate.union({
@@ -284,10 +284,17 @@ Automate =(function(){
 		NEGATED_CHARCLASS :function(){
 			var o = _getCharSet( arguments )
 			var I=getUniqueID(), F=getUniqueID()
-			var f1 = Automate.action( o.charset.join(''), 1 )
-			var f2 = Automate.action( o.negatedcharset.join(''), 0 )
-			var T = [[ I, f1.toString(), F, f1 ],[ I, f2.toString(), F, f2 ]]
-			return new Automate( I, [F], [f1.toString(),f2.toString()], [I,F], T )
+			if(	o.negatedcharset.length ){
+				var aCS = Array.diff( o.negatedcharset, o.charset )
+				// Aucun caractère valide... TODO: lancer une erreur ?
+				if( ! aCS.length ) return new Automate( I, [F], [EPSILON], [I,F], [ I, EPSILON, F ])
+				var f1 = Automate.action( aCS.join(''), 0 )
+				var T = [[ I, f1.toString(), F, f1 ]]
+				return new Automate( I, [F], [f1.toString()], [I,F], T )
+				}
+			var f2 = Automate.action( o.charset.join(''), 1 )
+			var T = [[ I, f2.toString(), F, f2 ]]
+			return new Automate( I, [F], [f2.toString()], [I,F], T )
 			},
 		DOT :Automate.fromChar( 'ANY' ),
 		RANGE :function( oToken, LEFT, RIGHT ){
