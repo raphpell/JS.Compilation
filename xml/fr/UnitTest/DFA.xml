@@ -1,0 +1,17 @@
+﻿<?xml version='1.0' encoding='UTF-8'?>
+<?xml-stylesheet type="text/xsl" href="UnitTest.xsl"?> 
+
+<truth name="DFA">
+	<script src="../../../js/framework.js"></script>
+	<script src="../../../js/automaton.js"></script>
+	<desc>...</desc>
+	<test name="new DFA">
+		<assertions name="...">
+			<desc></desc>
+			<value><![CDATA[
+
+			]]></value>
+			<assert><![CDATA[ true ]]></assert>
+		</assertions>
+	</test>
+</truth>

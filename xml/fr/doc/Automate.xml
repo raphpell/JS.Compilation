@@ -167,7 +167,161 @@
 				<returnValue type="Automate"></returnValue>
 			</function>
 		</methods>
-		<methods name="Générateur de contructeur d'automates spéciaux">
+		<methods name="Automates basiques">
+			<function name="makeEmpty">
+				<desc>Créé un automate vide reconnaissant le language vide.</desc>
+				<arguments>
+					<arg type="Number" name="I" opt="1">
+						<desc>Etat initial.</desc>
+					</arg>
+					<arg type="Number" name="F" opt="1">
+						<desc>Etat final.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="Automate"></returnValue>
+			</function>
+			<function name="makeChar">
+				<desc>Créé un automate reconnaissant un caractère.</desc>
+				<arguments>
+					<arg type="String" name="sChar">
+						<desc>Caractère à reconnaître.</desc>
+					</arg>
+					<arg type="Number" name="I" opt="1">
+						<desc>Etat initial.</desc>
+					</arg>
+					<arg type="Number" name="F" opt="1">
+						<desc>Etat final.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="Automate"></returnValue>
+			</function>
+			<function name="makeAnyChar">
+				<desc>Créé un automate reconnaissant n'importe quel caractère.</desc>
+				<arguments>
+					<arg type="String" name="sChar" opt="1" default="'a'">
+						<desc>Caractère à reconnaître.</desc>
+					</arg>
+					<arg type="Number" name="I" opt="1">
+						<desc>Etat initial.</desc>
+					</arg>
+					<arg type="Number" name="F" opt="1">
+						<desc>Etat final.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="Automate"></returnValue>
+			</function>
+			<function name="makeCharSet">
+				<desc>Créé un automate reconnaissant ou non un ensemble de caractère.</desc>
+				<arguments>
+					<arg type="Array" name="aSet">
+						<desc>Ensemble de caractère à reconnaître ou non.</desc>
+					</arg>
+					<arg type="Boolean" name="bNegated" opt="1" default="false">
+						<desc>Indique si l'ensemble est négatif.</desc>
+					</arg>
+					<arg type="Number" name="I" opt="1">
+						<desc>Etat initial.</desc>
+					</arg>
+					<arg type="Number" name="F" opt="1">
+						<desc>Etat final.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="Automate"></returnValue>
+			</function>
+			<function name="makeCharRange">
+				<desc>Créé un automate reconnaissant un intervalle de caractère.</desc>
+				<arguments>
+					<arg type="String" name="sChar1">
+						<desc>Limite de l'ensemble de caractère à reconnaître.</desc>
+					</arg>
+					<arg type="String" name="sChar2">
+						<desc>Limite de l'ensemble de caractère à reconnaître.</desc>
+					</arg>
+					<arg type="Number" name="I" opt="1">
+						<desc>Etat initial.</desc>
+					</arg>
+					<arg type="Number" name="F" opt="1">
+						<desc>Etat final.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="Automate"></returnValue>
+			</function>
+		</methods>
+		<methods name="Opérations basiques">
+			<function name="and">
+				<desc>.</desc>
+				<arguments>
+					<arg type="Automate" name="oFA1">
+						<desc>.</desc>
+					</arg>
+					<arg type="Automate" name="oFA2">
+						<desc>.</desc>
+					</arg>
+					<arg type="Automate" name="..." opt="1">
+						<desc>.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="Automate"></returnValue>
+			</function>
+			<function name="optional">
+				<desc>.</desc>
+				<arguments>
+					<arg type="Automate" name="oFA">
+						<desc>.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="Automate"></returnValue>
+			</function>
+			<function name="or">
+				<desc>.</desc>
+				<arguments>
+					<arg type="Automate" name="oFA1">
+						<desc>.</desc>
+					</arg>
+					<arg type="Automate" name="oFA2">
+						<desc>.</desc>
+					</arg>
+					<arg type="Automate" name="..." opt="1">
+						<desc>.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="Automate"></returnValue>
+			</function>
+			<function name="repeat">
+				<desc>.</desc>
+				<arguments>
+					<arg type="Automate" name="oFA">
+						<desc>.</desc>
+					</arg>
+					<arg type="Number" name="n" opt="1">
+						<desc>.</desc>
+					</arg>
+					<arg type="Number" name="m" opt="1">
+						<desc>.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="Automate"></returnValue>
+			</function>
+			<function name="repeat0n">
+				<desc>.</desc>
+				<arguments>
+					<arg type="Automate" name="oFA">
+						<desc>.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="Automate"></returnValue>
+			</function>
+			<function name="repeat1n">
+				<desc>.</desc>
+				<arguments>
+					<arg type="Automate" name="oFA">
+						<desc>.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="Automate"></returnValue>
+			</function>
+		</methods>
+		<methods name="Générateur d'automates spéciaux">
 			<function name="fromChar">
 				<desc>Créé une fonction retournant un automate à une transition pour un caractère.</desc>
 				<arguments>
@@ -190,7 +344,7 @@
 				<returnValue type="Function"></returnValue>
 			</function>
 		</methods>
-		<methods name="Constructeur d'automates spéciaux">
+		<methods name="Automates spéciaux">
 			<function name="['\\n']">
 				<returnValue type="Automate"></returnValue>
 			</function>
@@ -222,138 +376,6 @@
 				<returnValue type="Automate"></returnValue>
 			</function>
 			<function name="['\\W']">
-				<returnValue type="Automate"></returnValue>
-			</function>
-		</methods>
-		<methods name="Fonctions générant un automate depuis des éléments de l'AST...">
-			<desc>...</desc>
-			<function name="CHARCLASS">
-				<desc>.</desc>
-				<arguments>
-					<arg type="Object" name="oToken">
-						<desc>.</desc>
-					</arg>
-				</arguments>
-				<returnValue type="Automate"></returnValue>
-			</function>
-			<function name="NEGATED_CHARCLASS">
-				<desc>.</desc>
-				<arguments>
-					<arg type="Object" name="oToken">
-						<desc>.</desc>
-					</arg>
-				</arguments>
-				<returnValue type="Automate"></returnValue>
-			</function>
-			<function name="DOT">
-				<desc>.</desc>
-				<returnValue type="Automate"></returnValue>
-			</function>
-			<function name="RANGE">
-				<desc>.</desc>
-				<arguments>
-					<arg type="Object" name="oToken">
-						<desc>...</desc>
-					</arg>
-					<arg type="?" name="LEFT">
-						<desc>.</desc>
-					</arg>
-					<arg type="?" name="RIGHT">
-						<desc>.</desc>
-					</arg>
-				</arguments>
-				<returnValue type="Automate"></returnValue>
-			</function>
-			<function name="CONCAT">
-				<desc>.</desc>
-				<returnValue type="Automate"></returnValue>
-			</function>
-			<function name="PIPE">
-				<desc>.</desc>
-				<returnValue type="Automate"></returnValue>
-			</function>
-			<function name="QUANTIFIER">
-				<desc>.</desc>
-				<arguments>
-					<arg type="Object" name="oToken">
-						<desc>...</desc>
-					</arg>
-					<arg type="?" name="LEFT">
-						<desc>.</desc>
-					</arg>
-				</arguments>
-				<returnValue type="Automate"></returnValue>
-			</function>
-			<function name="['+']">
-				<desc>.</desc>
-				<arguments>
-					<arg type="Object" name="oToken">
-						<desc>...</desc>
-					</arg>
-					<arg type="?" name="LEFT">
-						<desc>.</desc>
-					</arg>
-				</arguments>
-				<returnValue type="Automate"></returnValue>
-			</function>
-			<function name="['*']">
-				<desc>.</desc>
-				<arguments>
-					<arg type="Object" name="oToken">
-						<desc>...</desc>
-					</arg>
-					<arg type="?" name="LEFT">
-						<desc>.</desc>
-					</arg>
-				</arguments>
-				<returnValue type="Automate"></returnValue>
-			</function>
-			<function name="['?']">
-				<desc>.</desc>
-				<arguments>
-					<arg type="Object" name="oToken">
-						<desc>...</desc>
-					</arg>
-					<arg type="?" name="LEFT">
-						<desc>.</desc>
-					</arg>
-				</arguments>
-				<returnValue type="Automate"></returnValue>
-			</function>
-			<function name="['{n}']">
-				<desc>.</desc>
-				<arguments>
-					<arg type="Object" name="oToken">
-						<desc>...</desc>
-					</arg>
-					<arg type="?" name="LEFT">
-						<desc>.</desc>
-					</arg>
-				</arguments>
-				<returnValue type="Automate"></returnValue>
-			</function>
-			<function name="['{n,}']">
-				<desc>.</desc>
-				<arguments>
-					<arg type="Object" name="oToken">
-						<desc>...</desc>
-					</arg>
-					<arg type="?" name="LEFT">
-						<desc>.</desc>
-					</arg>
-				</arguments>
-				<returnValue type="Automate"></returnValue>
-			</function>
-			<function name="['{n,m}']">
-				<desc>.</desc>
-				<arguments>
-					<arg type="Object" name="oToken">
-						<desc>...</desc>
-					</arg>
-					<arg type="?" name="LEFT">
-						<desc>.</desc>
-					</arg>
-				</arguments>
 				<returnValue type="Automate"></returnValue>
 			</function>
 		</methods>

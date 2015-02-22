@@ -166,7 +166,7 @@ Automate =(function(){
 					}
 				}
 				
-			oFA.type = oFA.type=='DFA' ? 'DFA' : 'NFA'
+			oFA.type = oFA.type || 'NFA'
 			oFA.I = NEW_ID[ oFA.I ]
 			oFA.F = F.sortBy('','ASC')
 			oFA.S = S
@@ -200,32 +200,192 @@ Automate =(function(){
 		if( nUniqueID ) ID = nUniqueID
 		}
 	Automate.wrapper =function( s ){
-		if( s.length==1 ) return Automate.fromChar(s)()
+		if( s.length==1 ) return Automate.makeChar(s)
 		else if( s.charAt(0)=='\\' ){ // symbole prefixé par '\'
 			if( Automate[s]) return Automate[s]()
 			s = s.length==2 ? s.substring(1) : s
-			return Automate.fromChar(s)()
+			return Automate.makeChar(s)
 			}
 		throwError( 'Automate '+ s +'?' )
 		}
-	Automate.empty =function( I, F ){
-		var I=I||getUniqueID(), F=F||getUniqueID()
-		return new Automate( I, [F], [EPSILON], [I,F], [ epsilonTransition( I, F )] )
-		}
-		
-	Automate.fromChar =function( sChar ){
-		return function(){
-			var I=getUniqueID(), F=getUniqueID()
+
+	// AUTOMATES BASIQUES
+	Automate.union({
+		makeEmpty :function( I, F ){
+			var I=I||getUniqueID(), F=F||getUniqueID()
+			return new Automate( I, [F], [EPSILON], [I,F], [ epsilonTransition( I, F )] )
+			},
+		makeChar :function( sChar, I, F ){
+			var I=I||getUniqueID(), F=F||getUniqueID()
 			return new Automate( I, [F], [sChar], [I,F], [[I,sChar,F]])
-			}
-		}
-	Automate.fromCharClass =function( aSet, bNegated ){
-		return function(){
-			var I=getUniqueID(), F=getUniqueID()
+			},
+		makeAnyChar :function( sChar, I, F ){
+			var sChar=sChar||'a', I=I||getUniqueID(), F=F||getUniqueID()
+			var f1 = Automate.action( sChar, 0 )
+			var f2 = Automate.action( sChar, 1 )
+			var T = [[ I, f1.toString(), F, f1 ],[ I, f2.toString(), F, f2 ]]
+			return new Automate( I, [F], [sChar], [I,F], T )
+			},
+		makeCharSet :function( aSet, bNegated, I, F ){
+			var I=I||getUniqueID(), F=F||getUniqueID()
 			var f = Automate.action( aSet.join(''), bNegated )
 			var T = [[ I, f.toString(), F, f ]]
 			return new Automate( I, [F], [f.toString()], [I,F], T )
+			},
+		makeCharRange :function( sChar1, sChar2, I, F ){
+			var getCharCode =function( sChar ){
+				if( sChar.length==1 ) return sChar.charCodeAt(0)
+				switch( sChar.charAt(1)){
+					case 'x':
+					case 'u':
+						return parseInt( sChar.slice( 2 ), 16 )
+					default: // number
+					}
+				throwError( 'getCharCode '+ sChar )
+				}
+			var nCode1 = getCharCode( sChar1 )
+			var nCode2 = getCharCode( sChar2 )
+			if( nCode1 > nCode2 ){
+				var tmp=nCode1
+				nCode1=nCode2
+				nCode2=tmp
+				}
+			var a=[]
+			for(var i=nCode1, ni=nCode2+1; i<ni; i++ ) a.push( i )
+			return Automate.makeCharSet( String.fromCharCode.apply( null, a ).toArray(), false, I, F )
 			}
+		})
+		
+	// OPERATIONS BASICS
+	Automate.union({
+		and :function(){
+			var o = arguments[0]
+			, I = o.I
+			, F = o.F
+			, A = [EPSILON].concat( o.A )
+			, S = o.S
+			, T = o.T
+			for(var i=1; o = arguments[i]; i++){
+				A = A.concat( o.A )
+				S = S.concat( o.S )
+				T = T.concat( o.T )
+				for(var j=0, nj=F.length; j<nj; j++)
+					T.push( epsilonTransition( F[j], o.I ))
+				F = o.F
+				}
+			A = Array.unique(A)
+			A.sort()
+			return new Automate( I, F, A, S, T )
+			},
+		optional :function( oFA ){
+			var T = oFA.T
+			for(var j=0, nj=oFA.F.length; j<nj; j++)
+				T.push( epsilonTransition( oFA.I, oFA.F[j]))
+			return new Automate(
+				oFA.I,
+				oFA.F,
+				Array.unique( oFA.A.concat([EPSILON])),
+				oFA.S.concat([]),
+				T
+				)
+			},
+		or :function(){
+			var I = getUniqueID()
+			var F = getUniqueID()
+			var A = [EPSILON]
+			var S = [I,F]
+			var T = []
+			var aTokensID = [] // aTokensID used in DFA aggregation
+			for(var i=0, o; o = arguments[i]; i++ ){
+				A = A.concat( o.A )
+				var aIntersection = Array.intersect( S, o.S )
+				if( aIntersection.length )
+					throwError( 'Error: Automate "|" intersection between automaton states.\n'+ aIntersection )
+				S = S.concat( o.S )
+				T.push( epsilonTransition( I, o.I ))
+				for(var j=0, nj=o.F.length; j<nj; j++)
+					T.push( epsilonTransition( o.F[j], F ))
+				T = T.concat( o.T )
+				if( o.aTokensID ) aTokensID = aTokensID.concat( o.aTokensID )
+				}
+			A = Array.unique(A)
+			A.sort()
+			return new Automate( I, [F], A, S, T, aTokensID )
+			},
+		repeat :function( oFA, n, m ){
+			n = n!==undefined ? n : 0
+			m = m!==undefined ? m : n
+			switch( n+','+m ){
+				case '0,1': return Automate.optional( oFA )
+				case '0,n': return Automate.repeat0n( oFA )
+				case '1,n': return Automate.repeat1n( oFA )
+				default:
+					if( m == 'n' ){
+						var oResultFA = Automate.repeat( oFA, n )
+						var F = oResultFA.F.concat([])
+						oResultFA = Automate.CONCAT( null, oResultFA, Automate.repeat1n( oFA.clone()))
+						return new Automate(
+							oResultFA.I,
+							Array.unique( F.concat( oResultFA.F )),
+							oResultFA.A,
+							oResultFA.S,
+							oResultFA.T
+							)
+						}
+					if( n >= m ) switch( n ){
+						case 0: return Automate.makeEmpty()
+						case 1: return oFA
+						default:
+							var oResultFA = oFA.clone()
+							for(var i=1; i<n; i++)
+								oResultFA = Automate.CONCAT( null, oResultFA, oFA.clone())
+							return oResultFA
+						}
+					if( n < m ){
+						var oResultFA = Automate.repeat( oFA, n )
+						var F = oResultFA.F.concat([])
+						for(var i=n; i<m; i++){
+							oResultFA = Automate.CONCAT( null, oResultFA, oFA.clone() )
+							F = F.concat( oResultFA.F )
+							}
+						return new Automate(
+							oResultFA.I,
+							Array.unique( F ),
+							oResultFA.A,
+							oResultFA.S,
+							oResultFA.T
+							)
+						}
+				}
+			},
+		repeat0n :function( oFA ){
+			var I=getUniqueID(), F=getUniqueID()
+			var T = oFA.T
+			T.push( epsilonTransition( I, oFA.I ))
+			T.push( epsilonTransition( I, F ))
+			for(var j=0, a=oFA.F, nj=a.length; j<nj; j++){
+				T.push( epsilonTransition( a[j], F ))
+				T.push( epsilonTransition( a[j], oFA.I ))
+				}
+			return new Automate(
+				I,
+				[F],
+				Array.unique( oFA.A.concat([EPSILON])),
+				Array.unique( oFA.S.concat([I,F])),
+				T
+				)
+			},
+		repeat1n :function( oFA ){
+			return Automate.CONCAT( null, oFA, Automate.repeat0n( oFA.clone()))
+			}
+		})
+	
+	// GENERATEUR D'AUTOMATE	
+	Automate.fromChar =function( sChar ){
+		return function(){ return Automate.makeChar( sChar ) }
+		}
+	Automate.fromCharClass =function( aSet, bNegated ){
+		return function(){ return Automate.makeCharSet( aSet, bNegated ) }
 		}
 
 	// CARACTÈRES SPÉCIAUX
@@ -253,12 +413,45 @@ Automate =(function(){
 			})
 	})()
 
-	// TRANSFORMATION ELEMENT DE L'AST en NFA
-	// Premier argument des fonctions, un élement de l'AST, le reste, ses enfants transformés en NFA
-	// Il y a une correspondance non validée entre le premier argument et le nom de fonction
+	return Automate
+	})()
+
+RegExp2AST =function( sRegExp ){
+	return ParserLR.parse(
+		AutomatonLexer( sRegExp, 'RegExp' ),
+		RegExpParser.REGEXP
+		)
+	}
+
+NFA =function( e ){ // Transformation de l'AST d'une expression régulière en automate
+	var S = e.nodeName
+	, f=function(e){ return e.oValue.value }
+	switch( S ){
+		case 'RANGE': return Automate.makeCharRange( f( e.firstChild ), f( e.lastChild ))
+		case 'QUANTIFIER':
+			var o = e.oValue, n = parseInt( o.n ), oFA = NFA( e.firstChild )
+			switch( o.m ){
+				case '': return Automate.repeat( oFA, n )
+				case '\u221E': return Automate.repeat( oFA, n, 'n' )
+				default: return Automate.repeat( oFA, n, parseInt( o.m ))
+				}
+		case 'DOT': return Automate.makeAnyChar()
+	//	case 'DOT': return Automate.fromChar( 'ANY' )()
+		default:
+			if( NFA[S]){
+				var a=to_array( e.childNodes )
+				for(var i=0, eChild; eChild=a[i]; i++ ) a[i] = NFA( a[i])
+				return NFA[S].apply( null, a )
+				}
+		}
+	if( ! e.oValue ) return false
+	if( ! f( e )) throwError( 'Error: symbol='+ S )
+	return Automate.wrapper( f( e ))
+	}
+NFA.union((function(){
 	var _getCharSet =function( aDFA ){
 		var aCS = [], aNCS = []
-		for(var i=1; aDFA[i]; i++ ){
+		for(var i=0; aDFA[i]; i++ ){
 			var symbol = aDFA[i].A[0]
 			if( symbol.charAt(0)=='[' && symbol.charAt(symbol.length-1)==']' ){
 				if( symbol.charAt(1)!='^' )
@@ -276,594 +469,408 @@ Automate =(function(){
 	//	if( Array.intersect( aCS, aNCS ).length ){}
 		return { charset:aCS, negatedcharset:aNCS }
 		}
-	Automate.union({
+	return {
 		CHARCLASS :function(){
 			var o = _getCharSet( arguments )
-			var I=getUniqueID(), F=getUniqueID()
-			var f1 = Automate.action( o.charset.join(''), 0 )
+			, I=Automate.getUniqueID(), F=Automate.getUniqueID(), A, S=[I,F], T
+			, f1 = Automate.action( o.charset.join(''), 0 )
 			if(	o.negatedcharset.length ){
 				var f2 = Automate.action( o.negatedcharset.join(''), 1 )
-				var T = [[ I, f1.toString(), F, f1 ],[ I, f2.toString(), F, f2 ]]
-				return new Automate( I, [F], [f1.toString(),f2.toString()], [I,F], T )
+				A = [f1.toString(),f2.toString()]
+				T = [[ I, f1.toString(), F, f1 ],[ I, f2.toString(), F, f2 ]]
 				}
-			var T = [[ I, f1.toString(), F, f1 ]]
-			return new Automate( I, [F], [f1.toString()], [I,F], T )
+			else{
+				A = [f1.toString()]
+				T = [[ I, f1.toString(), F, f1 ]]
+				}
+		//	return new Automate( I, [F], A, S, T )
+			var oFA = new Automate( I, [F], A, S, T )
+			NFA.validateAlphabet( oFA )
+			return ( new DFA( oFA )).minimize( I, true )
 			},
 		NEGATED_CHARCLASS :function(){
 			var o = _getCharSet( arguments )
-			var I=getUniqueID(), F=getUniqueID()
+			, I=Automate.getUniqueID(), F=Automate.getUniqueID(), A, S=[I,F], T
 			if(	o.negatedcharset.length ){
 				var aCS = Array.diff( o.negatedcharset, o.charset )
 				// Aucun caractère valide... TODO: lancer une erreur ?
-				if( ! aCS.length ) return Automate.empty(I,F)
+				if( ! aCS.length ) return Automate.makeEmpty(I,F)
 				var f1 = Automate.action( aCS.join(''), 0 )
-				var T = [[ I, f1.toString(), F, f1 ]]
-				return new Automate( I, [F], [f1.toString()], [I,F], T )
+				A = [f1.toString()]
+				T = [[ I, f1.toString(), F, f1 ]]
+				return new Automate( I, [F], A, S, T )
 				}
-			var f2 = Automate.action( o.charset.join(''), 1 )
-			var T = [[ I, f2.toString(), F, f2 ]]
-			return new Automate( I, [F], [f2.toString()], [I,F], T )
-			},
-		DOT :Automate.fromChar( 'ANY' ),
-		RANGE :function( oToken, LEFT, RIGHT ){
-			var getCharCode =function( sChar ){
-				if( sChar.length==1 ) return sChar.charCodeAt(0)
-				switch( sChar.charAt(1)){
-					case 'x':
-					case 'u':
-						return parseInt( sChar.slice( 2 ), 16 )
-					default: // number
-					}
-				throwError( 'getCharCode '+ sChar )
+			else{
+				var f2 = Automate.action( o.charset.join(''), 1 )
+				A = [f2.toString()]
+				T = [[ I, f2.toString(), F, f2 ]]
 				}
-			var nCode1 = getCharCode( LEFT.A[0])
-			var nCode2 = getCharCode( RIGHT.A[0])
-			if( nCode1 > nCode2 ){
-				var tmp=nCode1
-				nCode1=nCode2
-				nCode2=tmp
-				}
-			var a=[]
-			for(var i=nCode1, ni=nCode2+1; i<ni; i++ ) a.push( i )
-			return Automate.fromCharClass( String.fromCharCode.apply( null, a ).toArray() )()
+			return new Automate( I, [F], A, S, T )
+		//	var oFA = new Automate( I, [F], A, S, T )
+		//	NFA.validateAlphabet( oFA )
+		//	return ( new DFA( oFA )).minimize()
 			},
-		CONCAT :function(){
-			var o = arguments[1]
-			, I = o.I
-			, F = o.F
-			, A = [EPSILON].concat( o.A )
-			, S = o.S
-			, T = o.T
-			for(var i=2, ni=arguments.length; i<ni; i++){
-				var o = arguments[i]
-				A = A.concat( o.A )
-				S = S.concat( o.S )
-				T = T.concat( o.T )
-				for(var j=0, nj=F.length; j<nj; j++)
-					T.push( epsilonTransition( F[j], o.I ))
-				F = o.F
-				}
-			A = Array.unique(A)
-			A.sort()
-			return new Automate( I, F, A, S, T )
-			},
-		PIPE :function(){
-			var I = getUniqueID()
-			var F = getUniqueID()
-			var A = [EPSILON]
-			var S = [I,F]
-			var T = []
-			var aTokensID = [] // aTokensID used in DFA aggregation
-			for(var i=1,ni=arguments.length; i<ni; i++){
-				var o = arguments[i]
-				A = A.concat( o.A )
-				var aIntersection = Array.intersect( S, o.S )
-				if( aIntersection.length )
-					throwError( 'Error: Automate "|" intersection between automaton states.\n'+ aIntersection )
-				S = S.concat( o.S )
-				T.push( epsilonTransition( I, o.I ))
-				for(var j=0, nj=o.F.length; j<nj; j++)
-					T.push( epsilonTransition( o.F[j], F ))
-				T = T.concat( o.T )
-				if( o.aTokensID ) aTokensID = aTokensID.concat( o.aTokensID )
-				}
-			console.info( aTokensID )
-			A = Array.unique(A)
-			A.sort()
-			return new Automate( I, [F], A, S, T, aTokensID )
-			},
-		QUANTIFIER :function( oToken, LEFT ){
-			var o = oToken.oValue
-			oToken.n = o.n
-			oToken.m = o.m || ''
-			switch( o.m ){
-				case '':
-					return Automate['{n}']( oToken, LEFT )
-				case '\u221E':
-					return Automate['{n,}']( oToken, LEFT )
-				default:
-					return Automate['{n,m}']( oToken, LEFT )
-				}
-			},
-		'+' :function( oToken, LEFT ){
-			var CLONE = LEFT.clone()
-			return Automate.CONCAT( null, LEFT, Automate['*']( null, CLONE ))
-			},
-		'*' :function( oToken, LEFT ){
-			var I=getUniqueID(), F=getUniqueID()
-			var T = LEFT.T
-			T.push( epsilonTransition( I, LEFT.I ))
-			T.push( epsilonTransition( I, F ))
-			for(var j=0, a=LEFT.F, nj=a.length; j<nj; j++){
-				T.push( epsilonTransition( a[j], F ))
-				T.push( epsilonTransition( a[j], LEFT.I ))
-				}
-			return new Automate(
-				I,
-				[F],
-				Array.unique( LEFT.A.concat([EPSILON])),
-				Array.unique( LEFT.S.concat([I,F])),
-				T
-				)
-			},
-		'?' :function( oToken, LEFT ){
-			var T = LEFT.T
-			for(var j=0, nj=LEFT.F.length; j<nj; j++)
-				T.push( epsilonTransition( LEFT.I, LEFT.F[j]))
-			return new Automate(
-				LEFT.I,
-				LEFT.F,
-				Array.unique( LEFT.A.concat([EPSILON])),
-				LEFT.S.concat([]),
-				T
-				)
-			},
-		'{n}' :function( oToken, LEFT ){
-			switch( oToken.n ){
-				case '0': return Automate.empty()
-				case '1': return LEFT
-				default:
-					var oAutomate = LEFT
-					var F = []
-					for(var i=1; i<oToken.n; i++){
-						var CLONE = LEFT.clone()
-						oAutomate = Automate.CONCAT( null, oAutomate, CLONE )
-						var nRepetition = i+1
-						if( oToken.n <= nRepetition && nRepetition <= oToken.m ) F = F.concat( oAutomate.F )
-						}
-					return new Automate(
-						oAutomate.I,
-						Array.unique( F.concat( oAutomate.F )),
-						oAutomate.A,
-						oAutomate.S,
-						oAutomate.T
-						)
-				}
-			},
-		'{n,}' :function( oToken, LEFT ){
-			var oAutomate = LEFT
-			var F = []
-			switch( oToken.n ){
-				case '0': return Automate['*']( null, LEFT )
-				case '1': return Automate['+']( null, LEFT )
-				default:
-					for(var i=0; i<oToken.n; i++){
-						var CLONE = LEFT.clone()
-						if( i==oToken.n-1 ) CLONE = Automate['*']( null, CLONE )
-						oAutomate = Automate.CONCAT( null, oAutomate, CLONE )
-						var nRepetition = i+1
-						if( oToken.n <= nRepetition && nRepetition <= oToken.m ) F = F.concat( oAutomate.F )
-						}
-					return new Automate(
-						oAutomate.I,
-						Array.unique( F.concat( oAutomate.F )),
-						oAutomate.A,
-						oAutomate.S,
-						oAutomate.T
-						)
-				}
-			},
-		'{n,m}' :function( oToken, LEFT ){
-		var oAutomate = LEFT
-		var F = []
-		if( oToken.n <= 1 ) F = F.concat( oAutomate.F )
-		for(var i=1; i<oToken.m; i++){
-			var CLONE = LEFT.clone()
-			oAutomate = Automate.CONCAT( null, oAutomate, CLONE )
-			var nRepetition = i+1
-			if( oToken.n <= nRepetition && nRepetition <= oToken.m ) F = F.concat( oAutomate.F )
-			}
-		if( oToken.n == 0 ) oAutomate = Automate['?']( null, oAutomate )
-		return new Automate(
-			oAutomate.I,
-			Array.unique( F.concat( oAutomate.F )),
-			oAutomate.A,
-			oAutomate.S,
-			oAutomate.T
-			)
-		}
-		})
-	
-	return Automate
-	})()
-
-RegExp2AST =function( sRegExp ){
-	return ParserLR.parse(
-		AutomatonLexer( sRegExp, 'RegExp' ),
-		RegExpParser.REGEXP
-		)
-	}
-
-NFA =function( eASTNode ){ // Transformation de l'AST d'une expression régulière en automate
-	var S = eASTNode.nodeName
-	if( Automate[S]){
-		var a=to_array( eASTNode.childNodes )
-		for(var i=0, eChild; eChild=a[i]; i++ )
-			a[i] = NFA(a[i])
-		a.unshift( eASTNode )
-		return Automate[S].apply( null, a )
-		}
-	if( ! eASTNode.oValue ) return false
-	if( ! eASTNode.oValue.value ) throwError( 'Error: symbol='+ eASTNode.nodeName )
-	return Automate.wrapper( eASTNode.oValue.value )
-	}
-NFA.validateAlphabet =function( oNFA ){
-	var aAtoms=[], aGroups=[], aNegativeGroups=[]
-	, bAnyIn = false
-	, oUniqueNegativeCharset
-	
-	var bConsoleInfo = 0
-	var bConsoleInfoTransChange = true
-	var bConsoleInfoRNG = 1
-	var bConsoleInfoGvsTNG = 1
-	var bConsoleInfoAvsTNG = 1
-	var bConsoleInfoGvsG = 1
-	var bConsoleInfoAvsG = 1
-		
-	var Item =function( symbol ){
-		if( Item[symbol]) return Item[symbol]
-		var toString=function(){ return 'Item('+ this.symbol +','+ this.type +')' }
-		if( symbol.length==1
-			|| symbol.length==2 && symbol.charAt(0)=='\\'
-			|| /^(?:\\c[a-zA-Z]|\\x[0-9a-fA-F]{2}|\\u[0-9a-fA-F]{4})$/g.test( symbol )
-			)
-			return Item[symbol]={ type:'ATOM', symbol:symbol, toString:toString }
-		if( symbol==EPSILON )
-			return Item[symbol]={ type:'EPSILON', symbol:symbol, toString:toString }
-		if( symbol=='ANY' )
-			return Item[symbol]={ type:'ANY_CHARACTER', symbol:symbol, toString:toString }
-		if( symbol.charAt(0)=='[' && symbol.charAt(symbol.length-1)==']' ){
-			var sValue = symbol.replace( /^\[\^?((?:a|[^a])+)\]$/gim, '$1' )
-			var bNegated = symbol.substr(0,2)=='[^' && symbol.length>3
-			return Item[symbol]={
-				type: 'CHAR_CLASS',
-				symbol: (bNegated?'[^':'[')+ sValue+']',
-				valueIn: sValue,
-				negated: bNegated,
-				action: Automate.action( sValue, bNegated ),
-				toString:toString
-				}
-			}
-		throwError( 'Item('+ symbol +') ???' )
-		}
-	var ItemWrapper =function( sIn ){
-		if( sIn.length==0 ) return null
-		var bAtom = /^(?:\\c[a-zA-Z]|\\x[0-9a-fA-F]{2}|\\u[0-9a-fA-F]{4}|.|\^)$/g.test( sIn )
-		if( sIn.charAt(0)=='^' ) sIn = sIn.slice(1) + sIn.charAt(0) // Evite la création d'une classe négative par accident
-		if( bAtom && Transitions.getSymbol('['+ sIn +']')) return Item( '['+ sIn +']' )
-		return bAtom
-			? Item( sIn )
-			: Item( '['+ sIn +']' )
-		}
-	var Transitions =(function(){
-		var oBySymbols = {}
-		for(var i=0, ni=oNFA.T.length; i<ni; i++ ){
-			var a = oNFA.T[i]
-			var sSymbol = a[1]
-			if( ! oBySymbols[ sSymbol ]) oBySymbols[ sSymbol ] = []
-			oBySymbols[ sSymbol ].push( a )
-			}
-		var T ={
-			deleteSymbol :function( sSymbol ){
-				delete oBySymbols[ sSymbol ]
-			//	oBySymbols.remove( sSymbol )
-				oNFA.A.remove( sSymbol )
-				},
-			change :function( sSymbol, aNewItems, sMessage, bInfo ){
-				var aNewItems = Array.unique( aNewItems )
-				if( aNewItems.length==1 && sSymbol==aNewItems[0].symbol ) return ;
-				if( bInfo || bConsoleInfo && bConsoleInfoTransChange ){
-					var a = []
-					for(var i=0, ni=aNewItems.length; i<ni; i++ ){
-						if( aNewItems[i]) a.push( JSON.stringify( aNewItems[i].symbol ).slice(1,-1) )
-						}
-					console.warn(
-						JSON.stringify( sMessage||'' )
-						+'\n change \n\t\t'+ JSON.stringify( sSymbol ).slice(1,-1)
-						+'\n by \n \t\t'+ a.join('\n \t\t')
-						)
-					}
-				var addTransition =function( oItem, aBase ){
-					var I=Automate.getUniqueID(), F=Automate.getUniqueID()
-					oNFA.S = oNFA.S.concat([I,F])
-					var a = oBySymbols[ oItem.symbol ]
-					if( ! a.push ) throwError( 'Erreur pas de transition trouvée pour le symbole '+ oItem.symbol +'\n'+ JSON.stringify( a ))
-					a.push( oItem.action ? [ I, oItem.symbol, F, oItem.action ] : [ I, oItem.symbol, F ])
-					var a = oBySymbols[ EPSILON ]
-					if( ! a ){
-						a = oBySymbols[ EPSILON ] = []
-						oNFA.A.push( EPSILON )
-						}
-					a.push([ aBase[0], EPSILON, I ])
-					a.push([ F, EPSILON, aBase[2] ])
-					}
-				// Ajoute les nouveaux symboles dans l'alphabet
-				for(var i=0, ni=aNewItems.length; i<ni; i++ ){
-					if( ! aNewItems[i]) continue;
-					var sNewSymbol = aNewItems[i].symbol
-					if( ! oBySymbols[ sNewSymbol ]){
-						oBySymbols[ sNewSymbol ] = []
-						oNFA.A.push( sNewSymbol )
+		CONCAT :function(){ return Automate.and.apply( null, arguments )},
+		PIPE :function(){ return Automate.or.apply( null, arguments )},
+		validateAlphabet :function( oNFA ){
+			var aAtoms=[], aGroups=[], aNegativeGroups=[]
+			, bAnyIn = false
+			, oUniqueNegativeCharset
+			
+			var bConsoleInfo = 0
+			var bConsoleInfoTransChange = true
+			var bConsoleInfoRNG = 1
+			var bConsoleInfoGvsTNG = 1
+			var bConsoleInfoAvsTNG = 1
+			var bConsoleInfoGvsG = 1
+			var bConsoleInfoAvsG = 1
+				
+			var Item =function( symbol ){
+				if( Item[symbol]) return Item[symbol]
+				var toString=function(){ return 'Item('+ this.symbol +','+ this.type +')' }
+				if( symbol.length==1
+					|| symbol.length==2 && symbol.charAt(0)=='\\'
+					|| /^(?:\\c[a-zA-Z]|\\x[0-9a-fA-F]{2}|\\u[0-9a-fA-F]{4})$/g.test( symbol )
+					)
+					return Item[symbol]={ type:'ATOM', symbol:symbol, toString:toString }
+				if( symbol==EPSILON )
+					return Item[symbol]={ type:'EPSILON', symbol:symbol, toString:toString }
+				if( symbol=='ANY' )
+					return Item[symbol]={ type:'ANY_CHARACTER', symbol:symbol, toString:toString }
+				if( symbol.charAt(0)=='[' && symbol.charAt(symbol.length-1)==']' ){
+					var sValue = symbol.replace( /^\[\^?((?:a|[^a])+)\]$/gim, '$1' )
+					var bNegated = symbol.substr(0,2)=='[^' && symbol.length>3
+					return Item[symbol]={
+						type: 'CHAR_CLASS',
+						symbol: (bNegated?'[^':'[')+ sValue+']',
+						valueIn: sValue,
+						negated: bNegated,
+						action: Automate.action( sValue, bNegated ),
+						toString:toString
 						}
 					}
-				// Ajoute les nouvelles transitions
-				if( oBySymbols[sSymbol]){
-					for(var i=0, ni=oBySymbols[sSymbol].length; i<ni; i++ ){
-						var aTransition = oBySymbols[sSymbol][i]
-						for(var j=0, nj=aNewItems.length; j<nj; j++ ){
-							var oItem = aNewItems[j]
-							if( oItem && oItem.symbol!=sSymbol )
-								addTransition( oItem, aTransition.concat([]))
+				throwError( 'Item('+ symbol +') ???' )
+				}
+			var ItemWrapper =function( sIn ){
+				if( sIn.length==0 ) return null
+				var bAtom = /^(?:\\c[a-zA-Z]|\\x[0-9a-fA-F]{2}|\\u[0-9a-fA-F]{4}|.|\^)$/g.test( sIn )
+				if( sIn.charAt(0)=='^' ) sIn = sIn.slice(1) + sIn.charAt(0) // Evite la création d'une classe négative par accident
+				if( bAtom && Transitions.getSymbol('['+ sIn +']')) return Item( '['+ sIn +']' )
+				return bAtom
+					? Item( sIn )
+					: Item( '['+ sIn +']' )
+				}
+			var Transitions =(function(){
+				var oBySymbols = {}
+				for(var i=0, ni=oNFA.T.length; i<ni; i++ ){
+					var a = oNFA.T[i]
+					var sSymbol = a[1]
+					if( ! oBySymbols[ sSymbol ]) oBySymbols[ sSymbol ] = []
+					oBySymbols[ sSymbol ].push( a )
+					}
+				var T ={
+					deleteSymbol :function( sSymbol ){
+						delete oBySymbols[ sSymbol ]
+					//	oBySymbols.remove( sSymbol )
+						oNFA.A.remove( sSymbol )
+						},
+					change :function( sSymbol, aNewItems, sMessage, bInfo ){
+						var aNewItems = Array.unique( aNewItems )
+						if( aNewItems.length==1 && sSymbol==aNewItems[0].symbol ) return ;
+						if( bInfo || bConsoleInfo && bConsoleInfoTransChange ){
+							var a = []
+							for(var i=0, ni=aNewItems.length; i<ni; i++ ){
+								if( aNewItems[i]) a.push( JSON.stringify( aNewItems[i].symbol ).slice(1,-1) )
+								}
+							console.warn(
+								JSON.stringify( sMessage||'' )
+								+'\n change \n\t\t'+ JSON.stringify( sSymbol ).slice(1,-1)
+								+'\n by \n \t\t'+ a.join('\n \t\t')
+								)
 							}
+						var addTransition =function( oItem, aBase ){
+							var I=Automate.getUniqueID(), F=Automate.getUniqueID()
+							oNFA.S = oNFA.S.concat([I,F])
+							var a = oBySymbols[ oItem.symbol ]
+							if( ! a.push ) throwError( 'Erreur pas de transition trouvée pour le symbole '+ oItem.symbol +'\n'+ JSON.stringify( a ))
+							a.push( oItem.action ? [ I, oItem.symbol, F, oItem.action ] : [ I, oItem.symbol, F ])
+							var a = oBySymbols[ EPSILON ]
+							if( ! a ){
+								a = oBySymbols[ EPSILON ] = []
+								oNFA.A.push( EPSILON )
+								}
+							a.push([ aBase[0], EPSILON, I ])
+							a.push([ F, EPSILON, aBase[2] ])
+							}
+						// Ajoute les nouveaux symboles dans l'alphabet
+						for(var i=0, ni=aNewItems.length; i<ni; i++ ){
+							if( ! aNewItems[i]) continue;
+							var sNewSymbol = aNewItems[i].symbol
+							if( ! oBySymbols[ sNewSymbol ]){
+								oBySymbols[ sNewSymbol ] = []
+								oNFA.A.push( sNewSymbol )
+								}
+							}
+						// Ajoute les nouvelles transitions
+						if( oBySymbols[sSymbol]){
+							for(var i=0, ni=oBySymbols[sSymbol].length; i<ni; i++ ){
+								var aTransition = oBySymbols[sSymbol][i]
+								for(var j=0, nj=aNewItems.length; j<nj; j++ ){
+									var oItem = aNewItems[j]
+									if( oItem && oItem.symbol!=sSymbol )
+										addTransition( oItem, aTransition.concat([]))
+									}
+								}
+							}
+						T.deleteSymbol( sSymbol )
+						},
+					getSymbol: function( sSymbol ){ return oBySymbols[sSymbol] },
+					getSymbols: function(){ return oBySymbols },
+					get: function(){
+						var T = []
+						oNFA.A.sort()
+						for(var i=0, ni=oNFA.A.length; i<ni; i++ )
+							T = T.concat( oBySymbols[ oNFA.A[i]] || [])
+						return T
 						}
 					}
-				T.deleteSymbol( sSymbol )
-				},
-			getSymbol: function( sSymbol ){ return oBySymbols[sSymbol] },
-			getSymbols: function(){ return oBySymbols },
-			get: function(){
-				var T = []
-				oNFA.A.sort()
-				for(var i=0, ni=oNFA.A.length; i<ni; i++ )
-					T = T.concat( oBySymbols[ oNFA.A[i]] || [])
 				return T
+				})()
+			var addNewSymbols =function( aNewSymbols ){
+				for(var j=0, nj=aNewSymbols.length; j<nj; j++)
+					if( aNewSymbols[j])
+						switch( aNewSymbols[j].type ){
+							case 'ATOM':
+								aAtoms.push( aNewSymbols[j]);
+								break;
+							case 'CHAR_CLASS': 
+								aGroups.push( aNewSymbols[j]);
+								break;
+							}
 				}
-			}
-		return T
-		})()
-	var addNewSymbols =function( aNewSymbols ){
-		for(var j=0, nj=aNewSymbols.length; j<nj; j++)
-			if( aNewSymbols[j])
-				switch( aNewSymbols[j].type ){
-					case 'ATOM':
-						aAtoms.push( aNewSymbols[j]);
-						break;
-					case 'CHAR_CLASS': 
-						aGroups.push( aNewSymbols[j]);
-						break;
-					}
-		}
 
-	// Enumerate atoms, groups and negative group
-	for(var i=0, ni=oNFA.A.length; i<ni; i++){
-		var mIn = oNFA.A[i]
-		var oItem = Item( mIn )
-		if( ! oItem ) continue;
-		if( mIn==EPSILON ) continue;
-		else if( mIn.length==1 || mIn.charAt(0)=='\\' ) aAtoms.push( oItem )
-		else if( mIn.indexOf('[^')==0 ) aNegativeGroups.push( oItem )
-		else if( mIn.indexOf('[')==0 ) aGroups.push( oItem )
-		else if( mIn=='ANY' ) bAnyIn = true
-		else throwError( 'NFA Validation error: '+ mIn )
-	//	console.info( '['+ oItem.type +','+ oItem.symbol +'] VS '+ mIn )
-		}
-	var aNewSymbols
+			// Enumerate atoms, groups and negative group
+			for(var i=0, ni=oNFA.A.length; i<ni; i++){
+				var mIn = oNFA.A[i]
+				var oItem = Item( mIn )
+				if( ! oItem ) continue;
+				if( mIn==EPSILON ) continue;
+				else if( mIn.length==1 || mIn.charAt(0)=='\\' ) aAtoms.push( oItem )
+				else if( mIn.indexOf('[^')==0 ) aNegativeGroups.push( oItem )
+				else if( mIn.indexOf('[')==0 ) aGroups.push( oItem )
+				else if( mIn=='ANY' ) bAnyIn = true
+				else throwError( 'NFA Validation error: '+ mIn )
+			//	console.info( '['+ oItem.type +','+ oItem.symbol +'] VS '+ mIn )
+				}
+			var aNewSymbols
 
-	// Reduction Negative Groups in one
-	if( aNegativeGroups.length ){
-		if( aNegativeGroups.length==1 ){
-			oUniqueNegativeCharset = aNegativeGroups[0]
-			addNewSymbols([ ItemWrapper( aNegativeGroups[0].valueIn ) ])
-			}
-		else{
-			var aNot_G_1 = aNegativeGroups[0].valueIn.toArray()
-			for(var i=1, ni=aNegativeGroups.length; i<ni; i++){
-				var aNot_G_2 = aNegativeGroups[i].valueIn.toArray()
-				var sNot_G_1 = aNot_G_1.join('')
-				var sNot_G_2 = aNot_G_2.join('')
-				sG_inter = '[^'+ Array.unique( aNot_G_1.concat( aNot_G_2 )).join('') +']'
-				oUniqueNegativeCharset = Item( sG_inter )
-				
-				if( bConsoleInfo && bConsoleInfoRNG ){
-					console.info(
-						'-- Reduction Negative Groups --'
-						+'\n\n\t\t '+ JSON.stringify( oUniqueNegativeCharset.symbol )
-						+'\n\n\t\t '+ JSON.stringify( aNegativeGroups[i].symbol )
-						+'\n\n\t\t '
-						)
-					}
-				
-				if( ! Array.intersect( aNot_G_1, aNot_G_2 ).length ){
-					var oNot_G_1 = ItemWrapper( sNot_G_1 )
-					  , oNot_G_2 = ItemWrapper( sNot_G_2 )
-					Transitions.change( '[^'+ sNot_G_1 +']', [ oUniqueNegativeCharset, oNot_G_2 ], 'RNG1', bConsoleInfo && bConsoleInfoRNG )
-					Transitions.change( '[^'+ sNot_G_2 +']', [ oUniqueNegativeCharset, oNot_G_1 ], 'RNG2', bConsoleInfo && bConsoleInfoRNG )
-					aNewSymbols = [ oNot_G_1, oNot_G_2 ]
+			// Reduction Negative Groups in one
+			if( aNegativeGroups.length ){
+				if( aNegativeGroups.length==1 ){
+					oUniqueNegativeCharset = aNegativeGroups[0]
+					addNewSymbols([ ItemWrapper( aNegativeGroups[0].valueIn ) ])
 					}
 				else{
-					var oDiff_NotG2_NotG1 = ItemWrapper( Array.diff( aNot_G_2, aNot_G_1 ).join(''))
-					  , oDiff_NotG1_NotG2 = ItemWrapper( Array.diff( aNot_G_1, aNot_G_2 ).join(''))
-					Transitions.change( '[^'+ sNot_G_1 +']', [ oUniqueNegativeCharset, oDiff_NotG2_NotG1 ], 'RNG3', bConsoleInfo && bConsoleInfoRNG )
-					Transitions.change( '[^'+ sNot_G_2 +']', [ oUniqueNegativeCharset, oDiff_NotG1_NotG2 ], 'RNG4', bConsoleInfo && bConsoleInfoRNG )
-					aNewSymbols = [ oDiff_NotG2_NotG1, oDiff_NotG1_NotG2 ]
-					}
-				addNewSymbols( aNewSymbols )
-				aNot_G_1 = oUniqueNegativeCharset.valueIn.toArray()
-				}
-			}
-		aNegativeGroups = [ oUniqueNegativeCharset ]
-		}
-
-	// Reduction Negative Groups  VS Atoms & Groups : L'intersection doit-être nulle
-	if( oUniqueNegativeCharset ){
-		var aNegativeCharsetIn = oUniqueNegativeCharset.valueIn.toArray()
-		// Groups VS The Negative Group
-		for(var i=0; i<aGroups.length; i++){
-			var oCharacterClass = aGroups[i]
-			, aCharList = oCharacterClass.valueIn.toArray()
-			, aIntersection = Array.intersect( aNegativeCharsetIn, aCharList )
-			, sCharListDiff = Array.diff( aCharList, aIntersection ).join('')
-			
-			if( bConsoleInfo && bConsoleInfoGvsTNG ){
-				console.info(
-					'-- Reduction Groups VS The Negative Group --'
-					+'\n\t\t '+ JSON.stringify( oUniqueNegativeCharset.symbol )
-					+'\n\n\t\t '+ JSON.stringify( oCharacterClass.symbol )
-					+'\n'
-					)  /**/
-				}
+					var aNot_G_1 = aNegativeGroups[0].valueIn.toArray()
+					for(var i=1, ni=aNegativeGroups.length; i<ni; i++){
+						var aNot_G_2 = aNegativeGroups[i].valueIn.toArray()
+						var sNot_G_1 = aNot_G_1.join('')
+						var sNot_G_2 = aNot_G_2.join('')
+						sG_inter = '[^'+ Array.unique( aNot_G_1.concat( aNot_G_2 )).join('') +']'
+						oUniqueNegativeCharset = Item( sG_inter )
 						
-			if( sCharListDiff.length ){
-				aNegativeCharsetIn = Array.unique( aNegativeCharsetIn.concat( aCharList ))
-				var oCharSetDiff = ItemWrapper( sCharListDiff )
-				, sIntersection = aIntersection.join('')
-				, oIntersectionItem = sIntersection ? ItemWrapper( sIntersection ) : null
-				Transitions.change( oCharacterClass.symbol, [ oCharSetDiff, oIntersectionItem ]
-							, 'G VS TNG 1', bConsoleInfo && bConsoleInfoGvsTNG )
-				Transitions.change( oUniqueNegativeCharset.symbol, [
-							oCharSetDiff,
+						if( bConsoleInfo && bConsoleInfoRNG ){
+							console.info(
+								'-- Reduction Negative Groups --'
+								+'\n\n\t\t '+ JSON.stringify( oUniqueNegativeCharset.symbol )
+								+'\n\n\t\t '+ JSON.stringify( aNegativeGroups[i].symbol )
+								+'\n\n\t\t '
+								)
+							}
+						
+						if( ! Array.intersect( aNot_G_1, aNot_G_2 ).length ){
+							var oNot_G_1 = ItemWrapper( sNot_G_1 )
+							  , oNot_G_2 = ItemWrapper( sNot_G_2 )
+							Transitions.change( '[^'+ sNot_G_1 +']', [ oUniqueNegativeCharset, oNot_G_2 ], 'RNG1', bConsoleInfo && bConsoleInfoRNG )
+							Transitions.change( '[^'+ sNot_G_2 +']', [ oUniqueNegativeCharset, oNot_G_1 ], 'RNG2', bConsoleInfo && bConsoleInfoRNG )
+							aNewSymbols = [ oNot_G_1, oNot_G_2 ]
+							}
+						else{
+							var oDiff_NotG2_NotG1 = ItemWrapper( Array.diff( aNot_G_2, aNot_G_1 ).join(''))
+							  , oDiff_NotG1_NotG2 = ItemWrapper( Array.diff( aNot_G_1, aNot_G_2 ).join(''))
+							Transitions.change( '[^'+ sNot_G_1 +']', [ oUniqueNegativeCharset, oDiff_NotG2_NotG1 ], 'RNG3', bConsoleInfo && bConsoleInfoRNG )
+							Transitions.change( '[^'+ sNot_G_2 +']', [ oUniqueNegativeCharset, oDiff_NotG1_NotG2 ], 'RNG4', bConsoleInfo && bConsoleInfoRNG )
+							aNewSymbols = [ oDiff_NotG2_NotG1, oDiff_NotG1_NotG2 ]
+							}
+						addNewSymbols( aNewSymbols )
+						aNot_G_1 = oUniqueNegativeCharset.valueIn.toArray()
+						}
+					}
+				aNegativeGroups = [ oUniqueNegativeCharset ]
+				}
+
+			// Reduction Negative Groups  VS Atoms & Groups : L'intersection doit-être nulle
+			if( oUniqueNegativeCharset ){
+				var aNegativeCharsetIn = oUniqueNegativeCharset.valueIn.toArray()
+				// Groups VS The Negative Group
+				for(var i=0; i<aGroups.length; i++){
+					var oCharacterClass = aGroups[i]
+					, aCharList = oCharacterClass.valueIn.toArray()
+					, aIntersection = Array.intersect( aNegativeCharsetIn, aCharList )
+					, sCharListDiff = Array.diff( aCharList, aIntersection ).join('')
+					
+					if( bConsoleInfo && bConsoleInfoGvsTNG ){
+						console.info(
+							'-- Reduction Groups VS The Negative Group --'
+							+'\n\t\t '+ JSON.stringify( oUniqueNegativeCharset.symbol )
+							+'\n\n\t\t '+ JSON.stringify( oCharacterClass.symbol )
+							+'\n'
+							)  /**/
+						}
+								
+					if( sCharListDiff.length ){
+						aNegativeCharsetIn = Array.unique( aNegativeCharsetIn.concat( aCharList ))
+						var oCharSetDiff = ItemWrapper( sCharListDiff )
+						, sIntersection = aIntersection.join('')
+						, oIntersectionItem = sIntersection ? ItemWrapper( sIntersection ) : null
+						Transitions.change( oCharacterClass.symbol, [ oCharSetDiff, oIntersectionItem ]
+									, 'G VS TNG 1', bConsoleInfo && bConsoleInfoGvsTNG )
+						Transitions.change( oUniqueNegativeCharset.symbol, [
+									oCharSetDiff,
+									oUniqueNegativeCharset = Item( '[^'+ aNegativeCharsetIn.join('') +']' )
+									]
+									, 'G VS TNG 2', bConsoleInfo && bConsoleInfoGvsTNG )
+						addNewSymbols([ oIntersectionItem, oCharSetDiff ])
+						aGroups.splice( i, 1 )
+						i--
+						}
+					}
+				// Atoms VS The Negative Group
+				for(var i=0; i<aAtoms.length; i++){
+					var oAtom = aAtoms[i]
+					var sChar = oAtom.symbol
+					var aIntersection = Array.intersect( aNegativeCharsetIn, [sChar])
+
+					if( bConsoleInfo && bConsoleInfoAvsTNG ){
+						console.info(
+							'-- Reduction Atoms VS The Negative Group --'
+							+'\n\t\t '+ JSON.stringify( oUniqueNegativeCharset.symbol )
+							+'\n\n\t\t '+ JSON.stringify( oAtom.symbol )
+							+'\n'
+							)
+						}
+
+					if( ! aIntersection.length ){
+						aNegativeCharsetIn.push( sChar )
+						Transitions.change( oUniqueNegativeCharset.symbol, [
+							oAtom,
 							oUniqueNegativeCharset = Item( '[^'+ aNegativeCharsetIn.join('') +']' )
 							]
-							, 'G VS TNG 2', bConsoleInfo && bConsoleInfoGvsTNG )
-				addNewSymbols([ oIntersectionItem, oCharSetDiff ])
-				aGroups.splice( i, 1 )
-				i--
-				}
-			}
-		// Atoms VS The Negative Group
-		for(var i=0; i<aAtoms.length; i++){
-			var oAtom = aAtoms[i]
-			var sChar = oAtom.symbol
-			var aIntersection = Array.intersect( aNegativeCharsetIn, [sChar])
-
-			if( bConsoleInfo && bConsoleInfoAvsTNG ){
-				console.info(
-					'-- Reduction Atoms VS The Negative Group --'
-					+'\n\t\t '+ JSON.stringify( oUniqueNegativeCharset.symbol )
-					+'\n\n\t\t '+ JSON.stringify( oAtom.symbol )
-					+'\n'
-					)
+							, 'A VS TNG ', bConsoleInfo && bConsoleInfoAvsTNG )
+						continue ;
+						}
+					}
 				}
 
-			if( ! aIntersection.length ){
-				aNegativeCharsetIn.push( sChar )
-				Transitions.change( oUniqueNegativeCharset.symbol, [
-					oAtom,
-					oUniqueNegativeCharset = Item( '[^'+ aNegativeCharsetIn.join('') +']' )
-					]
-					, 'A VS TNG ', bConsoleInfo && bConsoleInfoAvsTNG )
-				continue ;
+			// Groups VS Groups : L'intersection doit-être nulle
+			for(var i=0; i<aGroups.length; i++){
+				if( ! aGroups[i]) continue ;
+				var aCharList1 = aGroups[i].valueIn.toArray()
+				aCharList1.sort()
+				for(var j=0; j<aGroups.length; j++){
+					if( ! aGroups[j] || i==j ) continue ;
+					var aCharList2 = aGroups[j].valueIn.toArray()
+					aCharList2.sort()
+					var aIntersection = Array.intersect( aCharList1, aCharList2 )
+
+					if( bConsoleInfo && bConsoleInfoGvsG ){
+						console.info(
+							'-- Reduction Group VS Group --'
+							+'\n\n\t\t '+ JSON.stringify( aGroups[i].symbol )
+							+'\n\n\t\t '+ JSON.stringify( aGroups[j].symbol )
+							+'\n'
+							)
+						}
+
+					if( ! aIntersection.length ) continue ;
+					aIntersection.sort()
+					var oItem1 = ItemWrapper( Array.diff( aCharList1, aIntersection ).join(''))
+					var oItem2 = ItemWrapper( Array.diff( aCharList2, aIntersection ).join(''))
+					var oIntersectionItem = ItemWrapper( aIntersection.join(''))
+					if( oItem1 ) Transitions.change( aGroups[i].symbol, [ oIntersectionItem, oItem1 ], 'G VS G 1', bConsoleInfo && bConsoleInfoGvsG )
+					if( oItem2 ) Transitions.change( aGroups[j].symbol, [ oIntersectionItem, oItem2 ], 'G VS G 2', bConsoleInfo && bConsoleInfoGvsG )
+					aGroups[j]=null
+					aGroups[i]=null
+					addNewSymbols([ oIntersectionItem, oItem1, oItem2 ])
+					break;
+					}
 				}
+			aGroups = Array.unique( aGroups )
+
+			// Groups VS Atoms
+			for(var j=0,nj=aAtoms.length; j<nj; j++){
+				var oAtom =aAtoms[j]
+				var sChar = oAtom.symbol
+				for(var i=0, ni=aGroups.length; i<ni; i++){
+					var oCharacterClass = aGroups[i]
+					, sCharList = oCharacterClass.valueIn
+
+					if( bConsoleInfo && bConsoleInfoAvsG ){
+						console.info(
+							'-- Reduction Group VS Atom --'
+							+'\n\n\t\t '+ JSON.stringify( oCharacterClass.symbol )
+							+'\n\n\t\t '+ JSON.stringify( oAtom.symbol )
+							+'\n'
+							)
+						}
+						
+					if( sCharList.indexOf( sChar ) > -1 ){
+						var oChar = Item( sChar )
+						, oItem = ItemWrapper( sCharList.replace( sChar, '' ))
+						Transitions.change( oCharacterClass.symbol, [ oChar, oItem ], 'G VS A', bConsoleInfo && bConsoleInfoAvsG )
+						addNewSymbols([ oChar, oItem ])
+						aGroups.splice( i, 1 )
+						i--
+						ni--
+						}
+					}
+				}
+
+			// Cas symbole ANY
+			if( bAnyIn ){
+				var a = aAtoms.concat( aGroups )
+				if( oNFA.A.length==1 ){
+					var oUniqueNegativeCharset = Item( '[^a]' )
+					var oItem = Item( 'a' )
+					aAtoms.push( oItem )
+					a = [ oItem, oUniqueNegativeCharset ]
+					}
+				else if( oUniqueNegativeCharset ) a.push( oUniqueNegativeCharset )
+				else{
+					var aItemIn = []
+					for(var i=0, ni=a.length; i<ni; i++){
+						var oItem=a[i]
+						if( oItem.type=="ATOM" ) aItemIn.push( oItem.symbol )
+						else if( oItem.type=="CHAR_CLASS" ) aItemIn = aItemIn.concat( oItem.valueIn.toArray())
+						}
+					oUniqueNegativeCharset = Item( '[^'+ Array.unique( aItemIn ).join('') +']' )
+					a.push( oUniqueNegativeCharset )
+					}
+				Transitions.change( 'ANY', a, 'Cas symbole ANY' )
+				}
+
+			// Création de l'alphabet !
+			var A = [ EPSILON ]
+			for(var i=0, ni=aAtoms.length; i<ni; i++ ) A.push( aAtoms[i].symbol )
+			for(var i=0, ni=aGroups.length; i<ni; i++ ) A.push( aGroups[i].symbol )
+			if( oUniqueNegativeCharset ) A.push( oUniqueNegativeCharset.symbol )
+
+			oNFA.A = Array.unique( A )
+			oNFA.T = Transitions.get()
+			return oNFA
 			}
 		}
-
-	// Groups VS Groups : L'intersection doit-être nulle
-	for(var i=0; i<aGroups.length; i++){
-		if( ! aGroups[i]) continue ;
-		var aCharList1 = aGroups[i].valueIn.toArray()
-		aCharList1.sort()
-		for(var j=0; j<aGroups.length; j++){
-			if( ! aGroups[j] || i==j ) continue ;
-			var aCharList2 = aGroups[j].valueIn.toArray()
-			aCharList2.sort()
-			var aIntersection = Array.intersect( aCharList1, aCharList2 )
-
-			if( bConsoleInfo && bConsoleInfoGvsG ){
-				console.info(
-					'-- Reduction Group VS Group --'
-					+'\n\n\t\t '+ JSON.stringify( aGroups[i].symbol )
-					+'\n\n\t\t '+ JSON.stringify( aGroups[j].symbol )
-					+'\n'
-					)
-				}
-
-			if( ! aIntersection.length ) continue ;
-			aIntersection.sort()
-			var oItem1 = ItemWrapper( Array.diff( aCharList1, aIntersection ).join(''))
-			var oItem2 = ItemWrapper( Array.diff( aCharList2, aIntersection ).join(''))
-			var oIntersectionItem = ItemWrapper( aIntersection.join(''))
-			if( oItem1 ) Transitions.change( aGroups[i].symbol, [ oIntersectionItem, oItem1 ], 'G VS G 1', bConsoleInfo && bConsoleInfoGvsG )
-			if( oItem2 ) Transitions.change( aGroups[j].symbol, [ oIntersectionItem, oItem2 ], 'G VS G 2', bConsoleInfo && bConsoleInfoGvsG )
-			aGroups[j]=null
-			aGroups[i]=null
-			addNewSymbols([ oIntersectionItem, oItem1, oItem2 ])
-			break;
-			}
-		}
-	aGroups = Array.unique( aGroups )
-
-	// Groups VS Atoms
-	for(var j=0,nj=aAtoms.length; j<nj; j++){
-		var oAtom =aAtoms[j]
-		var sChar = oAtom.symbol
-		for(var i=0, ni=aGroups.length; i<ni; i++){
-			var oCharacterClass = aGroups[i]
-			, sCharList = oCharacterClass.valueIn
-
-			if( bConsoleInfo && bConsoleInfoAvsG ){
-				console.info(
-					'-- Reduction Group VS Atom --'
-					+'\n\n\t\t '+ JSON.stringify( oCharacterClass.symbol )
-					+'\n\n\t\t '+ JSON.stringify( oAtom.symbol )
-					+'\n'
-					)
-				}
-				
-			if( sCharList.indexOf( sChar ) > -1 ){
-				var oChar = Item( sChar )
-				, oItem = ItemWrapper( sCharList.replace( sChar, '' ))
-				Transitions.change( oCharacterClass.symbol, [ oChar, oItem ], 'G VS A', bConsoleInfo && bConsoleInfoAvsG )
-				addNewSymbols([ oChar, oItem ])
-				aGroups.splice( i, 1 )
-				i--
-				ni--
-				}
-			}
-		}
-
-	// Cas symbole ANY
-	if( bAnyIn ){
-		var a = aAtoms.concat( aGroups )
-		if( oNFA.A.length==1 ){
-			var oUniqueNegativeCharset = Item( '[^a]' )
-			var oItem = Item( 'a' )
-			aAtoms.push( oItem )
-			a = [ oItem, oUniqueNegativeCharset ]
-			}
-		else if( oUniqueNegativeCharset ) a.push( oUniqueNegativeCharset )
-		else{
-			var aItemIn = []
-			for(var i=0, ni=a.length; i<ni; i++){
-				var oItem=a[i]
-				if( oItem.type=="ATOM" ) aItemIn.push( oItem.symbol )
-				else if( oItem.type=="CHAR_CLASS" ) aItemIn = aItemIn.concat( oItem.valueIn.toArray())
-				}
-			oUniqueNegativeCharset = Item( '[^'+ Array.unique( aItemIn ).join('') +']' )
-			a.push( oUniqueNegativeCharset )
-			}
-		Transitions.change( 'ANY', a, 'Cas symbole ANY' )
-		}
-
-	// Création de l'alphabet !
-	var A = [ EPSILON ]
-	for(var i=0, ni=aAtoms.length; i<ni; i++ ) A.push( aAtoms[i].symbol )
-	for(var i=0, ni=aGroups.length; i<ni; i++ ) A.push( aGroups[i].symbol )
-	if( oUniqueNegativeCharset ) A.push( oUniqueNegativeCharset.symbol )
-
-	oNFA.A = Array.unique( A )
-	oNFA.T = Transitions.get()
-	return oNFA
-	}
+	})())
 
 DFA =(function(){
 	var NFA
@@ -992,8 +999,6 @@ DFA =(function(){
 			var s = aTokensName[i]
 			aTokensID.push([ s, oTokensState[ s ]])
 			}
-	//	var oDFA = new Automate( I.id, F, A, S, T, aTokensID )
-		
 		Automate.call( this, I.id, F, A, S, T, aTokensID )
 		this.type = 'DFA'
 		this.buildTable()
@@ -1017,7 +1022,7 @@ DFA.inheritFrom( Automate ).union({
 				}
 		return sLongestMatch
 		},
-	minimize :function( bPreserveFinalState ){
+	minimize :function( nStateIDCounter, bAll ){
 		var oDFA = this
 		// MINIMISATION DU NOMBRE D'ETATS
 		var COUNTER = 2
@@ -1200,7 +1205,7 @@ DFA.inheritFrom( Automate ).union({
 			oDFA.A = Array.unique( A )
 			}
 
-		return oDFA.renameStates()
+		return oDFA.renameStates( nStateIDCounter, bAll )
 		},
 	toJS :function( bWhiteSpace, bUnCompressed ){
 		var oDFA = this
@@ -1548,33 +1553,31 @@ DFA.inheritFrom( Automate ).union({
 		return JSON.stringify( B[0]).slice(1,-1)
 		}
 	})
-DFA.union({
-	aggregate :function( oDFA1, oDFA2 ){
-		var oNFA = Automate.PIPE( null, oDFA1, oDFA2 )
-		NFA.validateAlphabet( oNFA )
-		var oDFA = new DFA( oNFA )
-		// NB: Ne détecte pas la reconnaissance d'une chaine par 2 tokens: premier arrivée, ...
-		if( oNFA.aTokensID.length != oDFA.aTokensID.length )
-			alert( 'Erreur perte de donnée dans l\'aggrégation.\n'+
-				'NFA Tokens ID ('+ oNFA.aTokensID.length +'):\n\t'+oNFA.aTokensID.join('\n\t')+'\n\n'+
-				'DFA Tokens ID ('+ oDFA.aTokensID.length +'):\n\t'+oDFA.aTokensID.join('\n\t')
-				)
-		oDFA.minimize( true )
-		var a = oDFA.aTokensID
-		if( a && a.length ){
-			var oSTATES = {}
-			for(var i=0, ni=a.length; i<ni; i++){
-				var aStates = a[i][1], sToken = a[i][0]
-				for(var j=0, nj=aStates.length; j<nj; j++){
-					var nState = aStates[j]
-					if( oSTATES[ nState ]){ // throwError( 'State '+ nState +' recognize '+ oSTATES[ nState ] +' and '+ sToken )
-						if( oSTATES[ nState ].charAt ) oSTATES[ nState ] = [ oSTATES[ nState ]]
-						oSTATES[ nState ].push( sToken )
-						}
-					else oSTATES[ nState ] = sToken
+DFA.aggregate =function( oDFA1, oDFA2 ){
+	var oNFA = Automate.PIPE( null, oDFA1, oDFA2 )
+	NFA.validateAlphabet( oNFA )
+	var oDFA = new DFA( oNFA )
+	// NB: Ne détecte pas la reconnaissance d'une chaine par 2 tokens: premier arrivée, ...
+	if( oNFA.aTokensID.length != oDFA.aTokensID.length )
+		alert( 'Erreur perte de donnée dans l\'aggrégation.\n'+
+			'NFA Tokens ID ('+ oNFA.aTokensID.length +'):\n\t'+oNFA.aTokensID.join('\n\t')+'\n\n'+
+			'DFA Tokens ID ('+ oDFA.aTokensID.length +'):\n\t'+oDFA.aTokensID.join('\n\t')
+			)
+	oDFA.minimize()
+	var a = oDFA.aTokensID
+	if( a && a.length ){
+		var oSTATES = {}
+		for(var i=0, ni=a.length; i<ni; i++){
+			var aStates = a[i][1], sToken = a[i][0]
+			for(var j=0, nj=aStates.length; j<nj; j++){
+				var nState = aStates[j]
+				if( oSTATES[ nState ]){ // throwError( 'State '+ nState +' recognize '+ oSTATES[ nState ] +' and '+ sToken )
+					if( oSTATES[ nState ].charAt ) oSTATES[ nState ] = [ oSTATES[ nState ]]
+					oSTATES[ nState ].push( sToken )
 					}
+				else oSTATES[ nState ] = sToken
 				}
 			}
-		return oDFA
 		}
-	})
+	return oDFA
+	}
