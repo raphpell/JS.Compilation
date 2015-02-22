@@ -223,8 +223,9 @@ Automate =(function(){
 			var sChar=sChar||'a', I=I||getUniqueID(), F=F||getUniqueID()
 			var f1 = Automate.action( sChar, 0 )
 			var f2 = Automate.action( sChar, 1 )
+			var A = [ f1.toString(), f2.toString() ]
 			var T = [[ I, f1.toString(), F, f1 ],[ I, f2.toString(), F, f2 ]]
-			return new Automate( I, [F], [sChar], [I,F], T )
+			return new Automate( I, [F], A, [I,F], T )
 			},
 		makeCharSet :function( aSet, bNegated, I, F ){
 			var I=I||getUniqueID(), F=F||getUniqueID()
@@ -256,7 +257,7 @@ Automate =(function(){
 			}
 		})
 		
-	// OPERATIONS BASICS
+	// OPERATIONS BASIQUES
 	Automate.union({
 		and :function(){
 			var o = arguments[0]
@@ -284,7 +285,7 @@ Automate =(function(){
 			return new Automate(
 				oFA.I,
 				oFA.F,
-				Array.unique( oFA.A.concat([EPSILON])),
+				Array.unique( [EPSILON].concat( oFA.A )),
 				oFA.S.concat([]),
 				T
 				)
@@ -293,7 +294,7 @@ Automate =(function(){
 			var I = getUniqueID()
 			var F = getUniqueID()
 			var A = [EPSILON]
-			var S = [I,F]
+			var S = []
 			var T = []
 			var aTokensID = [] // aTokensID used in DFA aggregation
 			for(var i=0, o; o = arguments[i]; i++ ){
@@ -308,6 +309,7 @@ Automate =(function(){
 				T = T.concat( o.T )
 				if( o.aTokensID ) aTokensID = aTokensID.concat( o.aTokensID )
 				}
+			S = S.concat([I,F])
 			A = Array.unique(A)
 			A.sort()
 			return new Automate( I, [F], A, S, T, aTokensID )
@@ -323,7 +325,7 @@ Automate =(function(){
 					if( m == 'n' ){
 						var oResultFA = Automate.repeat( oFA, n )
 						var F = oResultFA.F.concat([])
-						oResultFA = Automate.CONCAT( null, oResultFA, Automate.repeat1n( oFA.clone()))
+						oResultFA = Automate.and( oResultFA, Automate.repeat1n( oFA.clone()))
 						return new Automate(
 							oResultFA.I,
 							Array.unique( F.concat( oResultFA.F )),
@@ -338,14 +340,14 @@ Automate =(function(){
 						default:
 							var oResultFA = oFA.clone()
 							for(var i=1; i<n; i++)
-								oResultFA = Automate.CONCAT( null, oResultFA, oFA.clone())
+								oResultFA = Automate.and( oResultFA, oFA.clone())
 							return oResultFA
 						}
 					if( n < m ){
 						var oResultFA = Automate.repeat( oFA, n )
 						var F = oResultFA.F.concat([])
 						for(var i=n; i<m; i++){
-							oResultFA = Automate.CONCAT( null, oResultFA, oFA.clone() )
+							oResultFA = Automate.and( oResultFA, oFA.clone() )
 							F = F.concat( oResultFA.F )
 							}
 						return new Automate(
@@ -376,7 +378,7 @@ Automate =(function(){
 				)
 			},
 		repeat1n :function( oFA ){
-			return Automate.CONCAT( null, oFA, Automate.repeat0n( oFA.clone()))
+			return Automate.and( oFA, Automate.repeat0n( oFA.clone()))
 			}
 		})
 	
@@ -1010,7 +1012,7 @@ DFA.inheritFrom( Automate ).union({
 		, nStart = nIndex
 		, sChar
 		, sState=this.I
-		, sLongestMatch = null
+		, sLongestMatch = this.F.have( sState ) ? '' : null
 		if( s.length!=0 )
 			while( true ){
 				sChar = s[ nIndex ]

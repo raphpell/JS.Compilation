@@ -16,31 +16,49 @@
 <body>
 	<a href="../../../index.htm">Index</a>
 	 - <a href="../doc/index.htm">Documentation</a>
-	 
-	<dl class="legend">
-		<dd class="red">Erreur</dd>
-		<dd class="orange">Echec</dd>
-		<dd class="green">Réussi</dd>
-	</dl>
-	
-	<xsl:if test="script|link">
-	<dl class="required">
-		<dd><b>Requis</b></dd>
-		<xsl:for-each select="script"><dd><xsl:value-of select="@src"/></dd></xsl:for-each>
-		<xsl:for-each select="link"><dd><xsl:value-of select="@href"/></dd></xsl:for-each>
-	</dl>
-	</xsl:if>
-	
+
 	<h1><xsl:value-of select="@name"/></h1>
+	<dl class="legend">
+		<dd class="red"><code>erreur</code></dd>
+		<dd class="orange"><code>échec</code></dd>
+		<dd class="green"><code>réussi</code></dd>
+	</dl>
 	<xsl:if test="desc">
 		<div class="desc"><xsl:copy-of select="desc"/></div>
 	</xsl:if>
 	
+	<div class="toc">
+		<b>Sommaire</b>
+		<ul>
+		<xsl:for-each select="test">
+			<xsl:if test="hr"><li>--- ---</li></xsl:if>
+			<xsl:if test="@name"><li><a href="#{generate-id(current())}"><xsl:value-of select="@name"/></a></li></xsl:if>
+		</xsl:for-each>
+		</ul>
+	</div>
+		 
+	
+	<xsl:if test="script|link">
+	<div class="required">
+		<b>Requis</b>
+		<ul>
+			<xsl:for-each select="script"><li><xsl:value-of select="@src"/></li></xsl:for-each>
+			<xsl:for-each select="link"><li><xsl:value-of select="@href"/></li></xsl:for-each>
+		</ul>
+	</div>
+	</xsl:if>
+	
+	
 	<script>var aUnitTest = [], aEval = []</script>
+	<hr style="clear:both;"/>
 	
 	<xsl:for-each select="test">
+		<xsl:if test="hr">
+			<hr/>
+		</xsl:if>
 	<div class="test">
 		<xsl:if test="@name">
+			<a name="{generate-id(current())}"></a>
 			<h2><xsl:value-of select="@name"/></h2>
 		</xsl:if>
 		<xsl:if test="desc">
@@ -97,7 +115,7 @@
 			}
 		for(var i=0; i<3; i++ ){
 			if( aDD[i].count !== undefined )
-				aDD[i].innerHTML += ' '+ aDD[i].count
+				aDD[i].innerHTML += ' <b>'+ aDD[i].count +'</b>'
 			}
 		var aPRE = document.getElementsByTagName('PRE')
 		for(var i=0; aPRE[i]; i++ ){
