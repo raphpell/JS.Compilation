@@ -4,8 +4,23 @@
 <truth name="Objet Automate">
 	<script src="../../../js/framework.js"></script>
 	<script src="../../../js/automaton.js"></script>
-	 <desc>...</desc>
+	<desc>...</desc>
 
+	<test name="Préambule" class="preambule">
+		<desc>Environnement de test...</desc>
+		<assertions name="Affectation des variables oFA et oDFA">
+			<desc>Création depuis une fonction générant un automate... </desc>
+			<value><![CDATA[
+var oFA, oDFA
+var Test =function( fGetFA ){
+	Automate.setUniqueID( 1 )
+	oDFA = new DFA( oFA = fGetFA () )
+	}
+			]]></value>
+		</assertions>
+	</test>
+	
+	<test name="Méthodes internes" class="preambule"></test>
 	<test name="Automate.action">
 		<assertions>
 			<desc>Ensemble de caractère.</desc>
@@ -39,16 +54,12 @@ var f = Automate.action( 'abc', true )
 	</test>
 	<test name="Automate.setUniqueID">
 		<assertions>
-			<value><![CDATA[
-Automate.setUniqueID( 1 )
-			]]></value>
+			<assert><![CDATA[ ! Automate.setUniqueID( 1 ) ]]></assert>
 			<assert><![CDATA[ Automate.getUniqueID() === 1 ]]></assert>
-		</assertions>
-		<assertions>
-			<value><![CDATA[
-Automate.setUniqueID( 0 )
-			]]></value>
-			<assert><![CDATA[ Automate.getUniqueID() === 2 ]]></assert>
+			<assert><![CDATA[ ! Automate.setUniqueID( 10 ) ]]></assert>
+			<assert><![CDATA[ Automate.getUniqueID() === 10 ]]></assert>
+			<assert><![CDATA[ ! Automate.setUniqueID( 0 ) ]]></assert>
+			<assert><![CDATA[ Automate.getUniqueID() === 11 ]]></assert>
 		</assertions>
 	</test>
 	<test name="Automate.wrapper">
@@ -60,10 +71,10 @@ Automate.setUniqueID( 0 )
 		</assertions>
 	</test>
 
+	<test name="Générateur d'automate" class="preambule"></test>
 	<test name="Automate.fromChar">
-		<hr/>
 		<desc>
-Méthodes créées avec <code>Automate.fromChar</code>:
+Générateur créées avec <code>Automate.fromChar</code>:
 <code><ul>
 	<li>Automate['\\n'] = Automate.fromChar('\n')</li>
 	<li>Automate['\\t'] = Automate.fromChar('\t')</li>
@@ -74,29 +85,22 @@ Méthodes créées avec <code>Automate.fromChar</code>:
 		</desc>
 		<assertions>
 			<value><![CDATA[
-Automate.setUniqueID( 1 )
-var f = Automate['\\n']
+Test( Automate['\\n'] )
 			]]></value>
+			<assert><![CDATA[ oFA.I === 1 ]]></assert>
+			<assert><![CDATA[ oFA.F.toString() === "2" ]]></assert>
+			<assert><![CDATA[ oFA.A.toString() === "\n" ]]></assert>
+			<assert><![CDATA[ oFA.S.toString() === "1,2" ]]></assert>
+			<assert><![CDATA[ oFA.T.length === 1 ]]></assert>
+			<assert><![CDATA[ oFA.T[0].toString() === "1,\n,2" ]]></assert>
+			<assert><![CDATA[ oFA.aTokensID.length === 0 ]]></assert>
+			<assert><![CDATA[ ! oFA.M ]]></assert>
+			<assert><![CDATA[ oDFA.test( '\naaa' ) === '\n' ]]></assert>
+			<assert><![CDATA[ oDFA.test( '\naaa', 2 ) === null ]]></assert>
 		</assertions>
 		<assertions>
 			<value><![CDATA[
-var oFA1 = f()
-var oDFA1 = new DFA( oFA1 )
-			]]></value>
-			<assert><![CDATA[ oFA1.I === 1 ]]></assert>
-			<assert><![CDATA[ oFA1.F.toString() === "2" ]]></assert>
-			<assert><![CDATA[ oFA1.A.toString() === "\n" ]]></assert>
-			<assert><![CDATA[ oFA1.S.toString() === "1,2" ]]></assert>
-			<assert><![CDATA[ oFA1.T.length === 1 ]]></assert>
-			<assert><![CDATA[ oFA1.T[0].toString() === "1,\n,2" ]]></assert>
-			<assert><![CDATA[ oFA1.aTokensID.length === 0 ]]></assert>
-			<assert><![CDATA[ ! oFA1.M ]]></assert>
-			<assert><![CDATA[ oDFA1.test( '\naaa' ) === '\n' ]]></assert>
-			<assert><![CDATA[ oDFA1.test( '\naaa', 2 ) === null ]]></assert>
-		</assertions>
-		<assertions>
-			<value><![CDATA[
-var oFA2 = f()
+var oFA2 = Automate['\\n']()
 			]]></value>
 			<assert><![CDATA[ oFA2.I === 3 ]]></assert>
 			<assert><![CDATA[ oFA2.F.toString() === "4" ]]></assert>
@@ -109,69 +113,107 @@ var oFA2 = f()
 		</assertions>
 	</test>
 	<test name="Automate.fromCharClass">
-		<desc>
-Méthodes créées avec <code>Automate.fromCharClass</code>:
+		<assertions name="Ensemble de caractère">
+			<desc></desc>
+			<value><![CDATA[
+Test( Automate.fromCharClass( ['a','b','c'] ))
+			]]></value>
+			<assert><![CDATA[ oFA.I === 1 ]]></assert>
+			<assert><![CDATA[ oFA.F.toString() === "2" ]]></assert>
+			<assert><![CDATA[ oFA.A.length === 1 ]]></assert>
+			<assert><![CDATA[ oFA.A.toString() === "[abc]" ]]></assert>
+			<assert><![CDATA[ oFA.S.toString() === "1,2" ]]></assert>
+			<assert><![CDATA[ oFA.T.length === 1 ]]></assert>
+			<assert><![CDATA[ oFA.T[0].toString() === "1,[abc],2,[abc]" ]]></assert>
+			<assert><![CDATA[ oFA.T[0][3]('b', 10 ) === 10 ]]></assert>
+			<assert><![CDATA[ oFA.T[0][3]('D', 10 ) === -1 ]]></assert>
+			<assert><![CDATA[ oFA.aTokensID.length === 0 ]]></assert>
+			<assert><![CDATA[ ! oFA.M ]]></assert>
+		</assertions>
+		<assertions name="Ensemble de caractère négatif">
+			<desc></desc>
+			<value><![CDATA[
+Test( Automate.fromCharClass( ['a','b','c'], true ))
+			]]></value>
+			<assert><![CDATA[ oFA.I === 1 ]]></assert>
+			<assert><![CDATA[ oFA.F.toString() === "2" ]]></assert>
+			<assert><![CDATA[ oFA.A.length === 1 ]]></assert>
+			<assert><![CDATA[ oFA.A.toString() === "[^abc]" ]]></assert>
+			<assert><![CDATA[ oFA.S.toString() === "1,2" ]]></assert>
+			<assert><![CDATA[ oFA.T.length === 1 ]]></assert>
+			<assert><![CDATA[ oFA.T[0].toString() === "1,[^abc],2,[^abc]" ]]></assert>
+			<assert><![CDATA[ oFA.T[0][3]('b', 10 ) === -1 ]]></assert>
+			<assert><![CDATA[ oFA.T[0][3]('D', 10 ) === 10 ]]></assert>
+			<assert><![CDATA[ oFA.aTokensID.length === 0 ]]></assert>
+			<assert><![CDATA[ ! oFA.M ]]></assert>
+		</assertions>
+		<assertions name="">
+			<desc>
+Générateur créées avec <code>Automate.fromCharClass</code>:
 <ul>
 	<li><b>Ensemble de caractère.</b>
 		<code><ul>
 			<li>Automate['\\d'] = Automate.fromCharClass( NUMBERS, 0)</li>
-			<li>Automate['\\s'] ...</li>
-			<li>Automate['\\w'] ...</li>
+			<li>Automate['\\s'] = Automate.fromCharClass( WHITE_SPACES, 0)</li>
+			<li>Automate['\\w'] = Automate.fromCharClass( [].concat( NUMBERS, ASCII_LC, ASCII_UC, ['_']), 0 ))</li>
 		</ul></code></li>
 	<li><b>Ensemble de caractère négatif.</b>
 		<code><ul>
 			<li>Automate['\\D'] = Automate.fromCharClass( NUMBERS, 1)</li>
-			<li>Automate['\\S'] ...</li>
-			<li>Automate['\\W'] ...</li>
+			<li>Automate['\\S'] = Automate.fromCharClass( WHITE_SPACES, 1)</li>
+			<li>Automate['\\W'] = Automate.fromCharClass( [].concat( NUMBERS, ASCII_LC, ASCII_UC, ['_']), 1 )</li>
 		</ul></code></li>
 </ul>
-avec NUMBERS = '0123456789'.split('')
-		</desc>
-		<assertions>
-			<desc>Ensemble de caractère.</desc>
+			</desc>
 			<value><![CDATA[
-Automate.setUniqueID( 5 )
-var f = Automate.fromCharClass( ['a','b','c'] )
-var oFA3 = f()
+var oDFA ={
+	d :( new DFA ( Automate.repeat0n( Automate['\\d']() ))),
+	D :( new DFA ( Automate.repeat0n( Automate['\\D']() ))),
+	s :( new DFA ( Automate.repeat0n( Automate['\\s']() ))),
+	S :( new DFA ( Automate.repeat0n( Automate['\\S']() ))),
+	w :( new DFA ( Automate.repeat0n( Automate['\\w']() ))),
+	W :( new DFA ( Automate.repeat0n( Automate['\\W']() )))
+	}
+, sNUMBERS = '0123456789'
+, sASCII_LC = 'abcdefghijklmnopqrstuvwxyz'
+, sASCII_UC = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+, sWS = '\t\n\v\f\r '
 			]]></value>
-			<assert><![CDATA[ oFA3.I === 5 ]]></assert>
-			<assert><![CDATA[ oFA3.F.toString() === "6" ]]></assert>
-			<assert><![CDATA[ oFA3.A.length === 1 ]]></assert>
-			<assert><![CDATA[ oFA3.A.toString() === "[abc]" ]]></assert>
-			<assert><![CDATA[ oFA3.S.toString() === "5,6" ]]></assert>
-			<assert><![CDATA[ oFA3.T.length === 1 ]]></assert>
-			<assert><![CDATA[ oFA3.T[0].toString() === "5,[abc],6,[abc]" ]]></assert>
-			<assert><![CDATA[ oFA3.T[0][3]('b', 10 ) === 10 ]]></assert>
-			<assert><![CDATA[ oFA3.T[0][3]('D', 10 ) === -1 ]]></assert>
-			<assert><![CDATA[ oFA3.aTokensID.length === 0 ]]></assert>
-			<assert><![CDATA[ ! oFA3.M ]]></assert>
-		</assertions>
-		<assertions>
-			<desc>Ensemble de caractère négatif.</desc>
-			<value><![CDATA[
-var f = Automate.fromCharClass( ['a','b','c'], true )
-var oFA4 = f()
-			]]></value>
-			<assert><![CDATA[ oFA4.I === 7 ]]></assert>
-			<assert><![CDATA[ oFA4.F.toString() === "8" ]]></assert>
-			<assert><![CDATA[ oFA4.A.length === 1 ]]></assert>
-			<assert><![CDATA[ oFA4.A.toString() === "[^abc]" ]]></assert>
-			<assert><![CDATA[ oFA4.S.toString() === "7,8" ]]></assert>
-			<assert><![CDATA[ oFA4.T.length === 1 ]]></assert>
-			<assert><![CDATA[ oFA4.T[0].toString() === "7,[^abc],8,[^abc]" ]]></assert>
-			<assert><![CDATA[ oFA4.T[0][3]('b', 10 ) === -1 ]]></assert>
-			<assert><![CDATA[ oFA4.T[0][3]('D', 10 ) === 10 ]]></assert>
-			<assert><![CDATA[ oFA4.aTokensID.length === 0 ]]></assert>
-			<assert><![CDATA[ ! oFA4.M ]]></assert>
+			<assert><![CDATA[ oDFA.d ]]></assert>
+			<assert><![CDATA[ oDFA.d.test( sNUMBERS ) === sNUMBERS ]]></assert>
+			<assert><![CDATA[ oDFA.d.test( sASCII_LC ) === '' ]]></assert>
+			<assert><![CDATA[ oDFA.d.test( sASCII_UC ) === '' ]]></assert>
+			<assert><![CDATA[ oDFA.d.test( sWS ) === '' ]]></assert>
+			<assert><![CDATA[ oDFA.D.test( sNUMBERS ) === '' ]]></assert>
+			<assert><![CDATA[ oDFA.D.test( sASCII_LC ) === sASCII_LC ]]></assert>
+			<assert><![CDATA[ oDFA.D.test( sASCII_UC ) === sASCII_UC ]]></assert>
+			<assert><![CDATA[ oDFA.D.test( sWS ) === sWS ]]></assert>
+			<assert><![CDATA[ oDFA.s.test( sNUMBERS ) === '' ]]></assert>
+			<assert><![CDATA[ oDFA.s.test( sASCII_LC ) === '' ]]></assert>
+			<assert><![CDATA[ oDFA.s.test( sASCII_UC ) === '' ]]></assert>
+			<assert><![CDATA[ oDFA.s.test( sWS ) === sWS ]]></assert>
+			<assert><![CDATA[ oDFA.S.test( sNUMBERS ) === sNUMBERS ]]></assert>
+			<assert><![CDATA[ oDFA.S.test( sASCII_LC ) === sASCII_LC ]]></assert>
+			<assert><![CDATA[ oDFA.S.test( sASCII_UC ) === sASCII_UC ]]></assert>
+			<assert><![CDATA[ oDFA.S.test( sWS ) === '' ]]></assert>
+			<assert><![CDATA[ oDFA.w.test( sNUMBERS ) === sNUMBERS ]]></assert>
+			<assert><![CDATA[ oDFA.w.test( sASCII_LC ) === sASCII_LC ]]></assert>
+			<assert><![CDATA[ oDFA.w.test( sASCII_UC ) === sASCII_UC ]]></assert>
+			<assert><![CDATA[ oDFA.w.test( sWS ) === '' ]]></assert>
+			<assert><![CDATA[ oDFA.W.test( sNUMBERS ) === '' ]]></assert>
+			<assert><![CDATA[ oDFA.W.test( sASCII_LC ) === '' ]]></assert>
+			<assert><![CDATA[ oDFA.W.test( sASCII_UC ) === '' ]]></assert>
+			<assert><![CDATA[ oDFA.W.test( sWS ) === sWS ]]></assert>
 		</assertions>
 	</test>
 
+	<test name="Automates basiques" class="preambule"></test>
 	<test name="Automate.makeEmpty">
-		<hr/>
 		<assertions>
 			<value><![CDATA[
-Automate.setUniqueID( 1 )
-var oFA = Automate.makeEmpty()
+Test( function(){
+return Automate.makeEmpty()
+})
 			]]></value>
 			<assert><![CDATA[ oFA.I === 1 ]]></assert>
 			<assert><![CDATA[ oFA.F.toString() === "2" ]]></assert>
@@ -182,21 +224,22 @@ var oFA = Automate.makeEmpty()
 		</assertions>
 		<assertions>
 			<value><![CDATA[
-var oFA = Automate.makeEmpty( 1, 2 )
+oFA = Automate.makeEmpty( 11, 12 )
 			]]></value>
-			<assert><![CDATA[ oFA.I === 1 ]]></assert>
-			<assert><![CDATA[ oFA.F.toString() === "2" ]]></assert>
+			<assert><![CDATA[ oFA.I === 11 ]]></assert>
+			<assert><![CDATA[ oFA.F.toString() === "12" ]]></assert>
 			<assert><![CDATA[ oFA.A.toString() === EPSILON ]]></assert>
-			<assert><![CDATA[ oFA.S.toString() === "1,2" ]]></assert>
-			<assert><![CDATA[ oFA.T.toString() === "1,"+EPSILON+",2" ]]></assert>
+			<assert><![CDATA[ oFA.S.toString() === "11,12" ]]></assert>
+			<assert><![CDATA[ oFA.T.toString() === "11,"+EPSILON+",12" ]]></assert>
 			<assert><![CDATA[ ! oFA.M ]]></assert>
 		</assertions>
 	</test>
 	<test name="Automate.makeChar">
 		<assertions>
 			<value><![CDATA[
-Automate.setUniqueID( 1 )
-var oFA = Automate.makeChar( '\n' )
+Test( function(){
+return Automate.makeChar( '\n' )
+})
 			]]></value>
 			<assert><![CDATA[ oFA.I === 1 ]]></assert>
 			<assert><![CDATA[ oFA.F.toString() === "2" ]]></assert>
@@ -207,21 +250,22 @@ var oFA = Automate.makeChar( '\n' )
 		</assertions>
 		<assertions>
 			<value><![CDATA[
-var oFA = Automate.makeChar( '\n', 1, 2 )
+oFA = Automate.makeChar( '\n', 11, 12 )
 			]]></value>
-			<assert><![CDATA[ oFA.I === 1 ]]></assert>
-			<assert><![CDATA[ oFA.F.toString() === "2" ]]></assert>
+			<assert><![CDATA[ oFA.I === 11 ]]></assert>
+			<assert><![CDATA[ oFA.F.toString() === "12" ]]></assert>
 			<assert><![CDATA[ oFA.A.toString() === '\n' ]]></assert>
-			<assert><![CDATA[ oFA.S.toString() === "1,2" ]]></assert>
-			<assert><![CDATA[ oFA.T.toString() === "1,\n,2" ]]></assert>
+			<assert><![CDATA[ oFA.S.toString() === "11,12" ]]></assert>
+			<assert><![CDATA[ oFA.T.toString() === "11,\n,12" ]]></assert>
 			<assert><![CDATA[ ! oFA.M ]]></assert>
 		</assertions>
 	</test>
 	<test name="Automate.makeAnyChar">
 		<assertions>
 			<value><![CDATA[
-Automate.setUniqueID( 1 )
-var oFA = Automate.makeAnyChar()
+Test( function(){
+return Automate.makeAnyChar()
+})
 			]]></value>
 			<assert><![CDATA[ oFA ]]></assert>
 			<assert><![CDATA[ oFA.I === 1 ]]></assert>
@@ -234,23 +278,24 @@ var oFA = Automate.makeAnyChar()
 		</assertions>
 		<assertions>
 			<value><![CDATA[
-var oFA = Automate.makeAnyChar( '¤', 1, 2 )
+oFA = Automate.makeAnyChar( '¤', 11, 12 )
 			]]></value>
 			<assert><![CDATA[ oFA ]]></assert>
-			<assert><![CDATA[ oFA.I === 1 ]]></assert>
-			<assert><![CDATA[ oFA.F.toString() === "2" ]]></assert>
+			<assert><![CDATA[ oFA.I === 11 ]]></assert>
+			<assert><![CDATA[ oFA.F.toString() === "12" ]]></assert>
 			<assert><![CDATA[ oFA.A.toString() === '[¤],[^¤]' ]]></assert>
-			<assert><![CDATA[ oFA.S.toString() === "1,2" ]]></assert>
-			<assert><![CDATA[ oFA.T[0].toString() === "1,[¤],2,[¤]" ]]></assert>
-			<assert><![CDATA[ oFA.T[1].toString() === "1,[^¤],2,[^¤]" ]]></assert>
+			<assert><![CDATA[ oFA.S.toString() === "11,12" ]]></assert>
+			<assert><![CDATA[ oFA.T[0].toString() === "11,[¤],12,[¤]" ]]></assert>
+			<assert><![CDATA[ oFA.T[1].toString() === "11,[^¤],12,[^¤]" ]]></assert>
 			<assert><![CDATA[ ! oFA.M ]]></assert>
 		</assertions>
 	</test>
 	<test name="Automate.makeCharSet">
 		<assertions>
 			<value><![CDATA[
-Automate.setUniqueID( 1 )
-var oFA = Automate.makeCharSet(['a','b','c'])
+Test( function(){
+return Automate.makeCharSet(['a','b','c'])
+})
 			]]></value>
 			<assert><![CDATA[ oFA ]]></assert>
 			<assert><![CDATA[ oFA.I === 1 ]]></assert>
@@ -262,22 +307,23 @@ var oFA = Automate.makeCharSet(['a','b','c'])
 		</assertions>
 		<assertions>
 			<value><![CDATA[
-var oFA = Automate.makeCharSet(['a','b','c'] , true, 1, 2 )
+oFA = Automate.makeCharSet(['a','b','c'] , true, 11, 12 )
 			]]></value>
 			<assert><![CDATA[ oFA ]]></assert>
-			<assert><![CDATA[ oFA.I === 1 ]]></assert>
-			<assert><![CDATA[ oFA.F.toString() === "2" ]]></assert>
+			<assert><![CDATA[ oFA.I === 11 ]]></assert>
+			<assert><![CDATA[ oFA.F.toString() === "12" ]]></assert>
 			<assert><![CDATA[ oFA.A.toString() === '[^abc]' ]]></assert>
-			<assert><![CDATA[ oFA.S.toString() === "1,2" ]]></assert>
-			<assert><![CDATA[ oFA.T[0].toString() === "1,[^abc],2,[^abc]" ]]></assert>
+			<assert><![CDATA[ oFA.S.toString() === "11,12" ]]></assert>
+			<assert><![CDATA[ oFA.T[0].toString() === "11,[^abc],12,[^abc]" ]]></assert>
 			<assert><![CDATA[ ! oFA.M ]]></assert>
 		</assertions>
 	</test>
 	<test name="Automate.makeCharRange">
 		<assertions>
 			<value><![CDATA[
-Automate.setUniqueID( 1 )
-var oFA = Automate.makeCharRange( 'a', 'c' )
+Test( function(){
+return Automate.makeCharRange( 'a', 'c' )
+}) 
 			]]></value>
 			<assert><![CDATA[ oFA ]]></assert>
 			<assert><![CDATA[ oFA.I === 1 ]]></assert>
@@ -289,49 +335,56 @@ var oFA = Automate.makeCharRange( 'a', 'c' )
 		</assertions>
 		<assertions>
 			<value><![CDATA[
-var oFA = Automate.makeCharRange( 'a', 'c', 1, 2 )
+oFA = Automate.makeCharRange( 'a', 'c', 11, 12 )
 			]]></value>
 			<assert><![CDATA[ oFA ]]></assert>
-			<assert><![CDATA[ oFA.I === 1 ]]></assert>
-			<assert><![CDATA[ oFA.F.toString() === "2" ]]></assert>
+			<assert><![CDATA[ oFA.I === 11 ]]></assert>
+			<assert><![CDATA[ oFA.F.toString() === "12" ]]></assert>
 			<assert><![CDATA[ oFA.A.toString() === '[abc]' ]]></assert>
-			<assert><![CDATA[ oFA.S.toString() === "1,2" ]]></assert>
-			<assert><![CDATA[ oFA.T[0].toString() === "1,[abc],2,[abc]" ]]></assert>
+			<assert><![CDATA[ oFA.S.toString() === "11,12" ]]></assert>
+			<assert><![CDATA[ oFA.T[0].toString() === "11,[abc],12,[abc]" ]]></assert>
 			<assert><![CDATA[ ! oFA.M ]]></assert>
 		</assertions>
 	</test>
 
-	<test name="Préambules au opérations basiques">
-		<hr/>
-		<assertions>
-			<desc>Automate avec 2 états finaux</desc>
+	<test name="Opérations basiques" class="preambule">
+		<desc>Automates tests :</desc>
+		<assertions><desc>Création d'un automate avec 1 état final depuis un caractère</desc>
 			<value><![CDATA[
-var oFA_LuLa = new Automate(
-	1,
-	[3,4],
-	['L','u','à'],
-	[1,2,3,4],
-	[[1,'L',2],[2,'u',3],[2,'à',4]]
-	)
-var oDFA = new DFA ( oFA_LuLa )
+var f1 =function( sChar ){ return Automate.makeChar( sChar ) }
 			]]></value>
-			<assert><![CDATA[ oFA_LuLa ]]></assert>
+		</assertions>
+		<assertions><desc>Création d'un automate avec 2 états finaux</desc>
+			<value><![CDATA[
+var f2 =function(){
+	var s1 = Automate.getUniqueID()
+	var s2 = Automate.getUniqueID()
+	var s3 = Automate.getUniqueID()
+	var s4 = Automate.getUniqueID()
+	return new Automate(
+		s1,
+		[s3,s4],
+		['L','u','à'],
+		[s1,s2,s3,s4],
+		[[s1,'L',s2],[s2,'u',s3],[s2,'à',s4]]
+		)
+	}
+Test( f2 )
+			]]></value>
+			<assert><![CDATA[ oFA ]]></assert>
 			<assert><![CDATA[ oDFA ]]></assert>
 			<assert><![CDATA[ oDFA.test( "LuLu" ) === "Lu" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "Luu" ) === "Lu" ]]></assert>
 			<assert><![CDATA[ oDFA.test( "LàLà" ) === "Là" ]]></assert>
-		</assertions>
-		<assertions>
-			<desc>Automate pour caractère</desc>
-			<value><![CDATA[
-var f =function( sChar ){ return Automate.makeChar( sChar ) }
-			]]></value>
+			<assert><![CDATA[ oDFA.test( "Làà" ) === "Là" ]]></assert>
 		</assertions>
 	</test>
 	<test name="Automate.and">
 		<assertions>
 			<value><![CDATA[
-Automate.setUniqueID( 1 )
-var oFA = Automate.and( f('a'), f('b'), f('c'))
+Test( function(){
+return Automate.and( f1('a'), f1('b'), f1('c'))
+})
 			]]></value>
 			<assert><![CDATA[ oFA ]]></assert>
 			<assert><![CDATA[ oFA.I === 1 ]]></assert>
@@ -340,12 +393,13 @@ var oFA = Automate.and( f('a'), f('b'), f('c'))
 			<assert><![CDATA[ oFA.S.toString() === "1,2,3,4,5,6" ]]></assert>
 			<assert><![CDATA[ oFA.T.length === 5 ]]></assert>
 			<assert><![CDATA[ ! oFA.M ]]></assert>
+			<assert><![CDATA[ oDFA.test( "abc|" ) === "abc" ]]></assert>
 		</assertions>
 		<assertions>
 			<value><![CDATA[
-Automate.setUniqueID( 5 )
-var oFA = Automate.and( oFA_LuLa , oFA_LuLa.clone() )
-var oDFA = new DFA ( oFA )
+Test( function(){
+return Automate.and( f2(), f2() )
+})
 			]]></value>
 			<assert><![CDATA[ oFA ]]></assert>
 			<assert><![CDATA[ oDFA ]]></assert>
@@ -353,13 +407,16 @@ var oDFA = new DFA ( oFA )
 			<assert><![CDATA[ oDFA.test( "LàLàLu" ) === "LàLà" ]]></assert>
 			<assert><![CDATA[ oDFA.test( "LuLàLà" ) === "LuLà" ]]></assert>
 			<assert><![CDATA[ oDFA.test( "LàLuLu" ) === "LàLu" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "LuLuu" ) === "LuLu" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "LàLàà" ) === "LàLà" ]]></assert>
 		</assertions>
 	</test>
 	<test name="Automate.or">
 		<assertions>
 			<value><![CDATA[
-Automate.setUniqueID( 1 )
-var oFA = Automate.or( f('a'), f('b'), f('c'))
+Test( function(){
+return Automate.or( f1('a'), f1('b'), f1('c'))
+})
 			]]></value>
 			<assert><![CDATA[ oFA ]]></assert>
 			<assert><![CDATA[ oFA.I === 7 ]]></assert>
@@ -368,12 +425,13 @@ var oFA = Automate.or( f('a'), f('b'), f('c'))
 			<assert><![CDATA[ oFA.S.toString() === "1,2,3,4,5,6,7,8" ]]></assert>
 			<assert><![CDATA[ oFA.T.length === 9 ]]></assert>
 			<assert><![CDATA[ ! oFA.M ]]></assert>
+			<assert><![CDATA[ oDFA.test( "abc" ) === "a" ]]></assert>
 		</assertions>
 		<assertions>
 			<value><![CDATA[
-Automate.setUniqueID( 5 )
-var oFA = Automate.or( oFA_LuLa, f('A') )
-var oDFA = new DFA ( oFA )
+Test( function(){
+return Automate.or( f2(), f1('A') )
+})
 			]]></value>
 			<assert><![CDATA[ oFA ]]></assert>
 			<assert><![CDATA[ oDFA ]]></assert>
@@ -386,8 +444,9 @@ var oDFA = new DFA ( oFA )
 	<test name="Automate.optional">
 		<assertions>
 			<value><![CDATA[
-Automate.setUniqueID( 1 )
-var oFA = Automate.optional( f('a'))
+Test( function(){
+return Automate.optional( f1('a'))
+})
 			]]></value>
 			<assert><![CDATA[ oFA ]]></assert>
 			<assert><![CDATA[ oFA.I === 1 ]]></assert>
@@ -396,109 +455,151 @@ var oFA = Automate.optional( f('a'))
 			<assert><![CDATA[ oFA.S.toString() === "1,2" ]]></assert>
 			<assert><![CDATA[ oFA.T[0].toString() === "1,a,2" ]]></assert>
 			<assert><![CDATA[ oFA.T[1].toString() === "1,"+EPSILON+",2" ]]></assert>
-			<assert><![CDATA[ ! oFA.M ]]></assert>
+			<assert><![CDATA[ oDFA.test( "|" ) === "" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "aaa" ) === "a" ]]></assert>
 		</assertions>
 		<assertions>
 			<value><![CDATA[
-Automate.setUniqueID( 5 )
-var oFA = Automate.optional( oFA_LuLa )
-var oDFA = new DFA ( oFA )
+Test( function(){
+return Automate.optional( f2() )
+})
 			]]></value>
 			<assert><![CDATA[ oFA ]]></assert>
 			<assert><![CDATA[ oDFA ]]></assert>
-			<assert><![CDATA[ oDFA.test( "LuLuLà" ) === "Lu" ]]></assert>
-			<assert><![CDATA[ oDFA.test( "LàLàLu" ) === "Là" ]]></assert>
-			<assert><![CDATA[ oDFA.test( "Allô" ) === "" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "|" ) === "" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "Lu" ) === "Lu" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "LuuLu" ) === "Lu" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "LuLuLu" ) === "Lu" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "Là" ) === "Là" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "LààLà" ) === "Là" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "LàLàLà" ) === "Là" ]]></assert>
 		</assertions>
 	</test>
 	<test name="Automate.repeat">
+		<desc>Faire d'autres tests ?</desc>
 		<assertions>
 			<desc>0..n</desc>
 			<value><![CDATA[
-var oFA = Automate.repeat( f('a'), 0, 'n' )
-var oDFA = new DFA( oFA )
+Test( function(){
+return Automate.repeat( f1('a'), 0, 'n' )
+})
 			]]></value>
 			<assert><![CDATA[ oFA ]]></assert>
-			<assert><![CDATA[ oDFA.test( "b" ) === "" ]]></assert>
-			<assert><![CDATA[ oDFA.test( "ab" ) === "a" ]]></assert>
-			<assert><![CDATA[ oDFA.test( "aab" ) === "aa" ]]></assert>
-			<assert><![CDATA[ oDFA.test( "aaab" ) === "aaa" ]]></assert>
-			<assert><![CDATA[ oDFA.test( "aaaab" ) === "aaaa" ]]></assert>
-			<assert><![CDATA[ oDFA.test( "aaaaab" ) === "aaaaa" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "|" ) === "" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "a|" ) === "a" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "aa|" ) === "aa" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "aaa|" ) === "aaa" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "aaaa|" ) === "aaaa" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "aaaaa|" ) === "aaaaa" ]]></assert>
 		</assertions>
 		<assertions>
 			<desc>1..n</desc>
 			<value><![CDATA[
-var oFA = Automate.repeat( f('a'), 1, 'n' )
-var oDFA = new DFA( oFA )
+Test( function(){
+return Automate.repeat( f1('a'), 1, 'n' )
+})
 			]]></value>
 			<assert><![CDATA[ oFA ]]></assert>
-			<assert><![CDATA[ oDFA.test( "b" ) === null ]]></assert>
-			<assert><![CDATA[ oDFA.test( "ab" ) === "a" ]]></assert>
-			<assert><![CDATA[ oDFA.test( "aab" ) === "aa" ]]></assert>
-			<assert><![CDATA[ oDFA.test( "aaab" ) === "aaa" ]]></assert>
-			<assert><![CDATA[ oDFA.test( "aaaab" ) === "aaaa" ]]></assert>
-			<assert><![CDATA[ oDFA.test( "aaaaab" ) === "aaaaa" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "|" ) === null ]]></assert>
+			<assert><![CDATA[ oDFA.test( "a|" ) === "a" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "aa|" ) === "aa" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "aaa|" ) === "aaa" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "aaaa|" ) === "aaaa" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "aaaaa|" ) === "aaaaa" ]]></assert>
 		</assertions>
 		<assertions>
 			<desc>2..3</desc>
 			<value><![CDATA[
-var oFA = Automate.repeat( f('a'), 2, 3 )
-var oDFA = new DFA( oFA )
+Test( function(){
+return Automate.repeat( f1('a'), 2, 3 )
+})
 			]]></value>
 			<assert><![CDATA[ oFA ]]></assert>
-			<assert><![CDATA[ oDFA.test( "b" ) === null ]]></assert>
-			<assert><![CDATA[ oDFA.test( "ab" ) === null ]]></assert>
-			<assert><![CDATA[ oDFA.test( "aab" ) === "aa" ]]></assert>
-			<assert><![CDATA[ oDFA.test( "aaab" ) === "aaa" ]]></assert>
-			<assert><![CDATA[ oDFA.test( "aaaab" ) === "aaa" ]]></assert>
-			<assert><![CDATA[ oDFA.test( "aaaaab" ) === "aaa" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "|" ) === null ]]></assert>
+			<assert><![CDATA[ oDFA.test( "a|" ) === null ]]></assert>
+			<assert><![CDATA[ oDFA.test( "aa|" ) === "aa" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "aaa|" ) === "aaa" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "aaaa|" ) === "aaa" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "aaaaa|" ) === "aaa" ]]></assert>
 		</assertions>
 		<assertions>
 			<desc>4</desc>
 			<value><![CDATA[
-var oFA = Automate.repeat( f('a'), 4 )
-var oDFA = new DFA( oFA )
+Test( function(){
+return Automate.repeat( f1('a'), 4 )
+})
 			]]></value>
 			<assert><![CDATA[ oFA ]]></assert>
-			<assert><![CDATA[ oDFA.test( "b" ) === null ]]></assert>
-			<assert><![CDATA[ oDFA.test( "ab" ) === null ]]></assert>
-			<assert><![CDATA[ oDFA.test( "aab" ) === null ]]></assert>
-			<assert><![CDATA[ oDFA.test( "aaab" ) === null ]]></assert>
-			<assert><![CDATA[ oDFA.test( "aaaab" ) === "aaaa" ]]></assert>
-			<assert><![CDATA[ oDFA.test( "aaaaab" ) === "aaaa" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "|" ) === null ]]></assert>
+			<assert><![CDATA[ oDFA.test( "a|" ) === null ]]></assert>
+			<assert><![CDATA[ oDFA.test( "aa|" ) === null ]]></assert>
+			<assert><![CDATA[ oDFA.test( "aaa|" ) === null ]]></assert>
+			<assert><![CDATA[ oDFA.test( "aaaa|" ) === "aaaa" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "aaaaa|" ) === "aaaa" ]]></assert>
 		</assertions>
 	</test>
 	<test name="Automate.repeat0n">
 		<assertions>
 			<value><![CDATA[
-Automate.setUniqueID( 1 )
-var oFA = Automate.repeat0n( f('a'))
-var oDFA = new DFA( oFA )
+Test( function(){
+return Automate.repeat0n( f1('a'))
+})
 			]]></value>
 			<assert><![CDATA[ oFA ]]></assert>
-			<assert><![CDATA[ oDFA.test( "b" ) === "" ]]></assert>
-			<assert><![CDATA[ oDFA.test( "ab" ) === "a" ]]></assert>
-			<assert><![CDATA[ oDFA.test( "aab" ) === "aa" ]]></assert>
-			<assert><![CDATA[ oDFA.test( "aaab" ) === "aaa" ]]></assert>
-			<assert><![CDATA[ oDFA.test( "aaaab" ) === "aaaa" ]]></assert>
-			<assert><![CDATA[ oDFA.test( "aaaaab" ) === "aaaaa" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "|" ) === "" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "a|" ) === "a" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "aa|" ) === "aa" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "aaa|" ) === "aaa" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "aaaa|" ) === "aaaa" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "aaaaa|" ) === "aaaaa" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "aaaaaa|" ) === "aaaaaa" ]]></assert>
+		</assertions>
+		<assertions>
+			<value><![CDATA[
+Test( function(){
+return Automate.repeat0n( f2() )
+})
+			]]></value>
+			<assert><![CDATA[ oFA ]]></assert>
+			<assert><![CDATA[ oDFA.test( "|" ) === "" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "Lu|" ) === "Lu" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "LuLu|" ) === "LuLu" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "LuLuLuu" ) === "LuLuLu" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "Là|" ) === "Là" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "LàLà|" ) === "LàLà" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "LàLàLàà" ) === "LàLàLà" ]]></assert>
 		</assertions>
 	</test>
 	<test name="Automate.repeat1n">
 		<assertions>
 			<value><![CDATA[
-Automate.setUniqueID( 1 )
-var oFA = Automate.repeat1n( f('a'))
-var oDFA = new DFA( oFA )
+Test( function(){
+return Automate.repeat1n( f1('a'))
+})
 			]]></value>
 			<assert><![CDATA[ oFA ]]></assert>
-			<assert><![CDATA[ oDFA.test( "b" ) === null ]]></assert>
-			<assert><![CDATA[ oDFA.test( "ab" ) === "a" ]]></assert>
-			<assert><![CDATA[ oDFA.test( "aab" ) === "aa" ]]></assert>
-			<assert><![CDATA[ oDFA.test( "aaab" ) === "aaa" ]]></assert>
-			<assert><![CDATA[ oDFA.test( "aaaab" ) === "aaaa" ]]></assert>
-			<assert><![CDATA[ oDFA.test( "aaaaab" ) === "aaaaa" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "|" ) === null ]]></assert>
+			<assert><![CDATA[ oDFA.test( "a|" ) === "a" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "aa|" ) === "aa" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "aaa|" ) === "aaa" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "aaaa|" ) === "aaaa" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "aaaaa|" ) === "aaaaa" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "aaaaaa|" ) === "aaaaaa" ]]></assert>
+		</assertions>
+		<assertions>
+			<value><![CDATA[
+Test( function(){
+return Automate.repeat1n( f2() )
+})
+			]]></value>
+			<assert><![CDATA[ oFA ]]></assert>
+			<assert><![CDATA[ oDFA.test( "|" ) === null ]]></assert>
+			<assert><![CDATA[ oDFA.test( "Luu|" ) === "Lu" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "LuLu|" ) === "LuLu" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "LuLuLuu" ) === "LuLuLu" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "Làà|" ) === "Là" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "LàLà|" ) === "LàLà" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "LàLàLàà" ) === "LàLàLà" ]]></assert>
 		</assertions>
 	</test>
 </truth>

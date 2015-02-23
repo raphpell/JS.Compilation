@@ -33,11 +33,9 @@ DL { margin: 0; }
 	}
 
 
-/* */
-HR { visibility: hidden; }
-
 /* test */
 H1,H2,H3 {
+    text-shadow: 0 0 2px #ccc;
 	margin: 0;
 	padding: 0;
 	}
@@ -83,3 +81,23 @@ H1,H2,H3 {
 .red { background: red; }
 .orange { background: orange; }
 .green { background: darkgreen; color:#FFF; }
+
+/* */
+LI.preambule  {
+	font-style: italic;
+	margin: .5em 0 0 -1em;
+	}
+DIV.preambule,
+HR {
+	/* visibility: hidden; */
+	background: #FFF;
+	border: none;
+	box-shadow: none;
+	margin: 1em 0;
+	width: 100%;
+	}
+.preambule H2  {
+    letter-spacing: 5px;
+    text-shadow: 0 0 4px #ccc,  0 0 2px #FFC;
+	margin: 1em 0;
+}

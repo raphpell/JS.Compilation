@@ -5,7 +5,7 @@
 	<script src="../../../js/framework.js"></script>
 	<script src="../../../js/automaton.js"></script>
 	<desc>Elles sont créées par le programme...</desc>
-	<test name="new Automate">
+	<test name="constructor">
 		<assertions>
 			<desc>Comportement par défaut: pas de validation de données.</desc>
 			<value><![CDATA[

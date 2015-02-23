@@ -1008,6 +1008,8 @@ DFA =(function(){
 	})()
 DFA.inheritFrom( Automate ).union({
 	test :function( s, n ){
+		// Si les états du DFA sont issu de partition d'états du NFA
+		if( this.I.constructor == String ) this.renameStates()
 		var nIndex = n || 0
 		, nStart = nIndex
 		, sChar

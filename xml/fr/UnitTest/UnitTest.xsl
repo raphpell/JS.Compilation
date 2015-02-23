@@ -10,34 +10,37 @@
 <head>
 	<title><xsl:value-of select="@name"/></title>
 	<link rel="stylesheet" type="text/css" href="UnitTest.css" />
+	<!-- Import des fichiers requis -->
 	<xsl:for-each select="link"><xsl:copy-of select="current()"/></xsl:for-each>
 	<xsl:for-each select="script"><xsl:copy-of select="current()"/></xsl:for-each>
+	<script>var aUnitTest = [], aEval = []</script>
 </head>
 <body>
 	<a href="../../../index.htm">Index</a>
 	 - <a href="../doc/index.htm">Documentation</a>
 
 	<h1><xsl:value-of select="@name"/></h1>
+	
+	<!-- Résultat des tests -->
 	<dl class="legend">
 		<dd class="red"><code>erreur</code></dd>
 		<dd class="orange"><code>échec</code></dd>
 		<dd class="green"><code>réussi</code></dd>
 	</dl>
+	<!-- Description du fichier test -->
 	<xsl:if test="desc">
 		<div class="desc"><xsl:copy-of select="desc"/></div>
 	</xsl:if>
-	
+	<!-- Sommaire -->
 	<div class="toc">
 		<b>Sommaire</b>
 		<ul>
 		<xsl:for-each select="test">
-			<xsl:if test="hr"><li>--- ---</li></xsl:if>
-			<xsl:if test="@name"><li><a href="#{generate-id(current())}"><xsl:value-of select="@name"/></a></li></xsl:if>
+			<xsl:if test="@name"><li class="{@class}"><a href="#{generate-id(current())}"><xsl:value-of select="@name"/></a></li></xsl:if>
 		</xsl:for-each>
 		</ul>
 	</div>
-		 
-	
+	<!-- Fichiers requis -->
 	<xsl:if test="script|link">
 	<div class="required">
 		<b>Requis</b>
@@ -47,16 +50,11 @@
 		</ul>
 	</div>
 	</xsl:if>
-	
-	
-	<script>var aUnitTest = [], aEval = []</script>
+
 	<hr style="clear:both;"/>
 	
 	<xsl:for-each select="test">
-		<xsl:if test="hr">
-			<hr/>
-		</xsl:if>
-	<div class="test">
+	<div class="test {@class}">
 		<xsl:if test="@name">
 			<a name="{generate-id(current())}"></a>
 			<h2><xsl:value-of select="@name"/></h2>
