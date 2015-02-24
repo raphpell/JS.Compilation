@@ -7,7 +7,7 @@
 		</style>
 	</head>
 	<body>
-<a href="index.htm">Index</a>
+<a href="index.htm">Index</a> - <a href="xml/fr/doc/index.htm">Documentation</a>
 
 
 <h1>AFN</h1>
@@ -24,7 +24,7 @@
 </ul>
 
 <h2>Conversion des ER en AFN</h2>
-<p>Les <a href="src/regexp/syntax.htm" target="_INFO">expressions régulières</a> sont transformées en AFN à l'aide de l'algorithme de Thompson :</p>
+<p>Les <a href="src/regexp/syntax.htm" target="_INFO" title="expressions régulières">ER</a> sont transformées en AFN à l'aide de l'algorithme de Thompson :</p>
 		
 <table cellspacing="10">
 	<tr>
@@ -48,6 +48,12 @@
 		<th><div class="thompson kleeneClosure" title=""></div></th>
 	</tr>
 </table>
+
+<p>
+	Concrètement, une analyse lexicale et syntaxique est réalisée sur l'ER, 
+	puis depuis l'<a href="src/regexp/preview.htm" title="arbre syntaxique transformé">AST</a> obtenu, 
+	on utilise l'algorithme de Thompson pour créer notre NFA.
+</p>
 	
 	</body>
 </html>

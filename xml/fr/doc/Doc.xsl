@@ -18,6 +18,7 @@
 .syntaxe { margin: .5em 1em 1em ;}
 DL,
 SECTION { margin: .5em 0 1.5em 1em ;}
+DL SMALL { margin: 0 1em ;}
 H2, H3 { margin: 0; }
 CODE {	
 	background: #000;
@@ -93,7 +94,7 @@ INPUT:checked ~ DIV {
 							<code class="type"><xsl:value-of select="@type"/></code>
 							<xsl:text> </xsl:text>
 							<xsl:if test="@opt"><small>(optionnel)</small></xsl:if>
-							<xsl:if test="@default"><code class="type"><xsl:value-of select="@default"/></code></xsl:if>
+							<xsl:if test="@default"> <b>Valeur par défaut: </b><code class="type"><xsl:value-of select="@default"/></code></xsl:if>
 						</label>
 						<div class="block">
 							<div class="desc"><xsl:copy-of select="desc"/></div>
@@ -164,7 +165,7 @@ INPUT:checked ~ DIV {
 											<code class="type"><xsl:value-of select="@type"/></code>
 											<xsl:text> </xsl:text>
 											<xsl:if test="@opt"><small>(optionnel)</small></xsl:if>
-											<xsl:if test="@default"><code class="type"><xsl:value-of select="@default"/></code></xsl:if>
+											<xsl:if test="@default"> <b>défaut:</b> <code class="type"><xsl:value-of select="@default"/></code></xsl:if>
 										</label>
 										<div class="block">
 											<div class="desc"><xsl:copy-of select="desc"/></div>

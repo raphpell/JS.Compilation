@@ -177,21 +177,21 @@ Automate =(function(){
 		}	
 	
 	// OBJET AUTOMATE
-	Automate.action =function( sSymbols, bNegated ){
+	Automate.action =function( sChars, bNegated ){
 		var f
 		if( bNegated ){
 			f =function( symbol, state ){
 				if( symbol.length>1 ) return -1
-				return sSymbols.indexOf( symbol )<0?state:-1
+				return sChars.indexOf( symbol )<0?state:-1
 				}
-			f.toString =function(){ return '[^'+sSymbols+']' }
+			f.toString =function(){ return '[^'+sChars+']' }
 			}
 		else{
 			f =function( symbol, state ){
 				if( symbol.length>1 ) return -1
-				return sSymbols.indexOf( symbol )>-1?state:-1
+				return sChars.indexOf( symbol )>-1?state:-1
 				}
-			f.toString =function(){ return '['+sSymbols+']' }
+			f.toString =function(){ return '['+sChars+']' }
 			}
 		return f
 		}
@@ -257,7 +257,7 @@ Automate =(function(){
 			}
 		})
 		
-	// OPERATIONS BASIQUES
+	// OPÉRATIONS BASIQUES
 	Automate.union({
 		and :function(){
 			var o = arguments[0]
@@ -316,16 +316,16 @@ Automate =(function(){
 			},
 		repeat :function( oFA, n, m ){
 			n = n!==undefined ? n : 0
-			m = m!==undefined ? m : n
+			m = m!==undefined ? m : 'n'
 			switch( n+','+m ){
 				case '0,1': return Automate.optional( oFA )
 				case '0,n': return Automate.repeat0n( oFA )
-				case '1,n': return Automate.repeat1n( oFA )
+				case '1,n': return Automate.and( oFA, Automate.repeat0n( oFA.clone()))
 				default:
 					if( m == 'n' ){
-						var oResultFA = Automate.repeat( oFA, n )
+						var oResultFA = Automate.repeat( oFA, n, n )
 						var F = oResultFA.F.concat([])
-						oResultFA = Automate.and( oResultFA, Automate.repeat1n( oFA.clone()))
+						oResultFA = Automate.and( oResultFA, Automate.repeat0n( oFA.clone()))
 						return new Automate(
 							oResultFA.I,
 							Array.unique( F.concat( oResultFA.F )),
@@ -344,7 +344,7 @@ Automate =(function(){
 							return oResultFA
 						}
 					if( n < m ){
-						var oResultFA = Automate.repeat( oFA, n )
+						var oResultFA = Automate.repeat( oFA, n, n )
 						var F = oResultFA.F.concat([])
 						for(var i=n; i<m; i++){
 							oResultFA = Automate.and( oResultFA, oFA.clone() )
@@ -360,7 +360,7 @@ Automate =(function(){
 						}
 				}
 			},
-		repeat0n :function( oFA ){
+		repeat0n :function( oFA ){ // fermeture de Kleene
 			var I=getUniqueID(), F=getUniqueID()
 			var T = oFA.T
 			T.push( epsilonTransition( I, oFA.I ))
@@ -376,9 +376,6 @@ Automate =(function(){
 				Array.unique( oFA.S.concat([I,F])),
 				T
 				)
-			},
-		repeat1n :function( oFA ){
-			return Automate.and( oFA, Automate.repeat0n( oFA.clone()))
 			}
 		})
 	
@@ -433,8 +430,8 @@ NFA =function( e ){ // Transformation de l'AST d'une expression régulière en a
 		case 'QUANTIFIER':
 			var o = e.oValue, n = parseInt( o.n ), oFA = NFA( e.firstChild )
 			switch( o.m ){
-				case '': return Automate.repeat( oFA, n )
-				case '\u221E': return Automate.repeat( oFA, n, 'n' )
+				case '': return Automate.repeat( oFA, n, n )
+				case '\u221E': return Automate.repeat( oFA, n )
 				default: return Automate.repeat( oFA, n, parseInt( o.m ))
 				}
 		case 'DOT': return Automate.makeAnyChar()
@@ -472,7 +469,7 @@ NFA.union((function(){
 		return { charset:aCS, negatedcharset:aNCS }
 		}
 	return {
-		CHARCLASS :function(){
+		CHARCLASS :function(){ // Aucun caractère + ceux en argument
 			var o = _getCharSet( arguments )
 			, I=Automate.getUniqueID(), F=Automate.getUniqueID(), A, S=[I,F], T
 			, f1 = Automate.action( o.charset.join(''), 0 )
@@ -490,7 +487,7 @@ NFA.union((function(){
 			NFA.validateAlphabet( oFA )
 			return ( new DFA( oFA )).minimize( I, true )
 			},
-		NEGATED_CHARCLASS :function(){
+		NEGATED_CHARCLASS :function(){ // Tous les caractères - ceux en argument
 			var o = _getCharSet( arguments )
 			, I=Automate.getUniqueID(), F=Automate.getUniqueID(), A, S=[I,F], T
 			if(	o.negatedcharset.length ){

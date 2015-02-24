@@ -24,6 +24,12 @@
 				height: auto;
 				opacity: 1;
 				}
+			SUP {
+				color: red;
+				}
+			DD SUP {
+				color: green;
+				}
 		</style>
 	</head>
 	<body>
@@ -56,7 +62,7 @@
 	<li>d'atome &isin; A , A = { a, \n, \t, +, ... } </li>
 	<li>d'ensemble de caractères &isin; CC , CC = { [a-z], \w, \d, ... }</li>
 	<li>d'ensemble négatif de caractère &isin; NCC , NCC = { [^a-z], \W, \D, ... }  ce sont des ensembles infinis.</li>
-	<li>du symbole ANY : n'importe quel caractère.</li>
+	<li>du symbole ANY : n'importe quel caractère. <sup>deprecié</sup></li>
 </ul>
 
 <p>
@@ -607,7 +613,7 @@
 
 
 <a name="toc8"></a>
-<h2>Le symbole ANY</h2>
+<h2>Le symbole ANY <sup>deprecié</sup></h2>
 <p>
 	Le symbole ANY, représentant n'importe quel caractère, sera définitivement supprimé.<br>
 	Ses transitions seront multipliées au minimum par deux...

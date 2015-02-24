@@ -481,7 +481,7 @@ return Automate.optional( f2() )
 			<desc>0..n</desc>
 			<value><![CDATA[
 Test( function(){
-return Automate.repeat( f1('a'), 0, 'n' )
+return Automate.repeat( f1('a'))
 })
 			]]></value>
 			<assert><![CDATA[ oFA ]]></assert>
@@ -496,12 +496,27 @@ return Automate.repeat( f1('a'), 0, 'n' )
 			<desc>1..n</desc>
 			<value><![CDATA[
 Test( function(){
-return Automate.repeat( f1('a'), 1, 'n' )
+return Automate.repeat( f1('a'), 1 )
 })
 			]]></value>
 			<assert><![CDATA[ oFA ]]></assert>
 			<assert><![CDATA[ oDFA.test( "|" ) === null ]]></assert>
 			<assert><![CDATA[ oDFA.test( "a|" ) === "a" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "aa|" ) === "aa" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "aaa|" ) === "aaa" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "aaaa|" ) === "aaaa" ]]></assert>
+			<assert><![CDATA[ oDFA.test( "aaaaa|" ) === "aaaaa" ]]></assert>
+		</assertions>
+		<assertions>
+			<desc>2..n</desc>
+			<value><![CDATA[
+Test( function(){
+return Automate.repeat( f1('a'), 2 )
+})
+			]]></value>
+			<assert><![CDATA[ oFA ]]></assert>
+			<assert><![CDATA[ oDFA.test( "|" ) === null ]]></assert>
+			<assert><![CDATA[ oDFA.test( "a|" ) === null ]]></assert>
 			<assert><![CDATA[ oDFA.test( "aa|" ) === "aa" ]]></assert>
 			<assert><![CDATA[ oDFA.test( "aaa|" ) === "aaa" ]]></assert>
 			<assert><![CDATA[ oDFA.test( "aaaa|" ) === "aaaa" ]]></assert>
@@ -526,7 +541,7 @@ return Automate.repeat( f1('a'), 2, 3 )
 			<desc>4</desc>
 			<value><![CDATA[
 Test( function(){
-return Automate.repeat( f1('a'), 4 )
+return Automate.repeat( f1('a'), 4, 4 )
 })
 			]]></value>
 			<assert><![CDATA[ oFA ]]></assert>
@@ -566,38 +581,6 @@ return Automate.repeat0n( f2() )
 			<assert><![CDATA[ oDFA.test( "LuLu|" ) === "LuLu" ]]></assert>
 			<assert><![CDATA[ oDFA.test( "LuLuLuu" ) === "LuLuLu" ]]></assert>
 			<assert><![CDATA[ oDFA.test( "Là|" ) === "Là" ]]></assert>
-			<assert><![CDATA[ oDFA.test( "LàLà|" ) === "LàLà" ]]></assert>
-			<assert><![CDATA[ oDFA.test( "LàLàLàà" ) === "LàLàLà" ]]></assert>
-		</assertions>
-	</test>
-	<test name="Automate.repeat1n">
-		<assertions>
-			<value><![CDATA[
-Test( function(){
-return Automate.repeat1n( f1('a'))
-})
-			]]></value>
-			<assert><![CDATA[ oFA ]]></assert>
-			<assert><![CDATA[ oDFA.test( "|" ) === null ]]></assert>
-			<assert><![CDATA[ oDFA.test( "a|" ) === "a" ]]></assert>
-			<assert><![CDATA[ oDFA.test( "aa|" ) === "aa" ]]></assert>
-			<assert><![CDATA[ oDFA.test( "aaa|" ) === "aaa" ]]></assert>
-			<assert><![CDATA[ oDFA.test( "aaaa|" ) === "aaaa" ]]></assert>
-			<assert><![CDATA[ oDFA.test( "aaaaa|" ) === "aaaaa" ]]></assert>
-			<assert><![CDATA[ oDFA.test( "aaaaaa|" ) === "aaaaaa" ]]></assert>
-		</assertions>
-		<assertions>
-			<value><![CDATA[
-Test( function(){
-return Automate.repeat1n( f2() )
-})
-			]]></value>
-			<assert><![CDATA[ oFA ]]></assert>
-			<assert><![CDATA[ oDFA.test( "|" ) === null ]]></assert>
-			<assert><![CDATA[ oDFA.test( "Luu|" ) === "Lu" ]]></assert>
-			<assert><![CDATA[ oDFA.test( "LuLu|" ) === "LuLu" ]]></assert>
-			<assert><![CDATA[ oDFA.test( "LuLuLuu" ) === "LuLuLu" ]]></assert>
-			<assert><![CDATA[ oDFA.test( "Làà|" ) === "Là" ]]></assert>
 			<assert><![CDATA[ oDFA.test( "LàLà|" ) === "LàLà" ]]></assert>
 			<assert><![CDATA[ oDFA.test( "LàLàLàà" ) === "LàLàLà" ]]></assert>
 		</assertions>

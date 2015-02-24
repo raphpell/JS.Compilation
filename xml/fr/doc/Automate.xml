@@ -128,7 +128,7 @@
 					</dl>
 				</desc>
 				<arguments>
-					<arg type="String" name="sSymbols">
+					<arg type="String" name="sChars">
 						<desc>Liste de caractères.</desc>
 					</arg>
 					<arg type="Boolean" name="bNegated" opt="1">
@@ -168,6 +168,7 @@
 			</function>
 		</methods>
 		<methods name="Automates basiques">
+			<desc>Par défaut les arguments <code>I</code> et <code>F</code> sont générés par la méthode <code>Automate.getUniqueID</code>.</desc>
 			<function name="makeEmpty">
 				<desc>Créé un automate vide reconnaissant le language vide.</desc>
 				<arguments>
@@ -199,7 +200,7 @@
 				<desc>Créé un automate reconnaissant n'importe quel caractère.</desc>
 				<arguments>
 					<arg type="String" name="sChar" opt="1" default="'a'">
-						<desc>Caractère à reconnaître.</desc>
+						<desc>Caractère utilisé pour créer un automate reconnaissant une expression régulière de type <code>a|[^a]</code>.</desc>
 					</arg>
 					<arg type="Number" name="I" opt="1">
 						<desc>Etat initial.</desc>
@@ -249,73 +250,64 @@
 		</methods>
 		<methods name="Opérations basiques">
 			<function name="and">
-				<desc>.</desc>
+				<desc>Créé un automate reconnaissant la concaténation des langages des automates donnés.</desc>
 				<arguments>
 					<arg type="Automate" name="oFA1">
-						<desc>.</desc>
+						<desc>Premier automate.</desc>
 					</arg>
 					<arg type="Automate" name="oFA2">
-						<desc>.</desc>
+						<desc>Second automate.</desc>
 					</arg>
 					<arg type="Automate" name="..." opt="1">
-						<desc>.</desc>
+						<desc>Troisième automate...</desc>
 					</arg>
 				</arguments>
 				<returnValue type="Automate"></returnValue>
 			</function>
 			<function name="optional">
-				<desc>.</desc>
+				<desc>Créé un automate reconnaissant l'union d'une chaîne vide et du langage de l'automate donné (répétition de 0 à 1).</desc>
 				<arguments>
 					<arg type="Automate" name="oFA">
-						<desc>.</desc>
+						<desc>Un automate.</desc>
 					</arg>
 				</arguments>
 				<returnValue type="Automate"></returnValue>
 			</function>
 			<function name="or">
-				<desc>.</desc>
+				<desc>Créé un automate reconnaissant l'union des langages des automates donnés.</desc>
 				<arguments>
 					<arg type="Automate" name="oFA1">
-						<desc>.</desc>
+						<desc>Premier automate.</desc>
 					</arg>
 					<arg type="Automate" name="oFA2">
-						<desc>.</desc>
+						<desc>Second automate.</desc>
 					</arg>
 					<arg type="Automate" name="..." opt="1">
-						<desc>.</desc>
+						<desc>Troisième automate...</desc>
 					</arg>
 				</arguments>
 				<returnValue type="Automate"></returnValue>
 			</function>
 			<function name="repeat">
-				<desc>.</desc>
+				<desc>Créé un automate reconnaissant la répétition du langage de l'automate donné.</desc>
 				<arguments>
 					<arg type="Automate" name="oFA">
-						<desc>.</desc>
+						<desc>Un automate.</desc>
 					</arg>
-					<arg type="Number" name="n" opt="1">
-						<desc>.</desc>
+					<arg type="Number" name="nMin" opt="1" default="0">
+						<desc>Nombre minimum de répétition.</desc>
 					</arg>
-					<arg type="Number" name="m" opt="1">
-						<desc>.</desc>
+					<arg type="Number" name="nMax" opt="1" default="'n'">
+						<desc>Nombre maximum de répétition (valeur par défaut l'infini).</desc>
 					</arg>
 				</arguments>
 				<returnValue type="Automate"></returnValue>
 			</function>
 			<function name="repeat0n">
-				<desc>.</desc>
+				<desc>Créé un automate reconnaissant la répétition de 0 à n du langage de l'automate donné (fermeture de Kleene, symbole '*').</desc>
 				<arguments>
 					<arg type="Automate" name="oFA">
-						<desc>.</desc>
-					</arg>
-				</arguments>
-				<returnValue type="Automate"></returnValue>
-			</function>
-			<function name="repeat1n">
-				<desc>.</desc>
-				<arguments>
-					<arg type="Automate" name="oFA">
-						<desc>.</desc>
+						<desc>Un automate.</desc>
 					</arg>
 				</arguments>
 				<returnValue type="Automate"></returnValue>
@@ -323,7 +315,7 @@
 		</methods>
 		<methods name="Générateur d'automates spéciaux">
 			<function name="fromChar">
-				<desc>Créé une fonction retournant un automate à une transition pour un caractère.</desc>
+				<desc>Créé une fonction retournant un automate reconnaissant un caractère.</desc>
 				<arguments>
 					<arg type="String" name="sChar">
 						<desc>Un caractère.</desc>
@@ -332,13 +324,13 @@
 				<returnValue type="Function"></returnValue>
 			</function>
 			<function name="fromCharClass">
-				<desc>Créé une fonction retournant un automate à une transition pour un ensemble de caractère négatif ou non.</desc>
+				<desc>Créé une fonction retournant un automate reconnaissant un ensemble de caractère négatif ou non.</desc>
 				<arguments>
 					<arg type="Array" name="aSet">
 						<desc>Liste de caractères.</desc>
 					</arg>
-					<arg type="Boolean" name="bNegated" opt="1">
-						<desc>Indique si l'ensemble de caractères est négatif.</desc>
+					<arg type="Boolean" name="bNegated" opt="1" default="false">
+						<desc>Indique si l'ensemble de caractères à reconnaître est négatif.</desc>
 					</arg>
 				</arguments>
 				<returnValue type="Function"></returnValue>
