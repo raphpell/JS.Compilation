@@ -149,28 +149,6 @@
 			<function name="setUniqueID">
 				<desc>Défini le nombre de base utilisé pour définir le numéro d'un état.</desc>
 			</function>
-			<function name="wrapper">
-				<desc>
-					Créé un automate depuis une chaine représentant un caractère.
-					<dl>
-						<dt>Choix spéciaux possibles:</dt>
-						<dd>
-							<ul>
-								<li>Caractères spéciaux: '\\n', '\\t', '\\f', '\\r', '\\v'</li>
-								<li>Ensemble de caractères: '\\d', '\\D', '\\s', '\\S', '\\w', '\\W'</li>
-							</ul>
-						</dd>
-						<dt>Si la chaine est un caractère simple ou caractère "échappé" non reconnu, un automate à une transition est créé.</dt>
-					</dl>
-					Une erreur est lancé sinon...
-				</desc>
-				<arguments>
-					<arg type="String" name="s">
-						<desc>Une chaîne de longueur égale à 1 ou 2 ('\\n' à pour longueur 2).</desc>
-					</arg>
-				</arguments>
-				<returnValue type="Automate"></returnValue>
-			</function>
 		</methods>
 		<methods name="Automates basiques">
 			<desc>Par défaut les arguments <code>I</code> et <code>F</code> sont générés par la méthode <code>Automate.getUniqueID</code>.</desc>
@@ -187,7 +165,7 @@
 				<returnValue type="Automate"></returnValue>
 			</function>
 			<function name="makeChar">
-				<desc>Créé un automate reconnaissant un caractère.</desc>
+				<desc>Créé un automate (AFD) reconnaissant un caractère.</desc>
 				<arguments>
 					<arg type="String" name="sChar">
 						<desc>Caractère à reconnaître.</desc>
@@ -202,7 +180,7 @@
 				<returnValue type="Automate"></returnValue>
 			</function>
 			<function name="makeAnyChar">
-				<desc>Créé un automate reconnaissant n'importe quel caractère.</desc>
+				<desc>Créé un automate (AFD) reconnaissant n'importe quel caractère.</desc>
 				<arguments>
 					<arg type="String" name="sChar" opt="1" default="'a'">
 						<desc>Caractère utilisé pour créer un automate reconnaissant une expression régulière de type <code>a|[^a]</code>.</desc>
@@ -217,7 +195,7 @@
 				<returnValue type="Automate"></returnValue>
 			</function>
 			<function name="makeCharSet">
-				<desc>Créé un automate reconnaissant ou non un ensemble de caractère.</desc>
+				<desc>Créé un automate (AFD) reconnaissant ou non un ensemble de caractère.</desc>
 				<arguments>
 					<arg type="Array" name="aSet">
 						<desc>Ensemble de caractère à reconnaître ou non.</desc>
@@ -235,7 +213,7 @@
 				<returnValue type="Automate"></returnValue>
 			</function>
 			<function name="makeCharRange">
-				<desc>Créé un automate reconnaissant un intervalle de caractère.</desc>
+				<desc>Créé un automate (AFD) reconnaissant un intervalle de caractère.</desc>
 				<arguments>
 					<arg type="String" name="sChar1">
 						<desc>Limite de l'ensemble de caractère à reconnaître.</desc>
@@ -339,41 +317,6 @@
 					</arg>
 				</arguments>
 				<returnValue type="Function"></returnValue>
-			</function>
-		</methods>
-		<methods name="Automates spéciaux">
-			<function name="['\\n']">
-				<returnValue type="Automate"></returnValue>
-			</function>
-			<function name="['\\t']">
-				<returnValue type="Automate"></returnValue>
-			</function>
-			<function name="['\\f']">
-				<returnValue type="Automate"></returnValue>
-			</function>
-			<function name="['\\r']">
-				<returnValue type="Automate"></returnValue>
-			</function>
-			<function name="['\\v']">
-				<returnValue type="Automate"></returnValue>
-			</function>
-			<function name="['\\d']">
-				<returnValue type="Automate"></returnValue>
-			</function>
-			<function name="['\\D']">
-				<returnValue type="Automate"></returnValue>
-			</function>
-			<function name="['\\s']">
-				<returnValue type="Automate"></returnValue>
-			</function>
-			<function name="['\\S']">
-				<returnValue type="Automate"></returnValue>
-			</function>
-			<function name="['\\w']">
-				<returnValue type="Automate"></returnValue>
-			</function>
-			<function name="['\\W']">
-				<returnValue type="Automate"></returnValue>
 			</function>
 		</methods>
 	</group>

@@ -1,24 +1,107 @@
 ﻿<?xml version='1.0' encoding='UTF-8'?>
 <?xml-stylesheet type="text/xsl" href="Doc.xsl"?> 
 <class name="NFA" language="JavaScript">
-	<desc>Fonction générant un AFN depuis un AST.</desc>
+	<desc>Fonction générant un AFN depuis un élement d'AST.</desc>
 	<syntax>
-		<code><![CDATA[ oNFA = NFA( eAST ) ]]></code>
+		<code><![CDATA[ oNFA = NFA( eASTElement ) ]]></code>
 		<arguments>
-			<arg name="eAST" type="HTMLElement">
+			<arg name="eASTElement" type="HTMLElement">
 				<desc>Résultat de l'analyse syntaxique d'une ER.</desc>
 			</arg>
 		</arguments>
 	</syntax>
 	<group name="'Instance(s) NFA'">
 		<properties name="">
-			<variable name="type" type="String">
-				<desc>Valeur par défaut: "NFA".</desc>
+			<variable name="type" type="String" default="undefined">
+				<desc>Pas utilisé....</desc>
 			</variable>
 		</properties>
 	</group>
 	<group name="Objet NFA">
 		<methods name="">
+		</methods>
+		<methods name="Elément de l'AST">
+			<function name="CHARCLASS">
+				<desc></desc>
+				<arguments>
+				</arguments>
+				<returnValue type="Automate"></returnValue>
+			</function>
+			<function name="NEGATED_CHARCLASS">
+				<desc></desc>
+				<arguments>
+				</arguments>
+				<returnValue type="Automate"></returnValue>
+			</function>
+			<function name="CONCAT">
+				<desc></desc>
+				<arguments>
+				</arguments>
+				<returnValue type="Automate"></returnValue>
+			</function>
+			<function name="PIPE">
+				<desc></desc>
+				<arguments>
+				</arguments>
+				<returnValue type="Automate"></returnValue>
+			</function>
+		</methods>
+		<methods name="Valeur d'élément de l'AST">
+			<function name="wrapper">
+				<desc>
+					Créé un automate depuis une chaine représentant un caractère.
+					<dl>
+						<dt>Choix spéciaux possibles:</dt>
+						<dd>
+							<ul>
+								<li>Caractères spéciaux: '\\n', '\\t', '\\f', '\\r', '\\v'</li>
+								<li>Ensemble de caractères: '\\d', '\\D', '\\s', '\\S', '\\w', '\\W'</li>
+							</ul>
+						</dd>
+						<dt>Si la chaine est un caractère simple ou caractère "échappé" non reconnu, un automate à une transition est créé.</dt>
+					</dl>
+					Une erreur est lancé sinon...
+				</desc>
+				<arguments>
+					<arg type="String" name="s">
+						<desc>Une chaîne de longueur égale à 1 ou 2 ('\\n' à pour longueur 2).</desc>
+					</arg>
+				</arguments>
+				<returnValue type="Automate"></returnValue>
+			</function>
+			<function name="['\\n']">
+				<returnValue type="Automate"></returnValue>
+			</function>
+			<function name="['\\t']">
+				<returnValue type="Automate"></returnValue>
+			</function>
+			<function name="['\\f']">
+				<returnValue type="Automate"></returnValue>
+			</function>
+			<function name="['\\r']">
+				<returnValue type="Automate"></returnValue>
+			</function>
+			<function name="['\\v']">
+				<returnValue type="Automate"></returnValue>
+			</function>
+			<function name="['\\d']">
+				<returnValue type="Automate"></returnValue>
+			</function>
+			<function name="['\\D']">
+				<returnValue type="Automate"></returnValue>
+			</function>
+			<function name="['\\s']">
+				<returnValue type="Automate"></returnValue>
+			</function>
+			<function name="['\\S']">
+				<returnValue type="Automate"></returnValue>
+			</function>
+			<function name="['\\w']">
+				<returnValue type="Automate"></returnValue>
+			</function>
+			<function name="['\\W']">
+				<returnValue type="Automate"></returnValue>
+			</function>
 		</methods>
 	</group>
 </class>

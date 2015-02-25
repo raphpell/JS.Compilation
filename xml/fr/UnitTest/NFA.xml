@@ -5,9 +5,8 @@
 	<script src="../../../js/framework.js"></script>
 	<script src="../../../js/automaton.js"></script>
 	<desc>...</desc>
-	<test name="Objet NFA">
-		<desc>...</desc>
-		<assertions name="NFA.CHARCLASS">
+	<test name="NFA.CHARCLASS">
+		<assertions>
 			<desc>
 Un automate 'CHARCLASS' est généré depuis les éléments:
 <ul>
@@ -18,7 +17,7 @@ Un automate 'CHARCLASS' est généré depuis les éléments:
 			</desc>
 			<value><![CDATA[
 Automate.setUniqueID( 9 )
-var oFA5 = NFA.CHARCLASS( Automate['\\d'](), Automate['\\D'](), Automate.fromChar('A')())
+var oFA5 = NFA.CHARCLASS( NFA['\\d'](), NFA['\\D'](), Automate.fromChar('A')())
 var oDFA5 = new DFA( oFA5 )
 			]]></value>
 			<assert><![CDATA[ oFA5 ]]></assert>
@@ -31,7 +30,9 @@ var oDFA5 = new DFA( oFA5 )
 			<assert><![CDATA[ oDFA5.test( '0aa' ) === '0' ]]></assert>
 			<assert><![CDATA[ oDFA5.test( '0aa', 2 ) === 'a' ]]></assert>
 		</assertions>
-		<assertions name="NFA.NEGATED_CHARCLASS">
+	</test>
+	<test name="NFA.NEGATED_CHARCLASS">
+		<assertions>
 			<desc>
 Un automate 'NEGATED_CHARCLASS' est généré depuis les éléments:
 <ul>
@@ -42,7 +43,7 @@ Un automate 'NEGATED_CHARCLASS' est généré depuis les éléments:
 			</desc>
 			<value><![CDATA[
 Automate.setUniqueID( 9 )
-var oFA6 = NFA.NEGATED_CHARCLASS( Automate.fromCharClass(['0','1','2'])(), Automate['\\D'](), Automate.fromChar('A')())
+var oFA6 = NFA.NEGATED_CHARCLASS( Automate.fromCharClass(['0','1','2'])(), NFA['\\D'](), Automate.fromChar('A')())
 var oDFA6 = new DFA( oFA6 )
 			]]></value>
 			<assert><![CDATA[ oFA6 ]]></assert>
@@ -53,9 +54,81 @@ var oDFA6 = new DFA( oFA6 )
 			<assert><![CDATA[ oFA6.A.toString() === "[3456789]" ]]></assert>
 			<assert><![CDATA[ oFA6.S.toString() === "15,16" ]]></assert>
 		</assertions>
-		<assertions name="NFA.CONCAT">
+	</test>
+	<test name="NFA.CONCAT">
+		<assertions>
 		</assertions>
-		<assertions name="NFA.PIPE">
+	</test>
+	<test name="NFA.PIPE">
+		<assertions>
+		</assertions>
+	</test>
+	<test name="Automates spéciaux">
+		<assertions name="">
+			<desc>
+Générateur créées avec <code>Automate.fromCharClass</code>:
+<ul>
+	<li><b>Ensemble de caractère.</b>
+		<code><ul>
+			<li>NFA['\\d'] = Automate.fromCharClass( NUMBERS, 0)</li>
+			<li>NFA['\\s'] = Automate.fromCharClass( WHITE_SPACES, 0)</li>
+			<li>NFA['\\w'] = Automate.fromCharClass( [].concat( NUMBERS, ASCII_LC, ASCII_UC, ['_']), 0 ))</li>
+		</ul></code></li>
+	<li><b>Ensemble de caractère négatif.</b>
+		<code><ul>
+			<li>NFA['\\D'] = Automate.fromCharClass( NUMBERS, 1)</li>
+			<li>NFA['\\S'] = Automate.fromCharClass( WHITE_SPACES, 1)</li>
+			<li>NFA['\\W'] = Automate.fromCharClass( [].concat( NUMBERS, ASCII_LC, ASCII_UC, ['_']), 1 )</li>
+		</ul></code></li>
+</ul>
+			</desc>
+			<value><![CDATA[
+var oDFA ={
+	d :( new DFA ( Automate.repeat0n( NFA['\\d']() ))),
+	D :( new DFA ( Automate.repeat0n( NFA['\\D']() ))),
+	s :( new DFA ( Automate.repeat0n( NFA['\\s']() ))),
+	S :( new DFA ( Automate.repeat0n( NFA['\\S']() ))),
+	w :( new DFA ( Automate.repeat0n( NFA['\\w']() ))),
+	W :( new DFA ( Automate.repeat0n( NFA['\\W']() )))
+	}
+, sNUMBERS = '0123456789'
+, sASCII_LC = 'abcdefghijklmnopqrstuvwxyz'
+, sASCII_UC = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
+, sWS = '\t\n\v\f\r '
+			]]></value>
+			<assert><![CDATA[ oDFA.d ]]></assert>
+			<assert><![CDATA[ oDFA.d.test( sNUMBERS ) === sNUMBERS ]]></assert>
+			<assert><![CDATA[ oDFA.d.test( sASCII_LC ) === '' ]]></assert>
+			<assert><![CDATA[ oDFA.d.test( sASCII_UC ) === '' ]]></assert>
+			<assert><![CDATA[ oDFA.d.test( sWS ) === '' ]]></assert>
+			<assert><![CDATA[ oDFA.D.test( sNUMBERS ) === '' ]]></assert>
+			<assert><![CDATA[ oDFA.D.test( sASCII_LC ) === sASCII_LC ]]></assert>
+			<assert><![CDATA[ oDFA.D.test( sASCII_UC ) === sASCII_UC ]]></assert>
+			<assert><![CDATA[ oDFA.D.test( sWS ) === sWS ]]></assert>
+			<assert><![CDATA[ oDFA.s.test( sNUMBERS ) === '' ]]></assert>
+			<assert><![CDATA[ oDFA.s.test( sASCII_LC ) === '' ]]></assert>
+			<assert><![CDATA[ oDFA.s.test( sASCII_UC ) === '' ]]></assert>
+			<assert><![CDATA[ oDFA.s.test( sWS ) === sWS ]]></assert>
+			<assert><![CDATA[ oDFA.S.test( sNUMBERS ) === sNUMBERS ]]></assert>
+			<assert><![CDATA[ oDFA.S.test( sASCII_LC ) === sASCII_LC ]]></assert>
+			<assert><![CDATA[ oDFA.S.test( sASCII_UC ) === sASCII_UC ]]></assert>
+			<assert><![CDATA[ oDFA.S.test( sWS ) === '' ]]></assert>
+			<assert><![CDATA[ oDFA.w.test( sNUMBERS ) === sNUMBERS ]]></assert>
+			<assert><![CDATA[ oDFA.w.test( sASCII_LC ) === sASCII_LC ]]></assert>
+			<assert><![CDATA[ oDFA.w.test( sASCII_UC ) === sASCII_UC ]]></assert>
+			<assert><![CDATA[ oDFA.w.test( sWS ) === '' ]]></assert>
+			<assert><![CDATA[ oDFA.W.test( sNUMBERS ) === '' ]]></assert>
+			<assert><![CDATA[ oDFA.W.test( sASCII_LC ) === '' ]]></assert>
+			<assert><![CDATA[ oDFA.W.test( sASCII_UC ) === '' ]]></assert>
+			<assert><![CDATA[ oDFA.W.test( sWS ) === sWS ]]></assert>
+		</assertions>
+	</test>
+	<test name="NFA.wrapper">
+		<assertions>
+			<value><![CDATA[
+
+			]]></value>
+			<assert><![CDATA[ true ]]></assert>
 		</assertions>
 	</test>
 </truth>

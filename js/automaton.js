@@ -6,12 +6,12 @@ EMPTY = '&empty;'
 throwError =function( s ){ alert( s ); throw new Error ( s ) }
 
 Automate =(function(){
-	// UTILITAIRES
+	// 'PRIVÉES'
 	var ID = 1
 	var epsilonTransition =function( I, F ){ return [ I, EPSILON, F ]} // transition libre !
 	var getUniqueID =function(){ return ID++ } // Fonction retournant un identifiant unique ( état nouveau ! )
 
-	// INSTANCE AUTOMATE
+	// INSTANCES AUTOMATES
 	var Automate =function( I, F, A, S, T, aTokensID ){
 		this.union({
 			I: I,	// Etat initial
@@ -530,42 +530,35 @@ Automate =(function(){
 			return oNFA
 			}
 		}	
-	
-	// OBJET AUTOMATE
-	Automate.action =function( sChars, bNegated ){
-		var f
-		if( bNegated ){
-			f =function( symbol, state ){
-				if( symbol.length>1 ) return -1
-				return sChars.indexOf( symbol )<0?state:-1
-				}
-			f.toString =function(){ return '[^'+sChars+']' }
-			}
-		else{
-			f =function( symbol, state ){
-				if( symbol.length>1 ) return -1
-				return sChars.indexOf( symbol )>-1?state:-1
-				}
-			f.toString =function(){ return '['+sChars+']' }
-			}
-		return f
-		}
-	Automate.getUniqueID = getUniqueID
-	Automate.setUniqueID =function( nUniqueID ){
-		if( nUniqueID ) ID = nUniqueID
-		}
-	Automate.wrapper =function( s ){
-		if( s.length==1 ) return Automate.makeChar(s)
-		else if( s.charAt(0)=='\\' ){ // symbole prefixé par '\'
-			if( Automate[s]) return Automate[s]()
-			s = s.length==2 ? s.substring(1) : s
-			return Automate.makeChar(s)
-			}
-		throwError( 'Automate '+ s +'?' )
-		}
 
-	// AUTOMATES BASIQUES
+	// OBJET AUTOMATE
 	Automate.union({
+		
+		// MÉTHODES 'INTERNES'
+		action :function( sChars, bNegated ){
+			var f
+			if( bNegated ){
+				f =function( symbol, state ){
+					if( symbol.length>1 ) return -1
+					return sChars.indexOf( symbol )<0?state:-1
+					}
+				f.toString =function(){ return '[^'+sChars+']' }
+				}
+			else{
+				f =function( symbol, state ){
+					if( symbol.length>1 ) return -1
+					return sChars.indexOf( symbol )>-1?state:-1
+					}
+				f.toString =function(){ return '['+sChars+']' }
+				}
+			return f
+			},
+		getUniqueID : getUniqueID,
+		setUniqueID :function( nUniqueID ){
+			if( nUniqueID ) ID = nUniqueID
+			},
+		
+		// AUTOMATES BASIQUES
 		makeEmpty :function( I, F ){
 			var I=I||getUniqueID(), F=F||getUniqueID()
 			return new Automate( I, [F], [EPSILON], [I,F], [ epsilonTransition( I, F )] )
@@ -609,11 +602,9 @@ Automate =(function(){
 			var a=[]
 			for(var i=nCode1, ni=nCode2+1; i<ni; i++ ) a.push( i )
 			return Automate.makeCharSet( String.fromCharCode.apply( null, a ).toArray(), false, I, F )
-			}
-		})
+			},
 		
-	// OPÉRATIONS BASIQUES
-	Automate.union({
+		// OPÉRATIONS BASIQUES
 		and :function(){
 			var o = arguments[0]
 			, I = o.I
@@ -731,42 +722,17 @@ Automate =(function(){
 				Array.unique( oFA.S.concat([I,F])),
 				T
 				)
+			},
+		
+		// GÉNÉRATEUR D'AUTOMATE	
+		fromChar :function( sChar ){
+			return function(){ return Automate.makeChar( sChar ) }
+			},
+		fromCharClass :function( aSet, bNegated ){
+			return function(){ return Automate.makeCharSet( aSet, bNegated ) }
 			}
 		})
-	
-	// GENERATEUR D'AUTOMATE	
-	Automate.fromChar =function( sChar ){
-		return function(){ return Automate.makeChar( sChar ) }
-		}
-	Automate.fromCharClass =function( aSet, bNegated ){
-		return function(){ return Automate.makeCharSet( aSet, bNegated ) }
-		}
-
-	// CARACTÈRES SPÉCIAUX
-	Automate.union({
-		'\\n': Automate.fromChar('\n'),
-		'\\t': Automate.fromChar('\t'),
-		'\\f': Automate.fromChar('\f'),
-		'\\r': Automate.fromChar('\r'),
-		'\\v': Automate.fromChar('\v')
-		})
-
-	// ENSEMBLE DE CARACTÈRES
-	;(function(){
-		var NUMBERS = '0123456789'.split('')
-		, ASCII_LC = 'abcdefghijklmnopqrstuvwxyz'.split('')
-		, ASCII_UC = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
-		, WHITE_SPACES = '\t\n\v\f\r \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000'.split('')
-		Automate.union({
-			'\\d': Automate.fromCharClass( NUMBERS, 0 ),
-			'\\D': Automate.fromCharClass( NUMBERS, 1 ),
-			'\\s': Automate.fromCharClass( WHITE_SPACES, 0 ),
-			'\\S': Automate.fromCharClass( WHITE_SPACES, 1 ),
-			'\\w': Automate.fromCharClass( [].concat( NUMBERS, ASCII_LC, ASCII_UC, ['_']), 0 ),
-			'\\W': Automate.fromCharClass( [].concat( NUMBERS, ASCII_LC, ASCII_UC, ['_']), 1 )
-			})
-	})()
-
+		
 	return Automate
 	})()
 
@@ -800,7 +766,7 @@ NFA =function( e ){ // Transformation de l'AST d'une expression régulière en a
 		}
 	if( ! e.oValue ) return false
 	if( ! f( e )) throwError( 'Error: symbol='+ S )
-	return Automate.wrapper( f( e ))
+	return NFA.wrapper( f( e ))
 	}
 NFA.union((function(){
 	var _getCharSet =function( aDFA ){
@@ -823,7 +789,35 @@ NFA.union((function(){
 	//	if( Array.intersect( aCS, aNCS ).length ){}
 		return { charset:aCS, negatedcharset:aNCS }
 		}
+	var NUMBERS = '0123456789'.split('')
+	, ASCII_LC = 'abcdefghijklmnopqrstuvwxyz'.split('')
+	, ASCII_UC = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
+	, WHITE_SPACES = '\t\n\v\f\r \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000'.split('')
+
 	return {
+		wrapper :function( s ){
+			if( s.length==1 ) return Automate.makeChar(s)
+			else if( s.charAt(0)=='\\' ){ // symbole prefixé par '\'
+				if( NFA[s]) return NFA[s]()
+				s = s.length==2 ? s.substring(1) : s
+				return Automate.makeChar(s)
+				}
+			throwError( 'Automate '+ s +'?' )
+			},
+		// CARACTÈRES SPÉCIAUX
+		'\\n': Automate.fromChar('\n'),
+		'\\t': Automate.fromChar('\t'),
+		'\\f': Automate.fromChar('\f'),
+		'\\r': Automate.fromChar('\r'),
+		'\\v': Automate.fromChar('\v'),
+		// ENSEMBLE DE CARACTÈRES
+		'\\d': Automate.fromCharClass( NUMBERS, 0 ),
+		'\\D': Automate.fromCharClass( NUMBERS, 1 ),
+		'\\s': Automate.fromCharClass( WHITE_SPACES, 0 ),
+		'\\S': Automate.fromCharClass( WHITE_SPACES, 1 ),
+		'\\w': Automate.fromCharClass( [].concat( NUMBERS, ASCII_LC, ASCII_UC, ['_']), 0 ),
+		'\\W': Automate.fromCharClass( [].concat( NUMBERS, ASCII_LC, ASCII_UC, ['_']), 1 ),
+		// AST NODE
 		CHARCLASS :function(){ // Aucun caractère + ceux en argument
 			var o = _getCharSet( arguments )
 			, I=Automate.getUniqueID(), F=Automate.getUniqueID(), A, S=[I,F], T

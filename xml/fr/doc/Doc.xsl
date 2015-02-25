@@ -124,6 +124,7 @@ INPUT:checked ~ DIV {
 						<label for="{generate-id(@name)}">
 							<code><xsl:value-of select="@name"/></code>
 							<code class="type"><xsl:value-of select="@type"/></code>
+							<xsl:if test="@default"> <b>défaut:</b> <code class="type"><xsl:value-of select="@default"/></code></xsl:if>
 						</label>
 						<div class="block">
 							<div class="desc"><xsl:copy-of select="desc"/></div>
