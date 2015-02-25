@@ -218,8 +218,7 @@ var init =function(){
 var parseRE =function( sToken, sRegExp ){
 	var oTree = RegExp2AST( sRegExp )
 	oNFA = NFA( oTree )
-	NFA.validateAlphabet( oNFA )
-	oDFA = ( new DFA( oNFA )).minimize()
+	oDFA = ( new DFA( oNFA.validateAlphabet() )).minimize()
 	oDFA.renameStates( nStateIDCounter, true )
 	Automate.setUniqueID( oDFA.S[ oDFA.S.length-1 ]+1 )
 

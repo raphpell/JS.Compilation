@@ -170,346 +170,10 @@ Automate =(function(){
 			oFA.T = T
 			oFA.buildTable()
 			return oFA
-			}
-		}	
-	
-	// OBJET AUTOMATE
-	Automate.action =function( sChars, bNegated ){
-		var f
-		if( bNegated ){
-			f =function( symbol, state ){
-				if( symbol.length>1 ) return -1
-				return sChars.indexOf( symbol )<0?state:-1
-				}
-			f.toString =function(){ return '[^'+sChars+']' }
-			}
-		else{
-			f =function( symbol, state ){
-				if( symbol.length>1 ) return -1
-				return sChars.indexOf( symbol )>-1?state:-1
-				}
-			f.toString =function(){ return '['+sChars+']' }
-			}
-		return f
-		}
-	Automate.getUniqueID = getUniqueID
-	Automate.setUniqueID =function( nUniqueID ){
-		if( nUniqueID ) ID = nUniqueID
-		}
-	Automate.wrapper =function( s ){
-		if( s.length==1 ) return Automate.makeChar(s)
-		else if( s.charAt(0)=='\\' ){ // symbole prefixé par '\'
-			if( Automate[s]) return Automate[s]()
-			s = s.length==2 ? s.substring(1) : s
-			return Automate.makeChar(s)
-			}
-		throwError( 'Automate '+ s +'?' )
-		}
-
-	// AUTOMATES BASIQUES
-	Automate.union({
-		makeEmpty :function( I, F ){
-			var I=I||getUniqueID(), F=F||getUniqueID()
-			return new Automate( I, [F], [EPSILON], [I,F], [ epsilonTransition( I, F )] )
 			},
-		makeChar :function( sChar, I, F ){
-			var I=I||getUniqueID(), F=F||getUniqueID()
-			return new Automate( I, [F], [sChar], [I,F], [[I,sChar,F]])
-			},
-		makeAnyChar :function( sChar, I, F ){
-			var sChar=sChar||'a', I=I||getUniqueID(), F=F||getUniqueID()
-			var f1 = Automate.action( sChar, 0 )
-			var f2 = Automate.action( sChar, 1 )
-			var A = [ f1.toString(), f2.toString() ]
-			var T = [[ I, f1.toString(), F, f1 ],[ I, f2.toString(), F, f2 ]]
-			return new Automate( I, [F], A, [I,F], T )
-			},
-		makeCharSet :function( aSet, bNegated, I, F ){
-			var I=I||getUniqueID(), F=F||getUniqueID()
-			var f = Automate.action( aSet.join(''), bNegated )
-			var T = [[ I, f.toString(), F, f ]]
-			return new Automate( I, [F], [f.toString()], [I,F], T )
-			},
-		makeCharRange :function( sChar1, sChar2, I, F ){
-			var getCharCode =function( sChar ){
-				if( sChar.length==1 ) return sChar.charCodeAt(0)
-				switch( sChar.charAt(1)){
-					case 'x':
-					case 'u':
-						return parseInt( sChar.slice( 2 ), 16 )
-					default: // number
-					}
-				throwError( 'getCharCode '+ sChar )
-				}
-			var nCode1 = getCharCode( sChar1 )
-			var nCode2 = getCharCode( sChar2 )
-			if( nCode1 > nCode2 ){
-				var tmp=nCode1
-				nCode1=nCode2
-				nCode2=tmp
-				}
-			var a=[]
-			for(var i=nCode1, ni=nCode2+1; i<ni; i++ ) a.push( i )
-			return Automate.makeCharSet( String.fromCharCode.apply( null, a ).toArray(), false, I, F )
-			}
-		})
-		
-	// OPÉRATIONS BASIQUES
-	Automate.union({
-		and :function(){
-			var o = arguments[0]
-			, I = o.I
-			, F = o.F
-			, A = [EPSILON].concat( o.A )
-			, S = o.S
-			, T = o.T
-			for(var i=1; o = arguments[i]; i++){
-				A = A.concat( o.A )
-				S = S.concat( o.S )
-				T = T.concat( o.T )
-				for(var j=0, nj=F.length; j<nj; j++)
-					T.push( epsilonTransition( F[j], o.I ))
-				F = o.F
-				}
-			A = Array.unique(A)
-			A.sort()
-			return new Automate( I, F, A, S, T )
-			},
-		optional :function( oFA ){
-			var T = oFA.T
-			for(var j=0, nj=oFA.F.length; j<nj; j++)
-				T.push( epsilonTransition( oFA.I, oFA.F[j]))
-			return new Automate(
-				oFA.I,
-				oFA.F,
-				Array.unique( [EPSILON].concat( oFA.A )),
-				oFA.S.concat([]),
-				T
-				)
-			},
-		or :function(){
-			var I = getUniqueID()
-			var F = getUniqueID()
-			var A = [EPSILON]
-			var S = []
-			var T = []
-			var aTokensID = [] // aTokensID used in DFA aggregation
-			for(var i=0, o; o = arguments[i]; i++ ){
-				A = A.concat( o.A )
-				var aIntersection = Array.intersect( S, o.S )
-				if( aIntersection.length )
-					throwError( 'Error: Automate "|" intersection between automaton states.\n'+ aIntersection )
-				S = S.concat( o.S )
-				T.push( epsilonTransition( I, o.I ))
-				for(var j=0, nj=o.F.length; j<nj; j++)
-					T.push( epsilonTransition( o.F[j], F ))
-				T = T.concat( o.T )
-				if( o.aTokensID ) aTokensID = aTokensID.concat( o.aTokensID )
-				}
-			S = S.concat([I,F])
-			A = Array.unique(A)
-			A.sort()
-			return new Automate( I, [F], A, S, T, aTokensID )
-			},
-		repeat :function( oFA, n, m ){
-			n = n!==undefined ? n : 0
-			m = m!==undefined ? m : 'n'
-			switch( n+','+m ){
-				case '0,1': return Automate.optional( oFA )
-				case '0,n': return Automate.repeat0n( oFA )
-				case '1,n': return Automate.and( oFA, Automate.repeat0n( oFA.clone()))
-				default:
-					if( m == 'n' ){
-						var oResultFA = Automate.repeat( oFA, n, n )
-						var F = oResultFA.F.concat([])
-						oResultFA = Automate.and( oResultFA, Automate.repeat0n( oFA.clone()))
-						return new Automate(
-							oResultFA.I,
-							Array.unique( F.concat( oResultFA.F )),
-							oResultFA.A,
-							oResultFA.S,
-							oResultFA.T
-							)
-						}
-					if( n >= m ) switch( n ){
-						case 0: return Automate.makeEmpty()
-						case 1: return oFA
-						default:
-							var oResultFA = oFA.clone()
-							for(var i=1; i<n; i++)
-								oResultFA = Automate.and( oResultFA, oFA.clone())
-							return oResultFA
-						}
-					if( n < m ){
-						var oResultFA = Automate.repeat( oFA, n, n )
-						var F = oResultFA.F.concat([])
-						for(var i=n; i<m; i++){
-							oResultFA = Automate.and( oResultFA, oFA.clone() )
-							F = F.concat( oResultFA.F )
-							}
-						return new Automate(
-							oResultFA.I,
-							Array.unique( F ),
-							oResultFA.A,
-							oResultFA.S,
-							oResultFA.T
-							)
-						}
-				}
-			},
-		repeat0n :function( oFA ){ // fermeture de Kleene
-			var I=getUniqueID(), F=getUniqueID()
-			var T = oFA.T
-			T.push( epsilonTransition( I, oFA.I ))
-			T.push( epsilonTransition( I, F ))
-			for(var j=0, a=oFA.F, nj=a.length; j<nj; j++){
-				T.push( epsilonTransition( a[j], F ))
-				T.push( epsilonTransition( a[j], oFA.I ))
-				}
-			return new Automate(
-				I,
-				[F],
-				Array.unique( oFA.A.concat([EPSILON])),
-				Array.unique( oFA.S.concat([I,F])),
-				T
-				)
-			}
-		})
-	
-	// GENERATEUR D'AUTOMATE	
-	Automate.fromChar =function( sChar ){
-		return function(){ return Automate.makeChar( sChar ) }
-		}
-	Automate.fromCharClass =function( aSet, bNegated ){
-		return function(){ return Automate.makeCharSet( aSet, bNegated ) }
-		}
-
-	// CARACTÈRES SPÉCIAUX
-	Automate.union({
-		'\\n': Automate.fromChar('\n'),
-		'\\t': Automate.fromChar('\t'),
-		'\\f': Automate.fromChar('\f'),
-		'\\r': Automate.fromChar('\r'),
-		'\\v': Automate.fromChar('\v')
-		})
-
-	// ENSEMBLE DE CARACTÈRES
-	;(function(){
-		var NUMBERS = '0123456789'.split('')
-		, ASCII_LC = 'abcdefghijklmnopqrstuvwxyz'.split('')
-		, ASCII_UC = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
-		, WHITE_SPACES = '\t\n\v\f\r \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000'.split('')
-		Automate.union({
-			'\\d': Automate.fromCharClass( NUMBERS, 0 ),
-			'\\D': Automate.fromCharClass( NUMBERS, 1 ),
-			'\\s': Automate.fromCharClass( WHITE_SPACES, 0 ),
-			'\\S': Automate.fromCharClass( WHITE_SPACES, 1 ),
-			'\\w': Automate.fromCharClass( [].concat( NUMBERS, ASCII_LC, ASCII_UC, ['_']), 0 ),
-			'\\W': Automate.fromCharClass( [].concat( NUMBERS, ASCII_LC, ASCII_UC, ['_']), 1 )
-			})
-	})()
-
-	return Automate
-	})()
-
-RegExp2AST =function( sRegExp ){
-	return ParserLR.parse(
-		AutomatonLexer( sRegExp, 'RegExp' ),
-		RegExpParser.REGEXP
-		)
-	}
-
-NFA =function( e ){ // Transformation de l'AST d'une expression régulière en automate
-	var S = e.nodeName
-	, f=function(e){ return e.oValue.value }
-	switch( S ){
-		case 'RANGE': return Automate.makeCharRange( f( e.firstChild ), f( e.lastChild ))
-		case 'QUANTIFIER':
-			var o = e.oValue, n = parseInt( o.n ), oFA = NFA( e.firstChild )
-			switch( o.m ){
-				case '': return Automate.repeat( oFA, n, n )
-				case '\u221E': return Automate.repeat( oFA, n )
-				default: return Automate.repeat( oFA, n, parseInt( o.m ))
-				}
-		case 'DOT': return Automate.makeAnyChar()
-	//	case 'DOT': return Automate.fromChar( 'ANY' )()
-		default:
-			if( NFA[S]){
-				var a=to_array( e.childNodes )
-				for(var i=0, eChild; eChild=a[i]; i++ ) a[i] = NFA( a[i])
-				return NFA[S].apply( null, a )
-				}
-		}
-	if( ! e.oValue ) return false
-	if( ! f( e )) throwError( 'Error: symbol='+ S )
-	return Automate.wrapper( f( e ))
-	}
-NFA.union((function(){
-	var _getCharSet =function( aDFA ){
-		var aCS = [], aNCS = []
-		for(var i=0; aDFA[i]; i++ ){
-			var symbol = aDFA[i].A[0]
-			if( symbol.charAt(0)=='[' && symbol.charAt(symbol.length-1)==']' ){
-				if( symbol.charAt(1)!='^' )
-					aCS = aCS.concat( symbol.replace( /^\[((?:a|[^a])+)\]$/g, '$1' ).toArray())
-				else
-					aNCS = aNCS.concat( symbol.replace( /^\[\^((?:a|[^a])+)\]$/g, '$1' ).toArray())
-				continue; 
-				}
-			aCS.push( symbol )
-			}
-		aCS = Array.unique( aCS )
-		aCS.sort() // SUPER IMPORTANT !
-		aNCS = Array.unique( aNCS )
-		aNCS.sort() // SUPER IMPORTANT !
-	//	if( Array.intersect( aCS, aNCS ).length ){}
-		return { charset:aCS, negatedcharset:aNCS }
-		}
-	return {
-		CHARCLASS :function(){ // Aucun caractère + ceux en argument
-			var o = _getCharSet( arguments )
-			, I=Automate.getUniqueID(), F=Automate.getUniqueID(), A, S=[I,F], T
-			, f1 = Automate.action( o.charset.join(''), 0 )
-			if(	o.negatedcharset.length ){
-				var f2 = Automate.action( o.negatedcharset.join(''), 1 )
-				A = [f1.toString(),f2.toString()]
-				T = [[ I, f1.toString(), F, f1 ],[ I, f2.toString(), F, f2 ]]
-				}
-			else{
-				A = [f1.toString()]
-				T = [[ I, f1.toString(), F, f1 ]]
-				}
-		//	return new Automate( I, [F], A, S, T )
-			var oFA = new Automate( I, [F], A, S, T )
-			NFA.validateAlphabet( oFA )
-			return ( new DFA( oFA )).minimize( I, true )
-			},
-		NEGATED_CHARCLASS :function(){ // Tous les caractères - ceux en argument
-			var o = _getCharSet( arguments )
-			, I=Automate.getUniqueID(), F=Automate.getUniqueID(), A, S=[I,F], T
-			if(	o.negatedcharset.length ){
-				var aCS = Array.diff( o.negatedcharset, o.charset )
-				// Aucun caractère valide... TODO: lancer une erreur ?
-				if( ! aCS.length ) return Automate.makeEmpty(I,F)
-				var f1 = Automate.action( aCS.join(''), 0 )
-				A = [f1.toString()]
-				T = [[ I, f1.toString(), F, f1 ]]
-				return new Automate( I, [F], A, S, T )
-				}
-			else{
-				var f2 = Automate.action( o.charset.join(''), 1 )
-				A = [f2.toString()]
-				T = [[ I, f2.toString(), F, f2 ]]
-				}
-			return new Automate( I, [F], A, S, T )
-		//	var oFA = new Automate( I, [F], A, S, T )
-		//	NFA.validateAlphabet( oFA )
-		//	return ( new DFA( oFA )).minimize()
-			},
-		CONCAT :function(){ return Automate.and.apply( null, arguments )},
-		PIPE :function(){ return Automate.or.apply( null, arguments )},
-		validateAlphabet :function( oNFA ){
-			var aAtoms=[], aGroups=[], aNegativeGroups=[]
+		validateAlphabet :function(){
+			var oNFA = this
+			, aAtoms=[], aGroups=[], aNegativeGroups=[]
 			, bAnyIn = false
 			, oUniqueNegativeCharset
 			
@@ -865,6 +529,341 @@ NFA.union((function(){
 			oNFA.T = Transitions.get()
 			return oNFA
 			}
+		}	
+	
+	// OBJET AUTOMATE
+	Automate.action =function( sChars, bNegated ){
+		var f
+		if( bNegated ){
+			f =function( symbol, state ){
+				if( symbol.length>1 ) return -1
+				return sChars.indexOf( symbol )<0?state:-1
+				}
+			f.toString =function(){ return '[^'+sChars+']' }
+			}
+		else{
+			f =function( symbol, state ){
+				if( symbol.length>1 ) return -1
+				return sChars.indexOf( symbol )>-1?state:-1
+				}
+			f.toString =function(){ return '['+sChars+']' }
+			}
+		return f
+		}
+	Automate.getUniqueID = getUniqueID
+	Automate.setUniqueID =function( nUniqueID ){
+		if( nUniqueID ) ID = nUniqueID
+		}
+	Automate.wrapper =function( s ){
+		if( s.length==1 ) return Automate.makeChar(s)
+		else if( s.charAt(0)=='\\' ){ // symbole prefixé par '\'
+			if( Automate[s]) return Automate[s]()
+			s = s.length==2 ? s.substring(1) : s
+			return Automate.makeChar(s)
+			}
+		throwError( 'Automate '+ s +'?' )
+		}
+
+	// AUTOMATES BASIQUES
+	Automate.union({
+		makeEmpty :function( I, F ){
+			var I=I||getUniqueID(), F=F||getUniqueID()
+			return new Automate( I, [F], [EPSILON], [I,F], [ epsilonTransition( I, F )] )
+			},
+		makeChar :function( sChar, I, F ){
+			var I=I||getUniqueID(), F=F||getUniqueID()
+			return new Automate( I, [F], [sChar], [I,F], [[I,sChar,F]])
+			},
+		makeAnyChar :function( sChar, I, F ){
+			var sChar=sChar||'a', I=I||getUniqueID(), F=F||getUniqueID()
+			var f1 = Automate.action( sChar, 0 )
+			var f2 = Automate.action( sChar, 1 )
+			var A = [ f1.toString(), f2.toString() ]
+			var T = [[ I, f1.toString(), F, f1 ],[ I, f2.toString(), F, f2 ]]
+			return new Automate( I, [F], A, [I,F], T )
+			},
+		makeCharSet :function( aSet, bNegated, I, F ){
+			var I=I||getUniqueID(), F=F||getUniqueID()
+			var f = Automate.action( aSet.join(''), bNegated )
+			var T = [[ I, f.toString(), F, f ]]
+			return new Automate( I, [F], [f.toString()], [I,F], T )
+			},
+		makeCharRange :function( sChar1, sChar2, I, F ){
+			var getCharCode =function( sChar ){
+				if( sChar.length==1 ) return sChar.charCodeAt(0)
+				switch( sChar.charAt(1)){
+					case 'x':
+					case 'u':
+						return parseInt( sChar.slice( 2 ), 16 )
+					default: // number
+					}
+				throwError( 'getCharCode '+ sChar )
+				}
+			var nCode1 = getCharCode( sChar1 )
+			var nCode2 = getCharCode( sChar2 )
+			if( nCode1 > nCode2 ){
+				var tmp=nCode1
+				nCode1=nCode2
+				nCode2=tmp
+				}
+			var a=[]
+			for(var i=nCode1, ni=nCode2+1; i<ni; i++ ) a.push( i )
+			return Automate.makeCharSet( String.fromCharCode.apply( null, a ).toArray(), false, I, F )
+			}
+		})
+		
+	// OPÉRATIONS BASIQUES
+	Automate.union({
+		and :function(){
+			var o = arguments[0]
+			, I = o.I
+			, F = o.F
+			, A = [EPSILON].concat( o.A )
+			, S = o.S
+			, T = o.T
+			for(var i=1; o = arguments[i]; i++){
+				A = A.concat( o.A )
+				S = S.concat( o.S )
+				T = T.concat( o.T )
+				for(var j=0, nj=F.length; j<nj; j++)
+					T.push( epsilonTransition( F[j], o.I ))
+				F = o.F
+				}
+			A = Array.unique(A)
+			A.sort()
+			return new Automate( I, F, A, S, T )
+			},
+		optional :function( oFA ){
+			var T = oFA.T
+			for(var j=0, nj=oFA.F.length; j<nj; j++)
+				T.push( epsilonTransition( oFA.I, oFA.F[j]))
+			return new Automate(
+				oFA.I,
+				oFA.F,
+				Array.unique( [EPSILON].concat( oFA.A )),
+				oFA.S.concat([]),
+				T
+				)
+			},
+		or :function(){
+			var I = getUniqueID()
+			var F = getUniqueID()
+			var A = [EPSILON]
+			var S = []
+			var T = []
+			var aTokensID = [] // aTokensID used in DFA aggregation
+			for(var i=0, o; o = arguments[i]; i++ ){
+				A = A.concat( o.A )
+				var aIntersection = Array.intersect( S, o.S )
+				if( aIntersection.length )
+					throwError( 'Error: Automate "|" intersection between automaton states.\n'+ aIntersection )
+				S = S.concat( o.S )
+				T.push( epsilonTransition( I, o.I ))
+				for(var j=0, nj=o.F.length; j<nj; j++)
+					T.push( epsilonTransition( o.F[j], F ))
+				T = T.concat( o.T )
+				if( o.aTokensID ) aTokensID = aTokensID.concat( o.aTokensID )
+				}
+			S = S.concat([I,F])
+			A = Array.unique(A)
+			A.sort()
+			return new Automate( I, [F], A, S, T, aTokensID )
+			},
+		repeat :function( oFA, n, m ){
+			n = n!==undefined ? n : 0
+			m = m!==undefined ? m : 'n'
+			switch( n+','+m ){
+				case '0,1': return Automate.optional( oFA )
+				case '0,n': return Automate.repeat0n( oFA )
+				case '1,n': return Automate.and( oFA, Automate.repeat0n( oFA.clone()))
+				default:
+					if( m == 'n' ){
+						var oResultFA = Automate.repeat( oFA, n, n )
+						var F = oResultFA.F.concat([])
+						oResultFA = Automate.and( oResultFA, Automate.repeat0n( oFA.clone()))
+						return new Automate(
+							oResultFA.I,
+							Array.unique( F.concat( oResultFA.F )),
+							oResultFA.A,
+							oResultFA.S,
+							oResultFA.T
+							)
+						}
+					if( n >= m ) switch( n ){
+						case 0: return Automate.makeEmpty()
+						case 1: return oFA
+						default:
+							var oResultFA = oFA.clone()
+							for(var i=1; i<n; i++)
+								oResultFA = Automate.and( oResultFA, oFA.clone())
+							return oResultFA
+						}
+					if( n < m ){
+						var oResultFA = Automate.repeat( oFA, n, n )
+						var F = oResultFA.F.concat([])
+						for(var i=n; i<m; i++){
+							oResultFA = Automate.and( oResultFA, oFA.clone() )
+							F = F.concat( oResultFA.F )
+							}
+						return new Automate(
+							oResultFA.I,
+							Array.unique( F ),
+							oResultFA.A,
+							oResultFA.S,
+							oResultFA.T
+							)
+						}
+				}
+			},
+		repeat0n :function( oFA ){ // fermeture de Kleene
+			var I=getUniqueID(), F=getUniqueID()
+			var T = oFA.T
+			T.push( epsilonTransition( I, oFA.I ))
+			T.push( epsilonTransition( I, F ))
+			for(var j=0, a=oFA.F, nj=a.length; j<nj; j++){
+				T.push( epsilonTransition( a[j], F ))
+				T.push( epsilonTransition( a[j], oFA.I ))
+				}
+			return new Automate(
+				I,
+				[F],
+				Array.unique( oFA.A.concat([EPSILON])),
+				Array.unique( oFA.S.concat([I,F])),
+				T
+				)
+			}
+		})
+	
+	// GENERATEUR D'AUTOMATE	
+	Automate.fromChar =function( sChar ){
+		return function(){ return Automate.makeChar( sChar ) }
+		}
+	Automate.fromCharClass =function( aSet, bNegated ){
+		return function(){ return Automate.makeCharSet( aSet, bNegated ) }
+		}
+
+	// CARACTÈRES SPÉCIAUX
+	Automate.union({
+		'\\n': Automate.fromChar('\n'),
+		'\\t': Automate.fromChar('\t'),
+		'\\f': Automate.fromChar('\f'),
+		'\\r': Automate.fromChar('\r'),
+		'\\v': Automate.fromChar('\v')
+		})
+
+	// ENSEMBLE DE CARACTÈRES
+	;(function(){
+		var NUMBERS = '0123456789'.split('')
+		, ASCII_LC = 'abcdefghijklmnopqrstuvwxyz'.split('')
+		, ASCII_UC = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('')
+		, WHITE_SPACES = '\t\n\v\f\r \u00a0\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u200b\u2028\u2029\u3000'.split('')
+		Automate.union({
+			'\\d': Automate.fromCharClass( NUMBERS, 0 ),
+			'\\D': Automate.fromCharClass( NUMBERS, 1 ),
+			'\\s': Automate.fromCharClass( WHITE_SPACES, 0 ),
+			'\\S': Automate.fromCharClass( WHITE_SPACES, 1 ),
+			'\\w': Automate.fromCharClass( [].concat( NUMBERS, ASCII_LC, ASCII_UC, ['_']), 0 ),
+			'\\W': Automate.fromCharClass( [].concat( NUMBERS, ASCII_LC, ASCII_UC, ['_']), 1 )
+			})
+	})()
+
+	return Automate
+	})()
+
+RegExp2AST =function( sRegExp ){
+	return ParserLR.parse(
+		AutomatonLexer( sRegExp, 'RegExp' ),
+		RegExpParser.REGEXP
+		)
+	}
+
+NFA =function( e ){ // Transformation de l'AST d'une expression régulière en automate
+	var S = e.nodeName
+	, f=function(e){ return e.oValue.value }
+	switch( S ){
+		case 'RANGE': return Automate.makeCharRange( f( e.firstChild ), f( e.lastChild ))
+		case 'QUANTIFIER':
+			var o = e.oValue, n = parseInt( o.n ), oFA = NFA( e.firstChild )
+			switch( o.m ){
+				case '': return Automate.repeat( oFA, n, n )
+				case '\u221E': return Automate.repeat( oFA, n )
+				default: return Automate.repeat( oFA, n, parseInt( o.m ))
+				}
+		case 'DOT': return Automate.makeAnyChar()
+	//	case 'DOT': return Automate.fromChar( 'ANY' )()
+		default:
+			if( NFA[S]){
+				var a=to_array( e.childNodes )
+				for(var i=0, eChild; eChild=a[i]; i++ ) a[i] = NFA( a[i])
+				return NFA[S].apply( null, a )
+				}
+		}
+	if( ! e.oValue ) return false
+	if( ! f( e )) throwError( 'Error: symbol='+ S )
+	return Automate.wrapper( f( e ))
+	}
+NFA.union((function(){
+	var _getCharSet =function( aDFA ){
+		var aCS = [], aNCS = []
+		for(var i=0; aDFA[i]; i++ ){
+			var symbol = aDFA[i].A[0]
+			if( symbol.charAt(0)=='[' && symbol.charAt(symbol.length-1)==']' ){
+				if( symbol.charAt(1)!='^' )
+					aCS = aCS.concat( symbol.replace( /^\[((?:a|[^a])+)\]$/g, '$1' ).toArray())
+				else
+					aNCS = aNCS.concat( symbol.replace( /^\[\^((?:a|[^a])+)\]$/g, '$1' ).toArray())
+				continue; 
+				}
+			aCS.push( symbol )
+			}
+		aCS = Array.unique( aCS )
+		aCS.sort() // SUPER IMPORTANT !
+		aNCS = Array.unique( aNCS )
+		aNCS.sort() // SUPER IMPORTANT !
+	//	if( Array.intersect( aCS, aNCS ).length ){}
+		return { charset:aCS, negatedcharset:aNCS }
+		}
+	return {
+		CHARCLASS :function(){ // Aucun caractère + ceux en argument
+			var o = _getCharSet( arguments )
+			, I=Automate.getUniqueID(), F=Automate.getUniqueID(), A, S=[I,F], T
+			, f1 = Automate.action( o.charset.join(''), 0 )
+			if(	o.negatedcharset.length ){
+				var f2 = Automate.action( o.negatedcharset.join(''), 1 )
+				A = [f1.toString(),f2.toString()]
+				T = [[ I, f1.toString(), F, f1 ],[ I, f2.toString(), F, f2 ]]
+				}
+			else{
+				A = [f1.toString()]
+				T = [[ I, f1.toString(), F, f1 ]]
+				}
+		//	return new Automate( I, [F], A, S, T )
+			var oFA = new Automate( I, [F], A, S, T )
+			return ( new DFA( oFA.validateAlphabet() )).minimize( I, true )
+			},
+		NEGATED_CHARCLASS :function(){ // Tous les caractères - ceux en argument
+			var o = _getCharSet( arguments )
+			, I=Automate.getUniqueID(), F=Automate.getUniqueID(), A, S=[I,F], T
+			if(	o.negatedcharset.length ){
+				var aCS = Array.diff( o.negatedcharset, o.charset )
+				// Aucun caractère valide... TODO: lancer une erreur ?
+				if( ! aCS.length ) return Automate.makeEmpty(I,F)
+				var f1 = Automate.action( aCS.join(''), 0 )
+				A = [f1.toString()]
+				T = [[ I, f1.toString(), F, f1 ]]
+				return new Automate( I, [F], A, S, T )
+				}
+			else{
+				var f2 = Automate.action( o.charset.join(''), 1 )
+				A = [f2.toString()]
+				T = [[ I, f2.toString(), F, f2 ]]
+				}
+			return new Automate( I, [F], A, S, T )
+		//	var oFA = new Automate( I, [F], A, S, T )
+		//	return ( new DFA( oFA.validateAlphabet() )).minimize()
+			},
+		CONCAT :function(){ return Automate.and.apply( null, arguments )},
+		PIPE :function(){ return Automate.or.apply( null, arguments )},
 		}
 	})())
 
@@ -1553,14 +1552,13 @@ DFA.inheritFrom( Automate ).union({
 	})
 DFA.aggregate =function( oDFA1, oDFA2 ){
 	var oNFA = Automate.or( oDFA1, oDFA2 )
-	NFA.validateAlphabet( oNFA )
-	var oDFA = new DFA( oNFA )
+	var oDFA = new DFA( oNFA.validateAlphabet() )
 	// NB: Ne détecte pas la reconnaissance d'une chaine par 2 tokens: premier arrivée, ...
-	if( oNFA.aTokensID.length != oDFA.aTokensID.length )
+	if( oNFA.aTokensID.length != oDFA.aTokensID.length ){
 		alert( 'Erreur perte de donnée dans l\'aggrégation.\n'+
 			'NFA Tokens ID ('+ oNFA.aTokensID.length +'):\n\t'+oNFA.aTokensID.join('\n\t')+'\n\n'+
 			'DFA Tokens ID ('+ oDFA.aTokensID.length +'):\n\t'+oDFA.aTokensID.join('\n\t')
-			)
+			)}
 	oDFA.minimize()
 	var a = oDFA.aTokensID
 	if( a && a.length ){

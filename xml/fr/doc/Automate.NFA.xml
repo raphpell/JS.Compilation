@@ -19,14 +19,6 @@
 	</group>
 	<group name="Objet NFA">
 		<methods name="">
-			<function name="validateAlphabet">
-				<desc>Transforme l'alphabet d'un NFA de façon à le rendre déterministe...</desc>
-				<arguments>
-					<arg type="Automate" name="oNFA">
-						<desc>Un AFN.</desc>
-					</arg>
-				</arguments>
-			</function>
 		</methods>
 	</group>
 </class>

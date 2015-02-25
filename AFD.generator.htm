@@ -249,10 +249,7 @@ var oDFA, oNFA
 var parseRE =function( bValidate, bMinimize, bMatch, bExport ){
 	var oTree = RegExp2AST( eRE.value )
 	oNFA = NFA( oTree )
-	if( bValidate ){
-		NFA.validateAlphabet( oNFA )
-		oNFA.renameStates()
-		}
+	if( bValidate ) oNFA.validateAlphabet().renameStates()
 	oDFA = new DFA( oNFA )
 	if( bMinimize ) oDFA.minimize()
 	if( bMatch ) match()

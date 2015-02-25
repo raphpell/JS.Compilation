@@ -104,6 +104,9 @@
 				</arguments>
 				<returnValue type="this"></returnValue>
 			</function>
+			<function name="validateAlphabet">
+				<desc>Transforme l'alphabet de l'automate de façon à le rendre déterministe...</desc>
+			</function>
 		</methods>
 	</group>
 	<group name="Objet Automate">
