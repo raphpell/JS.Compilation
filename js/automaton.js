@@ -589,6 +589,7 @@ Automate =(function(){
 					case 'u':
 						return parseInt( sChar.slice( 2 ), 16 )
 					default: // number
+						return sChar.charCodeAt(1)
 					}
 				throwError( 'getCharCode '+ sChar )
 				}
