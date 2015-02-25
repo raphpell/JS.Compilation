@@ -3,9 +3,16 @@
 	<title>Documentation</title>
 	<style>
 	SECTION { margin: 0 0 0 1em; }
-	SECTION TABLE { margin: 0 0 0 1em; }
+	SECTION TABLE { margin: 0 0 0 1em; width: 90%; }
 	SECTION TH,
-	SECTION TD { padding: 0 1em; }
+	SECTION TD {
+		background: #eee;
+		border: 3px solid #CCC;
+		font: bold 1em Georgia;
+		padding: 4px 1em;
+		text-align: center;
+		width: 30%;
+		}
 	</style>
 </head>
 <body>
@@ -13,11 +20,14 @@
 	
 <h1>Documentation</h1>
 
+<section><table>
+	<tr><th>Spécification</th><th>Source(s)</th><th>Tests unitaires</th></tr>
+</table></section>
+	
 <section><h2>Framework</h2>
 	<table>
-		<tr><th>Spécification</th><th>Source</th><th>Test unitaire</th></tr>
 		<tr>
-			<td>...</td>
+			<td></td>
 			<td><a href="../../../source.htm?file=js/framework.js&syntax=JS">js</a></td>
 			<td></td>
 		</tr>
@@ -26,10 +36,9 @@
 
 <section><h2>Les automates</h2>
 	<table>
-		<tr><th>Spécification</th><th>Source</th><th>Test unitaire</th></tr>
 		<tr>
 			<td><a href="Automate.xml">Automate</a></td>
-			<td><a href="../../../source.htm?file=js/automaton.js&syntax=JS">js</a></td>
+			<td rowspan="3"><a href="../../../source.htm?file=js/automaton.js&syntax=JS">js</a></td>
 			<td>
 				<a href="../UnitTest/Automate.object.xml">Objet</a>, 
 				<a href="../UnitTest/Automate.instance.xml">Instance</a>
@@ -37,12 +46,10 @@
 		</tr>
 		<tr>
 			<td><a href="Automate.NFA.xml">NFA</a></td>
-			<td></td>
 			<td><a href="../UnitTest/NFA.xml">NFA</a></td>
 		</tr>
 		<tr>
 			<td><a href="Automate.DFA.xml">DFA</a></td>
-			<td></td>
 			<td><a href="../UnitTest/DFA.xml">DFA</a></td>
 		</tr>
 	</table>
@@ -50,7 +57,6 @@
 
 <section><h2>Les lexers</h2>
 	<table>
-		<tr><th>Spécification</th><th>Source</th><th>Test unitaire</th></tr>
 		<tr>
 			<td>AutomatonLexer</td>
 			<td>
@@ -77,7 +83,6 @@
 
 <section><h2>Les parsers</h2>
 	<table>
-		<tr><th>Spécification</th><th>Source</th><th>Test unitaire</th></tr>
 		<tr>
 			<td>ParserLR</td>
 			<td><a href="../../../source.htm?file=js/parserLR.js&syntax=JS">js</a></td>

@@ -1552,7 +1552,7 @@ DFA.inheritFrom( Automate ).union({
 		}
 	})
 DFA.aggregate =function( oDFA1, oDFA2 ){
-	var oNFA = Automate.PIPE( null, oDFA1, oDFA2 )
+	var oNFA = Automate.or( oDFA1, oDFA2 )
 	NFA.validateAlphabet( oNFA )
 	var oDFA = new DFA( oNFA )
 	// NB: Ne détecte pas la reconnaissance d'une chaine par 2 tokens: premier arrivée, ...
