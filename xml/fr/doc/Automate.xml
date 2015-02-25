@@ -1,7 +1,9 @@
 ﻿<?xml version='1.0' encoding='UTF-8'?>
 <?xml-stylesheet type="text/xsl" href="Doc.xsl"?> 
 <class name="Automate" language="JavaScript">
-	<desc>Fonction générant des automates.</desc>
+	<desc>
+	Automate Fini. 
+	</desc>
 	<syntax>
 		<code><![CDATA[ oAutomate = new Automate ( I, F, A, S, T [, aTokensID ]) ]]></code>
 		<arguments>
@@ -14,10 +16,10 @@
 			<arg name="A" type="Array">
 				<desc>Alphabet. Tableau contenant :
 					<ul>
-						<li>des caractères</li>
-						<li>des ensembles de caractère négatif ou non</li>
+						<li>des caractères ("a", "\n", ...)</li>
+						<li>des ensembles de caractère négatif ou non  ("[abc]", "[^abc]", ...)</li>
 						<li>le symbole EPSILON</li>
-						<li>le symbole ANY</li>
+						<li><strike>le symbole ANY</strike></li>
 					</ul>
 				</desc>
 			</arg>
@@ -25,13 +27,13 @@
 				<desc>États (tableau de nombre).</desc>
 			</arg>
 			<arg name="T" type="Array">
-				<desc>Transitions. Implémentation d'une transition : un tableau de 3 à 4 éléments.
+				<desc>Transitions. Une transition est un tableau de 3 à 4 éléments.
 					<dl>
 						<dt>[0] un état initial</dt>
 						<dt>[1] un symbole de l'alphabet</dt>
 						<dt>[2] un état final</dt>
-						<dt>[3] une fonction permettant de transiter d'un état à un autre (cas ensemble de caractère)
-								<pre>	var f =function( caractere, etatFinal ){...}</pre></dt>
+						<dt>[3] Cas ensemble de caractère: une fonction permettant de transiter d'un état à un autre 
+								(voir <code>Automate.action</code>)</dt>
 					</dl>
 				</desc>
 			</arg>

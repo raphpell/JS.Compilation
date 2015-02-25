@@ -1,37 +1,95 @@
 <html>
 <head>
 	<title>Documentation</title>
+	<style>
+	SECTION { margin: 0 0 0 1em; }
+	SECTION TABLE { margin: 0 0 0 1em; }
+	SECTION TH,
+	SECTION TD { padding: 0 1em; }
+	</style>
 </head>
 <body>
 <a href="../../../index.htm">Index</a>
 	
 <h1>Documentation</h1>
 
-<dl>
-	<dt><h2>Les automates</h2></dt>
-	<dd><a href="Automate.xml">Automate</a>
-		 <b>Tests unitaires</b>
-		( <a href="../UnitTest/Automate.object.xml">Objet</a>
-		, <a href="../UnitTest/Automate.instance.xml">Instance</a>
-		 )
-	</dd>
-	<dd><a href="Automate.DFA.xml">DFA</a>
-		 <b>Tests unitaires</b>
-		( <a href="../UnitTest/DFA.xml">DFA</a></li> )
-	</dd>
-	<dd><a href="Automate.NFA.xml">NFA</a>
-		 <b>Tests unitaires</b>
-		( <a href="../UnitTest/NFA.xml">NFA</a></li> )
-	</dd>
-	<!-- 
-	<dt><h2>Les lexers</h2></dt>
-	<dd><a href="Lexer.Automaton.xml">AutomatonLexer</a></dd>
-	<dd><a href="Lexer.MultiRegExp.xml">MultiRegExpLexer</a></dd>
-	<dt><h2>Les parsers</h2></dt>
-	<dd><a href="Parser.LL.xml">ParserLL</a></dd>
-	<dd><a href="Parser.LR.xml">ParserLR</a></dd>
-	 -->
-</dl>
+<section><h2>Framework</h2>
+	<table>
+		<tr><th>Spécification</th><th>Source</th><th>Test unitaire</th></tr>
+		<tr>
+			<td>...</td>
+			<td><a href="../../../source.htm?file=js/framework.js&syntax=JS">js</a></td>
+			<td></td>
+		</tr>
+	</table>
+</section>
+
+<section><h2>Les automates</h2>
+	<table>
+		<tr><th>Spécification</th><th>Source</th><th>Test unitaire</th></tr>
+		<tr>
+			<td><a href="Automate.xml">Automate</a></td>
+			<td><a href="../../../source.htm?file=js/automaton.js&syntax=JS">js</a></td>
+			<td>
+				<a href="../UnitTest/Automate.object.xml">Objet</a>, 
+				<a href="../UnitTest/Automate.instance.xml">Instance</a>
+			</td>
+		</tr>
+		<tr>
+			<td><a href="Automate.NFA.xml">NFA</a></td>
+			<td></td>
+			<td><a href="../UnitTest/NFA.xml">NFA</a></td>
+		</tr>
+		<tr>
+			<td><a href="Automate.DFA.xml">DFA</a></td>
+			<td></td>
+			<td><a href="../UnitTest/DFA.xml">DFA</a></td>
+		</tr>
+	</table>
+</section>
+
+<section><h2>Les lexers</h2>
+	<table>
+		<tr><th>Spécification</th><th>Source</th><th>Test unitaire</th></tr>
+		<tr>
+			<td>AutomatonLexer</td>
+			<td>
+				<a href="../../../source.htm?file=js/lexer.automaton.js&syntax=JS">js</a>, 
+				<a href="../../../source.htm?file=js/lexer.automaton.modules.js&syntax=JS">modules</a>
+			</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>MultiRegExpLexer</td>
+			<td>
+				<a href="../../../source.htm?file=js/lexer.regexp.multi.js&syntax=JS">js</a>, 
+				<a href="../../../source.htm?file=js/lexer.regexp.multi.modules.js&syntax=JS">modules</a>
+			</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>OneRegExpLexer</td>
+			<td><a href="../../../source.htm?file=js/lexer.regexp.one.js&syntax=JS">js</a></td>
+			<td></td>
+		</tr>
+	</table>
+</section>
+
+<section><h2>Les parsers</h2>
+	<table>
+		<tr><th>Spécification</th><th>Source</th><th>Test unitaire</th></tr>
+		<tr>
+			<td>ParserLR</td>
+			<td><a href="../../../source.htm?file=js/parserLR.js&syntax=JS">js</a></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>ParserLL</td>
+			<td></td>
+			<td></td>
+		</tr>
+	</table>
+</section>
 
 </body>
 </html>

@@ -3,10 +3,7 @@
 EPSILON = '&epsilon;'
 EMPTY = '&empty;'
 
-throwError =function( s ){
-	alert( s )
-	throw new Error ( s )
-	}
+throwError =function( s ){ alert( s ); throw new Error ( s ) }
 
 Automate =(function(){
 	// UTILITAIRES
