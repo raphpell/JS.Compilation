@@ -248,7 +248,6 @@ Automate =(function(){
 				var T ={
 					deleteSymbol :function( sSymbol ){
 						delete oBySymbols[ sSymbol ]
-					//	oBySymbols.remove( sSymbol )
 						oNFA.A.remove( sSymbol )
 						},
 					change :function( sSymbol, aNewItems, sMessage, bInfo ){
@@ -266,11 +265,13 @@ Automate =(function(){
 								)
 							}
 						var addTransition =function( oItem, aBase ){
-							var I=Automate.getUniqueID(), F=Automate.getUniqueID()
-							oNFA.S = oNFA.S.concat([I,F])
+							var I= aBase[0] // Automate.getUniqueID()
+							var F= aBase[2] // Automate.getUniqueID()
+						//	oNFA.S = oNFA.S.concat([I,F])
 							var a = oBySymbols[ oItem.symbol ]
 							if( ! a.push ) throwError( 'Erreur pas de transition trouvée pour le symbole '+ oItem.symbol +'\n'+ JSON.stringify( a ))
 							a.push( oItem.action ? [ I, oItem.symbol, F, oItem.action ] : [ I, oItem.symbol, F ])
+						/* 
 							var a = oBySymbols[ EPSILON ]
 							if( ! a ){
 								a = oBySymbols[ EPSILON ] = []
@@ -278,6 +279,7 @@ Automate =(function(){
 								}
 							a.push([ aBase[0], EPSILON, I ])
 							a.push([ F, EPSILON, aBase[2] ])
+						*/
 							}
 						// Ajoute les nouveaux symboles dans l'alphabet
 						for(var i=0, ni=aNewItems.length; i<ni; i++ ){
@@ -537,9 +539,13 @@ Automate =(function(){
 				}
 
 			// Création de l'alphabet !
-			var A = [ EPSILON ]
-			for(var i=0, ni=aAtoms.length; i<ni; i++ ) A.push( aAtoms[i].symbol )
-			for(var i=0, ni=aGroups.length; i<ni; i++ ) A.push( aGroups[i].symbol )
+			var A = Transitions.getSymbol( EPSILON ) ? [ EPSILON ] : []
+			for(var i=0, ni=aAtoms.length; i<ni; i++ )
+				if( Transitions.getSymbol( aAtoms[i].symbol ))
+					A.push( aAtoms[i].symbol )
+			for(var i=0, ni=aGroups.length; i<ni; i++ )
+				if( Transitions.getSymbol( aGroups[i].symbol ))
+					A.push( aGroups[i].symbol )
 			if( oUniqueNegativeCharset ) A.push( oUniqueNegativeCharset.symbol )
 
 			oNFA.A = Array.unique( A )

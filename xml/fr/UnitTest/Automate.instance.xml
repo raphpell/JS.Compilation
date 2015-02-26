@@ -62,9 +62,27 @@ var oClone = oFA.clone()
 	<test name="prototype.epsilonClosure">
 		<assertions>
 			<value><![CDATA[
-
+oFA = Automate.makeChar( 'a' )
+var f=function( oNFA ){ return {
+	nfa: oNFA.renameStates(),
+	epsilonclosure: JSON.stringify( oNFA.epsilonClosure())
+	}}
+var o1 = f( oFA )
+var oAND = f( Automate.and( oFA, oFA.clone()) )
+var oOR = f( Automate.or( oFA, oFA.clone()) )
+var oOPT = f( Automate.optional( oFA.clone() ) )
+var oREP = f( Automate.repeat0n( oFA.clone() ) )
 			]]></value>
-			<assert><![CDATA[ false ]]></assert>
+			<assert><![CDATA[ oFA ]]></assert>
+			<assert><![CDATA[ o1.epsilonclosure === '{"1":[1],"2":[2]}' ]]></assert>
+			<assert><![CDATA[ oAND.epsilonclosure === '{"1":[1],"2":[2,3],"3":[3],"4":[4]}' ]]></assert>
+			<assert><![CDATA[ oAND.nfa ]]></assert>
+			<assert><![CDATA[ oOR.epsilonclosure === '{"1":[1,2,4],"2":[2],"3":[3,6],"4":[4],"5":[5,6],"6":[6]}' ]]></assert>
+			<assert><![CDATA[ oOR.nfa ]]></assert>
+			<assert><![CDATA[ oOPT.epsilonclosure === '{"1":[1,2],"2":[2]}' ]]></assert>
+			<assert><![CDATA[ oOPT.nfa ]]></assert>
+			<assert><![CDATA[ oREP.epsilonclosure === '{"1":[1,2,4],"2":[2],"3":[3,4,2],"4":[4]}' ]]></assert>
+			<assert><![CDATA[ oREP.nfa ]]></assert>
 		</assertions>
 	</test>
 	<test name="prototype.renameStates">
@@ -116,45 +134,206 @@ oClone.renameStates( 20 )
 			<value><![CDATA[
 var I = 10
 var F = [15,20]
-var A = ["a","b"]
+var A = ["a","b","c"]
 var S = [10,15,20]
-var T = [[10,"a",20],[20,"a",10],[20,"b",15]]
+var T = [[10,"a",20],[20,"b",10],[20,"c",15]]
 oFA = new Automate ( I, F, A, S, T )
 oFA.renameStates( 2, false, [[10,50],[15,0],[20,100]] )
 			]]></value>
+			<assert><![CDATA[ oFA ]]></assert>
 			<assert><![CDATA[ oFA.I === 1 ]]></assert>
 			<assert><![CDATA[ oFA.F.toString() == "2,3"]]></assert>
-			<assert><![CDATA[ oFA.A.toString() === "a,b" ]]></assert>
+			<assert><![CDATA[ oFA.A.toString() === "a,b,c" ]]></assert>
 			<assert><![CDATA[ oFA.S.toString() === "1,2,3" ]]></assert>
 			<assert><![CDATA[ oFA.T.length === 3 ]]></assert>
-			<assert><![CDATA[ JSON.stringify( oFA.T ) === '[[1,"a",2],[2,"a",1],[2,"b",3]]' ]]></assert>
-			<assert><![CDATA[ JSON.stringify( oFA.M ) === '{"1":{"a":[2]},"2":{"a":[1],"b":[3]}}' ]]></assert>
+			<assert><![CDATA[ JSON.stringify( oFA.T ) === '[[1,"a",2],[2,"b",1],[2,"c",3]]' ]]></assert>
+			<assert><![CDATA[ JSON.stringify( oFA.M ) === '{"1":{"a":[2]},"2":{"b":[1],"c":[3]}}' ]]></assert>
 		</assertions>
 		<assertions>
 			<desc>Pas utilisé</desc>
 			<value><![CDATA[
 var I = 10
 var F = [15,20]
-var A = ["a","b"]
+var A = ["a","b","c"]
 var S = [10,15,20]
-var T = [[10,"a",20],[20,"a",10],[20,"b",15]]
+var T = [[10,"a",20],[20,"b",10],[20,"c",15]]
 oFA = new Automate ( I, F, A, S, T )
 oFA.renameStates( 2, true, [[10,50],[15,0],[20,100]] )
 			]]></value>
+			<assert><![CDATA[ oFA ]]></assert>
 			<assert><![CDATA[ oFA.I === 3 ]]></assert>
 			<assert><![CDATA[ oFA.F.toString() == "2,4"]]></assert>
-			<assert><![CDATA[ oFA.A.toString() === "a,b" ]]></assert>
+			<assert><![CDATA[ oFA.A.toString() === "a,b,c" ]]></assert>
 			<assert><![CDATA[ oFA.S.toString() === "2,3,4" ]]></assert>
-			<assert><![CDATA[ JSON.stringify( oFA.T ) === '[[3,"a",2],[2,"a",3],[2,"b",4]]' ]]></assert>
-			<assert><![CDATA[ JSON.stringify( oFA.M ) === '{"2":{"a":[3],"b":[4]},"3":{"a":[2]}}' ]]></assert>
+			<assert><![CDATA[ JSON.stringify( oFA.T ) === '[[3,"a",2],[2,"b",3],[2,"c",4]]' ]]></assert>
+			<assert><![CDATA[ JSON.stringify( oFA.M ) === '{"2":{"b":[3],"c":[4]},"3":{"a":[2]}}' ]]></assert>
+		</assertions>
+	</test>
+
+	<test name="Préambule" class="preambule">
+		<assertions>
+			<desc></desc>
+			<value><![CDATA[
+var Before, After
+var Test =function( oNFA1, oNFA2 ){
+	var oNFA = Automate.and( oNFA1, oNFA2 )
+	var oDFA = new DFA ( oNFA )
+	Before = oDFA.renameStates()
+	After = oDFA.clone().renameStates().validateAlphabet()
+	}
+			]]></value>
+		</assertions>
+		<assertions>
+			<desc></desc>
+			<value><![CDATA[
+var Only_A_and_T_change =function(){
+	return After.I === Before.I
+		&& After.F.toString() === Before.F.toString()
+		&& After.A.toString() !== Before.A.toString()
+		&& After.S.toString() === Before.S.toString()
+		&& After.T.toString() !== Before.T.toString()
+	}
+var __ =function( Value, ValueToString ){
+	return Value.toString() === ValueToString
+	}
+			]]></value>
 		</assertions>
 	</test>
 	<test name="prototype.validateAlphabet">
-		<assertions>
+		<assertions name="Réduction NCC 'sans intersection'">
 			<value><![CDATA[
-
+Test(
+	Automate.makeCharSet( ['a','b','c'], true ),
+	Automate.makeCharSet( ['A','B','C'], true )
+	)
 			]]></value>
-			<assert><![CDATA[ false ]]></assert>
+			<assert><![CDATA[ Only_A_and_T_change() ]]></assert>
+
+			<assert><![CDATA[ Before ]]></assert>
+			<assert><![CDATA[ __( Before.A, "[^ABC],[^abc]" ) ]]></assert>
+			<assert><![CDATA[ Before.T.length === 2 ]]></assert>
+			<assert><![CDATA[ __( Before.T[0], '1,[^abc],2,[^abc]' ) ]]></assert>
+			<assert><![CDATA[ __( Before.T[1], '2,[^ABC],3,[^ABC]' ) ]]></assert>
+
+			<assert><![CDATA[ After ]]></assert>
+			<assert><![CDATA[ __( After.A, '[ABC],[^ABCabc],[abc]' ) ]]></assert>
+			<assert><![CDATA[ After.T.length === 4 ]]></assert>
+			<assert><![CDATA[ __( After.T[0], '1,[ABC],2,[ABC]' ) ]]></assert>
+			<assert><![CDATA[ __( After.T[1], '2,[^ABCabc],3,[^ABCabc]' ) ]]></assert>
+			<assert><![CDATA[ __( After.T[2], '1,[^ABCabc],2,[^ABCabc]' ) ]]></assert>
+			<assert><![CDATA[ __( After.T[3], '2,[abc],3,[abc]' ) ]]></assert>
+		</assertions>
+		<assertions name="Réduction NCC 'intersection'">
+			<value><![CDATA[
+Test(
+	Automate.makeCharSet( ['a','b','c'], true ),
+	Automate.makeCharSet( ['a','A','B'], true )
+	)
+			]]></value>
+			<assert><![CDATA[ Only_A_and_T_change() ]]></assert>
+
+			<assert><![CDATA[ Before ]]></assert>
+			<assert><![CDATA[ __( Before.A, '[^aAB],[^abc]' ) ]]></assert>
+			<assert><![CDATA[ Before.T.length === 2 ]]></assert>
+			<assert><![CDATA[ __( Before.T[0], '1,[^abc],2,[^abc]' ) ]]></assert>
+			<assert><![CDATA[ __( Before.T[1], '2,[^aAB],3,[^aAB]' ) ]]></assert>
+
+			<assert><![CDATA[ After ]]></assert>
+			<assert><![CDATA[ __( After.A, '[AB],[^aABbc],[bc]' ) ]]></assert>
+			<assert><![CDATA[ After.T.length === 4 ]]></assert>
+			<assert><![CDATA[ __( After.T[0], '1,[AB],2,[AB]' ) ]]></assert>
+			<assert><![CDATA[ __( After.T[1], '2,[^aABbc],3,[^aABbc]' ) ]]></assert>
+			<assert><![CDATA[ __( After.T[2], '1,[^aABbc],2,[^aABbc]' ) ]]></assert>
+			<assert><![CDATA[ __( After.T[3], '2,[bc],3,[bc]' ) ]]></assert>
+		</assertions>
+		<assertions name="NCC vs CC">
+			<value><![CDATA[
+Test(
+	Automate.makeCharSet( ['a','b','c']),
+	Automate.makeCharSet( ['A','B','C'], true )
+	)
+			]]></value>
+			<assert><![CDATA[ Only_A_and_T_change() ]]></assert>
+
+			<assert><![CDATA[ Before ]]></assert>
+			<assert><![CDATA[ __( Before.A, '[^ABC],[abc]' ) ]]></assert>
+			<assert><![CDATA[ Before.T.length === 2 ]]></assert>
+			<assert><![CDATA[ __( Before.T[0], '1,[abc],2,[abc]' ) ]]></assert>
+			<assert><![CDATA[ __( Before.T[1], '2,[^ABC],3,[^ABC]' ) ]]></assert>
+
+			<assert><![CDATA[ After ]]></assert>
+			<assert><![CDATA[ __( After.A, '[^ABCabc],[abc]' ) ]]></assert>
+			<assert><![CDATA[ After.T.length === 3 ]]></assert>
+			<assert><![CDATA[ __( After.T[0], '2,[^ABCabc],3,[^ABCabc]' ) ]]></assert>
+			<assert><![CDATA[ __( After.T[1], '1,[abc],2,[abc]' ) ]]></assert>
+			<assert><![CDATA[ __( After.T[2], '2,[abc],3,[abc]' ) ]]></assert>
+		</assertions>
+		<assertions name="NCC vs Atom">
+			<value><![CDATA[
+Test(
+	Automate.makeCharSet( ['a','b','c'], true ),
+	Automate.makeChar( 'd' )
+	)
+			]]></value>
+			<assert><![CDATA[ Only_A_and_T_change() ]]></assert>
+
+			<assert><![CDATA[ Before ]]></assert>
+			<assert><![CDATA[ __( Before.A, '[^abc],d' ) ]]></assert>
+			<assert><![CDATA[ Before.T.length === 2 ]]></assert>
+			<assert><![CDATA[ __( Before.T[0], '1,[^abc],2,[^abc]' ) ]]></assert>
+			<assert><![CDATA[ __( Before.T[1], '2,d,3' ) ]]></assert>
+
+			<assert><![CDATA[ After ]]></assert>
+			<assert><![CDATA[ __( After.A, '[^abcd],d' ) ]]></assert>
+			<assert><![CDATA[ After.T.length === 3 ]]></assert>
+			<assert><![CDATA[ __( After.T[0], '1,[^abcd],2,[^abcd]' ) ]]></assert>
+			<assert><![CDATA[ __( After.T[1], '2,d,3' ) ]]></assert>
+			<assert><![CDATA[ __( After.T[2], '1,d,2' ) ]]></assert>
+		</assertions>
+		<assertions name="CC vs CC">
+			<value><![CDATA[
+Test(
+	Automate.makeCharSet( ['a','b','c'] ),
+	Automate.makeCharSet( ['b','c','d'] )
+	)
+			]]></value>
+			<assert><![CDATA[ Only_A_and_T_change() ]]></assert>
+
+			<assert><![CDATA[ Before ]]></assert>
+			<assert><![CDATA[ __( Before.A, '[abc],[bcd]' ) ]]></assert>
+			<assert><![CDATA[ Before.T.length === 2 ]]></assert>
+			<assert><![CDATA[ __( Before.T[0], '1,[abc],2,[abc]' ) ]]></assert>
+			<assert><![CDATA[ __( Before.T[1], '2,[bcd],3,[bcd]' ) ]]></assert>
+
+			<assert><![CDATA[ After ]]></assert>
+			<assert><![CDATA[ __( After.A, '[bc],a,d' ) ]]></assert>
+			<assert><![CDATA[ After.T.length === 4 ]]></assert>
+			<assert><![CDATA[ __( After.T[0], '1,[bc],2,[bc]' ) ]]></assert>
+			<assert><![CDATA[ __( After.T[1], '2,[bc],3,[bc]' ) ]]></assert>
+			<assert><![CDATA[ __( After.T[2], '1,a,2' ) ]]></assert>
+			<assert><![CDATA[ __( After.T[3], '2,d,3' ) ]]></assert>
+		</assertions>
+		<assertions name="CC vs Atom">
+			<value><![CDATA[
+Test(
+	Automate.makeCharSet( ['a','b','c'] ),
+	Automate.makeChar( 'c' )
+	)
+			]]></value>
+			<assert><![CDATA[ Only_A_and_T_change() ]]></assert>
+
+			<assert><![CDATA[ Before ]]></assert>
+			<assert><![CDATA[ __( Before.A, '[abc],c' ) ]]></assert>
+			<assert><![CDATA[ Before.T.length === 2 ]]></assert>
+			<assert><![CDATA[ __( Before.T[0], '1,[abc],2,[abc]' ) ]]></assert>
+			<assert><![CDATA[ __( Before.T[1], '2,c,3' ) ]]></assert>
+
+			<assert><![CDATA[ After ]]></assert>
+			<assert><![CDATA[ __( After.A, '[ab],c' ) ]]></assert>
+			<assert><![CDATA[ After.T.length === 3 ]]></assert>
+			<assert><![CDATA[ __( After.T[0], '1,[ab],2,[ab]' ) ]]></assert>
+			<assert><![CDATA[ __( After.T[1], '2,c,3' ) ]]></assert>
+			<assert><![CDATA[ __( After.T[2], '1,c,2' ) ]]></assert>
 		</assertions>
 	</test>
 </truth>
