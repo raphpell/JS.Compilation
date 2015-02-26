@@ -182,7 +182,7 @@ INPUT:checked ~ DIV {
 								<xsl:text> </xsl:text>
 								<code class="type"><xsl:value-of select="returnValue/@type"/></code>
 								<xsl:for-each select="returnValue/desc">
-									<p><xsl:copy-of select="current()"/></p>
+									<div class="desc"><xsl:copy-of select="current()"/></div>
 								</xsl:for-each>
 							</div>
 							</xsl:if>

@@ -31,6 +31,18 @@ var oFA = new Automate ( I, F, A, S, T, aTokensID )
 			<assert><![CDATA[ ! oFA.M ]]></assert>
 		</assertions>
 	</test>
+	<test name="prototype.buildTable">
+		<assertions>
+			<value><![CDATA[
+oFA.buildTable()
+Automate.setUniqueID( 3 )
+var oClone = oFA.clone()
+oClone.buildTable()
+			]]></value>
+			<assert><![CDATA[ JSON.stringify( oFA.M ) === '{"1":{"¤":[2]}}' ]]></assert>
+			<assert><![CDATA[ JSON.stringify( oClone.M ) === '{"3":{"¤":[4]}}' ]]></assert>
+		</assertions>
+	</test>
 	<test name="prototype.clone">
 		<assertions>
 			<value><![CDATA[
@@ -47,14 +59,12 @@ var oClone = oFA.clone()
 			<assert><![CDATA[ ! oClone.M ]]></assert>
 		</assertions>
 	</test>
-	<test name="prototype.buildTable">
+	<test name="prototype.epsilonClosure">
 		<assertions>
 			<value><![CDATA[
-oFA.buildTable()
-oClone.buildTable()
+
 			]]></value>
-			<assert><![CDATA[ JSON.stringify( oFA.M ) === '{"1":{"¤":[2]}}' ]]></assert>
-			<assert><![CDATA[ JSON.stringify( oClone.M ) === '{"3":{"¤":[4]}}' ]]></assert>
+			<assert><![CDATA[ false ]]></assert>
 		</assertions>
 	</test>
 	<test name="prototype.renameStates">
@@ -137,6 +147,14 @@ oFA.renameStates( 2, true, [[10,50],[15,0],[20,100]] )
 			<assert><![CDATA[ oFA.S.toString() === "2,3,4" ]]></assert>
 			<assert><![CDATA[ JSON.stringify( oFA.T ) === '[[3,"a",2],[2,"a",3],[2,"b",4]]' ]]></assert>
 			<assert><![CDATA[ JSON.stringify( oFA.M ) === '{"2":{"a":[3],"b":[4]},"3":{"a":[2]}}' ]]></assert>
+		</assertions>
+	</test>
+	<test name="prototype.validateAlphabet">
+		<assertions>
+			<value><![CDATA[
+
+			]]></value>
+			<assert><![CDATA[ false ]]></assert>
 		</assertions>
 	</test>
 </truth>

@@ -100,6 +100,23 @@ Automate =(function(){
 				this.aTokensID.concat([])
 				)
 			},
+		epsilonClosure :function(){
+			var E={}
+			for(var i=0, a=this.S, ni=a.length; i<ni; i++) E[a[i]]=[a[i]]
+			var bChanged = true
+			while( bChanged ){
+				bChanged = false
+				for(var i=0, a=this.T, ni=a.length; i<ni; i++){
+					var t = a[i]
+					if( t[1]==EPSILON ){
+						var n = E[ t[0]].length
+						E[ t[0]]= Array.unique( E[ t[0]].concat( E[ t[2]]))
+						if( n != E[ t[0]].length ) bChanged = true
+						}
+					}
+				}
+			return E
+			},
 		renameStates :function( nStateIDCounter, bAll, aOrder ){
 			var oFA = this
 			var NEW_ID = {} // NEW STATES ID
@@ -869,23 +886,6 @@ DFA =(function(){
 	, aTokensName
 	, oTokensState
 	, oNewStates
-	, _epsilonClosure =function(){
-		var E={}
-		for(var i=0, a=NFA.S, ni=a.length; i<ni; i++) E[a[i]]=[a[i]]
-		var bChanged = true
-		while( bChanged ){
-			bChanged = false
-			for(var i=0, a=NFA.T, ni=a.length; i<ni; i++){
-				var t = a[i]
-				if( t[1]==EPSILON ){
-					var n = E[ t[0]].length
-					E[ t[0]]= Array.unique( E[ t[0]].concat( E[ t[2]]))
-					if( n != E[ t[0]].length ) bChanged = true
-					}
-				}
-			}
-		return E
-		}
 	, stateID =function( NFAStates ){ return NFAStates.id || NFAStates.join(':') || '0' }
 	, getTransitions=(function(){
 		var Cache ={}
@@ -971,7 +971,7 @@ DFA =(function(){
 		getTransitions.init()
 		NFA = oNFA
 		NFA.T = NFA.T.concat([])
-		EpsilonClosure = _epsilonClosure()
+		EpsilonClosure = oNFA.epsilonClosure()
 		I = EpsilonClosure[ NFA.I ]
 		I.id = stateID(I) 
 		F = []

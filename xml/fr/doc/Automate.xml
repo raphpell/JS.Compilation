@@ -82,6 +82,16 @@
 				</desc>
 				<returnValue type="Automate"></returnValue>
 			</function>
+			<function name="epsilonClosure">
+				<desc>
+					Calcul la fermeture epsilon de tous les états de l'automate.
+				</desc>
+				<returnValue type="Object">
+					<desc>
+						(clé=état), (valeur=tableau d'états).
+					</desc>
+				</returnValue>
+			</function>
 			<function name="renameStates">
 				<desc>Renomme les états de l'automate. 
 					<ul>
