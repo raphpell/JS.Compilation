@@ -1,6 +1,7 @@
 Lexer et Parser JavaScript.
 ===========
-[Site du projet](http://raphpell.github.io/JS.Compilation/index.htm) 
+[Site du projet](http://raphpell.github.io/JS.Compilation/index.htm)
+[Documentation](http://raphpell.github.io/JS.Compilation/xml/fr/doc/index.htm)
 
 Objectif: Colorisation de code dans un éditeur de texte.
 

@@ -1,1 +1,90 @@
-﻿
+﻿<?xml version='1.0' encoding='UTF-8'?>
+<?xml-stylesheet type="text/xsl" href="Doc.xsl"?> 
+<class name="AutomatonLexer" language="JavaScript">
+	<desc>.</desc>
+	<syntax>
+		<code><![CDATA[ var oLexer = new AutomatonLexer () ]]></code>
+	</syntax>
+	<syntax>
+		<code><![CDATA[ var eScanResult = AutomatonLexer ( sText, sSyntax ) ]]></code>
+		<arguments>
+			<arg type="String" name="sText">
+				<desc>.</desc>
+			</arg>
+			<arg type="String" name="sSyntax">
+				<desc>.</desc>
+			</arg>
+		</arguments>
+	</syntax>
+	<group name="Instance(s)">
+		<properties name="Attributs">
+			<variable name="type" type="String">
+				<desc>.</desc>
+			</variable>
+		</properties>
+		<methods name="Méthodes scanning">
+			<function name="end">
+				<desc>.</desc>
+				<returnValue type="HTMLElement"></returnValue>
+			</function>
+			<function name="init">
+				<desc>.</desc>
+				<arguments>
+					<arg type="String" name="sText">
+						<desc>.</desc>
+					</arg>
+					<arg type="String" name="sSyntax">
+						<desc>.</desc>
+					</arg>
+				</arguments>
+			</function>
+			<function name="readToken">
+				<desc>.</desc>
+				<returnValue type="Mixte"></returnValue>
+			</function>
+			<function name="scan">
+				<desc>.</desc>
+				<arguments>
+					<arg type="String" name="sText">
+						<desc>.</desc>
+					</arg>
+					<arg type="String" name="sSyntax">
+						<desc>.</desc>
+					</arg>
+				</arguments>
+			</function>
+			<function name="searchToken">
+				<desc>.</desc>
+				<arguments>
+					<arg type="Automate" name="oDFA">
+						<desc>.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="String"></returnValue>
+			</function>
+			<function name="setSyntax">
+				<desc>.</desc>
+				<arguments>
+					<arg type="String" name="sSyntax">
+						<desc>.</desc>
+					</arg>
+				</arguments>
+			</function>
+		</methods>
+		<methods name="Méthodes incremental scanning">
+			<desc>.</desc>
+		</methods>
+	</group>
+	<group name="AutomatonLexer.Previous">
+		<desc>.</desc>
+	</group>
+	<group name="AutomatonLexer.Rules">
+		<desc>.</desc>
+	</group>
+	<group name="AutomatonLexer.Skip">
+		<desc>.</desc>
+	</group>
+	<group name="AutomatonLexer.Stack">
+		<desc>.</desc>
+	</group>
+</class>

@@ -1,1 +1,93 @@
-﻿
+﻿<?xml version='1.0' encoding='UTF-8'?>
+<?xml-stylesheet type="text/xsl" href="Doc.xsl"?> 
+<class name="ParserLR" language="JavaScript">
+	<desc>....</desc>
+	<syntax>
+		<code><![CDATA[ oParser = new ParserLR ( ENGINE ) ]]></code>
+		<arguments>
+			<arg name="ENGINE" type="Object">
+				<desc>...</desc>
+			</arg>
+		</arguments>
+	</syntax>
+	<group name="Instance(s)">
+		<methods name="">
+			<function name="getAction">
+				<desc>.</desc>
+				<arguments>
+					<arg type="Number" name="nState">
+						<desc>...</desc>
+					</arg>
+					<arg type="String" name="sSymbol">
+						<desc>...</desc>
+					</arg>
+				</arguments>
+				<returnValue type="String"></returnValue>
+			</function>
+			<function name="getResult">
+				<desc>.</desc>
+				<returnValue type="HTMLElement"></returnValue>
+			</function>
+			<function name="getState">
+				<desc>.</desc>
+				<returnValue type="Number"></returnValue>
+			</function>
+			<function name="readToken">
+				<desc>.</desc>
+				<arguments>
+					<arg type="Object" name="oToken">
+						<desc>...</desc>
+					</arg>
+				</arguments>
+				<returnValue type="HTMLElement"></returnValue>
+			</function>
+			<function name="e">
+				<desc>.</desc>
+				<arguments></arguments>
+				<returnValue type="Error"></returnValue>
+			</function>
+			<function name="s">
+				<desc>.</desc>
+			</function>
+			<function name="r">
+				<desc>.</desc>
+			</function>
+			<function name="a">
+				<desc>.</desc>
+				<returnValue type="HTMLElement"></returnValue>
+			</function>
+		</methods>
+	</group>
+	<group name="Objet">
+		<properties name="Attribut">
+			<variable name="Ignore" type="Object">
+				<desc>...</desc>
+			</variable>
+		</properties>
+		<methods name="Méthodes">
+			<function name="parse">
+				<desc>.</desc>
+				<arguments>
+					<arg type="HTMLElement" name="eScanResult">
+						<desc>...</desc>
+					</arg>
+					<arg type="Object" name="ENGINE">
+						<desc>...</desc>
+					</arg>
+				</arguments>
+				<returnValue type="HTMLElement"></returnValue>
+			</function>
+			<function name="Node">
+				<desc>.</desc>
+				<arguments>
+					<arg type="String" name="sNodeName">
+						<desc>...</desc>
+					</arg>
+				</arguments>
+				<returnValue type="HTMLElement"></returnValue>
+			</function>
+			<function name="ParseTree">
+			</function>
+		</methods>
+	</group>
+</class>

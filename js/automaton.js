@@ -193,14 +193,6 @@ Automate =(function(){
 			, aAtoms=[], aGroups=[], aNegativeGroups=[]
 			, bAnyIn = false
 			, oUniqueNegativeCharset
-			
-			var bConsoleInfo = 0
-			var bConsoleInfoTransChange = 1
-			var bConsoleInfoRNG = 1
-			var bConsoleInfoGvsTNG = 1
-			var bConsoleInfoAvsTNG = 1
-			var bConsoleInfoGvsG = 1
-			var bConsoleInfoAvsG = 1
 				
 			var Item =function( symbol ){
 				if( Item[symbol]) return Item[symbol]
@@ -250,20 +242,9 @@ Automate =(function(){
 						delete oBySymbols[ sSymbol ]
 						oNFA.A.remove( sSymbol )
 						},
-					change :function( sSymbol, aReplacmt, sMessage, bInfo ){
+					change :function( sSymbol, aReplacmt ){
 						aReplacmt = Array.unique( aReplacmt )
 						if( aReplacmt.length==1 && sSymbol==aReplacmt[0].symbol ) return ;
-						if( bInfo || bConsoleInfo && bConsoleInfoTransChange ){
-							var a = []
-							for(var i=0, ni=aReplacmt.length; i<ni; i++ ){
-								if( aReplacmt[i]) a.push( JSON.stringify( aReplacmt[i].symbol ).slice(1,-1) )
-								}
-							console.warn(
-								JSON.stringify( sMessage||'' )
-								+'\n change \n\t\t'+ JSON.stringify( sSymbol ).slice(1,-1)
-								+'\n by \n \t\t'+ a.join('\n \t\t')
-								)
-							}
 						var addTransition =function( oItem, aBase ){
 							var a = oBySymbols[ oItem.symbol ]
 							, I = aBase[0]
@@ -347,28 +328,19 @@ Automate =(function(){
 						var sNot_G_2 = aNot_G_2.join('')
 						sG_inter = '[^'+ Array.unique( aNot_G_1.concat( aNot_G_2 )).join('') +']'
 						oUniqueNegativeCharset = Item( sG_inter )
-						
-						if( bConsoleInfo && bConsoleInfoRNG ){
-							console.info(
-								'-- Reduction Negative Groups --'
-								+'\n\n\t\t '+ JSON.stringify( oUniqueNegativeCharset.symbol )
-								+'\n\n\t\t '+ JSON.stringify( aNegativeGroups[i].symbol )
-								+'\n\n\t\t '
-								)
-							}
-						
+
 						if( ! Array.intersect( aNot_G_1, aNot_G_2 ).length ){
 							var oNot_G_1 = ItemWrapper( sNot_G_1 )
 							  , oNot_G_2 = ItemWrapper( sNot_G_2 )
-							Transitions.change( '[^'+ sNot_G_1 +']', [ oUniqueNegativeCharset, oNot_G_2 ], 'RNG1', bConsoleInfo && bConsoleInfoRNG )
-							Transitions.change( '[^'+ sNot_G_2 +']', [ oUniqueNegativeCharset, oNot_G_1 ], 'RNG2', bConsoleInfo && bConsoleInfoRNG )
+							Transitions.change( '[^'+ sNot_G_1 +']', [ oUniqueNegativeCharset, oNot_G_2 ] )
+							Transitions.change( '[^'+ sNot_G_2 +']', [ oUniqueNegativeCharset, oNot_G_1 ] )
 							aNewSymbols = [ oNot_G_1, oNot_G_2 ]
 							}
 						else{
 							var oDiff_NotG2_NotG1 = ItemWrapper( Array.diff( aNot_G_2, aNot_G_1 ).join(''))
 							  , oDiff_NotG1_NotG2 = ItemWrapper( Array.diff( aNot_G_1, aNot_G_2 ).join(''))
-							Transitions.change( '[^'+ sNot_G_1 +']', [ oUniqueNegativeCharset, oDiff_NotG2_NotG1 ], 'RNG3', bConsoleInfo && bConsoleInfoRNG )
-							Transitions.change( '[^'+ sNot_G_2 +']', [ oUniqueNegativeCharset, oDiff_NotG1_NotG2 ], 'RNG4', bConsoleInfo && bConsoleInfoRNG )
+							Transitions.change( '[^'+ sNot_G_1 +']', [ oUniqueNegativeCharset, oDiff_NotG2_NotG1 ] )
+							Transitions.change( '[^'+ sNot_G_2 +']', [ oUniqueNegativeCharset, oDiff_NotG1_NotG2 ] )
 							aNewSymbols = [ oDiff_NotG2_NotG1, oDiff_NotG1_NotG2 ]
 							}
 						addNewSymbols( aNewSymbols )
@@ -387,28 +359,17 @@ Automate =(function(){
 					, aCharList = oCharacterClass.valueIn.toArray()
 					, aIntersection = Array.intersect( aNegativeCharsetIn, aCharList )
 					, sCharListDiff = Array.diff( aCharList, aIntersection ).join('')
-					
-					if( bConsoleInfo && bConsoleInfoGvsTNG ){
-						console.info(
-							'-- Reduction Groups VS The Negative Group --'
-							+'\n\t\t '+ JSON.stringify( oUniqueNegativeCharset.symbol )
-							+'\n\n\t\t '+ JSON.stringify( oCharacterClass.symbol )
-							+'\n'
-							)  /**/
-						}
-								
+
 					if( sCharListDiff.length ){
 						aNegativeCharsetIn = Array.unique( aNegativeCharsetIn.concat( aCharList ))
 						var oCharSetDiff = ItemWrapper( sCharListDiff )
 						, sIntersection = aIntersection.join('')
 						, oIntersectionItem = sIntersection ? ItemWrapper( sIntersection ) : null
-						Transitions.change( oCharacterClass.symbol, [ oCharSetDiff, oIntersectionItem ]
-									, 'G VS TNG 1', bConsoleInfo && bConsoleInfoGvsTNG )
+						Transitions.change( oCharacterClass.symbol, [ oCharSetDiff, oIntersectionItem ] )
 						Transitions.change( oUniqueNegativeCharset.symbol, [
 									oCharSetDiff,
 									oUniqueNegativeCharset = Item( '[^'+ aNegativeCharsetIn.join('') +']' )
-									]
-									, 'G VS TNG 2', bConsoleInfo && bConsoleInfoGvsTNG )
+									] )
 						addNewSymbols([ oIntersectionItem, oCharSetDiff ])
 						aGroups.splice( i, 1 )
 						i--
@@ -420,22 +381,12 @@ Automate =(function(){
 					var sChar = oAtom.symbol
 					var aIntersection = Array.intersect( aNegativeCharsetIn, [sChar])
 
-					if( bConsoleInfo && bConsoleInfoAvsTNG ){
-						console.info(
-							'-- Reduction Atoms VS The Negative Group --'
-							+'\n\t\t '+ JSON.stringify( oUniqueNegativeCharset.symbol )
-							+'\n\n\t\t '+ JSON.stringify( oAtom.symbol )
-							+'\n'
-							)
-						}
-
 					if( ! aIntersection.length ){
 						aNegativeCharsetIn.push( sChar )
 						Transitions.change( oUniqueNegativeCharset.symbol, [
 							oAtom,
 							oUniqueNegativeCharset = Item( '[^'+ aNegativeCharsetIn.join('') +']' )
-							]
-							, 'A VS TNG ', bConsoleInfo && bConsoleInfoAvsTNG )
+							] )
 						continue ;
 						}
 					}
@@ -452,22 +403,13 @@ Automate =(function(){
 					aCharList2.sort()
 					var aIntersection = Array.intersect( aCharList1, aCharList2 )
 
-					if( bConsoleInfo && bConsoleInfoGvsG ){
-						console.info(
-							'-- Reduction Group VS Group --'
-							+'\n\n\t\t '+ JSON.stringify( aGroups[i].symbol )
-							+'\n\n\t\t '+ JSON.stringify( aGroups[j].symbol )
-							+'\n'
-							)
-						}
-
 					if( ! aIntersection.length ) continue ;
 					aIntersection.sort()
 					var oItem1 = ItemWrapper( Array.diff( aCharList1, aIntersection ).join(''))
 					var oItem2 = ItemWrapper( Array.diff( aCharList2, aIntersection ).join(''))
 					var oIntersectionItem = ItemWrapper( aIntersection.join(''))
-					if( oItem1 ) Transitions.change( aGroups[i].symbol, [ oIntersectionItem, oItem1 ], 'G VS G 1', bConsoleInfo && bConsoleInfoGvsG )
-					if( oItem2 ) Transitions.change( aGroups[j].symbol, [ oIntersectionItem, oItem2 ], 'G VS G 2', bConsoleInfo && bConsoleInfoGvsG )
+					if( oItem1 ) Transitions.change( aGroups[i].symbol, [ oIntersectionItem, oItem1 ] )
+					if( oItem2 ) Transitions.change( aGroups[j].symbol, [ oIntersectionItem, oItem2 ] )
 					aGroups[j]=null
 					aGroups[i]=null
 					addNewSymbols([ oIntersectionItem, oItem1, oItem2 ])
@@ -484,19 +426,10 @@ Automate =(function(){
 					var oCharacterClass = aGroups[i]
 					, sCharList = oCharacterClass.valueIn
 
-					if( bConsoleInfo && bConsoleInfoAvsG ){
-						console.info(
-							'-- Reduction Group VS Atom --'
-							+'\n\n\t\t '+ JSON.stringify( oCharacterClass.symbol )
-							+'\n\n\t\t '+ JSON.stringify( oAtom.symbol )
-							+'\n'
-							)
-						}
-						
 					if( sCharList.indexOf( sChar ) > -1 ){
 						var oChar = Item( sChar )
 						, oItem = ItemWrapper( sCharList.replace( sChar, '' ))
-						Transitions.change( oCharacterClass.symbol, [ oChar, oItem ], 'G VS A', bConsoleInfo && bConsoleInfoAvsG )
+						Transitions.change( oCharacterClass.symbol, [ oChar, oItem ] )
 						addNewSymbols([ oChar, oItem ])
 						aGroups.splice( i, 1 )
 						i--
@@ -1013,7 +946,7 @@ DFA.inheritFrom( Automate ).union({
 		},
 	minimize :function( nStateIDCounter, bAll ){
 		var oDFA = this
-		// MINIMISATION DU NOMBRE D'ETATS
+
 		var COUNTER = 2
 		var STATES_COUNT = -1
 		oDFA.renameStates()
@@ -1072,10 +1005,8 @@ DFA.inheritFrom( Automate ).union({
 				}
 			}
 		var oTokens = Tokens().init( oDFA.aTokensID )
-		
-	//	if( ! oDFA.M ) buildTable( oDFA )
 
-		// MINIMISATION du nombre détats
+		// MINIMISATION DU NOMBRE D'ETATS
 		if( 1 ){
 			aPartition = [ Array.diff( oDFA.S, oDFA.F ) ]
 			if( oDFA.aTokensID.length )
@@ -1125,10 +1056,6 @@ DFA.inheritFrom( Automate ).union({
 			}
 
 		// MINIMISATION DE L'ALPHABET : regroupement de symbole en char_class
-		/* TODO : Les intentions sont nobles...
-			- RECREER LES TRANSITIONS 
-			- UN SYMBOLE PEUT ÊTRE un CHARCLASS !
-		*/
 		if( 1 ){
 			var aID = []
 			for(var j=0, nj=oDFA.A.length; j<nj ; j++ ){
