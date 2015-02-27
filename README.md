@@ -3,9 +3,6 @@ Lexer et Parser JavaScript.
 [Site du projet](http://raphpell.github.io/JS.Compilation/index.htm)
  / [Documentation](http://raphpell.github.io/JS.Compilation/xml/fr/doc/index.htm)
 
-Objectif: Colorisation de code dans un éditeur de texte.
-
-
 Lexers ( RE vs DFA )
 --------
 Comparaison d'un Lexer à expressions régulières et d'un lexer à automates finis déterministes :
