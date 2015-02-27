@@ -100,7 +100,7 @@ Automate =(function(){
 				this.aTokensID.concat([])
 				)
 			},
-		epsilonClosure :function(){
+		epsilonClosures :function(){
 			var E={}
 			for(var i=0, a=this.S, ni=a.length; i<ni; i++) E[a[i]]=[a[i]]
 			var bChanged = true
@@ -968,7 +968,7 @@ DFA =(function(){
 		getTransitions.init()
 		NFA = oNFA
 		NFA.T = NFA.T.concat([])
-		EpsilonClosure = oNFA.epsilonClosure()
+		EpsilonClosure = oNFA.epsilonClosures()
 		I = EpsilonClosure[ NFA.I ]
 		I.id = stateID(I) 
 		F = []

@@ -82,7 +82,7 @@
 				</desc>
 				<returnValue type="Automate"></returnValue>
 			</function>
-			<function name="epsilonClosure">
+			<function name="epsilonClosures">
 				<desc>
 					Calcul la fermeture epsilon de tous les états de l'automate.
 				</desc>

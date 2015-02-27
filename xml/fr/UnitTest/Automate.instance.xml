@@ -59,13 +59,13 @@ var oClone = oFA.clone()
 			<assert><![CDATA[ ! oClone.M ]]></assert>
 		</assertions>
 	</test>
-	<test name="prototype.epsilonClosure">
+	<test name="prototype.epsilonClosures">
 		<assertions>
 			<value><![CDATA[
 oFA = Automate.makeChar( 'a' )
 var f=function( oNFA ){ return {
 	nfa: oNFA.renameStates(),
-	epsilonclosure: JSON.stringify( oNFA.epsilonClosure())
+	epsilonclosure: JSON.stringify( oNFA.epsilonClosures())
 	}}
 var o1 = f( oFA )
 var oAND = f( Automate.and( oFA, oFA.clone()) )
