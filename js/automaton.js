@@ -195,7 +195,7 @@ Automate =(function(){
 			, oUniqueNegativeCharset
 			
 			var bConsoleInfo = 0
-			var bConsoleInfoTransChange = true
+			var bConsoleInfoTransChange = 1
 			var bConsoleInfoRNG = 1
 			var bConsoleInfoGvsTNG = 1
 			var bConsoleInfoAvsTNG = 1
@@ -250,13 +250,13 @@ Automate =(function(){
 						delete oBySymbols[ sSymbol ]
 						oNFA.A.remove( sSymbol )
 						},
-					change :function( sSymbol, aNewItems, sMessage, bInfo ){
-						var aNewItems = Array.unique( aNewItems )
-						if( aNewItems.length==1 && sSymbol==aNewItems[0].symbol ) return ;
+					change :function( sSymbol, aReplacmt, sMessage, bInfo ){
+						aReplacmt = Array.unique( aReplacmt )
+						if( aReplacmt.length==1 && sSymbol==aReplacmt[0].symbol ) return ;
 						if( bInfo || bConsoleInfo && bConsoleInfoTransChange ){
 							var a = []
-							for(var i=0, ni=aNewItems.length; i<ni; i++ ){
-								if( aNewItems[i]) a.push( JSON.stringify( aNewItems[i].symbol ).slice(1,-1) )
+							for(var i=0, ni=aReplacmt.length; i<ni; i++ ){
+								if( aReplacmt[i]) a.push( JSON.stringify( aReplacmt[i].symbol ).slice(1,-1) )
 								}
 							console.warn(
 								JSON.stringify( sMessage||'' )
@@ -265,26 +265,16 @@ Automate =(function(){
 								)
 							}
 						var addTransition =function( oItem, aBase ){
-							var I= aBase[0] // Automate.getUniqueID()
-							var F= aBase[2] // Automate.getUniqueID()
-						//	oNFA.S = oNFA.S.concat([I,F])
 							var a = oBySymbols[ oItem.symbol ]
+							, I = aBase[0]
+							, F = aBase[2]
 							if( ! a.push ) throwError( 'Erreur pas de transition trouvée pour le symbole '+ oItem.symbol +'\n'+ JSON.stringify( a ))
 							a.push( oItem.action ? [ I, oItem.symbol, F, oItem.action ] : [ I, oItem.symbol, F ])
-						/* 
-							var a = oBySymbols[ EPSILON ]
-							if( ! a ){
-								a = oBySymbols[ EPSILON ] = []
-								oNFA.A.push( EPSILON )
-								}
-							a.push([ aBase[0], EPSILON, I ])
-							a.push([ F, EPSILON, aBase[2] ])
-						*/
 							}
 						// Ajoute les nouveaux symboles dans l'alphabet
-						for(var i=0, ni=aNewItems.length; i<ni; i++ ){
-							if( ! aNewItems[i]) continue;
-							var sNewSymbol = aNewItems[i].symbol
+						for(var i=0, ni=aReplacmt.length; i<ni; i++ ){
+							if( ! aReplacmt[i]) continue;
+							var sNewSymbol = aReplacmt[i].symbol
 							if( ! oBySymbols[ sNewSymbol ]){
 								oBySymbols[ sNewSymbol ] = []
 								oNFA.A.push( sNewSymbol )
@@ -294,8 +284,8 @@ Automate =(function(){
 						if( oBySymbols[sSymbol]){
 							for(var i=0, ni=oBySymbols[sSymbol].length; i<ni; i++ ){
 								var aTransition = oBySymbols[sSymbol][i]
-								for(var j=0, nj=aNewItems.length; j<nj; j++ ){
-									var oItem = aNewItems[j]
+								for(var j=0, nj=aReplacmt.length; j<nj; j++ ){
+									var oItem = aReplacmt[j]
 									if( oItem && oItem.symbol!=sSymbol )
 										addTransition( oItem, aTransition.concat([]))
 									}
@@ -515,7 +505,7 @@ Automate =(function(){
 					}
 				}
 
-			// Cas symbole ANY
+			// Cas symbole ANY - deprecated
 			if( bAnyIn ){
 				var a = aAtoms.concat( aGroups )
 				if( oNFA.A.length==1 ){
@@ -556,7 +546,7 @@ Automate =(function(){
 
 	// OBJET AUTOMATE
 	Automate.union({
-		
+
 		// MÉTHODES 'INTERNES'
 		action :function( sChars, bNegated ){
 			var f
@@ -580,7 +570,7 @@ Automate =(function(){
 		setUniqueID :function( nUniqueID ){
 			if( nUniqueID ) ID = nUniqueID
 			},
-		
+
 		// AUTOMATES BASIQUES
 		makeEmpty :function( I, F ){
 			var I=I||getUniqueID(), F=F||getUniqueID()
@@ -627,7 +617,8 @@ Automate =(function(){
 			for(var i=nCode1, ni=nCode2+1; i<ni; i++ ) a.push( i )
 			return Automate.makeCharSet( String.fromCharCode.apply( null, a ).toArray(), false, I, F )
 			},
-		
+		makeString: function( s ){ throwError( 'NOT IMPLEMENTED' ) },
+
 		// OPÉRATIONS BASIQUES
 		and :function(){
 			var o = arguments[0]
@@ -747,7 +738,7 @@ Automate =(function(){
 				T
 				)
 			},
-		
+
 		// GÉNÉRATEUR D'AUTOMATE	
 		fromChar :function( sChar ){
 			return function(){ return Automate.makeChar( sChar ) }
@@ -756,7 +747,7 @@ Automate =(function(){
 			return function(){ return Automate.makeCharSet( aSet, bNegated ) }
 			}
 		})
-		
+
 	return Automate
 	})()
 
@@ -981,14 +972,14 @@ DFA =(function(){
 		I = EpsilonClosure[ NFA.I ]
 		I.id = stateID(I) 
 		F = []
-		aTokensName = []
-		oTokensState = {}
-		oNewStates = {}
-		
 		A = NFA.A.concat([])
 		A.remove( EPSILON )
 		S = [ I.id ]
 		T = []
+		aTokensName = []
+		oTokensState = {}
+		oNewStates = {}
+		
 		buildDfaStates( I )
 		var aTokensID =[]
 		for(var i=0, ni=aTokensName.length; i<ni; i++ ){
