@@ -13,65 +13,69 @@ Object.prototype.inheritFrom =function( fClass ){
 	return this.prototype
 	}
 	
-Array.prototype.have =function(m,b){
-	if(b){ for(var i=0,n=this.length;i<n;i++) if(this[i]===m )	return true }
-	else { for(var i=0,n=this.length;i<n;i++) if(this[i]==m)	return true }
-	return false
-	}
-Array.prototype.haveIntersectionWith =function(a,b){
-	for(var i=0,n=a.length;i<n;i++) if( this.have(a[i],b)) return true
-	return false
-	}
-Array.prototype.remove =function(m){
-	for(var i=0,n=this.length;i<n;i++)
-		if(this[i]==m) return this.splice(i,1)
-	return null
-	}
-Array.prototype.sortBy =function(s1,s2){
-	var s1=s1?"['"+s1.str_replace("\.","']['" )+"']":''
-	, a={'ASC':['<','>'],'DESC':['>','<']}[ s2 || 'ASC' ]
-	return this.sort( function (m1,m2){
-		return eval('m1'+s1+a[0]+'m2'+s1)?-1:(eval('m1'+s1+a[1]+'m2'+s1)?1:0)
-		})
-	}
-
-Array.unique =function( a1 ){
-	var a2=[]
-	for(var i=0, ni=a1.length; i<ni; i++ ){
-		var m = a1[i]
-		if( m!=undefined && ! a2.have( m )) a2.push( m )
+Array.prototype.union({
+	have :function(m,b){
+		if(b){ for(var i=0,n=this.length;i<n;i++) if(this[i]===m )	return true }
+		else { for(var i=0,n=this.length;i<n;i++) if(this[i]==m)	return true }
+		return false
+		},
+	haveIntersectionWith :function(a,b){
+		for(var i=0,n=a.length;i<n;i++) if( this.have(a[i],b)) return true
+		return false
+		},
+	remove :function(m){
+		for(var i=0,n=this.length;i<n;i++)
+			if(this[i]==m) return this.splice(i,1)
+		return null
+		},
+	sortBy :function(s1,s2){
+		var s1=s1?"['"+s1.str_replace("\.","']['" )+"']":''
+		, a={'ASC':['<','>'],'DESC':['>','<']}[ s2 || 'ASC' ]
+		return this.sort( function (m1,m2){
+			return eval('m1'+s1+a[0]+'m2'+s1)?-1:(eval('m1'+s1+a[1]+'m2'+s1)?1:0)
+			})
 		}
-	return a2
-	}
-Array.diff =function( a, a1, a2 /*, aj, ... */ ){
-	var ai=a.concat([]), nj=arguments.length
-	nextElt:
-		for(var i=0; i<ai.length; i++)
-			for(var j=1; j<nj; j++){
-				if( ! arguments[j]) continue;
-				if( arguments[j].have( ai[i])){
-					ai.splice( i--, 1 )
-					continue nextElt;
+	})
+
+Array.union({
+	unique :function( a1 ){
+		var a2=[]
+		for(var i=0, ni=a1.length; i<ni; i++ ){
+			var m = a1[i]
+			if( m!=undefined && ! a2.have( m )) a2.push( m )
+			}
+		return a2
+		},
+	diff :function( a, a1, a2 /*, aj, ... */ ){
+		var ai=a.concat([]), nj=arguments.length
+		nextElt:
+			for(var i=0; i<ai.length; i++)
+				for(var j=1; j<nj; j++){
+					if( ! arguments[j]) continue;
+					if( arguments[j].have( ai[i])){
+						ai.splice( i--, 1 )
+						continue nextElt;
+						}
 					}
-				}
-	return ai
-	}
-Array.intersect =function( /*,aj, ... */ ){
-	if( arguments.length==2 ){
-		var a = []
-		var ai = arguments[0]
-		for( var i=0, ni=ai.length; i<ai.length; i++ )
-			if( arguments[1].have( ai[i]))
-				a.push( ai[i])
+		return ai
+		},
+	intersect :function( /*,aj, ... */ ){
+		if( arguments.length==2 ){
+			var a = []
+			var ai = arguments[0]
+			for( var i=0, ni=ai.length; i<ai.length; i++ )
+				if( arguments[1].have( ai[i]))
+					a.push( ai[i])
+			return a
+			}
+		var ni = arguments.length
+		var a = arguments[0]
+		for( var i=1; i<ni; i++ )
+			a = Array.intersect( a, arguments[i])
 		return a
 		}
-	var ni = arguments.length
-	var a = arguments[0]
-	for( var i=1; i<ni; i++ )
-		a = Array.intersect( a, arguments[i])
-	return a
-	}
-
+	})
+	
 to_array =function( M ){
 	switch( M.constructor ){
 		case Array : return M
@@ -85,31 +89,36 @@ to_array =function( M ){
 	return [ M ]
 	}
 
-String.prototype.str_replace =function( m1, m2 ){
-	var s = this
-	, a1 = to_array( m1 )
-	, a2 = to_array( m2 )
-	, b = [String,Function].have( m2.constructor )
-	for( var i=0, ni=a1.length, m, re ; i<ni; i++ ){
-		m = a1[i]
-		re = m.constructor==RegExp ? m : new RegExp ( RegExp.escape( m ), 'g' )
-		s = s.replace( re , b ? a2[0] : ( a2[i] || '' ))
+String.prototype.union({
+	str_replace :function( m1, m2 ){
+		var s = this
+		, a1 = to_array( m1 )
+		, a2 = to_array( m2 )
+		, b = [String,Function].have( m2.constructor )
+		for( var i=0, ni=a1.length, m, re ; i<ni; i++ ){
+			m = a1[i]
+			re = m.constructor==RegExp ? m : new RegExp ( RegExp.escape( m ), 'g' )
+			s = s.replace( re , b ? a2[0] : ( a2[i] || '' ))
+			}
+		return s
+		},
+	toArray :function(){
+		var a=[]
+		var s = this
+		s = s.replace( /\\c[a-zA-Z]|\\x[0-9a-fA-F]{2}|\\u[0-9a-fA-F]{4}/g, // |\\.
+			function( sMatched, nIndex ){
+				a.push( sMatched )
+				return ''
+				})
+		for(var i=0, ni=s.length; i<ni; i++ )
+			a.push( s.charAt( i ))
+		return a
+		},
+	countLines :function(){
+		var a = this.match( /\n|\f|\r\n?/gim )
+		return a ? a.length + 1 : 1
 		}
-	return s
-	}
-String.prototype.toArray =function(){
-	var a=[]
-	var s = this
-	s = s.replace( /\\c[a-zA-Z]|\\x[0-9a-fA-F]{2}|\\u[0-9a-fA-F]{4}/g, // |\\.
-		function( sMatched, nIndex ){
-			a.push( sMatched )
-			return ''
-			})
-	for(var i=0, ni=s.length; i<ni; i++ )
-		a.push( s.charAt( i ))
-//	alert( JSON.stringify( a, null, '\t' ))
-	return a
-	}
+	})
 
 RegExp.escape =function( s ){
 	return s.replace( /(\.|\?|\*|\+|\\|\(|\)|\[|\]|\}|\{|\$|\^|\|)/g , "\\$1" )

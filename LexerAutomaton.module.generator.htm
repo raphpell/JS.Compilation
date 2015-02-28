@@ -24,7 +24,7 @@
 			}
 		#eIFRAME,
 		#eExport {
-			height: 500px;
+			height: auto;
 			width: 100%;
 			}
 		.annotation {
@@ -91,6 +91,7 @@
 
 <label for="eExport">Résultat: </label>
 <textarea id="eExport" spellcheck="false" wrap="off"></textarea>
+<div><label>Nombre de caractères : </label><b id="eExportSize"></b></div>
 
 <script src="js/shared.js"></script>
 <script src="js/framework.js"></script>
@@ -134,6 +135,12 @@ throwError =function( s ){
 	alert( s )
 	throw new Error ( s )
 	}
+
+setExport =function( sResult ){
+	eExport.value = sResult
+	eExport.rows = sResult.countLines()
+	eExportSize.innerHTML = sResult.length
+	}	
 	
 Calcul =(function(){
 	var aUrl =[
@@ -270,13 +277,14 @@ Calcul =(function(){
 				oDefinition.previousTokensOf[i] = "o.setPreviousTokenOf("+ JSON.stringify( aPrevious[0]) +","+ JSON.stringify( aPrevious[1]) +")"
 				}
 			
-			eExport.value = "AutomatonLexer.insert(function(o,f,g,h){"
+			setExport( "AutomatonLexer.insert(function(o,f,g,h){"
 				+( aResult.length ? "\no.addTokens([\n"+ aResult.join(',\n') +"\n])" : '' )
 				+( oDefinition.rules.length ? "\no.addRules("+ JSON.stringify( oDefinition.rules ) +")" : '' )
 				+( oDefinition.css.length ? "\no.addCSSClass("+ JSON.stringify( oDefinition.css ) +")" : '' )
 				+( oDefinition.previousTokensOf.length ? "\n"+ oDefinition.previousTokensOf.join('\n') : '' )
 				+( oDefinition.translations.length ? "\no.setTokensTranslation('"+ oDefinition.translations.join('&') +"')" : '' )
 				+"\n});"
+				)
 			iframe.style.display = 'none'
 			oProgressBar.add(1)
 			eNext.disabled = true
@@ -483,13 +491,13 @@ function exportRegExp (){
 		aRules.push( "['"+ aRule[0] +"','"+ aRule[1].join('|') +"']" )
 	for(var i=0, aRule; aRule = oDefinition.rules[i]; i++ )
 		aRules.push( "['"+ aRule[0] +"','"+ aRule[1] +"']" )
-	eExport.value = '// var o = MultiRegExpLexer.Rules'
+	setExport( '// var o = MultiRegExpLexer.Rules'
 		+'\no.addTokens([\n\t'+ aTokens.join( ',\n\t' ) +'\n\t])'
 		+( aRules.length ? '\no.addRules([\n\t'+ aRules.join( ',\n\t' ) +'\n\t])' : '' )
 		+( oDefinition.css.length ? "\no.addCSSClass("+ JSON.stringify( oDefinition.css ) +")" : '' )
 		+( oDefinition.previousTokensOf.length ? "\n"+ oDefinition.previousTokensOf.join('\n') : '' )
 		+( oDefinition.translations.length ? "\no.setTokensTranslation('"+ oDefinition.translations.join('&') +"')" : '' )
-
+		)
 	}
 </script>
 
@@ -498,7 +506,7 @@ _( 'eIFRAME,eResult,eExport' )
 _( 'eDisplayOk,eDisplaySource,eDisplayResult,eDisplayAnnotation' )
 _( 'eParentTokens,eTokens,eMacros' )
 _( 'eBtnScan,eProgressBar,eSteps,eNext' )
-_( 'eScanResult,eTest' )
+_( 'eScanResult,eTest,eExportSize' )
 
 var oProgressBar = new ProgressBar ( eProgressBar )
 oProgressBar.bColor = 1

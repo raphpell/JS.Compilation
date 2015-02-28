@@ -212,7 +212,7 @@ previewDFA = (function(){
 var init =function(){
 	oDFA = oDFAAggregated = { I:1, F:[], A:[], S:[0,1], T:[] }
 	nStateIDCounter = 2
-	clearExport()
+	Export.clear()
 	previewDFA.refresh()
 	}
 var parseRE =function( sToken, sRegExp ){
@@ -277,14 +277,22 @@ var match =function( s, n ){
 			//	+\n+ eResult.innerHTML
 				)
 	}
-var clearExport =function(){
-	eExportResult.value = ''
+
+var Export ={
+	clear :function(){
+		eExportResult.value = ''
+		eExportSize.innerHTML = 0
+		},
+	set :function( sResult ){
+		eExportResult.value = sResult
+		eExportSize.innerHTML = sResult.length
+		}
 	}
+
 var exportDFA =function( bWhiteSpace, bUnCompressed ){
-	clearExport()
+	Export.clear()
 	var sResult = oDFAAggregated.toJS( bWhiteSpace, bUnCompressed )
-	eExportResult.value = sResult
-	eExportSize.innerHTML = sResult.length
+	Export.set( sResult )
 	if( aParentItemCalcul && window.parent ){
 		window.parent.Calcul.add( aParentItemCalcul, oDFAAggregated, sResult, 'nextAggregation' )
 		aItemCalcul = false
