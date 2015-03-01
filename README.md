@@ -3,20 +3,20 @@ Lexer et Parser JavaScript.
 [Site du projet](http://raphpell.github.io/JS.Compilation/index.htm)
  / [Documentation](http://raphpell.github.io/JS.Compilation/xml/fr/doc/index.htm)
 
-Lexers ( RE vs DFA )
+Lexers ( ER vs AFD )
 --------
-Comparaison d'un Lexer à expressions régulières et d'un lexer à automates finis déterministes :
+Comparaison de Lexer à ER(expressions régulières) et d'un lexer à AFD(automates finis déterministes) :
+- [Comparaison du résultat](http://raphpell.github.io/JS.Compilation/Lexers.result.comparaison.htm)
 - [Performance: scan](http://raphpell.github.io/JS.Compilation/Lexers.performance.scan.htm)
 - [Performance: readToken](http://raphpell.github.io/JS.Compilation/Lexers.performance.readToken.htm)
-- [Comparaison résultats](http://raphpell.github.io/JS.Compilation/Lexers.result.comparaison.htm)
 
-Etude analyse lexicale incrémentielle :
+Analyse lexicale incrémentielle (AFD) :
 - [Performance](http://raphpell.github.io/JS.Compilation/LexerAutomaton.incremental.htm)
 
 Divers :
-- [ ER -> AFD ](http://raphpell.github.io/JS.Compilation/AFD.generator.htm)
-- [Aggréger des automates finis déterministes](http://raphpell.github.io/JS.Compilation/AFD.aggregator.htm)
-- [Créer des modules pour les lexers](http://raphpell.github.io/JS.Compilation/LexerAutomaton.module.generator.htm)
+- [Transformation d'une ER en AFD](http://raphpell.github.io/JS.Compilation/AFD.generator.htm)
+- [Aggrégation d'automates finis déterministes](http://raphpell.github.io/JS.Compilation/AFD.aggregator.htm)
+- [Création de module pour les lexers](http://raphpell.github.io/JS.Compilation/LexerAutomaton.module.generator.htm)
 
 
 Parser
