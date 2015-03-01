@@ -1,4 +1,4 @@
-Lexer et Parser JavaScript.
+Lexer et Parser en JavaScript.
 ===========
 [Site du projet](http://raphpell.github.io/JS.Compilation/index.htm)
  / [Documentation](http://raphpell.github.io/JS.Compilation/xml/fr/doc/index.htm)
