@@ -5,13 +5,61 @@
 	<script src="../../../js/framework.js"></script>
 	<script src="../../../js/automaton.js"></script>
 	<desc>...</desc>
-	<test name="new DFA">
-		<assertions name="...">
-			<desc></desc>
+	<test name="constructor">
+		<assertions>
+			<value><![CDATA[
+var oNFA = Automate.makeChar('a')
+var oDFA = new DFA( oNFA )
+			]]></value>
+			<assert><![CDATA[ oNFA ]]></assert>
+			<assert><![CDATA[ oDFA ]]></assert>
+		</assertions>
+	</test>
+	<test name="DFA.prototype.minimize">
+		<assertions>
+			<value><![CDATA[
+
+			]]></value>
+			<assert><![CDATA[ false ]]></assert>
+		</assertions>
+	</test>
+	<test name="DFA.prototype.test">
+		<assertions>
 			<value><![CDATA[
 
 			]]></value>
 			<assert><![CDATA[ true ]]></assert>
+		</assertions>
+	</test>
+	<test name="DFA.prototype.toJS">
+		<assertions>
+			<value><![CDATA[
+
+			]]></value>
+			<assert><![CDATA[ true ]]></assert>
+		</assertions>
+	</test>
+	<test name="DFA.prototype.toRE">
+		<assertions>
+			<value><![CDATA[
+
+			]]></value>
+			<assert><![CDATA[ true ]]></assert>
+		</assertions>
+	</test>
+	<test name="DFA.aggregate">
+		<assertions>
+			<value><![CDATA[
+var f = function( sChar ){
+	var oDFA = Automate.makeChar( sChar )
+	oDFA.aTokensID = [[ 'letter_'+ sChar, oDFA.F ]]
+	return oDFA
+	}
+var oDFA1 = f('a'), oDFA2 = f('b'), oDFA3 = f('a')
+var oDFA = DFA.aggregate( oDFA1, oDFA2 )
+// oDFA = DFA.aggregate( oDFA, oDFA3 )
+			]]></value>
+			<assert><![CDATA[ oDFA ]]></assert>
 		</assertions>
 	</test>
 </truth>

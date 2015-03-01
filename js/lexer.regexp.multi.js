@@ -9,10 +9,7 @@ var MultiRegExpLexer =(function(){
 			return {
 				list: {},
 				add :function( ID, m ){
-					if( this.list[ID]){
-						console.warn( sAddError.replace( '$1', ID ))
-						return; //throw new Error ( sAddError.replace( '$1', ID ))
-						}
+					if( this.list[ID]) throw new Error ( sAddError.replace( '$1', ID ))
 					return this.list[ID] = m
 					},
 				get :function( ID ){
@@ -25,7 +22,7 @@ var MultiRegExpLexer =(function(){
 				}
 			}
 		, Rules=Dictionary('rule')
-		, Tokens=Dictionary('RE')
+		, Tokens=Dictionary('token')
 		return{
 			setPreviousTokenOf :function( sToken, sPreviousTokens ){
 				if( Previous.ofToken[sToken]) throw new Error ( 'Previous token of '+ sToken +' already defined !' )
@@ -83,11 +80,13 @@ var MultiRegExpLexer =(function(){
 				if( aTokens.length )
 					for(var i=0; aTokens[i]; i++){
 						var sName=aTokens[i][0]
-						Tokens.add( sName, {
-							name: sName,
-							re: new RegExp ( '^(?:'+ aTokens[i][1].source +')' )
-							})
+						Tokens.add( sName, this.makeTokenFrom( sName, aTokens[i][1] ))
 						}
+				},
+			makeTokenFrom :function( sName, o ){
+				o = new RegExp ( '^(?:'+ o.source +')' )
+				o.name = sName
+				return o
 				}
 			}
 		})()
@@ -294,8 +293,8 @@ var MultiRegExpLexer =(function(){
 			return this.end()
 			},
 		searchToken :function( oRE ){
-			if( ! oRE.re.test( this.sText ) || this.previous.invalidFor( oRE.name )) return false;
-			var aFound = oRE.re.exec( this.sText )
+			if( ! oRE.test( this.sText ) || this.previous.invalidFor( oRE.name )) return false;
+			var aFound = oRE.exec( this.sText )
 			if( ! aFound[0].length ) return null
 			sToken = oRE.name
 			return sValue = aFound[0]

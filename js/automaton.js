@@ -479,7 +479,6 @@ Automate =(function(){
 
 	// OBJET AUTOMATE
 	Automate.union({
-
 		// MÉTHODES 'INTERNES'
 		action :function( sChars, bNegated ){
 			var f
@@ -859,15 +858,7 @@ DFA =(function(){
 						break; // Premier arrivé, premier servi !
 						}
 					}
-				/*
-				if( nOwner > 1 )
-					alert(
-						'Erreur:\n'+
-						'Un état reconnait plusieurs tokens !\n'+
-						'Il faut réécrire la définition des tokens '+
-						aTokensEnd.join(', ')
-						)
-				*/
+				/* if( nOwner > 1 ) Un état reconnait plusieurs tokens !' */
 				}
 			}
 		// ....
@@ -925,25 +916,6 @@ DFA =(function(){
 		}
 	})()
 DFA.inheritFrom( Automate ).union({
-	test :function( s, n ){
-		// Si les états du DFA sont issu de partition d'états du NFA
-		if( this.I.constructor == String ) this.renameStates()
-		var nIndex = n || 0
-		, nStart = nIndex
-		, sChar
-		, sState=this.I
-		, sLongestMatch = this.F.have( sState ) ? '' : null
-		if( s.length!=0 )
-			while( true ){
-				sChar = s[ nIndex ]
-				nIndex++ 
-				sState = this.M.nextState( sState, sChar )
-				if( sState<=0 ) break;
-				if( this.F.have( sState )) sLongestMatch = s.substring( nStart, nIndex )
-				if( nIndex==s.length ) break;
-				}
-		return sLongestMatch
-		},
 	minimize :function( nStateIDCounter, bAll ){
 		var oDFA = this
 
@@ -1122,6 +1094,25 @@ DFA.inheritFrom( Automate ).union({
 			}
 
 		return oDFA.renameStates( nStateIDCounter, bAll )
+		},
+	test :function( s, n ){
+		// Si les états du DFA sont issu de partition d'états du NFA
+		if( this.I.constructor == String ) this.renameStates()
+		var nIndex = n || 0
+		, nStart = nIndex
+		, sChar
+		, sState=this.I
+		, sLongestMatch = this.F.have( sState ) ? '' : null
+		if( s.length!=0 )
+			while( true ){
+				sChar = s[ nIndex ]
+				nIndex++ 
+				sState = this.M.nextState( sState, sChar )
+				if( sState<=0 ) break;
+				if( this.F.have( sState )) sLongestMatch = s.substring( nStart, nIndex )
+				if( nIndex==s.length ) break;
+				}
+		return sLongestMatch
 		},
 	toJS :function( bWhiteSpace, bUnCompressed ){
 		var oDFA = this

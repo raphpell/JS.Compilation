@@ -2,7 +2,7 @@
 <html>
 	<head>
 		<title>AFN</title>
-		<link rel="stylesheet" type="text/css" href="css/reToNFA.css">
+		<link rel="stylesheet" type="text/css" href="css/Thompson.css">
 		<style>
 		</style>
 	</head>
@@ -24,9 +24,15 @@
 </ul>
 
 <h2>Conversion des ER en AFN</h2>
-<p>Les <a href="src/regexp/syntax.htm" target="_INFO" title="expressions régulières">ER</a> sont transformées en AFN à l'aide de l'algorithme de Thompson :</p>
+
+
+<p>
+	Une analyse lexicale et syntaxique est réalisée sur l'<a href="src/regexp/syntax.htm" target="_INFO" title="expressions régulières">ER</a>, 
+	puis depuis l'<a href="src/regexp/preview.htm" title="arbre syntaxique transformé">AST</a> obtenu, 
+	on utilise l'algorithme de Thompson pour créer notre NFA :
+</p>
 		
-<table cellspacing="10">
+<table cellspacing="20">
 	<tr>
 		<th>transition &epsilon;</th>
 		<th><div class="thompson epsilon" title=""></div></th>
@@ -47,13 +53,11 @@
 		<th>Répétition N<sub>1</sub>*</th>
 		<th><div class="thompson kleeneClosure" title=""></div></th>
 	</tr>
+	<tr>
+		<th>Option N<sub>1</sub>?</th>
+		<th><div class="thompson optional" title=""></div></th>
+	</tr>
 </table>
-
-<p>
-	Concrètement, une analyse lexicale et syntaxique est réalisée sur l'ER, 
-	puis depuis l'<a href="src/regexp/preview.htm" title="arbre syntaxique transformé">AST</a> obtenu, 
-	on utilise l'algorithme de Thompson pour créer notre NFA.
-</p>
 	
 	</body>
 </html>

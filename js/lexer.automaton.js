@@ -58,7 +58,7 @@ var AutomatonLexer =(function(){
 				}
 			}
 		, Rules=Dictionary('rule')
-		, Tokens=Dictionary('DFA')
+		, Tokens=Dictionary('token')
 		return{
 			setPreviousTokenOf :function( sToken, sPreviousTokens ){
 				if( Previous.ofToken[sToken]) throw new Error ( 'Previous token of '+ sToken +' already defined !' )
@@ -115,11 +115,14 @@ var AutomatonLexer =(function(){
 			addTokens :function( aTokens ){
 				if( aTokens.length )
 					for(var i=0; aTokens[i]; i++){
-						var sName=aTokens[i][0], oDFA=aTokens[i][1]
-						Tokens.add( sName, oDFA )
-						oDFA.name = sName
-						if( ! oDFA.TokensTable ) oDFA.TokensTable = [,sName]
+						var sName=aTokens[i][0]
+						Tokens.add( sName, this.makeTokenFrom( sName, aTokens[i][1] ))
 						}
+				},
+			makeTokenFrom :function( sName, o ){
+				o.name = sName
+				if( ! o.TokensTable ) o.TokensTable = [,sName]
+				return o
 				},
 			addTokenFromString :function( sName, sDFA ){
 				var o;

@@ -3,6 +3,7 @@
 <class name="Automate" language="JavaScript">
 	<desc>
 	Automate Fini. 
+	<link href="../../../css/Thompson.css" type="text/css" rel="stylesheet" />
 	</desc>
 	<syntax>
 		<code><![CDATA[ oAutomate = new Automate ( I, F, A, S, T [, aTokensID ]) ]]></code>
@@ -243,7 +244,10 @@
 		</methods>
 		<methods name="Opérations basiques">
 			<function name="and">
-				<desc>Créé un automate reconnaissant la concaténation des langages des automates donnés.</desc>
+				<desc>
+					Création d'un automate reconnaissant la concaténation des langages des automates donnés.
+					<br/><div class="thompson concatenation" title=""></div>
+				</desc>
 				<arguments>
 					<arg type="Automate" name="oFA1">
 						<desc>Premier automate.</desc>
@@ -258,7 +262,10 @@
 				<returnValue type="Automate"></returnValue>
 			</function>
 			<function name="optional">
-				<desc>Créé un automate reconnaissant l'union d'une chaîne vide et du langage de l'automate donné (répétition de 0 à 1).</desc>
+				<desc>
+					Création d'un automate reconnaissant l'union d'une chaîne vide et du langage de l'automate donné (répétition de 0 à 1).
+					<br/><div class="thompson optional" title=""></div>
+				</desc>
 				<arguments>
 					<arg type="Automate" name="oFA">
 						<desc>Un automate.</desc>
@@ -267,7 +274,10 @@
 				<returnValue type="Automate"></returnValue>
 			</function>
 			<function name="or">
-				<desc>Créé un automate reconnaissant l'union des langages des automates donnés.</desc>
+				<desc>
+					Créé un automate reconnaissant l'union des langages des automates donnés.<br/>
+					<div class="thompson alternation" title=""></div>
+				</desc>
 				<arguments>
 					<arg type="Automate" name="oFA1">
 						<desc>Premier automate.</desc>
@@ -297,7 +307,10 @@
 				<returnValue type="Automate"></returnValue>
 			</function>
 			<function name="repeat0n">
-				<desc>Créé un automate reconnaissant la répétition de 0 à n du langage de l'automate donné (fermeture de Kleene, symbole '*').</desc>
+				<desc>
+					Créé un automate reconnaissant la répétition de 0 à n du langage de l'automate donné (fermeture de Kleene, symbole '*').
+					<br/><div class="thompson kleeneClosure" title=""></div>
+				</desc>
 				<arguments>
 					<arg type="Automate" name="oFA">
 						<desc>Un automate.</desc>

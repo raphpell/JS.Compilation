@@ -36,7 +36,6 @@ Array.prototype.union({
 			})
 		}
 	})
-
 Array.union({
 	unique :function( a1 ){
 		var a2=[]
@@ -75,7 +74,6 @@ Array.union({
 		return a
 		}
 	})
-	
 to_array =function( M ){
 	switch( M.constructor ){
 		case Array : return M
