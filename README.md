@@ -24,6 +24,5 @@ Parser
 - [Compilation de grammaires LL, LR(0), SLR, LR(1)](http://raphpell.github.io/JS.Compilation/Parser.htm)
 - [Parser LR : readToken](http://raphpell.github.io/JS.Compilation/Parser.byStep.htm)
 
-En rêve :
-- L'analyse syntaxique incrémentielle
+L'analyse syntaxique incrémentielle semble trop difficile à réaliser pour le moment...
 
