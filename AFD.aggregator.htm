@@ -224,6 +224,7 @@ var parseRE =function( sToken, sRegExp ){
 
 	oDFA.aTokensID = [[ sToken, oDFA.F ]]
 	oDFAAggregated = oDFA = DFA.aggregate( oDFAAggregated, oDFA )
+	if( oDFA.sError ) alert( oDFA.sError )
 	nStateIDCounter = oDFAAggregated.S[ oDFAAggregated.S.length-1 ]+1
 	exportBasic()
 	previewDFA.refresh()

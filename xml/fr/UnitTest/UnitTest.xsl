@@ -88,7 +88,7 @@
 				<script>
 					try{
 						var result = (<xsl:value-of select="current()"/>)
-						aUnitTest.push([result?2:1,JSON.stringify(result)])
+						aUnitTest.push([result?2:1,result.charAt ? result : JSON.stringify(result)])
 					}catch(e){
 						aUnitTest.push([0,e.message])
 						}

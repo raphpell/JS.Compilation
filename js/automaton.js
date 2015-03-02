@@ -594,7 +594,7 @@ Automate =(function(){
 				A = A.concat( o.A )
 				var aIntersection = Array.intersect( S, o.S )
 				if( aIntersection.length )
-					throwError( 'Error: Automate "|" intersection between automaton states.\n'+ aIntersection )
+					throwError( 'Error: "Automate.or" intersection between automaton states.\n'+ aIntersection )
 				S = S.concat( o.S )
 				T.push( epsilonTransition( I, o.I ))
 				for(var j=0, nj=o.F.length; j<nj; j++)
@@ -1463,12 +1463,6 @@ DFA.inheritFrom( Automate ).union({
 DFA.aggregate =function( oDFA1, oDFA2 ){
 	var oNFA = Automate.or( oDFA1, oDFA2 )
 	var oDFA = new DFA( oNFA.validateAlphabet() )
-	// NB: Ne détecte pas la reconnaissance d'une chaine par 2 tokens: premier arrivée, ...
-	if( oNFA.aTokensID.length != oDFA.aTokensID.length ){
-		alert( 'Erreur perte de donnée dans l\'aggrégation.\n'+
-			'NFA Tokens ID ('+ oNFA.aTokensID.length +'):\n\t'+oNFA.aTokensID.join('\n\t')+'\n\n'+
-			'DFA Tokens ID ('+ oDFA.aTokensID.length +'):\n\t'+oDFA.aTokensID.join('\n\t')
-			)}
 	oDFA.minimize()
 	var a = oDFA.aTokensID
 	if( a && a.length ){
@@ -1485,5 +1479,10 @@ DFA.aggregate =function( oDFA1, oDFA2 ){
 				}
 			}
 		}
+	// NB: Ne détecte pas la reconnaissance d'une chaine par 2 tokens: premier arrivée, ...
+	if( oNFA.aTokensID.length != oDFA.aTokensID.length )
+		oDFA.sError = 'Perte de donnée dans l\'aggrégation.\n'+
+			'NFA Tokens ID ('+ oNFA.aTokensID.length +'):\n\t'+oNFA.aTokensID.join('\n\t')+'\n'+
+			'DFA Tokens ID ('+ oDFA.aTokensID.length +'):\n\t'+oDFA.aTokensID.join('\n\t')
 	return oDFA
 	}

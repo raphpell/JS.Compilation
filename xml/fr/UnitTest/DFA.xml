@@ -55,11 +55,57 @@ var f = function( sChar ){
 	oDFA.aTokensID = [[ 'letter_'+ sChar, oDFA.F ]]
 	return oDFA
 	}
-var oDFA1 = f('a'), oDFA2 = f('b'), oDFA3 = f('a')
-var oDFA = DFA.aggregate( oDFA1, oDFA2 )
-// oDFA = DFA.aggregate( oDFA, oDFA3 )
+var oDFA
 			]]></value>
+		</assertions>
+		<assertions>
+			<value><![CDATA[
+oDFA = DFA.aggregate( f('a'), f('b') )
+			]]></value>
+			<assert><![CDATA[ ! oDFA.sError ]]></assert>
 			<assert><![CDATA[ oDFA ]]></assert>
+			<assert><![CDATA[ oDFA.I === 1 ]]></assert>
+			<assert><![CDATA[ oDFA.F.toString() === "2,3" ]]></assert>
+			<assert><![CDATA[ oDFA.A.toString() === "a,b" ]]></assert>
+			<assert><![CDATA[ oDFA.S.toString() === "1,2,3" ]]></assert>
+			<assert><![CDATA[ oDFA.T.length === 2 ]]></assert>
+			<assert><![CDATA[ oDFA.T.join('|') === '1,a,2|1,b,3' ]]></assert>
+			<assert><![CDATA[ oDFA.aTokensID.length === 2 ]]></assert>
+			<assert><![CDATA[ oDFA.aTokensID.join('|') === 'letter_a,2|letter_b,3' ]]></assert>
+			<assert><![CDATA[ oDFA.M ]]></assert>
+		</assertions>
+		<assertions name="erreur...">
+			<desc>Un nom de token est perdu.</desc>
+			<value><![CDATA[
+oDFA = DFA.aggregate( oDFA, f('a') )
+			]]></value>
+			<assert><![CDATA[ oDFA.sError ]]></assert>
+			<assert><![CDATA[ oDFA ]]></assert>
+			<assert><![CDATA[ oDFA.I === 1 ]]></assert>
+			<assert><![CDATA[ oDFA.F.toString() === "2,3" ]]></assert>
+			<assert><![CDATA[ oDFA.A.toString() === "a,b" ]]></assert>
+			<assert><![CDATA[ oDFA.S.toString() === "1,2,3" ]]></assert>
+			<assert><![CDATA[ oDFA.T.length === 2 ]]></assert>
+			<assert><![CDATA[ oDFA.T.join('|') === '1,a,2|1,b,3' ]]></assert>
+			<assert><![CDATA[ oDFA.aTokensID.length === 2 ]]></assert>
+			<assert><![CDATA[ oDFA.aTokensID.join('|') === 'letter_a,2|letter_b,3' ]]></assert>
+			<assert><![CDATA[ oDFA.M ]]></assert>
+		</assertions>
+		<assertions name="... sans erreur">
+			<value><![CDATA[
+oDFA = DFA.aggregate( oDFA, f('c') )
+			]]></value>
+			<assert><![CDATA[ ! oDFA.sError ]]></assert>
+			<assert><![CDATA[ oDFA ]]></assert>
+			<assert><![CDATA[ oDFA.I === 1 ]]></assert>
+			<assert><![CDATA[ oDFA.F.toString() === "2,3,4" ]]></assert>
+			<assert><![CDATA[ oDFA.A.toString() === "a,b,c" ]]></assert>
+			<assert><![CDATA[ oDFA.S.toString() === "1,2,3,4" ]]></assert>
+			<assert><![CDATA[ oDFA.T.length === 3 ]]></assert>
+			<assert><![CDATA[ oDFA.T.join('|') === '1,a,2|1,b,3|1,c,4' ]]></assert>
+			<assert><![CDATA[ oDFA.aTokensID.length === 3 ]]></assert>
+			<assert><![CDATA[ oDFA.aTokensID.join('|') === 'letter_a,2|letter_b,3|letter_c,4' ]]></assert>
+			<assert><![CDATA[ oDFA.M ]]></assert>
 		</assertions>
 	</test>
 </truth>
