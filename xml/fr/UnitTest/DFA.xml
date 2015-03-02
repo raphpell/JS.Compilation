@@ -5,14 +5,34 @@
 	<script src="../../../js/framework.js"></script>
 	<script src="../../../js/automaton.js"></script>
 	<desc>...</desc>
+	<test class="preambule">
+		<assertions>
+			<value><![CDATA[
+var f = function( sChar ){
+	var oFA = Automate.makeChar( sChar )
+	oFA.aTokensID = [[ 'letter_'+ sChar, oFA.F ]]
+	return oFA
+	}
+var oNFA, oDFA
+			]]></value>
+		</assertions>
+	</test>
 	<test name="constructor">
 		<assertions>
 			<value><![CDATA[
-var oNFA = Automate.makeChar('a')
-var oDFA = new DFA( oNFA )
+oNFA = f('a')
 			]]></value>
 			<assert><![CDATA[ oNFA ]]></assert>
+			<assert><![CDATA[ ! oNFA.type ]]></assert>
+			<assert><![CDATA[ ! oNFA.M ]]></assert>
+		</assertions>
+		<assertions>
+			<value><![CDATA[
+oDFA = new DFA( oNFA )
+			]]></value>
 			<assert><![CDATA[ oDFA ]]></assert>
+			<assert><![CDATA[ oDFA.type==="DFA" ]]></assert>
+			<assert><![CDATA[ oDFA.M ]]></assert>
 		</assertions>
 	</test>
 	<test name="DFA.prototype.minimize">
@@ -26,9 +46,25 @@ var oDFA = new DFA( oNFA )
 	<test name="DFA.prototype.test">
 		<assertions>
 			<value><![CDATA[
-
+var oDFA1 = new DFA ( f('a') )
+var oDFA2 = new DFA ( Automate.optional( f('a')) )
+var oDFA3 = new DFA ( Automate.repeat0n( f('a')) )
 			]]></value>
-			<assert><![CDATA[ true ]]></assert>
+		</assertions>
+		<assertions>
+			<assert><![CDATA[ oDFA1.test('|') === null  ]]></assert>
+			<assert><![CDATA[ oDFA1.test('a|') === 'a'  ]]></assert>
+			<assert><![CDATA[ oDFA1.test('aa|') === 'a'  ]]></assert>
+		</assertions>
+		<assertions>
+			<assert><![CDATA[ oDFA2.test('|') === ''  ]]></assert>
+			<assert><![CDATA[ oDFA2.test('a|') === 'a'  ]]></assert>
+			<assert><![CDATA[ oDFA2.test('aa|') === 'a'  ]]></assert>
+		</assertions>
+		<assertions>
+			<assert><![CDATA[ oDFA3.test('|') === ''  ]]></assert>
+			<assert><![CDATA[ oDFA3.test('a|') === 'a'  ]]></assert>
+			<assert><![CDATA[ oDFA3.test('aa|') === 'aa'  ]]></assert>
 		</assertions>
 	</test>
 	<test name="DFA.prototype.toJS">
@@ -50,16 +86,6 @@ var oDFA = new DFA( oNFA )
 	<test name="DFA.aggregate">
 		<assertions>
 			<value><![CDATA[
-var f = function( sChar ){
-	var oDFA = Automate.makeChar( sChar )
-	oDFA.aTokensID = [[ 'letter_'+ sChar, oDFA.F ]]
-	return oDFA
-	}
-var oDFA
-			]]></value>
-		</assertions>
-		<assertions>
-			<value><![CDATA[
 oDFA = DFA.aggregate( f('a'), f('b') )
 			]]></value>
 			<assert><![CDATA[ ! oDFA.sError ]]></assert>
@@ -74,8 +100,7 @@ oDFA = DFA.aggregate( f('a'), f('b') )
 			<assert><![CDATA[ oDFA.aTokensID.join('|') === 'letter_a,2|letter_b,3' ]]></assert>
 			<assert><![CDATA[ oDFA.M ]]></assert>
 		</assertions>
-		<assertions name="erreur...">
-			<desc>Un nom de token est perdu.</desc>
+		<assertions name="erreur ...un token est perdu...">
 			<value><![CDATA[
 oDFA = DFA.aggregate( oDFA, f('a') )
 			]]></value>
