@@ -6,7 +6,7 @@
 		<code><![CDATA[ oDFA = new DFA( oNFA ) ]]></code>
 		<arguments>
 			<arg name="oNFA" type="Automate">
-				<desc>AFN.</desc>
+				<desc>Un Automate Fini Non déterministe.</desc>
 			</arg>
 		</arguments>
 	</syntax>
@@ -21,40 +21,67 @@
 		</properties>
 		<methods name="Méthodes prototype">
 			<function name="minimize">
-				<desc>.</desc>
+				<desc>
+					Réduit si possible la taille de l'automate (Nombre d'état et alphabet).<br/>
+					Choix de la renumération des états en option.<br/>
+					Une description plus compléte est à la page <a href="../../../AFD.info.htm">DFA: minimisation</a>
+				</desc>
 				<arguments>
-					<arg type="Boolean" name="bPreserveFinalState">
-						<desc>.</desc>
+					<arg type="Number" name="nStateIDCounter" opt="1" default="2">
+						<desc>Premier nombre utilisé pour renuméroter les états.</desc>
+					</arg>
+					<arg type="Boolean" name="bAll" opt="1">
+						<desc>Indique si l'état initial(=1) et l'état puit(=0) doivent-être renumérotés aussi.</desc>
 					</arg>
 				</arguments>
-				<returnValue type="Automate"></returnValue>
+				<returnValue type="this"></returnValue>
+			</function>
+			<function name="minimizeA">
+				<desc>
+					Réduit si possible l'alphabet de l'automate.
+				</desc>
+				<returnValue type="this"></returnValue>
+			</function>
+			<function name="minimizeS">
+				<desc>
+					Réduit si possible le nombre d'état de l'automate.
+				</desc>
+				<returnValue type="this"></returnValue>
 			</function>
 			<function name="test">
-				<desc>.</desc>
+				<desc>Permet de savoir la plus grande portion de texte pouvant être reconnue par l'automate.</desc>
 				<arguments>
 					<arg type="String" name="sText">
-						<desc>.</desc>
+						<desc>Chaîne où est réalisé la recherche.</desc>
 					</arg>
-					<arg type="Number" name="nIndex">
-						<desc>.</desc>
+					<arg type="Number" name="nIndex" opt="1" default="0">
+						<desc>Index dans la chaîne.</desc>
 					</arg>
 				</arguments>
-				<returnValue type="String"></returnValue>
+				<returnValue type="String">
+					<desc>
+Elle retourne toujours la plus grande chaîne trouvée depuis <code>nIndex</code>.<br/>
+Par défaut, si aucune portion n'est reconnue, elle retourne <code>null</code>.
+					</desc>
+				</returnValue>
 			</function>
 			<function name="toJS">
-				<desc>.</desc>
+				<desc>
+Transforme l'automate en un format JavaScript (différent de JSON).<br/>
+<b>Objectif:</b> Obtenir le code le plus petit possible... pour le lexer.
+				</desc>
 				<arguments>
-					<arg type="Boolean" name="bWhiteSpace">
-						<desc>.</desc>
+					<arg type="Boolean" name="bWhiteSpace" default="false">
+						<desc>Ajoute des espaces blancs pour le rendre lisible.</desc>
 					</arg>
-					<arg type="Boolean" name="bUnCompressed">
-						<desc>.</desc>
+					<arg type="Boolean" name="bUnCompressed" default="false">
+						<desc>Décompresse l'automate pour le rendre compréhensible.</desc>
 					</arg>
 				</arguments>
 				<returnValue type="String"></returnValue>
 			</function>
 			<function name="toRE">
-				<desc>.</desc>
+				<desc>En test. Retransforme le DFA en expression régulière.</desc>
 				<returnValue type="String"></returnValue>
 			</function>
 		</methods>
@@ -63,16 +90,19 @@
 	<group name="Objet DFA">
 		<methods name="">
 			<function name="aggregate">
-				<desc>.</desc>
+				<desc>Créé un AFD validé et minimisé depuis deux autres.</desc>
 				<arguments>
-					<arg type="Automate" name="oDFA1">
-						<desc>Un AFD.</desc>
+					<arg type="DFA" name="oDFA1">
+						<desc>Un premier AFD.</desc>
 					</arg>
-					<arg type="Automate" name="oDFA2">
-						<desc>Un autre AFD.</desc>
+					<arg type="DFA" name="oDFA2">
+						<desc>Un deuxième AFD.</desc>
 					</arg>
 				</arguments>
-				<returnValue type="Automate"></returnValue>
+				<returnValue type="DFA">
+					<desc>
+					</desc>
+				</returnValue>
 			</function>
 		</methods>
 	</group>

@@ -76,7 +76,7 @@
 				<script>try{
 					<xsl:value-of select="value"/>
 					}catch( e){
-						aEval.push( e.message )
+						aEval.push( e )
 					}finally{
 						aEval.push( 0 )
 						}
@@ -90,7 +90,7 @@
 						var result = (<xsl:value-of select="current()"/>)
 						aUnitTest.push([result?2:1,result.charAt ? result : JSON.stringify(result)])
 					}catch(e){
-						aUnitTest.push([0,e.message])
+						aUnitTest.push([0,e])
 						}
 				</script>
 				</xsl:for-each>

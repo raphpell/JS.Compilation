@@ -917,11 +917,84 @@ DFA =(function(){
 	})()
 DFA.inheritFrom( Automate ).union({
 	minimize :function( nStateIDCounter, bAll ){
+		// MINIMISATION DU NOMBRE D'ETATS
+		this.minimizeS()
+		// MINIMISATION DE L'ALPHABET : regroupement de symbole en char_class
+		this.minimizeA()
+		return this.renameStates( nStateIDCounter, bAll )
+		},
+	minimizeA :function(){
+		var oDFA = this
+		var aID = []
+		for(var j=0, nj=oDFA.A.length; j<nj ; j++ ){
+			var symb=oDFA.A[j]
+			var sID
+			if( symb.length == 1 ){ // ATTENTION au symbole espace !
+				var a = []
+				for(var i=0, ni=oDFA.S.length; i<ni; i++){
+					var state = oDFA.S[i]
+					if( ! oDFA.M[state]) continue;
+					var aStatesF = oDFA.M[state][symb] || '0'
+					a.push(
+						aStatesF.length==1
+							? ( aStatesF[0].constructor==Array
+								? aStatesF[0][1]
+								: aStatesF[0]
+								)
+							: oDFA.M[state][symb].join(',')
+						)
+					}
+				sID = '_'+a.join('|')
+				} else sID = symb
+			if( aID[ sID ]){
+				aID[ sID ].push( symb )
+				}
+			else{
+				aID.push( sID )
+				aID[ sID ] = [ symb ]
+				}
+			}
+		var A = oDFA.A.concat([])
+		for(var i=0, ni=aID.length; i<ni; i++ ){
+			var aSymbols = aID[ aID[i]]
+			var nj = aSymbols.length
+			if( nj > 1 ){
+				var aCharClass = []
+				for(var j=0; j<nj; j++ ){
+					var symb = aSymbols[j]
+					if( symb.length==1 ){
+						aCharClass.push( symb )
+						A.remove( symb )
+						}
+					}
+				if( aCharClass.length > 1 ){
+					var sCharClass = aCharClass.join('')
+					var fAction = Automate.action( sCharClass, false )
+					var symb = aCharClass[0]
+					A.push( '['+ sCharClass +']' )
+					for(var k=0; k<oDFA.T.length; k++ ){
+						var trans = oDFA.T[k]
+						if( trans[1] == symb ){
+							trans[1] = '['+ sCharClass +']'
+							trans[3] = fAction
+							}
+						else if( sCharClass.indexOf( trans[1])>-1 ){
+							oDFA.T.splice( k, 1 )
+							k--
+							}
+						}
+					}
+				}
+			}
+		oDFA.A = Array.unique( A )
+		oDFA.buildTable()
+		return this
+		},
+	minimizeS :function(){
 		var oDFA = this
 
 		var COUNTER = 2
 		var STATES_COUNT = -1
-		oDFA.renameStates()
 
 		var mergeStates =function( NEW_ID ){
 			var getID =function( sState ){ return NEW_ID[sState] || sState }
@@ -978,122 +1051,53 @@ DFA.inheritFrom( Automate ).union({
 			}
 		var oTokens = Tokens().init( oDFA.aTokensID )
 
-		// MINIMISATION DU NOMBRE D'ETATS
-		if( 1 ){
-			aPartition = [ Array.diff( oDFA.S, oDFA.F ) ]
-			if( oDFA.aTokensID.length )
-				for(var i=0, aToken ; aToken = oDFA.aTokensID[i]; i++ )
-					aPartition.push( aToken[1])
-			else aPartition.push( oDFA.F )
-			var nPartitionSize, oStates
-			do{
-				nPartitionSize = aPartition.length
-				oStates = {}
-				for(var i=0, aGroup; aGroup=aPartition[i]; i++ ){
-					for(var j=0, nj=aGroup.length; j<nj; j++ )
-						oStates[ aGroup[j]] = i+1
-					}
-				for(var i=0, aGroup; aGroup=aPartition[i]; i++ ){
-					if( aGroup.length > 1 ){
-						var oSubGroups = { size:0, keys:[] }
-						for(var j=0, nj=aGroup.length; j<nj; j++ ){
-							var a = oDFA.M[ aGroup[j]].list.concat([])
-							for(var k=0, nk=a.length; k<nk; k++ ){
-								a[k] = oStates[ a[k]] || 0
-								}
-							var sKey = a.join('#')
-							if( oSubGroups[ sKey ]) oSubGroups[ sKey ].push( aGroup[j])
-							else {
-								oSubGroups[ sKey ] = [ aGroup[j]]
-								oSubGroups.keys.push( sKey )
-								oSubGroups.size++
-								}
+		aPartition = [ Array.diff( oDFA.S, oDFA.F ) ]
+		if( oDFA.aTokensID.length )
+			for(var i=0, aToken ; aToken = oDFA.aTokensID[i]; i++ )
+				aPartition.push( aToken[1])
+		else aPartition.push( oDFA.F )
+		var nPartitionSize, oStates
+		do{
+			nPartitionSize = aPartition.length
+			oStates = {}
+			for(var i=0, aGroup; aGroup=aPartition[i]; i++ ){
+				for(var j=0, nj=aGroup.length; j<nj; j++ )
+					oStates[ aGroup[j]] = i+1
+				}
+			for(var i=0, aGroup; aGroup=aPartition[i]; i++ ){
+				if( aGroup.length > 1 ){
+					var oSubGroups = { size:0, keys:[] }
+					for(var j=0, nj=aGroup.length; j<nj; j++ ){
+						var a = oDFA.M[ aGroup[j]].list.concat([])
+						for(var k=0, nk=a.length; k<nk; k++ ){
+							a[k] = oStates[ a[k]] || 0
 							}
-						if( oSubGroups.size > 1 ){
-							var aNewGroups = []
-							for(var j=0, nj=oSubGroups.keys.length; j<nj; j++ ){
-								var aSubGroup = oSubGroups[ oSubGroups.keys[j]]
-								aNewGroups.push( aSubGroup )
-								}
-							aPartition.splice.apply( aPartition, [ i, 1 ].concat( aNewGroups ))
-							i += aNewGroups.length - 1
+						var sKey = a.join('#')
+						if( oSubGroups[ sKey ]) oSubGroups[ sKey ].push( aGroup[j])
+						else {
+							oSubGroups[ sKey ] = [ aGroup[j]]
+							oSubGroups.keys.push( sKey )
+							oSubGroups.size++
 							}
 						}
+					if( oSubGroups.size > 1 ){
+						var aNewGroups = []
+						for(var j=0, nj=oSubGroups.keys.length; j<nj; j++ ){
+							var aSubGroup = oSubGroups[ oSubGroups.keys[j]]
+							aNewGroups.push( aSubGroup )
+							}
+						aPartition.splice.apply( aPartition, [ i, 1 ].concat( aNewGroups ))
+						i += aNewGroups.length - 1
+						}
 					}
-				}while( nPartitionSize != aPartition.length )
+				}
+			}while( nPartitionSize != aPartition.length )
+		
+		mergeStates( oStates )
+		oDFA.buildTable()
+	//	oTokens = Tokens().init( oDFA.aTokensID )
 			
-			mergeStates( oStates )
-			oDFA.buildTable()
-			oTokens = Tokens().init( oDFA.aTokensID )
-			}
-
-		// MINIMISATION DE L'ALPHABET : regroupement de symbole en char_class
-		if( 1 ){
-			var aID = []
-			for(var j=0, nj=oDFA.A.length; j<nj ; j++ ){
-				var symb=oDFA.A[j]
-				var sID
-				if( symb.length == 1 ){ // ATTENTION au symbole espace !
-					var a = []
-					for(var i=0, ni=oDFA.S.length; i<ni; i++){
-						var state = oDFA.S[i]
-						if( ! oDFA.M[state]) continue;
-						var aStatesF = oDFA.M[state][symb] || '0'
-						a.push(
-							aStatesF.length==1
-								? ( aStatesF[0].constructor==Array
-									? aStatesF[0][1]
-									: aStatesF[0]
-									)
-								: oDFA.M[state][symb].join(',')
-							)
-						}
-					sID = '_'+a.join('|')
-					} else sID = symb
-				if( aID[ sID ]){
-					aID[ sID ].push( symb )
-					}
-				else{
-					aID.push( sID )
-					aID[ sID ] = [ symb ]
-					}
-				}
-			var A = oDFA.A.concat([])
-			for(var i=0, ni=aID.length; i<ni; i++ ){
-				var aSymbols = aID[ aID[i]]
-				var nj = aSymbols.length
-				if( nj > 1 ){
-					var aCharClass = []
-					for(var j=0; j<nj; j++ ){
-						var symb = aSymbols[j]
-						if( symb.length==1 ){
-							aCharClass.push( symb )
-							A.remove( symb )
-							}
-						}
-					if( aCharClass.length > 1 ){
-						var sCharClass = aCharClass.join('')
-						var fAction = Automate.action( sCharClass, false )
-						var symb = aCharClass[0]
-						A.push( '['+ sCharClass +']' )
-						for(var k=0; k<oDFA.T.length; k++ ){
-							var trans = oDFA.T[k]
-							if( trans[1] == symb ){
-								trans[1] = '['+ sCharClass +']'
-								trans[3] = fAction
-								}
-							else if( sCharClass.indexOf( trans[1])>-1 ){
-								oDFA.T.splice( k, 1 )
-								k--
-								}
-							}
-						}
-					}
-				}
-			oDFA.A = Array.unique( A )
-			}
-
-		return oDFA.renameStates( nStateIDCounter, bAll )
+		return this
 		},
 	test :function( s, n ){
 		// Si les états du DFA sont issu de partition d'états du NFA
@@ -1464,21 +1468,6 @@ DFA.aggregate =function( oDFA1, oDFA2 ){
 	var oNFA = Automate.or( oDFA1, oDFA2 )
 	var oDFA = new DFA( oNFA.validateAlphabet() )
 	oDFA.minimize()
-	var a = oDFA.aTokensID
-	if( a && a.length ){
-		var oSTATES = {}
-		for(var i=0, ni=a.length; i<ni; i++){
-			var aStates = a[i][1], sToken = a[i][0]
-			for(var j=0, nj=aStates.length; j<nj; j++){
-				var nState = aStates[j]
-				if( oSTATES[ nState ]){ // throwError( 'State '+ nState +' recognize '+ oSTATES[ nState ] +' and '+ sToken )
-					if( oSTATES[ nState ].charAt ) oSTATES[ nState ] = [ oSTATES[ nState ]]
-					oSTATES[ nState ].push( sToken )
-					}
-				else oSTATES[ nState ] = sToken
-				}
-			}
-		}
 	// NB: Ne détecte pas la reconnaissance d'une chaine par 2 tokens: premier arrivée, ...
 	if( oNFA.aTokensID.length != oDFA.aTokensID.length )
 		oDFA.sError = 'Perte de donnée dans l\'aggrégation.\n'+

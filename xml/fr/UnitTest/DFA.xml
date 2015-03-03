@@ -35,14 +35,6 @@ oDFA = new DFA( oNFA )
 			<assert><![CDATA[ oDFA.M ]]></assert>
 		</assertions>
 	</test>
-	<test name="DFA.prototype.minimize">
-		<assertions>
-			<value><![CDATA[
-
-			]]></value>
-			<assert><![CDATA[ false ]]></assert>
-		</assertions>
-	</test>
 	<test name="DFA.prototype.test">
 		<assertions>
 			<value><![CDATA[
@@ -133,4 +125,121 @@ oDFA = DFA.aggregate( oDFA, f('c') )
 			<assert><![CDATA[ oDFA.M ]]></assert>
 		</assertions>
 	</test>
+	
+	
+	<test name="Minimisation" class="preambule">
+		<assertions>
+		<desc>Automate minimisable</desc>
+			<value><![CDATA[
+var makeDFA = function(){
+	var oFA = new DFA( Automate.or(
+	    Automate.makeChar( 'a' ),
+	    Automate.makeChar( 'b' ),
+	    Automate.makeChar( 'c' )
+	    ))
+	return oFA.renameStates()
+	}
+var oDFAMinimized
+			]]></value>
+		</assertions>
+		<assertions>
+			<desc>Teste la longueur (Array) d'attributs de l'automate</desc>
+			<value><![CDATA[
+var FAST = function( nF, nA, nS, nT ){
+	return oDFA.F.length === nF
+	    && oDFA.A.length === nA
+	    && oDFA.S.length === nS
+	    && oDFA.T.length === nT
+	    && oDFA
+	}
+			]]></value>
+		</assertions>
+		<assertions>
+			<desc>
+Automate non minimisable :<br/>
+à chaque état final est associé un nom de token...
+			</desc>
+			<value><![CDATA[
+var makeDFA2 = function(){
+	var oFA = new DFA( Automate.or(
+	    f( 'a' ),
+	    f( 'b' ),
+	    f( 'c' )
+	    ))
+	return oFA.renameStates()
+	}
+			]]></value>
+		</assertions>
+	</test>
+	<test name="DFA.prototype.minimize">
+		<desc><a href="../../../AFD.info.htm">DFA: minimisation</a></desc>
+		<assertions name="avant">
+			<value><![CDATA[
+oDFA = makeDFA()
+			]]></value>
+			<assert><![CDATA[ FAST( 3, 3, 4, 3 ) ]]></assert>
+			<assert><![CDATA[ oDFA.A.toString() === "a,b,c" ]]></assert>
+		</assertions>
+		<assertions name="après">
+			<value><![CDATA[
+oDFAMinimized = oDFA.minimize()
+			]]></value>
+			<assert><![CDATA[ FAST( 1, 1, 2, 1 ) ]]></assert>
+			<assert><![CDATA[ oDFA.A.toString() === "[abc]" ]]></assert>
+			<assert><![CDATA[ oDFA === oDFAMinimized ]]></assert>
+		</assertions>
+	</test>
+	<test name="DFA.prototype.minimizeA">
+		<desc>Réduction de l'alphabet.</desc>
+		<assertions name="Pas de réduction possible">
+			<value><![CDATA[
+oDFA = makeDFA().minimizeA()
+			]]></value>
+			<assert><![CDATA[ FAST( 3, 3, 4, 3 ) ]]></assert>
+			<assert><![CDATA[ oDFA.A.toString() === "a,b,c" ]]></assert>
+		</assertions>
+		<assertions name="Cas réduction possible">
+			<value><![CDATA[
+oDFA.minimizeS()
+			]]></value>
+			<assert><![CDATA[ FAST( 1, 3, 2, 3 ) ]]></assert>
+		</assertions>
+		<assertions name="Réduction">
+			<value><![CDATA[
+oDFA.minimizeA()
+			]]></value>
+			<assert><![CDATA[ FAST( 1, 1, 2, 1 ) ]]></assert>
+			<assert><![CDATA[ oDFA.A.toString() === "[abc]" ]]></assert>
+		</assertions>
+	</test>
+	<test name="DFA.prototype.minimizeS">
+		<desc>Réduction du nombre d'état.</desc>
+		<assertions name="avant">
+			<value><![CDATA[
+oDFA = makeDFA()
+	]]></value>
+			<assert><![CDATA[ FAST( 3, 3, 4, 3 ) ]]></assert>
+			<assert><![CDATA[ oDFA.A.toString() === "a,b,c" ]]></assert>
+		</assertions>
+		<assertions name="après">
+			<value><![CDATA[
+oDFA.minimizeS()
+	]]></value>
+			<assert><![CDATA[ FAST( 1, 3, 2, 3 ) ]]></assert>
+			<assert><![CDATA[ oDFA.A.toString() === "a,b,c" ]]></assert>
+		</assertions>
+		<assertions name="avant">
+			<value><![CDATA[
+oDFA = makeDFA2()
+	]]></value>
+			<assert><![CDATA[ FAST( 3, 3, 4, 3 ) ]]></assert>
+		</assertions>
+		<assertions name="après">
+			<value><![CDATA[
+oDFA.minimizeS()
+	]]></value>
+			<assert><![CDATA[ FAST( 3, 3, 4, 3 ) ]]></assert>
+		</assertions>
+	</test>
+
 </truth>

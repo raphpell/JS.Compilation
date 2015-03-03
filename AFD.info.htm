@@ -5,6 +5,7 @@
 		<link rel="stylesheet" type="text/css" href="widget/Toc/styles.css">
 		<style>
 SECTION { margin-left: 1em;}
+TD { padding: 0 1em;}
 		</style>
 	</head>
 	<body>
@@ -22,7 +23,7 @@ SECTION { margin-left: 1em;}
 			<dt><a href="#toc31">Nombre d'états</a></dt>
 			<dt><a href="#toc32">Alphabet</a></dt>
 		</dl></dd>
-	<dt><a href="#toc4">Résolution des ambiguïtés</a></dt>
+	<dt><a href="#toc4">Reconnaissance</a></dt>
 </dl>
 <p id="back-top"><a href="#"><span></span>Haut de page</a></p>
 
@@ -49,23 +50,23 @@ SECTION { margin-left: 1em;}
 <a name="toc2"></a>
 <h2>Conversion AFN en AFD</h2><section>
 	<ul>
-		<li>Un état du AFD correspond à des groupes d'états du AFN.</li>
+		<li>Un état d'un AFD correspond à des groupes d'états d'un AFN.</li>
 		<li>	
-			L'<b>état initial</b> du AFD est égale à l'&epsilon;-Closure de l'état initial du AFN.
+			L'<b>état initial</b> d'un AFD est égale à l'&epsilon;-Closure de l'état initial d'un AFN.
 		</li>
 		<li>
-			Pour chaque nouvel état du AFD et chaque symbole de l'alphabet : <br>
+			Pour chaque nouvel état d'un AFD et chaque symbole de l'alphabet : <br>
 			Une transition (s<sub>dfa1</sub>,c)&rarr;s<sub>dfa2</sub> est ajouté si s<sub>dfa2</sub> &ne; &empty; <br>
-			s<sub>dfa2</sub> est l'ensemble d'état du AFN accessible depuis s<sub>dfa1</sub> après avoir lu le symbole c, en considérant aussi les transitions &epsilon;.
+			s<sub>dfa2</sub> est l'ensemble d'état d'un AFN accessible depuis s<sub>dfa1</sub> après avoir lu le symbole c, en considérant aussi les transitions &epsilon;.
 		</li>
 		<li>
-			Un état du AFD est un <b>état final</b> si il contient un état final du AFN.
+			Un état d'un AFD est un <b>état final</b> si il contient un état final d'un AFN.
 		</li>
 	</ul>
 
 	<a name="toc21"></a>
 	<h3>&epsilon;-Closure </h3><section>
-		<p>l'&epsilon;-Closure d'un état du AFN contient :</p>
+		<p>l'&epsilon;-Closure d'un état d'un AFN contient :</p>
 		<ul>
 			<li>cet état.</li>
 			<li>tous les états accessibles par des transitions &epsilon; depuis cet état.</li>
@@ -77,10 +78,11 @@ SECTION { margin-left: 1em;}
 <h2>Minimisation</h2><section>
 	<a name="toc31"></a>
 	<h3>Nombre d'états</h3><section>
+		<p>Les états ayant des lignes identiques dans la matrice sont regroupés en un état... enfin presque :</p>
 		<ol>
 			<li>On commence avec une partition initiale <code>&Pi;</code> composé d'au moins deux groupes :
 				<ul>
-					<li>Les états finaux F reconnaissant un type de token (plusieurs groupes possibles).</li>
+					<li>Les états finaux F reconnaissant un type de token (plusieurs groupes possibles) ou tous les états finaux.</li>
 					<li>Le reste des états S&ndash;F.</li>
 				</ul>
 			</li>
@@ -99,6 +101,21 @@ SECTION { margin-left: 1em;}
 				Créé un nouvel AFD avec comme états la partition obtenue.
 			</li>
 		</ol>
+		<p>AFD avant et après réduction du nombre d'état:</p>
+		<table border="1" style="float:left;">
+		<tr><td><pre>   \Symbole<br>Etat\</pre></td><th>a</th><th>b</th><th>c</th><th>d</th></tr>
+		<tr><th style="background:#6FB1FC;">1</th>	<td>2</td><td>3</td><td>4</td><td>5</td></tr>
+		<tr><th style="background:#FC0   ;">2</th>	<td>1</td><td>0</td><td>0</td><td>0</td></tr>
+		<tr><th style="background:#FC0   ;">3</th>	<td>1</td><td>0</td><td>0</td><td>0</td></tr>
+		<tr><th style="background:#FC0   ;">4</th>	<td>1</td><td>0</td><td>0</td><td>0</td></tr>
+		<tr><th style="background:#FC0   ;">5</th>	<td>1</td><td>0</td><td>0</td><td>0</td></tr>
+		</table>
+		<table border="1" style="float:left; margin-left:2em;">
+		<tr><td><pre>   \Symbole<br>Etat\</pre></td><th>a</th><th>b</th><th>c</th><th>d</th></tr>
+		<tr><th style="background:#6FB1FC;">1</th>	<td>2</td><td>2</td><td>2</td><td>2</td></tr>
+		<tr><th style="background:#FC0   ;">2</th>	<td>1</td><td>0</td><td>0</td><td>0</td></tr>
+		</table>
+		<div style="clear:both;"></div>
 	</section>
 	<a name="toc32"></a>
 	<h3>Alphabet</h3><section>
@@ -123,7 +140,8 @@ SECTION { margin-left: 1em;}
 </section>
 
 <a name="toc4"></a>
-<h2>Résolution des ambiguïtés</h2><section>
+<h2>Reconnaissance</h2><section>
+	<p>Résolution des ambiguïtés:</p>
 	<ol>
 		<li>La chaîne trouvée sera toujours la plus longue possible.</li>
 		<li>Priorité des régles : Si la chaîne trouvée reconnaît deux tokens. Premier arrivé, premier servi !</li>
