@@ -222,7 +222,8 @@ var parseRE =function( sToken, sRegExp ){
 	oDFA.renameStates( nStateIDCounter, true )
 	Automate.setUniqueID( oDFA.S[ oDFA.S.length-1 ]+1 )
 
-	oDFA.aTokensID = [[ sToken, oDFA.F ]]
+//	oDFA.aTokensID = [[ sToken, oDFA.F ]]
+	oDFA.setTokenName( sToken )
 	oDFAAggregated = oDFA = DFA.aggregate( oDFAAggregated, oDFA )
 	if( oDFA.sError ) alert( oDFA.sError )
 	nStateIDCounter = oDFAAggregated.S[ oDFAAggregated.S.length-1 ]+1

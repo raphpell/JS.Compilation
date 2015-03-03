@@ -188,6 +188,10 @@ Automate =(function(){
 			oFA.buildTable()
 			return oFA
 			},
+		setTokenName :function( sToken, aF ){
+			this.aTokensID = this.aTokensID || []
+			this.aTokensID.push([ sToken, aF || this.F ])
+			},
 		validateAlphabet :function(){
 			var oNFA = this
 			, aAtoms=[], aGroups=[], aNegativeGroups=[]
