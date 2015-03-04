@@ -181,6 +181,21 @@ oFA.renameStates( 2, true, [[10,50],[15,0],[20,100]] )
 			<assert><![CDATA[ JSON.stringify( oFA.M ) === '{"2":{"b":[3],"c":[4]},"3":{"a":[2]}}' ]]></assert>
 		</assertions>
 	</test>
+	<test name="prototype.setTokenName">
+		<assertions>
+			<value><![CDATA[
+var oNFA = Automate.or(
+	Automate.makeChar('a'),
+	Automate.makeChar('b'),
+	Automate.makeChar('c')
+	)
+			]]></value>
+			<assert><![CDATA[ oNFA ]]></assert>
+			<assert><![CDATA[ oNFA.aTokensID.length === 0 ]]></assert>
+			<assert><![CDATA[ oNFA.setTokenName( 'aaa' ) ]]></assert>
+			<assert><![CDATA[ oNFA.aTokensID.length === 1 ]]></assert>
+		</assertions>
+	</test>
 
 	<test name="Préambule..." class="preambule">
 		<assertions>

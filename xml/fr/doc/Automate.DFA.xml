@@ -3,10 +3,13 @@
 <class name="DFA" language="JavaScript">
 	<desc>Fonction générant un AFD depuis un AFN.</desc>
 	<syntax>
-		<code><![CDATA[ oDFA = new DFA( oNFA ) ]]></code>
+		<code><![CDATA[ oDFA = new DFA( oNFA [, sTokenName ] ) ]]></code>
 		<arguments>
 			<arg name="oNFA" type="Automate">
 				<desc>Un Automate Fini Non déterministe.</desc>
+			</arg>
+			<arg name="sTokenName" type="String" opt="1">
+				<desc>Nom de token associé aux états finaux.</desc>
 			</arg>
 		</arguments>
 	</syntax>

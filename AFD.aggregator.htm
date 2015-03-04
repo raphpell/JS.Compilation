@@ -218,12 +218,10 @@ var init =function(){
 var parseRE =function( sToken, sRegExp ){
 	var oTree = RegExp2AST( sRegExp )
 	oNFA = NFA( oTree )
-	oDFA = ( new DFA( oNFA.validateAlphabet() )).minimize()
+	oDFA = ( new DFA( oNFA.validateAlphabet(), sToken )).minimize()
 	oDFA.renameStates( nStateIDCounter, true )
 	Automate.setUniqueID( oDFA.S[ oDFA.S.length-1 ]+1 )
 
-//	oDFA.aTokensID = [[ sToken, oDFA.F ]]
-	oDFA.setTokenName( sToken )
 	oDFAAggregated = oDFA = DFA.aggregate( oDFAAggregated, oDFA )
 	if( oDFA.sError ) alert( oDFA.sError )
 	nStateIDCounter = oDFAAggregated.S[ oDFAAggregated.S.length-1 ]+1

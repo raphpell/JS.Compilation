@@ -191,6 +191,7 @@ Automate =(function(){
 		setTokenName :function( sToken, aF ){
 			this.aTokensID = this.aTokensID || []
 			this.aTokensID.push([ sToken, aF || this.F ])
+			return this
 			},
 		validateAlphabet :function(){
 			var oNFA = this
@@ -892,11 +893,11 @@ DFA =(function(){
 			}
 		}
 
-	return function( oNFA ){
+	return function( oNFA, sTokenName ){
 		getTransitions.init()
 		NFA = oNFA
-		NFA.T = NFA.T.concat([])
-		EpsilonClosure = oNFA.epsilonClosures()
+		if( sTokenName ) NFA.aTokensID = null
+		EpsilonClosure = NFA.epsilonClosures()
 		I = EpsilonClosure[ NFA.I ]
 		I.id = stateID(I) 
 		F = []
@@ -907,14 +908,20 @@ DFA =(function(){
 		aTokensName = []
 		oTokensState = {}
 		oNewStates = {}
-		
 		buildDfaStates( I )
-		var aTokensID =[]
-		for(var i=0, ni=aTokensName.length; i<ni; i++ ){
-			var s = aTokensName[i]
-			aTokensID.push([ s, oTokensState[ s ]])
+		
+		if( sTokenName ){
+			Automate.call( this, I.id, F, A, S, T )
+			this.setTokenName( sTokenName )
 			}
-		Automate.call( this, I.id, F, A, S, T, aTokensID )
+		else{
+			var aTokensID =[]
+			for(var i=0, ni=aTokensName.length; i<ni; i++ ){
+				var s = aTokensName[i]
+				aTokensID.push([ s, oTokensState[ s ]])
+				}
+			Automate.call( this, I.id, F, A, S, T, aTokensID )
+			}
 		this.type = 'DFA'
 		this.buildTable()
 		}

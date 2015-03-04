@@ -115,6 +115,21 @@
 				</arguments>
 				<returnValue type="this"></returnValue>
 			</function>
+			<function name="setTokenName">
+				<desc>Défini le nom de token associé à un ou plusieurs états finaux.</desc>
+				<arguments>
+					<arg type="String" name="sTokenName">
+						<desc>Nom de token.</desc>
+					</arg>
+					<arg type="Array" name="aF" opt="1">
+						<desc>
+						Tableau contenant des états finaux.<br/>
+						Par défaut, cette valeur contient tous les états finaux de l'automate.
+						</desc>
+					</arg>
+				</arguments>
+				<returnValue type="this"></returnValue>
+			</function>
 			<function name="validateAlphabet">
 				<desc>Transforme l'alphabet de l'automate de façon à le rendre déterministe...</desc>
 			</function>
