@@ -1,4 +1,4 @@
-﻿// Require AutomatonLexer + modules
+﻿// RegExp2AST require AutomatonLexer + Modules
 
 EPSILON = '&epsilon;'
 EMPTY = '&empty;'
@@ -188,9 +188,9 @@ Automate =(function(){
 			oFA.buildTable()
 			return oFA
 			},
-		setTokenName :function( sToken, aF ){
+		setTokenName :function( sToken, aFinalStates ){
 			this.aTokensID = this.aTokensID || []
-			this.aTokensID.push([ sToken, aF || this.F ])
+			this.aTokensID.push([ sToken, aFinalStates || this.F ])
 			return this
 			},
 		validateAlphabet :function(){
@@ -554,7 +554,21 @@ Automate =(function(){
 			for(var i=nCode1, ni=nCode2+1; i<ni; i++ ) a.push( i )
 			return Automate.makeCharSet( String.fromCharCode.apply( null, a ).toArray(), false, I, F )
 			},
-		makeString: function( s ){ throwError( 'NOT IMPLEMENTED' ) },
+		makeString: function( sString ){
+			var I=getUniqueID()
+			var A=sString.split('')
+			var S=[I]
+			var T=[]
+			var nStateID = I
+			for(var i=0, ni=A.length; i<ni; i++ ){
+				T.push([ nStateID, A[i], nStateID=getUniqueID() ])
+				S.push( nStateID )
+				}
+		//	throwError( 'NOT IMPLEMENTED' )
+			A = Array.unique( A )
+			A.sort()
+			return new Automate( I, [nStateID], A, S, T )
+			},
 
 		// OPÉRATIONS BASIQUES
 		and :function(){
@@ -708,7 +722,6 @@ NFA =function( e ){ // Transformation de l'AST d'une expression régulière en a
 				default: return Automate.repeat( oFA, n, parseInt( o.m ))
 				}
 		case 'DOT': return Automate.makeAnyChar()
-	//	case 'DOT': return Automate.fromChar( 'ANY' )()
 		default:
 			if( NFA[S]){
 				var a=to_array( e.childNodes )
@@ -1003,7 +1016,6 @@ DFA.inheritFrom( Automate ).union({
 		},
 	minimizeS :function(){
 		var oDFA = this
-
 		var COUNTER = 2
 		var STATES_COUNT = -1
 
@@ -1061,8 +1073,8 @@ DFA.inheritFrom( Automate ).union({
 				}
 			}
 		var oTokens = Tokens().init( oDFA.aTokensID )
-
-		aPartition = [ Array.diff( oDFA.S, oDFA.F ) ]
+		
+		var aPartition = [ Array.diff( oDFA.S, oDFA.F ) ]
 		if( oDFA.aTokensID.length )
 			for(var i=0, aToken ; aToken = oDFA.aTokensID[i]; i++ )
 				aPartition.push( aToken[1])
@@ -1106,8 +1118,7 @@ DFA.inheritFrom( Automate ).union({
 		
 		mergeStates( oStates )
 		oDFA.buildTable()
-	//	oTokens = Tokens().init( oDFA.aTokensID )
-			
+
 		return this
 		},
 	test :function( s, n ){
@@ -1476,10 +1487,10 @@ DFA.inheritFrom( Automate ).union({
 		}
 	})
 DFA.aggregate =function( oDFA1, oDFA2 ){
-	var oNFA = Automate.or( oDFA1, oDFA2 )
-	var oDFA = new DFA( oNFA.validateAlphabet() )
+	var oNFA = Automate.or( oDFA1, oDFA2 ).validateAlphabet()
+	var oDFA = new DFA( oNFA )
 	oDFA.minimize()
-	// NB: Ne détecte pas la reconnaissance d'une chaine par 2 tokens: premier arrivée, ...
+	// NB: Ne détecte pas la reconnaissance d'une chaine par 2 tokens: premier arrivé, premier servi.
 	if( oNFA.aTokensID.length != oDFA.aTokensID.length )
 		oDFA.sError = 'Perte de donnée dans l\'aggrégation.\n'+
 			'NFA Tokens ID ('+ oNFA.aTokensID.length +'):\n\t'+oNFA.aTokensID.join('\n\t')+'\n'+

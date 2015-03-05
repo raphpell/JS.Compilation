@@ -280,7 +280,20 @@ oFA = Automate.makeCharRange( 'a', 'c', 11, 12 )
 			<assert><![CDATA[ ! oFA.M ]]></assert>
 		</assertions>
 	</test>
-
+	<test name="Automate.makeString">
+		<assertions>
+			<value><![CDATA[
+Test( function(){
+return Automate.makeString( 'red car' )
+}) 
+			]]></value>
+			<assert><![CDATA[ oFA ]]></assert>
+			<assert><![CDATA[ oDFA ]]></assert>
+			<assert><![CDATA[ oDFA.test( 'blue') === null ]]></assert>
+			<assert><![CDATA[ oDFA.test( 'red car|') === 'red car' ]]></assert>
+		</assertions>
+	</test>
+	
 	<test name="Opérations basiques" class="preambule">
 		<desc>Automates tests :</desc>
 		<assertions><desc>Création d'un automate avec 1 état final depuis un caractère</desc>

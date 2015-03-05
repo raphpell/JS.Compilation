@@ -256,6 +256,15 @@
 				</arguments>
 				<returnValue type="Automate"></returnValue>
 			</function>
+			<function name="makeString">
+				<desc>Créé un automate (AFD) reconnaissant une chaîne.</desc>
+				<arguments>
+					<arg type="String" name="sString">
+						<desc>Chaîne à reconnaître.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="Automate"></returnValue>
+			</function>
 		</methods>
 		<methods name="Opérations basiques">
 			<function name="and">
