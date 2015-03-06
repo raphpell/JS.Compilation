@@ -1,0 +1,129 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>FA Graph</title>
+<style type="text/css">
+    body,
+    #mynetwork {
+      position: absolute;
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+    }
+  </style>
+</head>
+<body>
+<div id="mynetwork"></div>
+
+<script src="widget/cytoscape/jquery.min.js"></script>
+<script src="widget/cytoscape/arbor.js"></script>
+<script src="widget/cytoscape/cytoscape.min.js"></script>
+<script>
+EPSILON = '&epsilon;'
+
+var oFA1 = {"I":1,"F":[2,3,4],"A":["a","b","c"],"S":[1,2,3,4],"T":[[1,"a",2],[1,"b",3],[1,"c",4]],"aTokensID":[],"type":"DFA","M":{"1":{"a":[2],"b":[3],"c":[4],"list":[2,3,4]},"2":{"list":[0,0,0]},"3":{"list":[0,0,0]},"4":{"list":[0,0,0]}}}
+var oFA2 = {"I":1,"F":[2],"A":["[abc]"],"S":[1,2],"T":[[1,"[abc]",2,null]],"aTokensID":[],"type":"DFA","M":{"1":{"[abc]":[[null,2]],"list":[2]},"2":{"list":[0]}}}
+
+function setFA( oFA ){
+/*NODES*/ nodes=(function(){ 
+			var a = []
+			oFA.S.every( function( S ){
+				if( S == 0 ) return 1
+				var bI = S==oFA.I, bF = oFA.F.indexOf( S ) > -1
+				var sBgColor = bI && bF ? '#0C0'
+					: ( bI ? '#6FB1FC'
+						: ( bF ? '#FC0'
+							: ( S==0 ? '#F00'
+								: '#CCC'
+								)))
+				a.push({ data: { id:''+S, name:''+S, faveColor:sBgColor }})
+				return 1
+				})
+			return a
+			})();
+/*EDGES*/ edges=(function(){
+			var a = []
+			oFA.T.every( function( T ){
+				if( T[2] == 0 ) return 1
+				var sSymbol = T[1]==EPSILON ? '' : T[1]
+				var bCharClass = sSymbol.length > 1
+				var sSymbolLabel = JSON.stringify( bCharClass ? sSymbol.substring(0,5)+(sSymbol.length>5?'...':'') : sSymbol ).slice(1,-1)
+				a.push({
+					data: { source:''+T[0], name:sSymbolLabel, target:''+T[2] },
+					classes: T[1]==EPSILON ? 'epsilon' : ( bCharClass ? 'charclass' : '' )
+					})
+				return 1
+				})
+			return a
+			})();
+
+$('#mynetwork').cytoscape({
+	style: cytoscape.stylesheet()
+		.selector('node').css({
+			'content': 'data(name)',
+			'height': 40,
+			'width': 40,
+			'text-valign': 'center',
+			'color': 'white',
+			'text-outline-width': 2,
+			'text-outline-color': 'data(faveColor)',
+			'background-color': 'data(faveColor)'
+			})
+		.selector('edge').css({
+			'width': 'mapData(strength, 70, 100, 2, 6)',
+			'content': 'data(name)',
+			'target-arrow-shape': 'triangle',
+			'line-color': '#6FB1FC',
+			'source-arrow-color': '#6FB1FC',
+			'target-arrow-color': '#6FB1FC'
+			})
+		.selector('edge.epsilon').css({
+			'line-style': 'dashed',
+			'target-arrow-shape': 'triangle'
+			})
+		.selector('edge.charclass').css({
+			'color': '#060',
+			'line-color': '#0F0',
+			'source-arrow-color': '#0F0',
+			'target-arrow-color': '#0F0'
+			}),
+
+	elements: {
+		nodes: nodes,
+		edges: edges
+		},
+
+	layout:  { name: 'arbor' } /*
+		{
+		name: 'cose',
+		ready               : function() {},
+		stop                : function() {},
+		animate             : true,
+		refresh             : 4,
+		fit                 : true, 
+		padding             : 30, 
+		boundingBox         : undefined,
+		randomize           : true,
+		debug               : false,
+		nodeRepulsion       : 400000,
+		nodeOverlap         : 10,
+		idealEdgeLength     : 10,
+		edgeElasticity      : 100,
+		nestingFactor       : 5, 
+		gravity             : 250, 
+		numIter             : 100,
+		initialTemp         : 200,
+		coolingFactor       : 0.95, 
+		minTemp             : 1.0
+		}*/ 
+	})
+	}
+/*
+setFA( oFA2 )
+setTimeout( function(){setFA( oFA1 )}, 2000 )
+*/
+</script>
+</body>
+</html>

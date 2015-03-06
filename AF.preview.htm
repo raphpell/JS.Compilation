@@ -27,6 +27,7 @@ TABLE.Table {
 	float:left;
 	}
 	</style>
+
 </head>
 <body spellcheck="false">
 
@@ -41,11 +42,9 @@ TABLE.Table {
 <div id="eFA"></div>
 
 <div id="eSectionGraph">
-	<input type="button" value="+" onclick="augmentGraph('FA')" title="">
-	<input type="button" value="-" onclick="reduceGraph('FA')" title="">
-	<!-- <input type="button" value="Réorganiser" onclick="layoutGraph('FA')" title="Change le placement des états."> -->
-	<br>
-	<div id="eFAGraph" class="graph"></div>
+	<input type="button" onclick="FAGraph( oFA )" value="window">
+
+	<iframe id="eFAGraph" src="Graph.preview.htm" class="graph"></iframe>
 </div>
 
 <hr style="clear:both;">
@@ -63,157 +62,10 @@ TABLE.Table {
 <script src="js/automaton.js"></script>
 
 <!-- GRAPH... -->
-<script src="widget/cytoscape2.0.1/jquery.min.js"></script>
-<script src="widget/cytoscape2.0.1/cytoscape.js"></script>
-<script src="widget/cytoscape2.0.1/arbor.js"></script>
 <script>
-var oFA, EPSILON = '&epsilon;'
-var buildGraph =function( sType, nodes, edges ){
-	return window[ sType+'Graph'] = $('#e'+sType+'Graph').cytoscape({
-	//	container: document.getElementById('e'+sType+'Graph'),
-		style: cytoscape.stylesheet()
-			.selector('node').css({
-				'content': 'data(name)',
-				'width': 'mapData(weight, 40, 80, 20, 60)',
-				'text-valign': 'center',
-				'color': 'white',
-				'text-outline-width': 2,
-				'text-outline-color': 'data(faveColor)',
-				'background-color': 'data(faveColor)'
-				})
-			.selector('edge').css({
-				'width': 'mapData(strength, 70, 100, 2, 6)',
-				'content': 'data(name)',
-				'target-arrow-shape': 'triangle',
-				'line-color': '#6FB1FC',
-				'source-arrow-color': '#6FB1FC',
-				'target-arrow-color': '#6FB1FC'
-				})
-			.selector('edge.epsilon').css({
-				'line-style': 'dashed',
-				'target-arrow-shape': 'triangle'
-				})
-			.selector('edge.charclass').css({
-				'color': '#060',
-				'line-color': '#0F0',
-				'source-arrow-color': '#0F0',
-				'target-arrow-color': '#0F0'
-				})
-			.selector(':selected').css({
-				'background-color': 'black',
-				'line-color': 'black',
-				'target-arrow-color': 'black',
-				'source-arrow-color': 'black'
-				})
-			.selector('.faded').css({
-				'opacity': 0.25,
-				'text-opacity': 0
-				}),
-		elements:{
-			nodes: nodes,
-			edges: edges
-			},
-		ready: function(){
-			var Graph = this
-			Graph.elements().unselectify()
-			Graph.on('tap', 'node', function(e){
-				var node = e.cyTarget 
-				var neighborhood = node.neighborhood().add(node)
-				Graph.elements().addClass('faded')
-				neighborhood.removeClass('faded')
-				});
-			Graph.on('tap', function(e){
-				if( e.cyTarget === Graph )
-					Graph.elements().removeClass('faded')
-				});
-			}
-		})
-	}
-var showGraph =function( sType ){
-	oFA = window[ 'o' + sType ]
-	var o = window[ sType+'Graph'] = buildGraph(
-			sType,
-	/*NODES*/	( function(){ 
-				var a = []
-				oFA.S.every( function( S ){
-					if( S == 0 ) return 1
-					var bI = S==oFA.I, bF = oFA.F.have( S )
-					var sBgColor = bI && bF ? '#0C0'
-						: ( bI ? '#6FB1FC'
-							: ( bF ? '#FC0'
-								: ( S==0 ? '#F00'
-									: '#CCC'
-									)))
-					a.push({ data: { id:''+S, name:''+S, faveColor:sBgColor }})
-					return 1
-					})
-				return a
-				})(),
-	/*EDGES*/	( function(){
-				var a = []
-				oFA.T.every( function( T ){
-					if( T[2] == 0 ) return 1
-					var sSymbol = T[1]==EPSILON ? '' : T[1]
-					var bCharClass = sSymbol.length > 1
-					var sSymbolLabel = JSON.stringify( bCharClass ? sSymbol.substring(0,5)+(sSymbol.length>5?'...':'') : sSymbol ).slice(1,-1)
-					a.push({
-						data: { source:''+T[0], name:sSymbolLabel, target:''+T[2] },
-						classes: T[1]==EPSILON ? 'epsilon' : ( bCharClass ? 'charclass' : '' )
-						})
-					return 1
-					})
-				return a
-				})()
-			)
-	}
-var layoutGraph =function( sType ){
-	var o = window[ sType+'Graph']
-	if( o ){
-		var options = {
-			name: 'arbor',
-			liveUpdate: true, // whether to show the layout as it's running
-			ready: undefined, // callback on layoutready 
-			stop: undefined, // callback on layoutstop
-			maxSimulationTime: 10000, // max length in ms to run the layout
-			fit: false, // fit to viewport
-			padding: [ 25, 25, 25, 25 ], // top, right, bottom, left
-			ungrabifyWhileSimulating: true, // so you can't drag nodes during layout
-
-			// forces used by arbor (use arbor default on undefined)
-			repulsion: undefined,
-			stiffness: undefined,
-			friction: undefined,
-			gravity: true,
-			fps: undefined,
-			precision: undefined,
-
-			// static numbers or functions that dynamically return what these
-			// values should be for each element
-			nodeMass: undefined, 
-			edgeLength: undefined,
-
-			stepSize: 1, // size of timestep in simulation
-
-			// function that returns true if the system is stable to indicate
-			// that the layout can be stopped
-			stableEnergy: function( e ){
-				return ( e.max <= 0.5 ) || ( e.mean <= 0.3 )
-				}
-			}
-		o.cytoscape("get").layout( options )
-		}
-	}
-var augmentGraph =function( sType ){
-	var e = window[ 'e'+sType+'Graph']
-	var n = parseInt( e.offsetWidth )
-	e.style.height = e.style.width = n + 100 + 'px'
-	showGraph( sType )
-	}
-var reduceGraph =function( sType ){
-	var e = window[ 'e'+sType+'Graph']
-	var n = parseInt( e.offsetWidth )
-	e.style.height = e.style.width = n - 100 + 'px'
-	showGraph( sType )
+function showGraph( oFA ){
+	if( eFAGraph.contentWindow.setFA )
+		eFAGraph.contentWindow.setFA( oFA )
 	}
 </script>
 
@@ -254,7 +106,7 @@ var setFA =function( o ){
 			}catch(e){ alert( e.message )}
 		}
 	refreshFAHTML('FA')
-	if( eShowFAGraph.checked ) showGraph( 'FA' )
+	if( eShowFAGraph.checked ) showGraph( oFA )
 	eSectionMatch.style.display = o.automate ? '' : 'none'
 //	match()
 	}
@@ -333,7 +185,6 @@ var refreshFAHTML =function( sType ){
 		return Bufferize( '</table>' )
 		}
 	window['e'+sType].innerHTML = getHTMLTable( oLoaded.type || sType, window['o'+sType])
-//	if( window['eShow'+sType+'Graph'].checked ) showGraph( sType )
 	}
 var match =function(){
 	eResult.innerHTML = ''
@@ -358,7 +209,7 @@ eShowFA.onchange =function(){
 eShowFAGraph.onchange =function(){
 	var b = eShowFAGraph.checked
 	eSectionGraph.style.display= b?'':'none'
-	if( b ) showGraph( 'FA' )
+	if( b ) showGraph( oFA )
 	}
 eShowFA.onchange()
 eShowFAGraph.onchange()

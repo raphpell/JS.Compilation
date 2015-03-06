@@ -122,7 +122,6 @@ RegExp.escape =function( s ){
 	return s.replace( /(\.|\?|\*|\+|\\|\(|\)|\[|\]|\}|\{|\$|\^|\|)/g , "\\$1" )
 	}
 
-	
 /*
 	Divers...
 */
@@ -244,3 +243,4 @@ regexpSyntax =SubWindow( "src/regexp/syntax.htm" )
 wizSyntax =SubWindow( "src/wiz/syntax.htm" )
 grammarSyntax =SubWindow( "src/grammar/syntax.htm" )
 previewFA =SubWindow( "AF.preview.htm", "PreviewFA", 600, 600, 'setFA' )
+FAGraph =SubWindow( "Graph.preview.htm", "PreviewGraph", 600, 600, 'setFA' )
