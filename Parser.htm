@@ -16,7 +16,7 @@
 			}
 		#eExport {
 			font-size: 0.8em;
-			height: 500px;
+			height: auto;
 			width: 90%;
 			margin: 1em;
 			}
@@ -109,7 +109,7 @@ F -> ( E ) | id
 <input type="button" value="Exporter" onclick="exportEngine( ENGINE, eWhiteSpaces.checked )">
 <input id="eWhiteSpaces" type="checkbox" checked><label for="eWhiteSpaces">Espaces blanc.</label>
 <textarea id="eExport" wrap="off"></textarea>
-<pre id="eExportPreview"></pre>
+<div><label>Nombre de caractères : </label><b id="eExportSize"></b></div>
 
 
 <!-- FRAMEWORK... -->
@@ -129,7 +129,7 @@ _( 'eShowGrammar,eShowDFA,eShowFFTable,eShowParsingTable' )
 _( 'eTest,eParser,eGrammar,eDFA,eFFTable,eParsingTable,eGrammarInput,ePhraseInput' )
 _( 'eShowResultTable,eShowResultTree' )
 _( 'eResultTable,eResultTree' )
-_( 'eExport,eWhiteSpaces,eExportPreview' )
+_( 'eExport,eWhiteSpaces' )
 
 showFrom( eShowGrammar, eGrammar )()
 showFrom( eShowDFA, eDFA )()
@@ -139,6 +139,18 @@ showFrom( eShowResultTree, eResultTree )()
 showFrom( eShowResultTable, eResultTable )()
 
 var ENGINE
+
+var Export ={
+	clear :function(){
+		eExport.value = ''
+		eExportSize.innerHTML = 0
+		},
+	set :function( sResult ){
+		eExport.value = sResult
+		eExport.rows = sResult.countLines()
+		eExportSize.innerHTML = sResult.length
+		}
+	}
 
 var exportEngine =function( ENGINE, bWhiteSpaces ){
 	if( ! ENGINE ) return eExport.innerHTML = 'Pas de machine...'
@@ -229,14 +241,14 @@ var exportEngine =function( ENGINE, bWhiteSpaces ){
 		aOptions.push( '\t\tcase "('+ prodID +') '+ P.LHS +' -> '+ P.RHS.join(' ')+'": return f( LHS, RHS )')
 		return 1
 		})
-	eExportPreview.innerHTML = ''
-	eExport.value =
+
+	Export.set(
 		'var ENGINE = {'+
 		'\n\tSYMBOLS:'+ TableSymbols.toString( bWhiteSpaces ) +','+
 		'\n\tPRODUCTIONS:'+ sProductions +','+
 		'\n\tMATRICE:'+ sMatrice +','+
 		'\n\tAST:'+ sASTFunction.replace( '{options}', aOptions.join('\n')).split('\n').join('\n\t') +
-		'\n\t}'
+		'\n\t}' )
 	}	
 
 var getGrammar =function( sText ){

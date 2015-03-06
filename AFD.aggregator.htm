@@ -45,7 +45,7 @@
 	<input type="button" id="eBtnAdd" value="Ajouter" title="">
 	<input type="button" id="eBtnClear" value="Initialiser" title="">
 	<hr>
-	<label for="eTokenID" title="">Token : </label>
+	<label for="eTokenID" title="">Nom de token : </label>
 	<input type="text" id="eTokenID">
 	<label for="eTokenRE" title="">Expression réguliére : </label>
 	<input type="text" id="eTokenRE">
@@ -54,8 +54,8 @@
 
 <hr style="clear:both;">
 
-<input type="button" value="Visualiser l'AFD" onclick="previewDFA()" title="Matrice et graphe de l'AFD.">
-<input type="button" id="eBtnExport" value="Exporter">
+<input type="button" value="Visualiser l'AFD" onclick="if( eExportResult.value ) previewDFA()" title="Matrice et graphe de l'AFD.">
+<input type="button" id="eBtnExport" value="Exporter" style="display:none;">
 <input type="checkbox" id="eExportWhiteSpace"><label for="eExportWhiteSpace">Espaces blancs.</label>
 <input type="checkbox" id="eExportCompressed"><label for="eExportCompressed">Compressé.</label>
 <a href="AFD.compression.htm" target="_INFO">info</a>

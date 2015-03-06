@@ -2,6 +2,10 @@ TEXTAREA {
 	height:17px;
 	width:300px;
 	}
+INPUT[type=button]{
+	font-weight: bold;
+	padding:.25em 1em;
+	}
 
 .difference {
 	border: 3px solid red !important;
