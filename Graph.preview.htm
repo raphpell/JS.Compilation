@@ -58,7 +58,6 @@ function setFA( oFA ){
 				})
 			return a
 			})();
-
 $('#mynetwork').cytoscape({
 	style: cytoscape.stylesheet()
 		.selector('node').css({
@@ -95,9 +94,9 @@ $('#mynetwork').cytoscape({
 		edges: edges
 		},
 
-	layout:  { name: 'arbor' } /*
-		{
-		name: 'cose',
+	layout: oFA.S.length > 0
+		? { name: 'arbor' }
+		: { name: 'cose',
 		ready               : function() {},
 		stop                : function() {},
 		animate             : true,
@@ -117,7 +116,7 @@ $('#mynetwork').cytoscape({
 		initialTemp         : 200,
 		coolingFactor       : 0.95, 
 		minTemp             : 1.0
-		}*/ 
+		}
 	})
 	}
 /*

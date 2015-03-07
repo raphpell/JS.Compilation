@@ -112,6 +112,7 @@ var setFA =function( o ){
 	}
 var refreshFAHTML =function( sType ){	
 	var getHTMLTable =function( sTitle, oAutomaton ){
+		if( ! oAutomaton.F.length ) return ''
 		var A = []
 		for(var i=0, ni=oAutomaton.A.length; i<ni; i++ )
 			A[i] = '<b style="background:lime; color:purple; padding:1px;">'+ JSON.stringify(oAutomaton.A[i]).slice(1,-1).replace( /\\"/g, '"' ) +'</b>'
