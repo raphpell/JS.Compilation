@@ -94,12 +94,12 @@ INPUT[type=button]{
 <fieldset><legend>Affichage</legend>
 	<dl>
 		<dt><input type="checkbox" id="eShowResults" checked><label for="eShowResults">Afficher le résultat</label></dt>
-		<dt><input type="radio" id="eTestCase1" name="TestCase"><label for="eTestCase1">Résultat analyse lexicale (Lexeme lourd).</label></dt>
-		<dt><input type="radio" id="eTestCase2" name="TestCase"><label for="eTestCase2">Texte généré: parcours arbre (Lexeme légé).</label></dt>
-		<dt><input type="radio" id="eTestCase3" name="TestCase"><label for="eTestCase3">Texte généré: ligne/ligne (Lexeme légé).</label></dt>
+		<dt><input type="radio" id="eTestCase1" name="TestCase"><label for="eTestCase1">Résultat analyse lexicale (Lexème lourd).</label></dt>
+		<dt><input type="radio" id="eTestCase2" name="TestCase"><label for="eTestCase2">Texte généré: parcours arbre (Lexème légé).</label></dt>
+		<dt><input type="radio" id="eTestCase3" name="TestCase"><label for="eTestCase3">Texte généré: ligne/ligne (Lexème légé).</label></dt>
 	</dl>
 </fieldset>
-<fieldset><legend>Lexeme</legend>
+<fieldset><legend>Lexème</legend>
 	<dl>
 		<dt><select id="eLexeme">
 			<option value="HTMLElement">HTMLElement</option>
@@ -219,6 +219,7 @@ var Lexeme
 		case 'SimpleNode': s='new SimpleNode(o.token)'; break;
 		}
 	Lexeme = new Function ( 'o', 
+	//	'console.warn( o.token );'+
 		'var e = '+ s +';'
 		+'e.oValue=o;'
 		+( bByLine ? 'e.getElementsByLine=getElementsByLine;' : '' )

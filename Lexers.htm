@@ -93,14 +93,21 @@ H2, H3 {
 		</ul>
 		</section>
 
-	<h3>Le dernier à éviter impérativement</h3><section>
+	<h3>Le dernier à éviter</h3><section>
 		<ul>
 			<li class="lexer"><b>"1 RegExp" Lexer</b> <sup style="color:red;">deprecated</sup>
 				<ul>
 					<li>Une seule grande expression régulière est créée pour parcourir le texte.</li>
 					<li>Le défaut: quand un mot est trouvé il faut déterminé son type. 
 						Pour cela il faut réaliser une boucle !</li>
-					<li>J'ai abandonné son utilisation.</li>
+					<li>J'ai abandonné son utilisation:
+						<blockquote>
+							En JavaScript il faut savoir différencier la division '/' au délimitation d'une expression régulière. <br>
+							Pour cela, j'ai besoin de connaître le token précédant. <br>
+							Si le token précédant correspond à token pouvant être avant un token ER alors le token ER est validé. <br>
+							...sinon il faut parcourir les ER utilisées pour créer la grande une par une... pour finalement déterminer le token division.
+						</blockquote>
+					</li>
 				</ul></li>
 		</ul>
 		</section>
