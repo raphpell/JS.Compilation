@@ -73,8 +73,9 @@ var OneRegExpLexer =(function(){
 						}
 				},
 			makeToken :function( sName, o ){
-				o.name = sName
-				return o
+				var oRE = new RegExp ( o.source, 'gm' )
+				oRE.name = sName
+				return oRE
 				},
 			makeRule :function( sName, sTokens ){
 				var aRules = sTokens.split('|')
@@ -84,11 +85,10 @@ var OneRegExpLexer =(function(){
 					aRules[i] = oRule
 					aRegExp[i] = '('+ aRules[i].source +')'
 					}
-				return {
-					sId: sName,
-					re: new RegExp ( aRegExp.join('|'), 'gm' ),
-					tokens: aRules
-					}
+				var oRE = new RegExp ( aRegExp.join('|'), 'gm' )
+				oRE.sId = sName
+				oRE.tokens = aRules
+				return Array.concat( [oRE], aRules )
 				}
 			}
 		})()
@@ -241,15 +241,12 @@ var OneRegExpLexer =(function(){
 		})
 	Lexer.prototype ={
 		bSkip: 0,
-		appendNode: appendNode =function( eNode ){
+		appendNode: function( eNode ){
 			return this.skip( eNode.oValue.token )
 				? true
 				: this.eParent.appendChild( eNode )
 			},
 		end :function(){
-
-
-
 			return this.eRoot
 			},
 		init :function( sText, sSyntax ){
@@ -272,53 +269,60 @@ var OneRegExpLexer =(function(){
 				}))
 			},
 		readToken :function(){
-			// End of input?
-			if( this.rule.re.lastIndex >= this.sText.length ) return null
-
-		//	console.info( this.sSyntax, this.rule.re )
-		//	console.info( this.rule.re.lastIndex, this.nPos, JSON.stringify( this.sText.substr( this.nPos )))
-
-			var result = this.rule.re.exec( this.sText )
-		//	console.warn( result )
-			if( result === null || result.index > this.nPos || ! result[0].length )
-				return this.stack.pop() ? true : null
-			//	throw Error( 'Cannot match a token at position ' + this.rule.re.lastIndex )
-
-			for(var i=1; result[i]===undefined; i++ );
-			if( ! result[i] ) throw Error( 'Internal error' )
-			var oToken =this.rule.tokens[i-1]
-
-		/* 	DEBUG ONLY
-			if( result.length-1 != this.rule.tokens.length ){
-				console.warn( result.length , this.rule.tokens.length )
-				throw Error ( "WARN: no matching parenthesis is allowed in token regexp. Required (?:regexp)" )
+			for(var i=0; this.aRules[i]; i++ ){
+				if( this.searchToken( this.aRules[i])){
+					oLexeme ={
+						value: sValue,
+						token: LexerRules.Translation[sToken]||sToken,
+						css: LexerRules.CSS[sToken]||'',
+						rule:this.sSyntax,
+						index:this.nPos,
+						lineStart:this.nLine,
+						lineEnd:this.nLine
+						}
+					this.nPos += sValue.length
+					return Actions(this)
+					}
 				}
-		*/
-
-			sToken = oToken.name
-
-		//	if( this.previous.invalidFor( sToken )) // faire quoi ??? parcourir les tokens 1 par 1 jusqu'au premier token valide différent de sToken !
-
-			oLexeme ={
-				token: LexerRules.Translation[sToken]||sToken,
-				value: result[0],
-				css: LexerRules.CSS[sToken]||'',
-				index: result.index,
-				lineStart: this.nLine,
-				lineEnd: this.nLine,
-				rule: this.sSyntax
-				}
-			this.nPos += result[0].length
-			return Actions(this)
+			return this.stack.pop() ? true : null
 			},
 		scan :function( sText, sSyntax ){
 			this.init( sText, sSyntax )
 			while( this.readToken());
 			return this.end()
 			},
+		searchToken :function( oRE ){
+			// End of input?
+			if( this.nPos==this.sText.length ) return null
+			
+			oRE.lastIndex = this.nPos
+			var result = oRE.exec( this.sText )
+
+			if( result === null || result.index != this.nPos || ! result[0].length )
+				return null
+			//	throw Error( 'Cannot match a token at position ' + oRE.lastIndex )
+
+
+			if( oRE.tokens ){
+				/* ONLY FOR DEBUGGING PURPOSES
+				if( result.length-1 != oRE.tokens.length ){
+					console.warn( result.length , oRE.tokens.length )
+					throw Error ( "WARN: no matching parenthesis is allowed in token regexp.\n Required non capturing parenthesis (?:regexp)" )
+					}*/
+				for(var i=1; result[i]===undefined; i++ );
+				if( ! result[i] ) throw Error( 'Internal error' )
+				sToken = oRE.tokens[i-1].name
+				}
+			else {
+				sToken = oRE.name
+				}
+
+			if( this.previous.invalidFor( sToken )) return null
+
+			return sValue = result[0]
+			},
 		setSyntax :function( sSyntax ){
-			this.rule = LexerRules.Rules.get( this.sSyntax = sSyntax )
-			this.rule.re.lastIndex = this.nPos
+			this.aRules = LexerRules.Rules.get( this.sSyntax = sSyntax )
 			bNoSkip = Skip.notFor[ sSyntax ]
 			}
 		}
