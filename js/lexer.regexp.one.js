@@ -1,5 +1,5 @@
-/* DEPRECATED */
-// Lexeme requis
+ï»¿/* DEPRECATED */
+// Lexeme REQUIS
 
 var OneRegExpLexer =(function(){
 	var SINGLETON
@@ -58,19 +58,7 @@ var OneRegExpLexer =(function(){
 				},
 			Rules: Rules,
 			addRule :function( sName, sTokens ){
-				var aList = sTokens.split('|')
-				var a = []
-				for(var i=0; aList[i]; i++){
-					var ID = aList[i]
-					var oToken = Tokens.list[ID]
-					if( oToken ) a.push( oToken )
-					else {
-						var aRule = Rules.list[ID]
-						if( ! aRule ) throw Error ('Rule "'+ ID +'" Not Found !' )
-						a = a.concat( aRule )
-						}
-					}
-				return Rules.add( sName, a )
+				return Rules.add( sName, this.makeRule( sName, sTokens ))
 				},
 			addRules :function( aRules ){
 				for(var i=0; aRules[i]; i++ )
@@ -81,27 +69,29 @@ var OneRegExpLexer =(function(){
 				if( aTokens.length )
 					for(var i=0; aTokens[i]; i++){
 						var sName=aTokens[i][0]
-						Tokens.add( sName, this.makeTokenFrom( sName, aTokens[i][1] ))
+						Tokens.add( sName, this.makeToken( sName, aTokens[i][1] ))
 						}
 				},
-			makeTokenFrom :function( sName, o ){
-				o = new RegExp ( '^(?:'+ o.source +')' )
+			makeToken :function( sName, o ){
 				o.name = sName
 				return o
+				},
+			makeRule :function( sName, sTokens ){
+				var aRules = sTokens.split('|')
+				for( var aRegExp=[], i=0, ni=aRules.length, oRule; i<ni; i++ ){
+					oRule = LexerRules.Tokens.get( aRules[i])
+					if( ! oRule ) throw new Error ( 'Lexer: "'+ aRules[i] +'" is not a rule name.' )
+					aRules[i] = oRule
+					aRegExp[i] = '('+ aRules[i].source +')'
+					}
+				return {
+					sId: sName,
+					re: new RegExp ( aRegExp.join('|'), 'gm' ),
+					tokens: aRules
+					}
 				}
 			}
 		})()
-
-	var Rules ={
-		oList: {},
-		get :function( sId ){
-			return Rules.oList[sId] || null // (function(){ throw new Error ( 'Lexer: "'+ sId +'" is not a rule.' ) })()
-			},
-		set :function( sId, o ){
-			if( Rules.oList[sId]) throw new Error ( 'Lexer: Rule "'+ sId +'" already exist.' )
-			return Rules.oList[sId] = o
-			}
-		}
 	var oLexeme, sToken, sValue, bNoSkip
 	, Actions =(function(){
 		var Actions={
@@ -178,15 +168,15 @@ var OneRegExpLexer =(function(){
 					},
 				set :function( sToken ){
 					return o.excluded[sToken]
-						? false // doit impérativement retourner cette valeur
-						: s = /* LexerRules.Translation[sToken]|| */sToken
+						? false // doit impÃ©rativement retourner cette valeur
+						: s = LexerRules.Translation[sToken]||sToken
 					},
 				get :function(){ return s }
 				}
 			}
 		o.union({
 			excluded :{
-				WHITE_SPACES:1,SPACES:1,SPACE:1,TAB:1,// L_NEW_LINE:1,L_NEW_LINE:1,
+				WHITE_SPACES:1,SPACES:1,SPACE:1,TAB:1,// NEW_LINE:1,L_NEW_LINE:1,
 				S_SLC:1,SLC:1,SLC_IN:1,
 				S_MLC:1,MLC:1,MLC_IN:1,E_MLC:1,
 				COMMENT:1,
@@ -249,31 +239,6 @@ var OneRegExpLexer =(function(){
 		Skip: Skip,
 		Stack: Stack
 		})
-	Lexer.rule =function( sId, m, sCSS ){
-		switch( arguments.length ){
-			case 1:
-				for( var i=0, a=sId, ni=a.length; i<ni; i++ ) Lexer.rule.apply( this, a[i])
-				break;
-			case 2:
-				if( m.constructor==String ){
-					var aRules = m.split('|')
-					for( var aRegExp=[], i=0, ni=aRules.length, oRule; i<ni; i++ ){
-						oRule = Rules.get( aRules[i])
-						if( ! oRule ) throw new Error ( 'Lexer: "'+ aRules[i] +'" is not a rule name.' )
-						aRules[i] = oRule
-						aRegExp[i] = '('+ aRules[i].re.source +')'
-						}
-					return Rules.set( sId ,{
-						sId: sId,
-						re: new RegExp ( aRegExp.join('|'), 'gm' ),
-						tokens: aRules
-						})
-					}
-			default:
-				return Rules.set( sId ,{ sId:sId, re:m, css:sCSS })
-			}
-		}
-
 	Lexer.prototype ={
 		bSkip: 0,
 		appendNode: appendNode =function( eNode ){
@@ -282,11 +247,13 @@ var OneRegExpLexer =(function(){
 				: this.eParent.appendChild( eNode )
 			},
 		end :function(){
+
+
+
 			return this.eRoot
 			},
 		init :function( sText, sSyntax ){
 			sSyntax = sSyntax || 'TXT'
-			this.rule = Rules.get( sSyntax )
 			this.union({
 				nLine:1,
 				nPos:0,
@@ -320,23 +287,22 @@ var OneRegExpLexer =(function(){
 			for(var i=1; result[i]===undefined; i++ );
 			if( ! result[i] ) throw Error( 'Internal error' )
 			var oToken =this.rule.tokens[i-1]
-			
-			
+
 		/* 	DEBUG ONLY
 			if( result.length-1 != this.rule.tokens.length ){
 				console.warn( result.length , this.rule.tokens.length )
 				throw Error ( "WARN: no matching parenthesis is allowed in token regexp. Required (?:regexp)" )
 				}
 		*/
-		 
-			sToken = oToken.sId
-			
-		//	if( this.previous.invalidFor( sToken )) return false;
-			
+
+			sToken = oToken.name
+
+		//	if( this.previous.invalidFor( sToken )) // faire quoi ??? parcourir les tokens 1 par 1 jusqu'au premier token valide diffÃ©rent de sToken !
+
 			oLexeme ={
 				token: LexerRules.Translation[sToken]||sToken,
 				value: result[0],
-				css: LexerRules.CSS[sToken],
+				css: LexerRules.CSS[sToken]||'',
 				index: result.index,
 				lineStart: this.nLine,
 				lineEnd: this.nLine,
@@ -351,13 +317,13 @@ var OneRegExpLexer =(function(){
 			return this.end()
 			},
 		setSyntax :function( sSyntax ){
-			this.rule = Rules.get( this.sSyntax = sSyntax )
+			this.rule = LexerRules.Rules.get( this.sSyntax = sSyntax )
 			this.rule.re.lastIndex = this.nPos
 			bNoSkip = Skip.notFor[ sSyntax ]
 			}
 		}
 
-	// Analyse par défaut
+	// Analyse par dÃ©faut
 	;(function(){
 		var o = LexerRules
 /* 		o.addTokens([
@@ -366,14 +332,18 @@ var OneRegExpLexer =(function(){
 			['TAB',{A:g("\t"),M:[,[2]],F:[,,1]}],
 			['L_NEW_LINE',{A:g("\n","\f","\r"),M:[,[3,3,2],[3]],F:[,,1,1]}],
 			['WHITE_SPACES',{A:g("[\t \n\r\f]"),R:[[0,f("\t \n\r\f",1)]],M:[[],[2],[2]],F:[,,1]}],
+
 			// Tout sauf un espaces blancs
 			['NOT_WHITE_SPACES',{A:{"[^\t \n\r\f]":0},R:[[0,f("\t \n\r\f")]],M:[[1],[1]],F:{1:1}}],
-			// Syntaxe par défaut
+
+			// Syntaxe par dÃ©faut
 			['TXT',{A:g("\n","[^\t\n\f\r ]","\t","\f","\r"," "),R:[[1,f("\t\n\f\r ")]],M:[[],[5,3,4,5,2,6],[5],[,3]],F:[,,3,5,2,3,4],TokensTable:',,TAB,L_NEW_LINE,SPACES,TEXT'.split(',')}]
 			]) */
+
 		o.addCSSClass( 'space=SPACES&tab=TAB&linefeed=L_NEW_LINE&whitespaces=WHITE_SPACES&undefined=NOT_WHITE_SPACES' )
 		o.setTokensTranslation('L_NEW_LINE=NEW_LINE')
 		})();
+
 	SINGLETON = new Lexer
 	return Lexer
 	})()
@@ -381,67 +351,65 @@ var OneRegExpLexer =(function(){
 // Rules...
 ;(function(){
 	var Lexer = OneRegExpLexer
-	var o = OneRegExpLexer.Rules
-	var add = Lexer.rule
+	var o = Lexer.Rules
 	;(function(){// SimpleRegexp = Sample test
-	add([
-		['CHARSET', /\[\^?|\]|\-/ ],
-		['PIPE', /\|/ ],
-		['PUNCTUATOR', /\(|\)/ ],
-		['QUANTIFIER1', /\{\d+(?:\,\d*)?\}/ ],
-		['QUANTIFIER2', /\*|\+|\?/ ],
-		['CHAR_ESCAPED', /\\./ ],
-		['ANY', /\./ ],
-		['CHAR', /[^\(\)\\\|\.\[\]\*\+\?\{\-]/ ]
+	o.addTokens([
+		['CHARSET',/\[\^?|\]|\-/],
+		['PIPE',/\|/],
+		['PUNCTUATOR',/\(|\)/],
+		['QUANTIFIER1',/\{\d+(?:\,\d*)?\}/],
+		['QUANTIFIER2',/\*|\+|\?/],
+		['CHAR_ESCAPED',/\\./],
+		['ANY',/\./],
+		['CHAR',/[^\(\)\\\|\.\[\]\*\+\?\{\-]/]
 		])
-	add( 'SimpleRegExp',
-		'CHARSET|PIPE|PUNCTUATOR|QUANTIFIER1|QUANTIFIER2|CHAR_ESCAPED|ANY|CHAR'
-		)
+	o.addRule('SimpleRegExp','CHARSET|PIPE|PUNCTUATOR|QUANTIFIER1|QUANTIFIER2|CHAR_ESCAPED|ANY|CHAR')
 	})()
 	;(function(){// Common
-	add([
-		['BACKSLASH', /\\/, 'undefined' ],
-		['L_NEW_LINE', /(?:\n|\r\n?|\f)/, 'linefeed' ],
-		['NOT_NEW_LINE', /[^\n\r]+/, '' ],
-		['NOT_WHITE_SPACES', /[^\s]+?/, 'undefined' ],
-		['WHITE_SPACES', /(?: |\t)+/, 'whitespaces' ],
-		['TAB', /\t/, 'tab space' ],
-		['SPACES', /[ ]/, 'space' ],
-		['SINGLE_QUOTE', /'/, '' ],
-		['DOUBLE_QUOTE', /"/, '' ],
-		['LBRACE',/\{/, 'punctuator'],['RBRACE',/\}/, 'punctuator'],
-		['LPAREN',/\(/, 'punctuator'],['RPAREN',/\)/, 'punctuator'],
-		['LBRACK',/\[/, 'punctuator'],['RBRACK',/\]/, 'punctuator'],
-		['ELISION',/\,/, 'punctuator elision'],
-		['DOT',/\./, 'punctuator'],
-		['SEMI',/\;/, 'punctuator'],
-		['QUESTION',/\?/, 'punctuator'],
-		['COLON',/\:/, 'punctuator']
+	o.addTokens([
+		['BACKSLASH',/\\/],
+		['L_NEW_LINE',/(?:\n|\r\n?|\f)/],
+		['NOT_NEW_LINE',/[^\n\r]+/],
+		['NOT_WHITE_SPACES',/[^\s]+?/],
+		['WHITE_SPACES',/(?: |\t)+/],
+		['TAB',/\t/],
+		['SPACES',/[ ]/],
+		['SINGLE_QUOTE',/'/],
+		['DOUBLE_QUOTE',/"/],
+		['LBRACE',/\{/],['RBRACE',/\}/],
+		['LPAREN',/\(/],['RPAREN',/\)/],
+		['LBRACK',/\[/],['RBRACK',/\]/],
+		['ELISION',/\,/],
+		['DOT',/\./],
+		['SEMI',/\;/],
+		['QUESTION',/\?/],
+		['COLON',/\:/]
 		])
 	})()
 	;(function(){// Number
-	add([
-		['NUMBER',/[\+\-]?(?:(?:[1-9]\d*|0)|(?:0[xX](?:[0-9a-fA-F])+)|(?:0[0-7]+)|(?:0b[01]+)|(?:\d+\.\d*(?:[eE][\+\-]?\d+)?|\.?\d+(?:[eE][\+\-]?\d+)?))/, 'number' ]
+	o.addTokens([
+		['NUMBER',/[\+\-]?(?:(?:[1-9]\d*|0)|(?:0[xX](?:[0-9a-fA-F])+)|(?:0[0-7]+)|(?:0b[01]+)|(?:\d+\.\d*(?:[eE][\+\-]?\d+)?|\.?\d+(?:[eE][\+\-]?\d+)?))/]
 		])
 	})()
 	;(function(){// SUPER SCRIPT
-	add( 'S_PHP', /(?:\<\?(?:php\b|=))/ )
+	o.addTokens([['S_PHP', /(?:\<\?(?:php\b|=))/]])
 	o.addCSSClass("tag=S_PHP")
 	})()
 	;(function(){// STRINGS & COMMENTS	
-	add([
+	o.addTokens([
 	// STRING
-		['S_SSQ', /'/ ],['E_SSQ', /'/ ],['SSQ_IN', /(?:[^'\\\n\r\f \t]|\\[^\n\r\f \t])+/ ],
-		['S_SDQ', /"/ ],['E_SDQ', /"/ ],['SDQ_IN', /(?:[^"\\\n\r\f \t]|\\[^\n\r\f \t])+/ ],
+		['S_SSQ',/'/],['E_SSQ',/'/],['SSQ_IN',/(?:[^'\\\n\r\f \t]|\\[^\n\r\f \t])+/],
+		['S_SDQ',/"/],['E_SDQ',/"/],['SDQ_IN',/(?:[^"\\\n\r\f \t]|\\[^\n\r\f \t])+/],
 	// COMMENT
-		['S_MLC', /\/\*/ ],['E_MLC', /[^\n\r\f \t]*\*\// ],['MLC_IN', /(?:[^\*\n\r\f \t]|\*[^\/\n\r\f \t])+/ ],
-		['S_SLC', /\/\// ], ['SLC_IN', /[^\n\r\f \t]+/ ],
+		['S_MLC',/\/\*/],['E_MLC',/[^\n\r\f \t]*\*\//],['MLC_IN',/(?:[^\*\n\r\f \t]|\*[^\/\n\r\f \t])+/],
+		['S_SLC',/\/\//], ['SLC_IN',/[^\n\r\f \t]+/],
 		])
-	add( 'SSQ', 'S_PHP|TAB|SPACES|L_NEW_LINE|SSQ_IN|BACKSLASH|E_SSQ' )
-	add( 'SDQ', 'S_PHP|TAB|SPACES|L_NEW_LINE|SDQ_IN|BACKSLASH|E_SDQ' )
-	add( 'MLC', 'S_MLC|E_MLC|L_NEW_LINE|TAB|SPACES|MLC_IN' )
-	add( 'SLC', 'S_SLC|TAB|SPACES|SLC_IN|NOT_WHITE_SPACES' )
-	
+	o.addRules([
+		['SSQ','S_PHP|TAB|SPACES|L_NEW_LINE|SSQ_IN|BACKSLASH|E_SSQ'],
+		['SDQ','S_PHP|TAB|SPACES|L_NEW_LINE|SDQ_IN|BACKSLASH|E_SDQ'],
+		['MLC','S_MLC|E_MLC|L_NEW_LINE|TAB|SPACES|MLC_IN'],
+		['SLC','S_SLC|TAB|SPACES|SLC_IN|NOT_WHITE_SPACES']
+		])
 	o.setPreviousTokenOf("L_NEW_LINE_IN_STRING","BACKSLASH")
 	o.setTokensTranslation('L_NEW_LINE_IN_STRING=NEW_LINE&SSQ=STRING&S_SSQ=SINGLE_QUOTE&E_SSQ=SINGLE_QUOTE&SDQ=STRING&S_SDQ=DOUBLE_QUOTE&E_SDQ=DOUBLE_QUOTE&MLC=COMMENT&SLC=COMMENT')
 	o.addCSSClass([
@@ -451,26 +419,25 @@ var OneRegExpLexer =(function(){
 		])
 	})()
 	;(function(){// PHP
-	add([
-		['E_PHP', /(?:\?\>)/ ],
-		['PHP_SPECIAL_VARS', /(?:\$(?:GLOBALS|_(?:COOKIE|ENV|FILES|GET|POST|REQUEST|SE(?:RVER|SSION))))\b/ ],
-		['PHP_IDENTIFIER', /\$[\w_][\w\d_]*\b/ ],
-		['PHP_KEYWORD', /\b(?:break|case|continue|declare|default|do|each|elseif|else|foreach|for|goto|if|include|include_once|require|require_once|return|switch|while)\b/ ],
-		['PHP_LITERAL', /\b(?:true|TRUE|false|FALSE|null|NULL)\b/ ],
-		['PHP_RESERVED', /\b(?:\@|and|or|xor|exception|as|var|class|const|declare|die|echo|empty|eval|exit|extends|function|global|isset|list|new|print|static|unset|use|__FUNCTION__|__CLASS__|__METHOD__|final|interface|implements|extends|public|private|protected|abstract|clone|\$this)\b/ ],
-		['PHP_FUNCTION', /\b\w[\w\d_]*\b/ ],
+	o.addTokens([
+		['E_PHP',/(?:\?\>)/],
+		['PHP_SPECIAL_VARS',/(?:\$(?:GLOBALS|_(?:COOKIE|ENV|FILES|GET|POST|REQUEST|SE(?:RVER|SSION))))\b/],
+		['PHP_IDENTIFIER',/\$[\w_][\w\d_]*\b/],
+		['PHP_KEYWORD',/\b(?:break|case|continue|declare|default|do|each|elseif|else|foreach|for|goto|if|include|include_once|require|require_once|return|switch|while)\b/],
+		['PHP_LITERAL',/\b(?:true|TRUE|false|FALSE|null|NULL)\b/],
+		['PHP_RESERVED',/\b(?:\@|and|or|xor|exception|as|var|class|const|declare|die|echo|empty|eval|exit|extends|function|global|isset|list|new|print|static|unset|use|__FUNCTION__|__CLASS__|__METHOD__|final|interface|implements|extends|public|private|protected|abstract|clone|\$this)\b/],
+		['PHP_FUNCTION',/\b\w[\w\d_]*\b/],
 		
-		['PHP_ARITHMETIC_OP', /\+\+?|\-\-?|\*|\%|\// ],
-		['PHP_ASSIGNMENT_OP', /\+=|\-=|\*=|\/=|\.=|\%=|\&=|\|=|\^=|<<=|>>=|=>?/ ],
-		['PHP_BITWISE_OP', /&|\||\^|\~|<<|>>/ ],
-		['PHP_COMPARISON_OP', /===?|!==?|<>|<=?|>=?/ ],
-		['PHP_ERROR_CONTROL_OP', /@/ ],
-		['PHP_LOGICAL_OP', /and|or|xor|!|&&|\|\|/ ],
-		['PHP_STRING_OP', /\./ ],
-		['PHP_TYPE_OP', /\((?:int|float|string|array|object|bool)\)/ ]
+		['PHP_ARITHMETIC_OP',/\+\+?|\-\-?|\*|\%|\//],
+		['PHP_ASSIGNMENT_OP',/\+=|\-=|\*=|\/=|\.=|\%=|\&=|\|=|\^=|<<=|>>=|=>?/],
+		['PHP_BITWISE_OP',/&|\||\^|\~|<<|>>/],
+		['PHP_COMPARISON_OP',/===?|!==?|<>|<=?|>=?/],
+		['PHP_ERROR_CONTROL_OP',/@/],
+		['PHP_LOGICAL_OP',/and|or|xor|!|&&|\|\|/],
+		['PHP_STRING_OP',/\./],
+		['PHP_TYPE_OP',/\((?:int|float|string|array|object|bool)\)/]
 		])
-		
-	add( 'PHP',[
+	o.addRule( 'PHP',[
 		'E_PHP',
 		'NUMBER',
 		'L_NEW_LINE|SPACES|TAB',
@@ -482,7 +449,6 @@ var OneRegExpLexer =(function(){
 		'PHP_RESERVED|PHP_LITERAL|PHP_KEYWORD|PHP_SPECIAL_VARS|PHP_FUNCTION|PHP_IDENTIFIER',
 		'NOT_WHITE_SPACES'
 		].join('|'))
-
 	o.addCSSClass([
 		'operator=PHP_UNARY_OP|PHP_LOGICAL_OP|PHP_ARITHMETIC_OP|PHP_ASSIGNMENT_OP|PHP_COMPARISON_OP|PHP_STRING_OP|PHP_ERROR_CONTROL_OP',
 		'special=PHP_SPECIAL_VARS',
@@ -497,19 +463,19 @@ var OneRegExpLexer =(function(){
 		])
 	})()
 	;(function(){// JS
-	add([
+	o.addTokens([
 		['R_REGULAR_EXPRESSION',/\/(?:(?:[^\n\r\f\*\\\/\[]|(?:\\[^\n\r\f])|(?:\[(?:(?:[^\n\r\f\]\\]|(?:\\[^\n\r\f]))*)\]))(?:(?:[^\n\r\f\\\/\[]|(?:\\[^\n\r\f])|(?:\[(?:(?:[^\n\r\f\]\\]|(?:\\[^\n\r\f]))*)\]))*))\/(?:(?:[a-zA-Z])*)/],
 		['REGULAR_EXPRESSION_IN',/[^\t ]+/],
-		['JS_IDENTIFIER', /[\$\_a-zA-Z]+[\$_\w\d]*/],
-		['JS_KEYWORD', /\b(?:break|case|catch|continue|default|delete|do|else|finally|for|function|if|in|instanceof|new|return|switch|this|throw|try|typeof|var|void|while|with)\b/],
-		['JS_LITERAL', /\b(?:true|false|null|undefined|Infinity|NaN)\b/],
+		['JS_IDENTIFIER',/[\$\_a-zA-Z]+[\$_\w\d]*/],
+		['JS_KEYWORD',/\b(?:break|case|catch|continue|default|delete|do|else|finally|for|function|if|in|instanceof|new|return|switch|this|throw|try|typeof|var|void|while|with)\b/],
+		['JS_LITERAL',/\b(?:true|false|null|undefined|Infinity|NaN)\b/],
 		['JS_UNARY_OP',/\+\+|\-\-|\~|\!/],
 		['JS_ARITHMETIC_OP',/[\+\-\*\%\/]/],
 		['JS_LOGICAL_OP',/&&|\|\|/],
 		['JS_COMPARISON_OP',/(?:[<>]|[=!]=)=?/],
 		['JS_ASSIGNMENT_OP',/=|\*=|\/=|\%=|\+=|\-=|<<=|>>=|>>>=|\&=|\^=|\|=/]
 		])
-	add( 'JS',['L_NEW_LINE|SPACES|TAB',
+	o.addRule( 'JS',['L_NEW_LINE|SPACES|TAB',
 			'JS_KEYWORD|JS_LITERAL|JS_IDENTIFIER',
 			'LBRACE|RBRACE|LPAREN|RPAREN|LBRACK|RBRACK',
 			'S_SSQ|S_SDQ|S_MLC|S_SLC',
@@ -520,8 +486,7 @@ var OneRegExpLexer =(function(){
 			'JS_LOGICAL_OP|JS_COMPARISON_OP|JS_ASSIGNMENT_OP|JS_UNARY_OP|JS_ARITHMETIC_OP',
 			'NOT_WHITE_SPACES'
 			].join('|'))
-	add( 'REGULAR_EXPRESSION', 'TAB|SPACES|REGULAR_EXPRESSION_IN' )
-
+	o.addRule( 'REGULAR_EXPRESSION', 'TAB|SPACES|REGULAR_EXPRESSION_IN' )
 	o.setPreviousTokenOf("R_REGULAR_EXPRESSION","JS_ARITHMETIC_OP|JS_ASSIGNMENT_OP|JS_COMPARISON_OP|JS_LOGICAL_OP|ELISION|DOT|LPAREN|LBRACE|LBRACK|COLON|SEMI|QUESTION|JS_KEYWORD")
 	o.addCSSClass([
 		'charset=CHARSET',

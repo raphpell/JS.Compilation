@@ -37,7 +37,6 @@ var AutomatonLexer =(function(){
 			|| -2 
 		}
 
-	// Données d'analyse
 	, LexerRules =(function(){
 		var Dictionary =function( sId ){
 			var sGetError = '"$1" is not a lexer '+ sId
@@ -93,6 +92,26 @@ var AutomatonLexer =(function(){
 				},
 			Rules: Rules,
 			addRule :function( sName, sTokens ){
+				return Rules.add( sName, this.makeRule( sName, sTokens ))
+				},
+			addRules :function( aRules ){
+				for(var i=0; aRules[i]; i++ )
+					this.addRule( aRules[i][0], aRules[i][1])
+				},
+			Tokens: Tokens,
+			addTokens :function( aTokens ){
+				if( aTokens.length )
+					for(var i=0; aTokens[i]; i++){
+						var sName=aTokens[i][0]
+						Tokens.add( sName, this.makeToken( sName, aTokens[i][1] ))
+						}
+				},
+			makeToken :function( sName, o ){
+				o.name = sName
+				if( ! o.TokensTable ) o.TokensTable = [,sName]
+				return o
+				},
+			makeRule :function( sName, sTokens ){
 				var aList = sTokens.split('|')
 				var a = []
 				for(var i=0; aList[i]; i++){
@@ -105,24 +124,7 @@ var AutomatonLexer =(function(){
 						a = a.concat( aRule )
 						}
 					}
-				return Rules.add( sName, a )
-				},
-			addRules :function( aRules ){
-				for(var i=0; aRules[i]; i++ )
-					this.addRule( aRules[i][0], aRules[i][1])
-				},
-			Tokens: Tokens,
-			addTokens :function( aTokens ){
-				if( aTokens.length )
-					for(var i=0; aTokens[i]; i++){
-						var sName=aTokens[i][0]
-						Tokens.add( sName, this.makeTokenFrom( sName, aTokens[i][1] ))
-						}
-				},
-			makeTokenFrom :function( sName, o ){
-				o.name = sName
-				if( ! o.TokensTable ) o.TokensTable = [,sName]
-				return o
+				return a
 				},
 			addTokenFromString :function( sName, sDFA ){
 				var o;
@@ -131,8 +133,6 @@ var AutomatonLexer =(function(){
 				}
 			}
 		})()
-
-	// Données d'analyse
 	var oLexeme, sToken, sValue, bNoSkip
 	, sWSTokens ='|WHITE_SPACES|SPACES|SPACE|NEW_LINE|L_NEW_LINE|TAB|'
 	, Actions =(function(){
