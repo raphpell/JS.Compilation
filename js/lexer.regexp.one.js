@@ -92,7 +92,6 @@ var OneRegExpLexer =(function(){
 			}
 		})()
 
-	var sDefaultSyntax = 'JS'
 	var Rules ={
 		oList: {},
 		get :function( sId ){
@@ -250,42 +249,29 @@ var OneRegExpLexer =(function(){
 		Skip: Skip,
 		Stack: Stack
 		})
-	Lexer.alternative =function( aRules ){
-		for( var aRegExp=[], i=0, ni=aRules.length, oRule; i<ni; i++ ){
-			oRule = Rules.get( aRules[i])
-			if( ! oRule ) throw new Error ( 'Lexer: "'+ aRules[i] +'" is not a rule name.' )
-			aRules[i] = oRule
-			aRegExp[i] = '('+ aRules[i].re.source +')'
-			}
-		return {
-			re:new RegExp ( aRegExp.join('|'), 'gm' ),
-			tokens:aRules
-			}
-		}
 	Lexer.rule =function( sId, m, sCSS ){
 		switch( arguments.length ){
 			case 1:
 				for( var i=0, a=sId, ni=a.length; i<ni; i++ ) Lexer.rule.apply( this, a[i])
 				break;
 			case 2:
-				m = Lexer.alternative( m )
-				return Rules.set( sId ,{ sId:sId, re:m.re, tokens:m.tokens })
-			case 3:
+				if( m.constructor==String ){
+					var aRules = m.split('|')
+					for( var aRegExp=[], i=0, ni=aRules.length, oRule; i<ni; i++ ){
+						oRule = Rules.get( aRules[i])
+						if( ! oRule ) throw new Error ( 'Lexer: "'+ aRules[i] +'" is not a rule name.' )
+						aRules[i] = oRule
+						aRegExp[i] = '('+ aRules[i].re.source +')'
+						}
+					return Rules.set( sId ,{
+						sId: sId,
+						re: new RegExp ( aRegExp.join('|'), 'gm' ),
+						tokens: aRules
+						})
+					}
 			default:
 				return Rules.set( sId ,{ sId:sId, re:m, css:sCSS })
 			}
-		}
-	Lexer.createWordsRegExp =function( sWords, bBoundaries ){
-		var a = sWords.split(',')  // .sort()
-		bBoundaries = bBoundaries==undefined ? true : bBoundaries
-		for(var i=0; a[i]; i++ )
-			a[i] = RegExp.escape( a[i])
-		var reResult = new RegExp(
-			bBoundaries
-				? "\\b(?:" + a.join('|') + ")\\b"
-				: '(?:' + a.join('|') + ')'
-			, 'g' )
-		return reResult
 		}
 
 	Lexer.prototype ={
@@ -324,6 +310,7 @@ var OneRegExpLexer =(function(){
 
 		//	console.info( this.sSyntax, this.rule.re )
 		//	console.info( this.rule.re.lastIndex, this.nPos, JSON.stringify( this.sText.substr( this.nPos )))
+
 			var result = this.rule.re.exec( this.sText )
 		//	console.warn( result )
 			if( result === null || result.index > this.nPos || ! result[0].length )
@@ -349,7 +336,7 @@ var OneRegExpLexer =(function(){
 			oLexeme ={
 				token: LexerRules.Translation[sToken]||sToken,
 				value: result[0],
-				css: LexerRules.CSS[sToken]||'',
+				css: LexerRules.CSS[sToken],
 				index: result.index,
 				lineStart: this.nLine,
 				lineEnd: this.nLine,
@@ -369,7 +356,7 @@ var OneRegExpLexer =(function(){
 			bNoSkip = Skip.notFor[ sSyntax ]
 			}
 		}
-	
+
 	// Analyse par défaut
 	;(function(){
 		var o = LexerRules
@@ -391,7 +378,6 @@ var OneRegExpLexer =(function(){
 	return Lexer
 	})()
 
-
 // Rules...
 ;(function(){
 	var Lexer = OneRegExpLexer
@@ -399,17 +385,17 @@ var OneRegExpLexer =(function(){
 	var add = Lexer.rule
 	;(function(){// SimpleRegexp = Sample test
 	add([
-		['CHARSET', /\[\^?|\]|\-/, 'charset' ],
-		['PIPE', /\|/, 'punctuator' ],
-		['PUNCTUATOR', /\(|\)/, 'punctuator' ],
-		['QUANTIFIER1', /\{\d+(?:\,\d*)?\}/, 'repetition' ],
-		['QUANTIFIER2', /\*|\+|\?/, 'repetition' ],
-		['CHAR_ESCAPED', /\\./, 'character' ],
-		['ANY', /\./, 'character' ],
-		['CHAR', /[^\(\)\\\|\.\[\]\*\+\?\{\-]/, 'character' ]
+		['CHARSET', /\[\^?|\]|\-/ ],
+		['PIPE', /\|/ ],
+		['PUNCTUATOR', /\(|\)/ ],
+		['QUANTIFIER1', /\{\d+(?:\,\d*)?\}/ ],
+		['QUANTIFIER2', /\*|\+|\?/ ],
+		['CHAR_ESCAPED', /\\./ ],
+		['ANY', /\./ ],
+		['CHAR', /[^\(\)\\\|\.\[\]\*\+\?\{\-]/ ]
 		])
 	add( 'SimpleRegExp',
-		'CHARSET,PIPE,PUNCTUATOR,QUANTIFIER1,QUANTIFIER2,CHAR_ESCAPED,ANY,CHAR'.split(',')
+		'CHARSET|PIPE|PUNCTUATOR|QUANTIFIER1|QUANTIFIER2|CHAR_ESCAPED|ANY|CHAR'
 		)
 	})()
 	;(function(){// Common
@@ -439,24 +425,22 @@ var OneRegExpLexer =(function(){
 		])
 	})()
 	;(function(){// SUPER SCRIPT
-	add([
-		['S_PHP', /(?:\<\?(?:php\b|=))/, 'tag' ]
-		])
+	add( 'S_PHP', /(?:\<\?(?:php\b|=))/ )
 	o.addCSSClass("tag=S_PHP")
 	})()
 	;(function(){// STRINGS & COMMENTS	
 	add([
 	// STRING
-		['S_SSQ', /'/, '' ],['E_SSQ', /'/, '' ],['SSQ_IN', /(?:[^'\\\n\r\f \t]|\\[^\n\r\f \t])+/, '' ],
-		['S_SDQ', /"/, '' ],['E_SDQ', /"/, '' ],['SDQ_IN', /(?:[^"\\\n\r\f \t]|\\[^\n\r\f \t])+/, '' ],
+		['S_SSQ', /'/ ],['E_SSQ', /'/ ],['SSQ_IN', /(?:[^'\\\n\r\f \t]|\\[^\n\r\f \t])+/ ],
+		['S_SDQ', /"/ ],['E_SDQ', /"/ ],['SDQ_IN', /(?:[^"\\\n\r\f \t]|\\[^\n\r\f \t])+/ ],
 	// COMMENT
-		['S_MLC', /\/\*/, '' ],['E_MLC', /[^\n\r\f \t]*\*\//, '' ],['MLC_IN', /(?:[^\*\n\r\f \t]|\*[^\/\n\r\f \t])+/, '' ],
-		['S_SLC', /\/\//, '' ], ['SLC_IN', /[^\n\r\f \t]+/, '' ],
+		['S_MLC', /\/\*/ ],['E_MLC', /[^\n\r\f \t]*\*\// ],['MLC_IN', /(?:[^\*\n\r\f \t]|\*[^\/\n\r\f \t])+/ ],
+		['S_SLC', /\/\// ], ['SLC_IN', /[^\n\r\f \t]+/ ],
 		])
-	add( 'SSQ',[ 'S_PHP','TAB','SPACES','L_NEW_LINE','SSQ_IN','BACKSLASH','E_SSQ' ])
-	add( 'SDQ',[ 'S_PHP','TAB','SPACES','L_NEW_LINE','SDQ_IN','BACKSLASH','E_SDQ' ])
-	add( 'MLC',[ 'S_MLC','E_MLC','L_NEW_LINE','TAB','SPACES','MLC_IN' ])
-	add( 'SLC',[ 'S_SLC','TAB','SPACES','SLC_IN','NOT_WHITE_SPACES' ])
+	add( 'SSQ', 'S_PHP|TAB|SPACES|L_NEW_LINE|SSQ_IN|BACKSLASH|E_SSQ' )
+	add( 'SDQ', 'S_PHP|TAB|SPACES|L_NEW_LINE|SDQ_IN|BACKSLASH|E_SDQ' )
+	add( 'MLC', 'S_MLC|E_MLC|L_NEW_LINE|TAB|SPACES|MLC_IN' )
+	add( 'SLC', 'S_SLC|TAB|SPACES|SLC_IN|NOT_WHITE_SPACES' )
 	
 	o.setPreviousTokenOf("L_NEW_LINE_IN_STRING","BACKSLASH")
 	o.setTokensTranslation('L_NEW_LINE_IN_STRING=NEW_LINE&SSQ=STRING&S_SSQ=SINGLE_QUOTE&E_SSQ=SINGLE_QUOTE&SDQ=STRING&S_SDQ=DOUBLE_QUOTE&E_SDQ=DOUBLE_QUOTE&MLC=COMMENT&SLC=COMMENT')
@@ -468,45 +452,36 @@ var OneRegExpLexer =(function(){
 	})()
 	;(function(){// PHP
 	add([
-		['E_PHP', /(?:\?\>)/, 'tag' ],
-		['PHP_SPECIAL_VARS', /(?:\$(?:GLOBALS|_(?:COOKIE|ENV|FILES|GET|POST|REQUEST|SE(?:RVER|SSION))))\b/g , 'special' ],
-		['PHP_IDENTIFIER', /\$[\w_][\w\d_]*\b/, 'identifier' ],
-		['PHP_KEYWORD', Lexer.createWordsRegExp( 'break,case,continue,declare,default,do,each,elseif,else,foreach,for,goto,if,include,include_once,require,require_once,return,switch,while' ), 'keyword' ],
-		['PHP_LITERAL', Lexer.createWordsRegExp( 'true,TRUE,false,FALSE,null,NULL' ), 'literal' ],
-		['PHP_RESERVED', Lexer.createWordsRegExp( '@,and,or,xor,exception,as,var,class,const,declare,die,echo,empty,eval,exit,extends,function,global,isset,list,new,print,static,unset,use,__FUNCTION__,__CLASS__,__METHOD__,final,interface,implements,extends,public,private,protected,abstract,clone,$this' ), 'keyword' ],
-		['PHP_FUNCTION', /\b\w[\w\d_]*\b/, 'function' ],
+		['E_PHP', /(?:\?\>)/ ],
+		['PHP_SPECIAL_VARS', /(?:\$(?:GLOBALS|_(?:COOKIE|ENV|FILES|GET|POST|REQUEST|SE(?:RVER|SSION))))\b/ ],
+		['PHP_IDENTIFIER', /\$[\w_][\w\d_]*\b/ ],
+		['PHP_KEYWORD', /\b(?:break|case|continue|declare|default|do|each|elseif|else|foreach|for|goto|if|include|include_once|require|require_once|return|switch|while)\b/ ],
+		['PHP_LITERAL', /\b(?:true|TRUE|false|FALSE|null|NULL)\b/ ],
+		['PHP_RESERVED', /\b(?:\@|and|or|xor|exception|as|var|class|const|declare|die|echo|empty|eval|exit|extends|function|global|isset|list|new|print|static|unset|use|__FUNCTION__|__CLASS__|__METHOD__|final|interface|implements|extends|public|private|protected|abstract|clone|\$this)\b/ ],
+		['PHP_FUNCTION', /\b\w[\w\d_]*\b/ ],
 		
-		['PHP_ARITHMETIC_OP',/\+\+?|\-\-?|\*|\%|\//, 'operator'],
-		['PHP_ASSIGNMENT_OP',/\+=|\-=|\*=|\/=|\.=|\%=|\&=|\|=|\^=|<<=|>>=|=>?/, 'operator'],
-		['PHP_BITWISE_OP',/&|\||\^|\~|<<|>>/, 'operator'],
-		['PHP_COMPARISON_OP',/===?|!==?|<>|<=?|>=?/, 'operator'],
-		['PHP_ERROR_CONTROL_OP',/@/, 'operator'],
-		['PHP_LOGICAL_OP',/and|or|xor|!|&&|\|\|/, 'operator'],
-		['PHP_STRING_OP',/\./, 'operator'],
-		['PHP_TYPE_OP',/\(int\)|\(float\)|\(string\)|\(array\)|\(object\)|\(bool\)/, 'operator']
+		['PHP_ARITHMETIC_OP', /\+\+?|\-\-?|\*|\%|\// ],
+		['PHP_ASSIGNMENT_OP', /\+=|\-=|\*=|\/=|\.=|\%=|\&=|\|=|\^=|<<=|>>=|=>?/ ],
+		['PHP_BITWISE_OP', /&|\||\^|\~|<<|>>/ ],
+		['PHP_COMPARISON_OP', /===?|!==?|<>|<=?|>=?/ ],
+		['PHP_ERROR_CONTROL_OP', /@/ ],
+		['PHP_LOGICAL_OP', /and|or|xor|!|&&|\|\|/ ],
+		['PHP_STRING_OP', /\./ ],
+		['PHP_TYPE_OP', /\((?:int|float|string|array|object|bool)\)/ ]
 		])
 		
 	add( 'PHP',[
 		'E_PHP',
 		'NUMBER',
-		'L_NEW_LINE','SPACES','TAB',
-		'S_SLC','S_MLC',
-		
-		'PHP_COMPARISON_OP','PHP_ASSIGNMENT_OP','PHP_ARITHMETIC_OP','PHP_LOGICAL_OP','PHP_BITWISE_OP','PHP_ERROR_CONTROL_OP','PHP_STRING_OP','PHP_TYPE_OP',
-
-		'S_SSQ','S_SDQ',
-		'ELISION','LBRACE','RBRACE','LPAREN','RPAREN','LBRACK','RBRACK',
-		'DOT','SEMI','COLON','QUESTION',
-
-		'PHP_RESERVED',
-		'PHP_LITERAL',
-		'PHP_KEYWORD',
-		'PHP_SPECIAL_VARS',
-		'PHP_FUNCTION',
-		'PHP_IDENTIFIER',
-		
+		'L_NEW_LINE|SPACES|TAB',
+		'S_SLC|S_MLC',
+		'PHP_COMPARISON_OP|PHP_ASSIGNMENT_OP|PHP_ARITHMETIC_OP|PHP_LOGICAL_OP|PHP_BITWISE_OP|PHP_ERROR_CONTROL_OP|PHP_STRING_OP|PHP_TYPE_OP',
+		'S_SSQ|S_SDQ',
+		'ELISION|LBRACE|RBRACE|LPAREN|RPAREN|LBRACK|RBRACK',
+		'DOT|SEMI|COLON|QUESTION',
+		'PHP_RESERVED|PHP_LITERAL|PHP_KEYWORD|PHP_SPECIAL_VARS|PHP_FUNCTION|PHP_IDENTIFIER',
 		'NOT_WHITE_SPACES'
-		])
+		].join('|'))
 
 	o.addCSSClass([
 		'operator=PHP_UNARY_OP|PHP_LOGICAL_OP|PHP_ARITHMETIC_OP|PHP_ASSIGNMENT_OP|PHP_COMPARISON_OP|PHP_STRING_OP|PHP_ERROR_CONTROL_OP',
@@ -523,31 +498,29 @@ var OneRegExpLexer =(function(){
 	})()
 	;(function(){// JS
 	add([
-		['R_REGULAR_EXPRESSION',/\/(?:(?:[^\n\r\f\*\\\/\[]|(?:\\[^\n\r\f])|(?:\[(?:(?:[^\n\r\f\]\\]|(?:\\[^\n\r\f]))*)\]))(?:(?:[^\n\r\f\\\/\[]|(?:\\[^\n\r\f])|(?:\[(?:(?:[^\n\r\f\]\\]|(?:\\[^\n\r\f]))*)\]))*))\/(?:(?:[a-zA-Z])*)/,'regexp'],
-		['REGULAR_EXPRESSION_IN',/[^\t ]+/,'regexpin'],
-		
-		['JS_IDENTIFIER', /[\$\_a-zA-Z]+[\$_\w\d]*/, 'identifier' ],
-		['JS_KEYWORD', Lexer.createWordsRegExp( 'break,case,catch,continue,default,delete,do,else,finally,for,function,if,in,instanceof,new,return,switch,this,throw,try,typeof,var,void,while,with' ), 'keyword' ],
-		['JS_LITERAL', Lexer.createWordsRegExp( 'true,false,null,undefined,Infinity,NaN' ), 'literal' ],
-		
-		['JS_UNARY_OP',/\+\+|\-\-|\~|\!/, 'operator'],
-		['JS_ARITHMETIC_OP',/[\+\-\*\%\/]/, 'operator'],
-		['JS_LOGICAL_OP',/&&|\|\|/, 'operator'],
-		['JS_COMPARISON_OP',/(?:[<>]|[=!]=)=?/, 'operator'],
-		['JS_ASSIGNMENT_OP',/=|\*=|\/=|\%=|\+=|\-=|<<=|>>=|>>>=|\&=|\^=|\|=/, 'operator']
+		['R_REGULAR_EXPRESSION',/\/(?:(?:[^\n\r\f\*\\\/\[]|(?:\\[^\n\r\f])|(?:\[(?:(?:[^\n\r\f\]\\]|(?:\\[^\n\r\f]))*)\]))(?:(?:[^\n\r\f\\\/\[]|(?:\\[^\n\r\f])|(?:\[(?:(?:[^\n\r\f\]\\]|(?:\\[^\n\r\f]))*)\]))*))\/(?:(?:[a-zA-Z])*)/],
+		['REGULAR_EXPRESSION_IN',/[^\t ]+/],
+		['JS_IDENTIFIER', /[\$\_a-zA-Z]+[\$_\w\d]*/],
+		['JS_KEYWORD', /\b(?:break|case|catch|continue|default|delete|do|else|finally|for|function|if|in|instanceof|new|return|switch|this|throw|try|typeof|var|void|while|with)\b/],
+		['JS_LITERAL', /\b(?:true|false|null|undefined|Infinity|NaN)\b/],
+		['JS_UNARY_OP',/\+\+|\-\-|\~|\!/],
+		['JS_ARITHMETIC_OP',/[\+\-\*\%\/]/],
+		['JS_LOGICAL_OP',/&&|\|\|/],
+		['JS_COMPARISON_OP',/(?:[<>]|[=!]=)=?/],
+		['JS_ASSIGNMENT_OP',/=|\*=|\/=|\%=|\+=|\-=|<<=|>>=|>>>=|\&=|\^=|\|=/]
 		])
-	add( 'JS',['L_NEW_LINE','SPACES','TAB',
-		'JS_KEYWORD','JS_LITERAL','JS_IDENTIFIER',
-		'LBRACE','RBRACE','LPAREN','RPAREN','LBRACK','RBRACK',
-		'S_SSQ','S_SDQ','S_MLC','S_SLC',
-		'R_REGULAR_EXPRESSION',
-		'NUMBER',
-		'ELISION','DOT','SEMI','COLON','QUESTION',
-		'S_PHP',
-		'JS_LOGICAL_OP','JS_COMPARISON_OP','JS_ASSIGNMENT_OP','JS_UNARY_OP','JS_ARITHMETIC_OP',
-		'NOT_WHITE_SPACES'
-		])
-	add( 'REGULAR_EXPRESSION',['TAB','SPACES','REGULAR_EXPRESSION_IN'])
+	add( 'JS',['L_NEW_LINE|SPACES|TAB',
+			'JS_KEYWORD|JS_LITERAL|JS_IDENTIFIER',
+			'LBRACE|RBRACE|LPAREN|RPAREN|LBRACK|RBRACK',
+			'S_SSQ|S_SDQ|S_MLC|S_SLC',
+			'R_REGULAR_EXPRESSION',
+			'NUMBER',
+			'ELISION|DOT|SEMI|COLON|QUESTION',
+			'S_PHP',
+			'JS_LOGICAL_OP|JS_COMPARISON_OP|JS_ASSIGNMENT_OP|JS_UNARY_OP|JS_ARITHMETIC_OP',
+			'NOT_WHITE_SPACES'
+			].join('|'))
+	add( 'REGULAR_EXPRESSION', 'TAB|SPACES|REGULAR_EXPRESSION_IN' )
 
 	o.setPreviousTokenOf("R_REGULAR_EXPRESSION","JS_ARITHMETIC_OP|JS_ASSIGNMENT_OP|JS_COMPARISON_OP|JS_LOGICAL_OP|ELISION|DOT|LPAREN|LBRACE|LBRACK|COLON|SEMI|QUESTION|JS_KEYWORD")
 	o.addCSSClass([
