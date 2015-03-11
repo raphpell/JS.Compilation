@@ -4,6 +4,7 @@ TODO : Regrouper ici toutes les fonctionnalités communes au Lexers
 
 var Lexer =(function(){
 	var SINGLETON
+	, oLexeme, sToken, sValue, bNoSkip
 	, LexerRules =(function(){
 		var Dictionary =function( sId ){
 			var sGetError = '"$1" is not a lexer '+ sId
@@ -31,7 +32,7 @@ var Lexer =(function(){
 				Previous.ofToken[sToken] = sPreviousTokens
 				},
 			CSS: {},
-			addCSSClass :function( m ){ // m = 'class1=TOKEN1|TOKEN2&class2=TOKEN3'
+			addCSSClass :function( m ){
 				var o = this.CSS
 				var aCouples = m.constructor==Array ? m : m.split('&')
 				for(var i=0, s ; s=aCouples[i]; i++){
@@ -47,7 +48,7 @@ var Lexer =(function(){
 					}
 				},
 			Translation: {},
-			setTokensTranslation :function( m ){ // m = 'TOKEN1=NEWNAME1&TOKEN2=NEWNAME2'
+			setTokensTranslation :function( m ){
 				var o = this.Translation
 				var aCouples = m.constructor==Array ? m : m.split('&')
 				for(var aCouple, sToken, i=0, ni=aCouples.length; i<ni ; i++ ){
@@ -77,7 +78,6 @@ var Lexer =(function(){
 			makeRule :function( sName, sTokens ){ /* TODO */ }
 			}
 		})()
-	var oLexeme, sToken, sValue, bNoSkip
 	, Actions =(function(){
 		var Actions={
 			add :function(){
@@ -226,11 +226,7 @@ var Lexer =(function(){
 		})
 	Lexer.prototype ={
 		bSkip: 0,
-		appendNode: appendNode =function( eNode ){
-			return this.skip( eNode.oValue.token )
-				? true
-				: this.eParent.appendChild( eNode )
-			},
+		appendNode: null,
 		end :function(){
 			return this.eRoot
 			},
@@ -252,6 +248,11 @@ var Lexer =(function(){
 				index:0,
 				lineStart:1
 				}))
+			this.appendNode =function( eNode ){
+				return this.skip( eNode.oValue.token )
+					? true
+					: this.eParent.appendChild( eNode )
+				}
 			},
 		readToken :function(){
 			for(var i=0; this.aRules[i]; i++ ){
@@ -265,7 +266,7 @@ var Lexer =(function(){
 						lineStart:this.nLine,
 						lineEnd:this.nLine
 						}
-					if( this.haveLexeme( oLexeme )) return false
+				//	if( this.haveLexeme( oLexeme )) return false
 					this.nPos += sValue.length
 					return Actions(this)
 					}
@@ -277,12 +278,10 @@ var Lexer =(function(){
 			while( this.readToken());
 			return this.end()
 			},
-		searchToken :function(){
-			
-			},
+		searchToken :function( mTokenOrTokens ){ /* TODO */ },
 		setSyntax :function( sSyntax ){
-			this.rule = LexerRules.Rules.get( this.sSyntax = sSyntax )
-			
+			this.aRules = LexerRules.Rules.list[ this.sSyntax = sSyntax ]
+							|| [ LexerRules.Tokens.list[sSyntax] ]
 			bNoSkip = Skip.notFor[ sSyntax ]
 			}
 		}

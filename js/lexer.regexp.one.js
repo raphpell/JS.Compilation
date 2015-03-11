@@ -3,7 +3,8 @@
 
 var OneRegExpLexer =(function(){
 	var SINGLETON
-	, LexerRules =(function(){
+	, oLexeme, sToken, sValue, bNoSkip
+	, LexerRules =function(){
 		var Dictionary =function( sId ){
 			var sGetError = '"$1" is not a lexer '+ sId
 			var sAddError = 'Lexer '+ sId +' "$1" already exist.'
@@ -80,7 +81,7 @@ var OneRegExpLexer =(function(){
 			makeRule :function( sName, sTokens ){
 				var aRules = sTokens.split('|')
 				for( var aRegExp=[], i=0, ni=aRules.length, oRule; i<ni; i++ ){
-					oRule = LexerRules.Tokens.get( aRules[i])
+					oRule = this.Tokens.get( aRules[i])
 					if( ! oRule ) throw new Error ( 'Lexer: "'+ aRules[i] +'" is not a rule name.' )
 					aRules[i] = oRule
 					aRegExp[i] = '('+ aRules[i].source +')'
@@ -91,8 +92,7 @@ var OneRegExpLexer =(function(){
 				return Array.concat( [oRE], aRules )
 				}
 			}
-		})()
-	var oLexeme, sToken, sValue, bNoSkip
+		}
 	, Actions =(function(){
 		var Actions={
 			add :function(){
@@ -133,8 +133,8 @@ var OneRegExpLexer =(function(){
 			startParent :function(){
 				sToken = sToken.slice(2)
 				var eNewParent = Lexeme({
-					token: LexerRules.Translation[sToken]||sToken,
-					css: LexerRules.CSS[sToken]||'',
+					token: Lexer.Rules.Translation[sToken]||sToken,
+					css: Lexer.Rules.CSS[sToken]||'',
 					rule:sToken,
 					value:'',
 					index:oLexeme.index,
@@ -160,7 +160,7 @@ var OneRegExpLexer =(function(){
 			}
 		})()
 	, Previous =(function(){
-		var o =function(){
+		var o =function(that){
 			var s = ''
 			return {
 				invalidFor :function( sToken ){
@@ -169,7 +169,7 @@ var OneRegExpLexer =(function(){
 				set :function( sToken ){
 					return o.excluded[sToken]
 						? false // doit impérativement retourner cette valeur
-						: s = LexerRules.Translation[sToken]||sToken
+						: s = Lexer.Rules.Translation[sToken]||sToken
 					},
 				get :function(){ return s }
 				}
@@ -235,17 +235,13 @@ var OneRegExpLexer =(function(){
 		}
 	Lexer.union({
 		Previous: Previous,
-		Rules: LexerRules,
+		Rules: LexerRules(),
 		Skip: Skip,
 		Stack: Stack
 		})
 	Lexer.prototype ={
 		bSkip: 0,
-		appendNode: function( eNode ){
-			return this.skip( eNode.oValue.token )
-				? true
-				: this.eParent.appendChild( eNode )
-			},
+		appendNode: null,
 		end :function(){
 			return this.eRoot
 			},
@@ -257,7 +253,7 @@ var OneRegExpLexer =(function(){
 				sText:sText,
 				skip:Skip(this),
 				stack:Stack(this),
-				previous:Previous()
+				previous:Previous(this)
 				})
 			this.eRoot = this.stack.push( Lexeme({
 				value:'',
@@ -267,14 +263,19 @@ var OneRegExpLexer =(function(){
 				index:0,
 				lineStart:1
 				}))
+			this.appendNode =function( eNode ){
+				return this.skip( eNode.oValue.token )
+					? true
+					: this.eParent.appendChild( eNode )
+				}
 			},
 		readToken :function(){
 			for(var i=0; this.aRules[i]; i++ ){
 				if( this.searchToken( this.aRules[i])){
 					oLexeme ={
 						value: sValue,
-						token: LexerRules.Translation[sToken]||sToken,
-						css: LexerRules.CSS[sToken]||'',
+						token: Lexer.Rules.Translation[sToken]||sToken,
+						css: Lexer.Rules.CSS[sToken]||'',
 						rule:this.sSyntax,
 						index:this.nPos,
 						lineStart:this.nLine,
@@ -322,14 +323,15 @@ var OneRegExpLexer =(function(){
 			return sValue = result[0]
 			},
 		setSyntax :function( sSyntax ){
-			this.aRules = LexerRules.Rules.get( this.sSyntax = sSyntax )
+			this.aRules = Lexer.Rules.Rules.list[ this.sSyntax = sSyntax ]
+							|| [ Lexer.Rules.Tokens.list[sSyntax] ]
 			bNoSkip = Skip.notFor[ sSyntax ]
 			}
 		}
 
 	// Analyse par défaut
 	;(function(){
-		var o = LexerRules
+		var o = Lexer.Rules
 /* 		o.addTokens([
 			// Espaces blancs
 			['SPACES',{A:g(" "),M:[,[2]],F:[,,1]}],
