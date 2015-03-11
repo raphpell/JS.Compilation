@@ -125,13 +125,13 @@ INPUT[type=button]{
 <hr style="clear:both;">
 
 <div id="eTest1" class="test"><h2>Char/Char</h2>
-	<input type="checkbox" id="eEnabled1"><label for="eEnabled1">Actif.</label>
+	<input type="checkbox" id="eEnabled1" checked><label for="eEnabled1">Actif.</label>
 	<pre id="eChrono1" class="chrono">...</pre>
 	<pre id="eTime1" class="chrono">...</pre>
 	<pre id="eResult1" class="result"></pre>
 </div>
 <div id="eTest2" class="test"><h2>One RegExp</h2>
-	<input type="checkbox" id="eEnabled2"><label for="eEnabled2">Actif.</label>
+	<input type="checkbox" id="eEnabled2" checked><label for="eEnabled2">Actif.</label>
 	<pre id="eChrono2" class="chrono">...</pre>
 	<pre id="eTime2" class="chrono">...</pre>
 	<pre id="eResult2" class="result"></pre>
@@ -268,7 +268,9 @@ var getContents =function( eRoot ){
 </script>
 
 <!-- LEXERS -->
+<script src="js/lexer.class.js"></script>
 <script src="js/lexer.regexp.one.js"></script>
+<script src="js/lexer.regexp.one.modules.js"></script>
 <script src="js/lexer.regexp.multi.js"></script>
 <script src="js/lexer.regexp.multi.modules.js"></script>
 <script src="js/lexer.automaton.js"></script>

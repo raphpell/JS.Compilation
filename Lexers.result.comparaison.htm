@@ -37,7 +37,6 @@
 <a href="index.htm">Index</a>
 
 <h1>Comparaison des résultats</h1>
-
 <p>
 	<label for="eRegExpLexer">RegExp Lexer :</label>
 	<select id="eRegExpLexer">
@@ -339,11 +338,13 @@ Lexeme.parent =function( e, sTokenName, oValue ){
 	e.token = sTokenName
 	}
 </script>
-<script src="js/lexer.automaton.js"></script>
-<script src="js/lexer.automaton.modules.js"></script>
+<script src="js/lexer.class.js"></script>
 <script src="js/lexer.regexp.one.js"></script>
+<script src="js/lexer.regexp.one.modules.js"></script>
 <script src="js/lexer.regexp.multi.js"></script>
 <script src="js/lexer.regexp.multi.modules.js"></script>
+<script src="js/lexer.automaton.js"></script>
+<script src="js/lexer.automaton.modules.js"></script>
 <script>
 _( 'eRegExpLexer' )
 var oRELexers={

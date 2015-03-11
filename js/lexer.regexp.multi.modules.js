@@ -16,6 +16,9 @@
 	})()
 	;(function(){// Common
 	o.addTokens([
+		['BACKSLASH',/\\/],
+		['SINGLE_QUOTE',/'/],
+		['DOUBLE_QUOTE',/"/],
 		['LBRACE',/\{/],['RBRACE',/\}/],
 		['LPAREN',/\(/],['RPAREN',/\)/],
 		['LBRACK',/\[/],['RBRACK',/\]/],
@@ -39,7 +42,6 @@
 	})()
 	;(function(){// STRINGS & COMMENTS
 	o.addTokens([
-		['BACKSLASH',/\\/],
 		['L_NEW_LINE_IN_STRING',/\r\n|[\n\r\f]/],
 		['S_SSQ',/'/],['E_SSQ',/'/],['SSQ_IN',/([^'\\\n\r\f \t]|\\[^\n\r\f \t])+/],
 		['S_SDQ',/"/],['E_SDQ',/"/],['SDQ_IN',/([^"\\\n\r\f \t]|\\[^\n\r\f \t])+/],
@@ -278,5 +280,4 @@
 	o.addCSSClass("keyword=INI_KEYWORD&var=INI_VAR&undefined=INI_TMP&comment=INI_COMMENT&section=INI_SECTION_IN&value=INI_VALUE&punctuator=S_INI_VALUE&string=INI_SDQ|INI_SSQ")
 	o.setTokensTranslation('INI_COMMENT=COMMENT&INI_SECTION_IN=SECTION_PART&INI_VALUE=VALUES&S_INI_VALUE=OPERATOR&INI_SDQ=STRING&INI_SSQ=STRING')
 	})()
-	
 	})();
