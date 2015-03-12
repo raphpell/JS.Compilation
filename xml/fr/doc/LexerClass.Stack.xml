@@ -1,0 +1,59 @@
+﻿<?xml version='1.0' encoding='UTF-8'?>
+<?xml-stylesheet type="text/xsl" href="Doc.xsl"?> 
+<class name="Stack" language="JavaScript">
+	<desc>
+	Fonction retournant une pile gérant les parents courants...
+	elle prend en argument son lexer...
+	</desc>
+	<syntax>
+		<code><![CDATA[ var oStack = Stack( MyLexer ) ]]></code>
+		<arguments>
+			<arg name="MyLexer" type="Object">
+				<desc>Un lexer créé avec la méthode <code>LexerClass</code>.</desc>
+			</arg>
+		</arguments>
+	</syntax>
+	<group name="oStack">
+		<properties name="Attributs privées">
+			<variable name="a" type="Array">
+				<desc>Pile.</desc>
+			</variable>
+			<variable name="n" type="Number">
+				<desc>Taille de la pile.</desc>
+			</variable>
+		</properties>
+		<methods name="Méthodes">
+			<function name="pop">
+				<desc>Dépile un élément.</desc>
+				<returnValue type="Number">
+					<desc>Longueur de la pile.</desc>
+				</returnValue>
+			</function>
+			<function name="push">
+				<desc>Empile un élément.</desc>
+				<arguments>
+					<arg type="HTMLElement" name="e">
+						<desc>Élément empilé.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="HTMLElement">
+					<desc>Élément empilé.</desc>
+				</returnValue>
+			</function>
+			<function name="top">
+				<desc>Retourne l'élément en sommet de pile sans le dépiler.</desc>
+				<returnValue type="HTMLElement">
+					<desc>Élément en sommet de pile.</desc>
+				</returnValue>
+			</function>
+			<function name="unshift">
+				<desc>Ajoute un élément sous la pile.</desc>
+				<arguments>
+					<arg type="HTMLElement" name="e">
+						<desc>Élément à placer sous la pile.</desc>
+					</arg>
+				</arguments>
+			</function>
+		</methods>
+	</group>
+</class>

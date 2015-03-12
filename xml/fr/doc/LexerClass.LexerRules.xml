@@ -1,0 +1,126 @@
+﻿<?xml version='1.0' encoding='UTF-8'?>
+<?xml-stylesheet type="text/xsl" href="Doc.xsl"?> 
+<class name="LexerRules" language="JavaScript">
+	<desc>
+	Régles d'analyse lexicale.
+	</desc>
+	<group name="Objet LexerRules">
+		<methods name="Méthode privée">
+			<function name="Dictionary">
+				<desc>Créé un dictionnaire de données.</desc>
+				<arguments>
+					<arg type="String" name="sId">
+						<desc>Nom du dictionnaire.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="Object">
+					<desc>Un dictionnaire de données.</desc>
+				</returnValue>
+			</function>
+		</methods>
+		<properties name="Attributs">
+			<variable name="CSS" type="Object">
+				<desc>Classes css des tokens.</desc>
+			</variable>
+			<variable name="Rules" type="Dictionary">
+				<desc>Dictionnaire des règles</desc>
+			</variable>
+			<variable name="Tokens" type="Dictionary">
+				<desc>Dictionnaire des tokens.</desc>
+			</variable>
+			<variable name="Translation" type="Object">
+				<desc>Renommage des tokens.</desc>
+			</variable>
+		</properties>
+		<methods name="Méthodes">
+			<function name="addCSSClass">
+				<desc>.</desc>
+				<arguments>
+					<arg type="___" name="___">
+						<desc>.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="___">
+					<desc>.</desc>
+				</returnValue>
+			</function>
+			<function name="addRule">
+				<desc>.</desc>
+				<arguments>
+					<arg type="___" name="___">
+						<desc>.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="___">
+					<desc>.</desc>
+				</returnValue>
+			</function>
+			<function name="addRules">
+				<desc>.</desc>
+				<arguments>
+					<arg type="___" name="___">
+						<desc>.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="___">
+					<desc>.</desc>
+				</returnValue>
+			</function>
+			<function name="addTokens">
+				<desc>.</desc>
+				<arguments>
+					<arg type="___" name="___">
+						<desc>.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="___">
+					<desc>.</desc>
+				</returnValue>
+			</function>
+			<function name="makeToken">
+				<desc>.</desc>
+				<arguments>
+					<arg type="___" name="___">
+						<desc>.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="___">
+					<desc>.</desc>
+				</returnValue>
+			</function>
+			<function name="makeRule">
+				<desc>.</desc>
+				<arguments>
+					<arg type="___" name="___">
+						<desc>.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="___">
+					<desc>.</desc>
+				</returnValue>
+			</function>
+			<function name="setPreviousTokenOf">
+				<desc>.</desc>
+				<arguments>
+					<arg type="___" name="___">
+						<desc>.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="___">
+					<desc>.</desc>
+				</returnValue>
+			</function>
+			<function name="setTokensTranslation">
+				<desc>.</desc>
+				<arguments>
+					<arg type="___" name="___">
+						<desc>.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="___">
+					<desc>.</desc>
+				</returnValue>
+			</function>
+		</methods>
+	</group>
+</class>

@@ -44,7 +44,7 @@ var OneRegExpLexer =(function( Lexer ){
 			this.sToken = oRE.name
 			}
 
-		if( this.previous.invalidFor( this.sToken )) return null
+		if( this.previous.invalidFor( this.sToken )) return false
 
 		return this.sValue = result[0]
 		}

@@ -23,36 +23,51 @@ LI {
 H2, H3 {
 	clear: left;
 	}
-.warn {
-	background: #FC0;
-	border: 3px solid darkblue;
-	box-shadow: inset 0 0 15px #FF0, 0 2px 10px #660;
-	color: darkblue;
-	font: bold 1em/1.5em Verdana;
-	margin:1em;
-	overflow: hidden;
-	padding: 0.5em 1em;
-	text-align: center;
-	text-shadow: 0 0 2px #FFF, 0 0 4px white;
-	}
 		</style>
 	</head>
 	<body>
 <a href="index.htm">Index</a>
 
 
-<div class="warn">
-	<big>Le contenu sera mise à jour demain</big><br>
-</div>
-
 <h1>Les Lexers</h1>
 
-<p>Il y a trois différents lexers testés. Mais il n'y en a que deux à privilégier.</p>
-<p>
-	Les lexers utilisent soit <b>directement les ER</b> ou soit les <b>AFD issus de ces ER</b>.<br>
-	L'utilisation des AFD est préférable car elle nous laissent plus possibilités en programmation. <br>
-	L'<a href="LexerAutomaton.incremental.htm">analyse partielle</a> n'est pas implémenté pour le lexer à ER pour qu'il reste le plus performant.
-</p>
+<p>Il y a trois différents lexers testés  :</p>
+<ul>
+	<li><a href="#MultiRegExpLexer">Lexer à 'plusieurs ER'</a></li>
+	<li><a href="#OneRegExpLexer">Lexer à 'une ER'</a></li>
+	<li><a href="#AutomatonLexer">Lexer à DFA</a></li>
+</ul>
+
+<p>L'<a href="LexerAutomaton.incremental.htm">analyse partielle</a> est en attente de test pour les lexers à ER.</p>
+
+
+<h2>Principe de fonctionnement</h2><section>
+	<p>Il sont créés depuis une même base :</p>
+	<ul>
+		<li>Ils réalisent tous une analyse à <a href="Lexers.result.comparaison.htm">plusieurs niveaux</a>: un <i>arbre lexicale</i> est créé.</li>
+		<li>Parcourent le texte une et une seule fois...</li>
+		<li>Permettent de:
+			<ol>
+				<li>réaliser un double scannage d'un token (à éviter si possible !): il en fait un token parent.</li>
+				<li>détecter le début et la fin d'un token parent.</li>
+			</ol>
+		</li>
+		<li>Utilisent une liste d'<i>objet</i> pour reconnaître des tokens.<br>
+			<small><b>ATTENTION</b></small>: Premier objet arrivé, premier objet trouvé.
+			<ol>
+				<li>Un ordre est requis (mots clés avant identifiant, ...)</li>
+				<li>Les objets trouvés le plus souvant doivent être classés en tête :
+					<i>amélioration des performances</i>.</li>
+			</ol>
+		</li>
+	</ul>
+
+	<p>Si vous recherchez un lexer retournant une liste de tokens, consultez le site d'Eli Bendersky, il pourra vous être utile :</p>
+	<ul>
+		<li><a target="_blank" href="http://eli.thegreenplace.net/2013/06/25/regex-based-lexical-analysis-in-python-and-javascript">Regex-based lexical analysis in Python and Javascript</a></li>
+		<li><a target="_blank" href="http://eli.thegreenplace.net/2013/07/16/hand-written-lexer-in-javascript-compared-to-the-regex-based-ones">Hand-written lexer in Javascript compared to the regex-based ones </a></li>
+	</ul>
+</section>
 
 <h2>Performance</h2><section>
 	<p>Elle est mesurée sur deux méthodes :</p>
@@ -65,95 +80,91 @@ H2, H3 {
 		afin d'assurer des mesures dans des conditions identiques.
 	</p>
 	<p>La performance est dependante de l'objet retourné par la fonction <a href="Lexeme.htm">Lexeme</a>.</p>
-	</section>
+</section>
+
 <h2>Description</h2><section>
-	<p style="margin-bottom:0;">
-		Ils réalisent tous une analyse à <a href="Lexers.result.comparaison.htm">plusieurs niveaux</a>: un <i>arbre lexicale</i> est créé.<br>
-	</p>
-
-	<h3>Les deux lexers à privilégier</h3><section>
+	<a name="AutomatonLexer"></a>
+	<h3>Automaton Lexer</h3><section>
+		Utilise des AFD : Il reconnaisse 1 à plusieurs tokens.
 		<ul>
-			<li>Parcourent le texte une et une seule fois...</li>
-			<li>Permettent de:
-				<ol>
-					<li>réaliser un double scannage d'un token (à éviter si possible !): il en fait un token parent.</li>
-					<li>détecter le début et la fin d'un token parent.</li>
-				</ol>
-			</li>
-			<li>Utilisent une liste d'<i>objet</i> pour reconnaître des tokens.<br>
-				<small><b>ATTENTION</b></small>: Premier objet arrivé, premier servi.
-				<ol>
-					<li>Un ordre est requis (mots clés avant identifiant, ...)</li>
-					<li>Les objets trouvés le plus souvant doivent être classés en tête :
-						<i>amélioration des performances</i>.</li>
-				</ol>
-			</li>
+			<li style="color:orange;">Pas le plus rapide des lexer.</li>
+			<li style="color:red;">Modules énormes et abstraits...</li>
+			<li style="color:green;">Le plus long token trouvé est toujours retourné.</li>
+			<li><strike>Analyse partielle implémenté (<a href="LexerAutomaton.incremental.htm">aperçu</a>).</strike></li>
 		</ul>
-		<p>Comparaisons des deux lexers :</p>
-		<ul>
-			<li class="lexer"><b>Automaton Lexer</b>. <br>
-				Utilise des AFD : Il reconnaisse 1 à plusieurs tokens.
-				<ul>
-					<li style="color:red;">Lexer plus lent.</li>
-					<li style="color:red;">Code source très grand.</li>
-					<li style="color:green;">Analyse partielle implémenté (<a href="LexerAutomaton.incremental.htm">aperçu</a>).</li>
-					<li style="color:green;">Le plus long token trouvé est toujours retourné.</li>
-				</ul></li>
-			<li class="lexer"><b>Multiple RegExp Lexer</b>. <br>
-				Utilise des ER : Elle reconnaisse 1 et 1 seul token.
-				<ul>
-					<li style="color:green;">Lexer plus rapide.</li>
-					<li style="color:green;">Code source beaucoup plus petit.</li>
-					<li style="color:red;">Analyse partielle non implémentée.</li>
-					<li style="color:red;">Premier arrivé, premier servi.</li>
-				</ul></li>
-		</ul>
-		</section>
-
-	<h3>Le dernier à éviter</h3><section>
-		<ul>
-			<li class="lexer"><b>"1 RegExp" Lexer</b> <sup style="color:red;">deprecated</sup>
-				<ul>
-					<li>Une seule grande expression régulière est créée pour parcourir le texte.</li>
-					<li>Le défaut: quand un mot est trouvé il faut déterminé son type. 
-						Pour cela il faut réaliser une boucle !</li>
-					<li>J'ai abandonné son utilisation:
-						<blockquote>
-							En JavaScript il faut savoir différencier la division '/' au délimitation d'une expression régulière. <br>
-							Pour cela, j'ai besoin de connaître le token précédant. <br>
-							Si le token précédant correspond à token pouvant être avant un token ER alors le token ER est validé. <br>
-							...sinon il faut parcourir les ER utilisées pour créer la grande une par une... pour finalement déterminer le token division.
-						</blockquote>
-					</li>
-				</ul></li>
-		</ul>
+		
+		<h4>Considérations techniques</h4><section>
+			<p>Les AFD doivent-être précalculés car leur calcul prend du temps.</p>
+			<ol>
+				<li>Chaque <a href="AFD.generator.htm">ER transformé en AFD</a></li>
+				<li>Les <a href="AFD.aggregator.htm">AFD sont ensuite aggrégés entre eux</a> afin d'en obtenir plus qu'un !</li>
+			</ol>
+			<p>Malheureusement il est parfois préférable d'utiliser plusieurs AFD au lieu d'un :</p>
+			<ul>
+				<li>La taille de l'automate résultat pouvant-être trop volumineuse, </li>
+				<li>ou sa création prennant beaucoup trop de temps.</li>
+			</ul>
+			<!-- <p>Vous pouvez <a href="LexerAutomaton.module.generator.htm">créer des modules pour le Lexer Automaton</a>.</p> -->
+			<p>L'analyse lexicale se fait ensuite avec un ou plusieurs AFD :</p>
+			<ul>
+				<li>Performance (calcul) = 1 AFD.</li>
+				<li>Maintenance / Evolution = Plusieurs AFDs.</li>
+				<li>Performance téléchargement = Fonction de la taille des AFDs.</li>
+			</ul>
 		</section>
 	</section>
-<h2>Considérations techniques</h2><section>
-	<p>Les Automates Finis Déterministes doivent-être précalculés :</p>
-	<ol>
-		<li>Chaque <a href="AFD.generator.htm">ER transformé en AFD</a></li>
-		<li>Chaque <a href="AFD.aggregator.htm">AFD aggrégé entre eux</a> afin d'en obtenir plus qu'un !</li>
-	</ol>
-	<p>Malheureusement il est parfois préférable d'en utiliser plusieurs à la place :</p>
-	<ul>
-		<li>La taille de l'automate résultat pouvant-être trop volumineuse, </li>
-		<li>ou sa création prennant beaucoup trop de temps.</li>
-	</ul>
-	<p>L'analyse lexicale se fait ensuite avec un ou plusieurs AFD :</p>
-	<ul>
-		<li>Performance (calcul) = 1 AFD.</li>
-		<li>Maintenance / Evolution = Plusieurs AFDs.</li>
-		<li>Performance téléchargement = Fonction de la taille des AFDs.</li>
-	</ul>
-	<p>Vous pouvez <a href="LexerAutomaton.module.generator.htm">créer des modules pour le Lexer Automaton</a>.</p>
+	<a name="MultiRegExpLexer"></a>
+	<h3>Multiple RegExp Lexer</h3><section>
+		Utilise des ER : Elle reconnaisse 1 et 1 seul token.
+		<ul>
+			<li style="color:red;">Lexer le plus lent.</li>
+			<li style="color:green;">Modules à taille modeste et compréhensibles...</li>
+			<li style="color:red;">Premier token arrivé, premier servi.</li>
+			<li><strike>Analyse partielle non implémentée.</strike></li>
+		</ul>
+		
+		<h4>Considérations techniques</h4><section>
+			<ul>
+				<li>L'ordre des ER est important.
+					<ul>
+						<li>Première arrivée, première trouvée !</li>
+						<li>[performance] Les ER les plus souvant rencontrés doivent être montée dans les premières position.</li>
+					</ul>
+				</li>
+			</ul>
+		</section>
 	</section>
-<h2>Liens utiles</h2><section>
-	<ul>
-		<li>http://eli.thegreenplace.net/2013/06/25/regex-based-lexical-analysis-in-python-and-javascript</li>
-		<li>http://eli.thegreenplace.net/2013/07/16/hand-written-lexer-in-javascript-compared-to-the-regex-based-ones</li>
-	</ul>
+	<a name="OneRegExpLexer"></a>
+	<h3>One RegExp Lexer</h3><section>
+		<ul>
+			<li style="color:green;">Lexer le plus rapide.</li>
+			<li style="color:green;">Modules à taille modeste et compréhensibles...</li>
+			<li style="color:green;">Le plus long token trouvé est toujours retourné.</li>
+			<li><strike>Analyse partielle non implémentée.</strike></li>
+		</ul>
+		
+		<h4>Considérations techniques</h4><section>
+			<ul>
+				<li>Une seule grande expression régulière est créée pour parcourir le texte.</li>
+				<li>Le défaut: quand un mot est trouvé il faut déterminé son type. 
+					Pour cela il faut réaliser une boucle !</li>
+				<li>En JavaScript il faut savoir différencier la division '/' au délimitation d'une expression régulière : 
+						pour cela, j'ai besoin de connaître le token précédant. <br>
+					Si le token précédant correspond à token pouvant être avant le token trouvé alors celui-ci est validé. <br>
+						...sinon il faut parcourir les ER utilisées pour créer la grande une par une... pour finalement déterminer un autre token.
+						<ul>
+							<li>L'ordre des ER est important.
+								<ul>
+									<li>Première arrivée, première trouvée !</li>
+									<li>[performance] Les ER les plus souvant rencontrés doivent être montée dans les premières position.</li>
+								</ul>
+							</li>
+						</ul>
+				</li>
+			</ul>
+		</section>
 	</section>
+</section>
 
 	</body>
 </html>

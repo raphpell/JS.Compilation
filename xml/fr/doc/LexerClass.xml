@@ -1,0 +1,163 @@
+﻿<?xml version='1.0' encoding='UTF-8'?>
+<?xml-stylesheet type="text/xsl" href="Doc.xsl"?> 
+<class name="LexerClass" language="JavaScript">
+	<desc>
+		Fabrique de Lexer: elle retourne un nouveau constructeur prêt à être augmenté.
+		<br/>À implémenter:
+		<ul>
+			<li><code>MyLexer.ID</code>: nom du lexer</li>
+			<li><code>MyLexer.Rules.makeToken</code></li>
+			<li><code>MyLexer.Rules.makeRule</code></li>
+			<li><code>MyLexer.prototype.searchToken</code></li>
+		</ul>
+	</desc>
+	<syntax>
+		<code><![CDATA[ var MyLexer = LexerClass() ]]></code>
+	</syntax>
+	<group name="MyLexer">
+		<desc>
+			<code>MyLexer</code> est utilisée soit en fonction, soit en constructeur.
+		</desc>
+	</group>
+	<group name="Objet MyLexer">
+		<properties name="Attributs">
+			<variable name="ID" type="String" default="'LexerClass'">
+				<desc>Nom du lexer.</desc>
+			</variable>
+			<variable name="Previous" type="Function">
+				<desc>Voir spécification <a href="LexerClass.Previous.xml">Previous</a>.</desc>
+			</variable>
+			<variable name="Rules" type="Object">
+				<desc>Voir spécification <a href="LexerClass.LexerRules.xml">LexerRules</a>.</desc>
+			</variable>
+			<variable name="Skip" type="Function">
+				<desc>Voir spécification <a href="LexerClass.Skip.xml">Skip</a>.</desc>
+			</variable>
+			<variable name="Stack" type="Function">
+				<desc>Voir spécification <a href="LexerClass.Stack.xml">Stack</a>.</desc>
+			</variable>
+		</properties>
+		<methods name="Méthodes">
+			<function name="rescan"></function>
+		</methods>
+	</group>
+	<group name="MyLexer.prototype (scanne)">
+		<properties name="Attributs">
+			<variable name="bSkip" type="Boolean">
+				<desc>.</desc>
+			</variable>
+			<variable name="sToken" type="String">
+				<desc>.</desc>
+			</variable>
+			<variable name="sValue" type="String">
+				<desc>.</desc>
+			</variable>
+			<variable name="appendNode" type="Function" default="null">
+				<desc>.</desc>
+			</variable>
+		</properties>
+		<methods name="Méthodes">
+			<function name="end">
+				<desc>Méthode déclenchée à la fin de l'analyse lexicale.</desc>
+				<returnValue type="HTMLElement">
+					<desc>La racine de l'arbre lexical est retournée.</desc>
+				</returnValue>
+			</function>
+			<function name="init">
+				<desc>Initialise le lexer à zéro.</desc>
+				<arguments>
+					<arg type="String" name="sText">
+						<desc>Texte à scanner.</desc>
+					</arg>
+					<arg type="String" name="sSyntax">
+						<desc>Syntaxe (règle) à utilisée.</desc>
+					</arg>
+				</arguments>
+			</function>
+			<function name="readToken">
+				<desc>Cherche et retourne le token suivant.</desc>
+				<returnValue type="Mixte"><desc>
+Elle retourne
+<ul>
+	<li>un <code>HTMLElement</code>, si un token est trouvé.</li>
+	<li><code>true</code> si aucun token n'a été trouvé et qu'un parent à pu être dépilé.</li>
+	<li><code>null</code> sinon : fin d'analyse.</li>
+</ul>
+				</desc></returnValue>
+			</function>
+			<function name="scan">
+				<desc>Scanne un texte du début à la fin.</desc>
+				<arguments>
+					<arg type="String" name="sText">
+						<desc>Texte à scanner.</desc>
+					</arg>
+					<arg type="String" name="sSyntax">
+						<desc>Syntaxe (règle) à utilisée.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="HTMLElement">
+					<desc>La racine de l'arbre lexical est retournée.</desc>
+				</returnValue>
+			</function>
+			<function name="searchToken">
+				<desc>CETTE FONCTION EST À IMPLÉMENTER<br/>
+Elle doit
+<ul>
+	<li>Depuis l'objet en argument tenter de trouver un token.</li>
+	<li>Si un token est trouvé et qu'il est incompatible avec le token précédant, retourner <code>false</code>.</li>
+	<li>Si aucun token n'est trouvé, retourner <code>null</code>.</li>
+	<li>Sinon définir:
+		<ul>
+			<li><code>this.sToken</code>: avec le nom token trouvé</li>
+			<li><code>this.sValue</code>: avec sa valeur</li>
+		</ul></li>
+</ul>
+				</desc>
+				<arguments>
+					<arg type="Mixte" name="mTokenOrTokens">
+						<desc>DFA ou RE permettant de trouver un ou plusieurs tokens.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="String">
+					<desc>La valeur du token trouvé.</desc>
+				</returnValue>
+			</function>
+			<function name="setSyntax">
+				<desc>Défini la syntaxe (règle) à utiliser.</desc>
+				<arguments>
+					<arg type="String" name="sSyntax">
+						<desc>Nom de la règle.</desc>
+					</arg>
+				</arguments>
+			</function>
+		</methods>
+	</group>
+	<group name="MyLexer.prototype (scanne incrementiel)">
+		<desc>...à décrire...</desc>
+		<properties name="Attributs">
+			<variable name="eEndToken" type="HTMLElement" default="null">
+				<desc>.</desc>
+			</variable>
+			<variable name="nShift" type="Number" default="null">
+				<desc>.</desc>
+			</variable>
+			<variable name="nLineShift" type="Number" default="null">
+				<desc>.</desc>
+			</variable>
+		</properties>
+		<methods name="Méthodes">
+			<function name="getTokenAfter"></function>
+			<function name="getTokenBefore"></function>
+			<function name="getNextEndToken"></function>
+			<function name="haveLexeme"></function>
+			<function name="isPartOfRange"></function>
+			<function name="isWhiteSpace"></function>
+			<function name="nodeAt"></function>
+			<function name="removeDeletedNodes"></function>
+			<function name="removeToken"></function>
+			<function name="rescan"></function>
+			<function name="updateValues"></function>
+		</methods>
+	</group>
+
+</class>

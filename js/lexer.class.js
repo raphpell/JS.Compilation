@@ -25,11 +25,10 @@ var LexerClass =function(){
 		, Rules=Dictionary('rule')
 		, Tokens=Dictionary('token')
 		return{
-			setPreviousTokenOf :function( sToken, sPreviousTokens ){
-				if( Previous.ofToken[sToken]) throw new Error ( 'Previous token of '+ sToken +' already defined !' )
-				Previous.ofToken[sToken] = sPreviousTokens
-				},
 			CSS: {},
+			Rules: Rules,
+			Tokens: Tokens,
+			Translation: {},
 			addCSSClass :function( m ){
 				var o = this.CSS
 				var aCouples = m.constructor==Array ? m : m.split('&')
@@ -45,7 +44,26 @@ var LexerClass =function(){
 						}
 					}
 				},
-			Translation: {},
+			addRule :function( sName, sTokens ){
+				return Rules.add( sName, this.makeRule( sName, sTokens ))
+				},
+			addRules :function( aRules ){
+				for(var i=0; aRules[i]; i++ )
+					this.addRule( aRules[i][0], aRules[i][1])
+				},
+			addTokens :function( aTokens ){
+				if( aTokens.length )
+					for(var i=0; aTokens[i]; i++){
+						var sName=aTokens[i][0]
+						Tokens.add( sName, this.makeToken( sName, aTokens[i][1] ))
+						}
+				},
+			makeToken :function( sName, o ){ /* TODO */ },
+			makeRule :function( sName, sTokens ){ /* TODO */ },
+			setPreviousTokenOf :function( sToken, sPreviousTokens ){
+				if( Previous.ofToken[sToken]) throw new Error ( 'Previous token of '+ sToken +' already defined !' )
+				Previous.ofToken[sToken] = sPreviousTokens
+				},
 			setTokensTranslation :function( m ){
 				var o = this.Translation
 				var aCouples = m.constructor==Array ? m : m.split('&')
@@ -55,25 +73,7 @@ var LexerClass =function(){
 					if( o[sToken]) throw Error ( 'Token Translation of '+ sToken +' already defined with '+ o[sToken] +' !' )
 					o[sToken] = aCouple[1]
 					}
-				},
-			Rules: Rules,
-			addRule :function( sName, sTokens ){
-				return Rules.add( sName, this.makeRule( sName, sTokens ))
-				},
-			addRules :function( aRules ){
-				for(var i=0; aRules[i]; i++ )
-					this.addRule( aRules[i][0], aRules[i][1])
-				},
-			Tokens: Tokens,
-			addTokens :function( aTokens ){
-				if( aTokens.length )
-					for(var i=0; aTokens[i]; i++){
-						var sName=aTokens[i][0]
-						Tokens.add( sName, this.makeToken( sName, aTokens[i][1] ))
-						}
-				},
-			makeToken :function( sName, o ){ /* TODO */ },
-			makeRule :function( sName, sTokens ){ /* TODO */ }
+				}
 			}
 		})()
 	, Actions =(function(){

@@ -1,0 +1,33 @@
+﻿<?xml version='1.0' encoding='UTF-8'?>
+<?xml-stylesheet type="text/xsl" href="Doc.xsl"?> 
+<class name="Stack" language="JavaScript">
+	<desc>
+	Fonction retournant une fonction pour gérer les tokens à ignorer...
+	elle prend en argument son lexer...
+	</desc>
+	<syntax>
+		<code><![CDATA[ var fSkip = Skip( MyLexer ) ]]></code>
+		<arguments>
+			<arg name="MyLexer" type="Object">
+				<desc>Un lexer créé avec la méthode <code>LexerClass</code>.</desc>
+			</arg>
+		</arguments>
+	</syntax>
+	<group name="fSkip">
+		<properties name="Attributs">
+			<variable name="notFor" type="Object">
+				<desc>???.</desc>
+			</variable>
+		</properties>
+		<methods name="Méthodes">
+			<function name="set">
+				<desc>Défini si il faut ignorer les tokens non significatifs.</desc>
+				<arguments>
+					<arg type="Boolean" name="bSkip">
+						<desc>Ignorer ?</desc>
+					</arg>
+				</arguments>
+			</function>
+		</methods>
+	</group>
+</class>

@@ -1,0 +1,76 @@
+﻿<?xml version='1.0' encoding='UTF-8'?>
+<?xml-stylesheet type="text/xsl" href="Doc.xsl"?> 
+<class name="Previous" language="JavaScript">
+	<desc>
+	Fonction retournant un objet gérant les actions vis à vis du token précédant...
+	<ul>
+		<li>affectation et récupération du nom token précédant.</li>
+		<li>détermination si un token peut suivre le token précédant.</li>
+	</ul>
+	</desc>
+	<group name="Fonction Previous">
+		<properties name="Attributs">
+			<variable name="excluded" type="Object">
+				<desc>
+					Stockage des noms des tokens non significatifs.
+					<p>
+					Objet ayant comme attribut les noms des tokens non significatifs.<br/>
+					La valeur des ces attributs est assigné à 1.
+					</p>
+				</desc>
+			</variable>
+			<variable name="ofToken" type="Object">
+				<desc>
+					Stockage des noms des tokens devant précéder un autre.
+					<p>
+					Objet ayant comme attribut les noms des tokens devant être précédés par d'autres.<br/>
+					La valeur des ces attributs est affecté avec une chaîne : liste de noms de token séparés avec le caractère '|' non représentatif.
+					</p>
+				</desc>
+			</variable>
+		</properties>
+	</group>
+	<group name="Objet retourné par la fonction Previous">
+		<properties name="Attribut privé">
+			<variable name="s" type="String">
+				<desc>Nom du token précédant.</desc>
+			</variable>
+		</properties>
+		<methods name="Méthodes">
+			<function name="invalidFor">
+				<desc>Détermine si un token peut suivre le token précédant.</desc>
+				<arguments>
+					<arg type="String" name="sToken">
+						<desc>Nom d'un token.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="Boolean">
+					<desc>
+						<code>true</code> si le token peut suivre le token précédant.<br/>
+						<code>false</code> sinon.
+					</desc>
+				</returnValue>
+			</function>
+			<function name="set">
+				<desc>Défini la valeur du token précédant.</desc>
+				<arguments>
+					<arg type="String" name="sToken">
+						<desc>Nom d'un token.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="Mixte">
+					<desc>
+						<code>false</code> si le token n'est pas significatif.<br/>
+						Sinon le nom du token affecté (il est préalablement traduit...).
+					</desc>
+				</returnValue>
+			</function>
+			<function name="get">
+				<desc>Retourne le nom du token précédant.</desc>
+				<returnValue type="String">
+					<desc>Nom du token précédant.</desc>
+				</returnValue>
+			</function>
+		</methods>
+	</group>
+</class>
