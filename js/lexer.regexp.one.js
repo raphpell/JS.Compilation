@@ -1,11 +1,11 @@
-﻿/* DEPRECATED */
-// Lexeme REQUIS
+﻿// lexer.class.js requis
+
 var OneRegExpLexer =(function( Lexer ){
 	Lexer.ID = "OneRegExpLexer"
 	Lexer.Rules.makeToken =function( sName, o ){
-		var oRE = new RegExp ( o.source, 'gm' )
-		oRE.name = sName
-		return oRE
+		o = new RegExp ( o.source, 'gm' )
+		o.name = sName
+		return o
 		}
 	Lexer.Rules.makeRule =function( sName, sTokens ){
 		var aRules = sTokens.split('|')

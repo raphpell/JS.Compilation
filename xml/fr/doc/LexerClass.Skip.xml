@@ -5,7 +5,7 @@
 	Fonction retournant une fonction pour gérer les tokens à ignorer...
 	elle prend en argument son lexer...
 	</desc>
-	<syntax>
+	<syntax name="Création d'un objet Skip">
 		<code><![CDATA[ var fSkip = Skip( MyLexer ) ]]></code>
 		<arguments>
 			<arg name="MyLexer" type="Object">
@@ -13,10 +13,26 @@
 			</arg>
 		</arguments>
 	</syntax>
+	<syntax name="Utilisation">
+		<desc>La fonction <code>fSkip</code> permet de déterminer si un token est non significatif.</desc>
+		<code><![CDATA[ var bSkip = fSkip( sToken ) ]]></code>
+		<arguments>
+			<arg name="sToken" type="String">
+				<desc>Nom d'un token.</desc>
+			</arg>
+		</arguments>
+	</syntax>
 	<group name="fSkip">
 		<properties name="Attributs">
-			<variable name="notFor" type="Object">
-				<desc>???.</desc>
+			<variable name="stepOf" type="Object">
+				<desc>
+					Liste des parents devant être retourné en un coup lors d'un <code>readToken</code> : 
+					toutes les étapes des enfants sont passés.
+					<p>
+					Objet ayant comme attribut des noms de token parent.<br/>
+					La valeur des ces attributs est assigné à 1.
+					</p>
+				</desc>
 			</variable>
 		</properties>
 		<methods name="Méthodes">

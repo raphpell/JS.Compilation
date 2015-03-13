@@ -46,8 +46,8 @@
 				</arguments>
 				<returnValue type="Boolean">
 					<desc>
-						<code>true</code> si le token peut suivre le token précédant.<br/>
-						<code>false</code> sinon.
+						<code>false</code> si le token peut suivre le token précédant.<br/>
+						<code>true</code> sinon.
 					</desc>
 				</returnValue>
 			</function>
@@ -61,7 +61,7 @@
 				<returnValue type="Mixte">
 					<desc>
 						<code>false</code> si le token n'est pas significatif.<br/>
-						Sinon le nom du token affecté (il est préalablement traduit...).
+						Sinon le nom du token défini la valeur du token précédant (mais il est préalablement traduit).
 					</desc>
 				</returnValue>
 			</function>

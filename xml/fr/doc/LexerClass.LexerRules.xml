@@ -29,74 +29,110 @@
 				<desc>Dictionnaire des tokens.</desc>
 			</variable>
 			<variable name="Translation" type="Object">
-				<desc>Renommage des tokens.</desc>
+				<desc>Traduction des tokens (renommage).</desc>
 			</variable>
 		</properties>
 		<methods name="Méthodes">
 			<function name="addCSSClass">
-				<desc>.</desc>
+				<desc>Associe des noms de classe css à des noms de token.</desc>
 				<arguments>
-					<arg type="___" name="___">
-						<desc>.</desc>
+					<arg type="Mixte" name="m">
+						<desc>
+Si l'argument est de type:
+<ul>
+	<li><code>Array</code> : Chaque élément doit être une chaîne de la forme:<br/>
+		className + '=' + liste de noms de token séparés par le caractère '|'<br/>
+		<b>Exemple:</b>
+		<code>'punctuator=ELISION|DOT|SEMI|QUESTION|COLON'</code>
+	</li>
+	<li><code>String</code> : Il doit être l'équivalent du tableau précédant regroupé avec le caractère '&amp;'.
+		
+	</li>
+</ul>
+						</desc>
 					</arg>
 				</arguments>
-				<returnValue type="___">
-					<desc>.</desc>
-				</returnValue>
 			</function>
 			<function name="addRule">
-				<desc>.</desc>
+				<desc>Ajoute une règle d'analyse créée avec <code>makeRule</code>.</desc>
 				<arguments>
-					<arg type="___" name="___">
-						<desc>.</desc>
+					<arg type="String" name="sName">
+						<desc>Nom de la règle.</desc>
+					</arg>
+					<arg type="String" name="sTokens">
+						<desc>Liste de noms de token séparés par le symbole '|'.</desc>
 					</arg>
 				</arguments>
-				<returnValue type="___">
-					<desc>.</desc>
+				<returnValue type="Mixte">
+					<desc>La règle ajoutée est retournée.</desc>
 				</returnValue>
 			</function>
 			<function name="addRules">
-				<desc>.</desc>
+				<desc>Ajoute des règles d'analyse.</desc>
 				<arguments>
-					<arg type="___" name="___">
-						<desc>.</desc>
+					<arg type="Array" name="aRules">
+						<desc>
+							Liste de règle d'analyse. Une règle est ici un tableau à deux élements contenant :
+							<ul>
+								<li>le nom de la règle.</li>
+								<li>la liste de noms de token séparés par le symbole '|'.</li>
+							</ul>
+						</desc>
 					</arg>
 				</arguments>
-				<returnValue type="___">
-					<desc>.</desc>
+				<returnValue type="Array">
+					<desc>Les règles créées sont retournées.</desc>
 				</returnValue>
 			</function>
 			<function name="addTokens">
-				<desc>.</desc>
+				<desc>Ajoute des modèles de tokens créés avec <code>makeToken</code>.</desc>
 				<arguments>
-					<arg type="___" name="___">
-						<desc>.</desc>
+					<arg type="Array" name="aTokens">
+						<desc>
+							Liste de tokens. Un token est ici un tableau à deux élements contenant :
+							<ul>
+								<li>le nom du token.</li>
+								<li>le modèle du token.</li>
+							</ul>
+						</desc>
 					</arg>
 				</arguments>
-				<returnValue type="___">
-					<desc>.</desc>
+				<returnValue type="Array">
+					<desc>Les tokens créés sont retournés.</desc>
 				</returnValue>
 			</function>
 			<function name="makeToken">
-				<desc>.</desc>
+				<desc>CETTE FONCTION EST À IMPLÉMENTER<br/>
+					Créé un modèle de token.
+				</desc>
 				<arguments>
-					<arg type="___" name="___">
-						<desc>.</desc>
+					<arg type="String" name="sName">
+						<desc>Nom de token.</desc>
+					</arg>
+					<arg type="Mixte" name="mModele">
+						<desc>Modèle de token (expression règulière, automate, ...).</desc>
 					</arg>
 				</arguments>
-				<returnValue type="___">
-					<desc>.</desc>
+				<returnValue type="Mixte">
+					<desc>Modèle définitif du token.</desc>
 				</returnValue>
 			</function>
 			<function name="makeRule">
-				<desc>.</desc>
+				<desc> Créé une règle d'analyse. </desc>
 				<arguments>
-					<arg type="___" name="___">
-						<desc>.</desc>
+					<arg type="String" name="sName">
+						<desc>Nom de la règle.</desc>
+					</arg>
+					<arg type="String" name="sTokens">
+						<desc>Liste de noms de token séparés par le symbole '|'.</desc>
 					</arg>
 				</arguments>
-				<returnValue type="___">
-					<desc>.</desc>
+				<returnValue type="Array">
+					<desc>
+						La règle créée est retournée.<br/>
+						Par défaut elle retourne un tableau contenant les modèles d'analyse de chaque token de la règle.<br/>
+						Si une règle d'analyse est rencontrée dans les noms de token, les tokens de cette règle sont ajoutés.
+					</desc>
 				</returnValue>
 			</function>
 			<function name="setPreviousTokenOf">

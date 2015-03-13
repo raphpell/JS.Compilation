@@ -1,8 +1,7 @@
-﻿/*
-TODO : Regrouper ici toutes les fonctionnalités communes au Lexers
-*/
+﻿// fonction 'Lexeme' requise
+
 var LexerClass =function(){
-	var oLexeme, bNoSkip
+	var oLexeme
 	, LexerRules =(function(){
 		var Dictionary =function( sId ){
 			var sGetError = '"$1" is not a lexer '+ sId
@@ -49,17 +48,33 @@ var LexerClass =function(){
 				},
 			addRules :function( aRules ){
 				for(var i=0; aRules[i]; i++ )
-					this.addRule( aRules[i][0], aRules[i][1])
+					aRules[i] = this.addRule( aRules[i][0], aRules[i][1])
+				return aRules
 				},
 			addTokens :function( aTokens ){
 				if( aTokens.length )
 					for(var i=0; aTokens[i]; i++){
 						var sName=aTokens[i][0]
-						Tokens.add( sName, this.makeToken( sName, aTokens[i][1] ))
+						aTokens[i] = Tokens.add( sName, this.makeToken( sName, aTokens[i][1] ))
 						}
+				return aTokens
 				},
 			makeToken :function( sName, o ){ /* TODO */ },
-			makeRule :function( sName, sTokens ){ /* TODO */ },
+			makeRule :function( sName, sTokens ){
+				var aList = sTokens.split('|')
+				var a = []
+				for(var i=0; aList[i]; i++){
+					var ID = aList[i]
+					var oToken = this.Tokens.list[ID]
+					if( oToken ) a.push( oToken )
+					else {
+						var aRule = this.Rules.list[ID]
+						if( ! aRule ) throw Error ('Rule "'+ ID +'" Not Found !' )
+						a = a.concat( aRule )
+						}
+					}
+				return a
+				},
 			setPreviousTokenOf :function( sToken, sPreviousTokens ){
 				if( Previous.ofToken[sToken]) throw new Error ( 'Previous token of '+ sToken +' already defined !' )
 				Previous.ofToken[sToken] = sPreviousTokens
@@ -130,7 +145,7 @@ var LexerClass =function(){
 				if( ! bSkip ) this.appendNode( eNewParent )
 				this.stack.push( eNewParent )
 				this.appendNode( Lexeme( oLexeme ))
-				if( Skip.notFor[ this.sSyntax ])
+				if( Skip.stepOf[ this.sSyntax ])
 					do{ this.readToken()}while( this.eParent==eNewParent )
 				return bSkip ? true : eNewParent
 				}
@@ -214,17 +229,15 @@ var LexerClass =function(){
 	, Skip =(function(){
 		var o = function( that ){
 			var f = that.bSkip
-				? function( sToken ){
-					return bNoSkip ? false : Previous.excluded[sToken]
-					}
-				: function(){ return false }
+				? function( sToken ){ return Previous.excluded[sToken] }
+				: function( sToken ){ return false }
 			f.set =function( bSkip ){
 				that.bSkip = bSkip
 				that.skip = Skip(that)
 				}
 			return f
 			}
-		o.notFor={SSQ:1,SDQ:1,MLC:1,SLC:1,REGULAR_EXPRESSION:1}
+		o.stepOf={SSQ:1,SDQ:1,MLC:1,SLC:1,REGULAR_EXPRESSION:1}
 		return o
 		})()
 	, Lexer =function( sText, sSyntax ){
@@ -302,7 +315,6 @@ var LexerClass =function(){
 		setSyntax :function( sSyntax ){
 			this.aRules = LexerRules.Rules.list[ this.sSyntax = sSyntax ]
 							|| [ LexerRules.Tokens.list[sSyntax] ]
-			bNoSkip = Skip.notFor[ sSyntax ]
 			}
 		}
 

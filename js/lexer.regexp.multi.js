@@ -1,4 +1,4 @@
-﻿// Lexeme REQUIS
+﻿// lexer.class.js requis
 
 var MultiRegExpLexer =(function( Lexer ){
 	Lexer.ID = "MultiRegExpLexer"
@@ -6,21 +6,6 @@ var MultiRegExpLexer =(function( Lexer ){
 		o = new RegExp ( o.source, 'gm' )
 		o.name = sName
 		return o
-		}
-	Lexer.Rules.makeRule =function( sName, sTokens ){
-		var aList = sTokens.split('|')
-		var a = []
-		for(var i=0; aList[i]; i++){
-			var ID = aList[i]
-			var oToken = this.Tokens.list[ID]
-			if( oToken ) a.push( oToken )
-			else {
-				var aRule = this.Rules.list[ID]
-				if( ! aRule ) throw Error ('Rule "'+ ID +'" Not Found !' )
-				a = a.concat( aRule )
-				}
-			}
-		return a
 		}
 	Lexer.prototype.searchToken =function( oRE ){
 		oRE.lastIndex = this.nPos
