@@ -1,5 +1,4 @@
-﻿if( AutomatonLexer.insert ){
-AutomatonLexer.insert(function(o,f,g,h){
+﻿AutomatonLexer.insert(function(o,f,g,h){
 	// Languages definition
 	;(function(){// SimpleRegexp = Sample test
 	o.addTokens([
@@ -115,5 +114,4 @@ AutomatonLexer.insert(function(o,f,g,h){
 	o.addCSSClass("elt=ELT&id=ELTID&className=ELTCLASS&multiplication=MULTIPLICATION&punctuator=ARGUMENT_PREFIX|LPAREN|RPAREN|LBRACK|EQUAL|RBRACK&operator=PLUS|GTHAN|UP&space=SPACES|TAB&string=SNIPPET_SSQ|SNIPPET_SSQ_IN|SNIPPET_SDQ|SNIPPET_SDQ_IN")
 	o.setTokensTranslation('SNIPPET_SSQ=STRING&SNIPPET_SSQ_IN=STRING&SNIPPET_SDQ=STRING&SNIPPET_SDQ_IN=STRING')
 	})()
-});
-}
+})

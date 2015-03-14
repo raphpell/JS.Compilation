@@ -258,6 +258,7 @@ var LexerClass =function(){
 		Rules: LexerRules,
 		Skip: Skip,
 		Stack: Stack,
+		insert :function( fModule ){ fModule( Lexer.Rules )},
 		rescan :function( eRoot, sSource, nPos, nDeleted, nAdded ){
 			return Lexer.SINGLETON.rescan( eRoot, sSource, nPos, nDeleted, nAdded )
 			}

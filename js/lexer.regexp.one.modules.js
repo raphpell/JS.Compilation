@@ -1,6 +1,4 @@
-// Rules...
-;(function(){
-	var o = OneRegExpLexer.Rules
+OneRegExpLexer.insert( function(o){
 	;(function(){// SimpleRegexp = Sample test
 	o.addTokens([
 		['CHARSET',/\[\^?|\]|\-/],
@@ -159,4 +157,4 @@
 		'JS_BRACE=BRACE','S_JS_BRACE=LBRACE','E_JS_BRACE=RBRACE'
 		])
 	})()
-	})();
+	})

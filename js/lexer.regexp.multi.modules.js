@@ -1,6 +1,4 @@
-﻿;(function(){
-	var o = MultiRegExpLexer.Rules
-	// Languages definition
+﻿MultiRegExpLexer.insert( function(o){
 	;(function(){// SimpleRegexp = Sample test
 	o.addTokens([
 		['CHARSET',/\[\^?|\]|\-/],
@@ -280,4 +278,4 @@
 	o.addCSSClass("keyword=INI_KEYWORD&var=INI_VAR&undefined=INI_TMP&comment=INI_COMMENT&section=INI_SECTION_IN&value=INI_VALUE&punctuator=S_INI_VALUE&string=INI_SDQ|INI_SSQ")
 	o.setTokensTranslation('INI_COMMENT=COMMENT&INI_SECTION_IN=SECTION_PART&INI_VALUE=VALUES&S_INI_VALUE=OPERATOR&INI_SDQ=STRING&INI_SSQ=STRING')
 	})()
-	})();
+	})
