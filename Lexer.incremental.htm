@@ -94,8 +94,13 @@ FIELDSET DL {
 
 <hr>
 
-<fieldset><legend>Affichage</legend>
+<fieldset><legend>Lexer</legend>
 	<dl>
+		<dt><select id="eLexer">
+			<option value="AutomatonLexer" selected>AutomatonLexer</option>
+			<option value="MultiRegExpLexer">MultiRegExpLexer</option>
+			<option value="OneRegExpLexer">OneRegExpLexer</option>
+		</select></dt>
 		<dt><input type="checkbox" id="eShowResults" checked><label for="eShowResults">Afficher le résultat</label></dt>
 		<dt><input type="radio" id="eTestCase1" name="TestCase"><label for="eTestCase1">Résultat analyse lexicale (Lexeme lourd).</label></dt>
 		<dt><input type="radio" id="eTestCase2" name="TestCase"><label for="eTestCase2">Texte généré: parcours arbre (Lexeme légé).</label></dt>
@@ -218,6 +223,10 @@ alert('ok')
 
 <!-- LEXER -->
 <script src="js/lexer.class.js"></script>
+<script src="js/lexer.regexp.one.js"></script>
+<script src="js/lexer.regexp.one.modules.js"></script>
+<script src="js/lexer.regexp.multi.js"></script>
+<script src="js/lexer.regexp.multi.modules.js"></script>
 <script src="js/lexer.automaton.js"></script>
 <script src="js/lexer.automaton.modules.js"></script>
 
@@ -332,6 +341,10 @@ BenchmarkFunctions(
 
 <!-- ANALYSES -->
 <script>
+var getLexer =function(){
+	return window[ eLexer.value ]
+	}
+
 var Analyse =(function(){
 	var eRootLocal, eRootGlobal
 	var compareResult =function( e1, e2 ){
@@ -386,7 +399,7 @@ var Analyse =(function(){
 				Stats.init('local_time')
 				eResult1.innerHTML = ''
 				var oChrono = new Chrono ()
-				eRootLocal = AutomatonLexer( eText.value, eSyntax.value )
+				eRootLocal = getLexer()( eText.value, eSyntax.value )
 				eChrono1.innerHTML = '...<br>...<br>...<br>...<br>...'
 				if( eShowResults.checked )
 					switch( nDisplayMode ){
@@ -401,7 +414,7 @@ var Analyse =(function(){
 				if( ! eResult1.parentNode ) return;
 				eTest1.removeChild( eResult1 )
 				var oChrono = new Chrono ()
-				var oUpdate = AutomatonLexer.rescan( eRootLocal, eText.value, nPos, nDeleted, nAddded )
+				var oUpdate = getLexer().rescan( eRootLocal, eText.value, nPos, nDeleted, nAddded )
 				eChrono1.innerHTML = Stats.set( 'local_time', oChrono.stop())
 				if( oUpdate && eShowResults.checked )
 					switch( nDisplayMode ){
@@ -438,7 +451,7 @@ var Analyse =(function(){
 			eTest2.removeChild( eResult2 )
 			eResult2.innerHTML = ''
 			var oChrono = new Chrono ()
-			eRootGlobal = AutomatonLexer( eText.value, eSyntax.value )
+			eRootGlobal = getLexer()( eText.value, eSyntax.value )
 			eChrono2.innerHTML = Stats.set( 'global_time', oChrono.stop())
 			if( eShowResults.checked )
 				switch( nDisplayMode ){
@@ -470,7 +483,7 @@ _( 'eLocalAnalyse,eGlobalAnalyse' )
 _( 'eChrono1,eChrono2' )
 _( 'eLexeme,eClassName,eTitle,eInnerHTML,eByLine' )
 _( 'eIndex,eDeletedCharNumber,eAdded,eUpdate' )
-_( 'eSyntax' )
+_( 'eLexer,eSyntax' )
 
 
 var sMode
@@ -489,6 +502,9 @@ Events.add(
 		eLexeme, function(){
 			if( this.value!='HTMLElement' && nDisplayMode==11 ) eShowResults.checked = false
 			createLexeme( eClassName.checked,eTitle.checked,eInnerHTML.checked,eByLine.checked );
+			Analyse.init()
+			},
+		eLexer, function(){
 			Analyse.init()
 			},
 	'click',

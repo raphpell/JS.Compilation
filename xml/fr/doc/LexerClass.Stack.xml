@@ -2,8 +2,21 @@
 <?xml-stylesheet type="text/xsl" href="Doc.xsl"?> 
 <class name="Stack" language="JavaScript">
 	<desc>
-	Fonction retournant une pile gérant les parents courants...
-	elle prend en argument son lexer...
+		Fonction retournant une pile gérant les parents courants...
+		elle prend en argument son lexer...
+
+		<p>La pile des parents contient la liste des ancêtres des futurs tokens trouvés.</p>
+		<p>
+			Le premier élément ajouté à la pile est la racine de l'arbre créée avant le lancement de l'analyse.<br/>
+			Lorsqu'un token parent est créé il est ajouté au sommet de la pile; <br/>
+			Lorsque la fin d'un token parent est détecté il est dépilé du sommet de pile. <br/>
+			L'analyse est stoppée quand la pile est vide.
+		</p>
+		<p> Lors d'un changement de taille, elle défini:</p><ul>
+			<li>le parent courant</li>
+			<li>la syntaxe à utiliser</li>
+		</ul>
+		<p>Et lors d'un dépilage, elle définie la ligne finale du parent dépilé (dépendante du dernier enfant trouvé).</p>
 	</desc>
 	<syntax>
 		<code><![CDATA[ var oStack = Stack( MyLexer ) ]]></code>
@@ -14,7 +27,7 @@
 		</arguments>
 	</syntax>
 	<group name="oStack">
-		<properties name="Attributs privées">
+		<properties name="Attributs privés">
 			<variable name="a" type="Array">
 				<desc>Pile.</desc>
 			</variable>

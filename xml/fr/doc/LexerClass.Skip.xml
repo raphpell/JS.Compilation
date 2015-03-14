@@ -1,9 +1,15 @@
 ﻿<?xml version='1.0' encoding='UTF-8'?>
 <?xml-stylesheet type="text/xsl" href="Doc.xsl"?> 
-<class name="Stack" language="JavaScript">
+<class name="Skip" language="JavaScript">
 	<desc>
-	Fonction retournant une fonction pour gérer les tokens à ignorer...
-	elle prend en argument son lexer...
+		Fonction retournant une fonction pour gérer les tokens à ignorer...
+		elle prend en argument son lexer...
+	
+		<p>Elle détermine les tokens devant être passés sans être ajoutés.</p>
+		<blockquote><cite>
+			Cette étape optionnelle est importante pour la phase analyse syntaxique lors de la compilation de code.
+		</cite></blockquote>
+		<p>Elle détermine aussi les tokens parents devant être retourné directement sans que la fonction <code>readToken</code> retourne ses enfants un par un.</p>
 	</desc>
 	<syntax name="Création d'un objet Skip">
 		<code><![CDATA[ var fSkip = Skip( MyLexer ) ]]></code>

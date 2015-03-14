@@ -1,0 +1,173 @@
+﻿<?xml version='1.0' encoding='UTF-8'?>
+<?xml-stylesheet type="text/xsl" href="Doc.xsl"?> 
+<class name="Actions" language="JavaScript">
+	<desc>Fonction construisant l'arbre lexical depuis le lexème trouvé.
+		<p>
+			Par défaut, le token trouvé est ajouté au token parent courant.<br/>
+			Cependant la machine peut réaliser certaines tâches décidées selon le <b>préfixe du nom du token trouvé</b>.
+		</p>
+		<style>
+.text {
+border: 1px solid #000;
+box-sizing: border-box;
+display: inline-block;
+padding: 4px;
+vertical-align: middle;
+white-space: nowrap;
+}
+.sentence {
+border: 2px solid #000;
+display: inline-block;
+padding: 4px 2px;
+white-space: nowrap;
+vertical-align: middle;
+}
+.sentence .word {
+float: left;
+}
+.word {
+background-color: #FFF;
+background-image: url(../../../img/turing.png);
+border: 1px solid #000;
+box-sizing: border-box;
+display: inline-block;
+height: 20px;
+margin: 0 2px;
+vertical-align: middle;
+}
+.caret {
+background-color: blue;
+box-shadow: 0 0 4px blue;
+display: inline-block;
+height: 20px;
+margin: 0 2px;
+width: 2px;
+vertical-align: middle;
+}
+.red { background-color: red; }
+.lime { background-color: lime; }
+.length1 { width:20px; }
+.length2 { width:40px; }
+.length3 { width:60px; }
+.length4 { width:80px; }
+.length5 { width:100px; }
+.length10 { width:200px; }
+	</style>
+		<p>
+			<div class="caret"></div> : Symbole représentant l'emplacement où sera ajouté le token suivant.
+		</p>
+		<ul>
+			<li><b>"L_"</b>: 
+				incrémente la valeur de la ligne courante de 1.
+			</li>
+			<li><b>"R_"</b>: 
+				effectue un double scannage du token : création de tokens enfants depuis la valeur du token trouvé.
+				<blockquote>
+					<div class="word length10 red"></div> <div class="caret"></div>
+					 =&gt; 
+					<div class="sentence lime">
+						<div class="word length1 red"></div>
+						<div class="word length4 red"></div>
+						<div class="word length3 red"></div>
+						<div class="word length1 red"></div>
+						<div class="word length1 red"></div>
+					</div> <div class="caret"></div>
+				</blockquote>
+			</li>
+			<li><b>"S_"</b>: 
+				créé un token parent.
+				<blockquote>
+					<div class="word length2 lime"></div> <div class="caret"></div>
+					 =&gt; 
+					<div class="sentence">
+						<div class="word length2 lime"></div>
+						<div class="caret"></div>
+					</div>
+				</blockquote>
+			</li>
+			<li><b>"E_"</b>: 
+				finalise un token parent.
+				<blockquote>
+					<div class="sentence">
+						<div class="word length2"></div>
+						<div class="word length2 lime"></div>
+						<div class="caret"></div>
+					</div>
+					 =&gt; 
+					<div class="sentence">
+						<div class="word length2"></div>
+						<div class="word length2 lime"></div>
+					</div>
+					<div class="caret"></div>
+				</blockquote>
+				<b>NB:</b> Un token parent se termine automatiquement si aucun token n'est trouvé.
+			</li>
+		</ul>
+		<p>
+			Cette approche simplifie significativement la création des expressions régulière.<br/>
+			On la retrouve dans <a href="../../../src/wiz/syntax.htm">la syntaxe du générateur de module des lexers</a>.
+		</p>
+	</desc>
+	<syntax>
+		<code><![CDATA[ var mLexemeNode = Action( MyLexer ) ]]></code>
+		<arguments>
+			<arg name="MyLexer" type="Object">
+				<desc>Un lexer créé avec la méthode <code>LexerClass</code>.</desc>
+			</arg>
+		</arguments>
+	</syntax>
+	<group name="Actions">
+		<properties name="Attributs">
+			<variable name="directive" type="Object" default="{
+			E:'endParent',
+			L:'newLine',
+			R:'rescanToken',
+			S:'startParent'
+			}">
+				<desc>Objet associant à des lettres une méthode.</desc>
+			</variable>
+		</properties>
+		<methods name="Méthodes">
+			<function name="add">
+				<desc>Ajoute le lexème touvé au parent courant.</desc>
+				<returnValue type="Mixte">
+					<desc>
+						<ul>
+							<li><code>true</code> si il est 'skipper'</li>
+							<li>sinon l'HTMLElement ajouté</li>
+						</ul>
+					</desc>
+				</returnValue>
+			</function>
+			<function name="endParent">
+				<desc>Finalise un parent.</desc>
+				<returnValue type="HTMLElement">
+					<desc>Le dernier HTMLElement du parent.</desc>
+				</returnValue>
+			</function>
+			<function name="newLine">
+				<desc>Ajoute un lexème newLine au parent courant et incrémente de un la ligne courante dans la machine.</desc>
+				<returnValue type="HTMLElement">
+					<desc>L'HTMLElement ajouté.</desc>
+				</returnValue>
+			</function>
+			<function name="rescanToken">
+				<desc>Lance un deuxième scannage sur le dernier lexème trouvé.</desc>
+				<returnValue type="HTMLElement">
+					<desc>Le nouveau parent.</desc>
+				</returnValue>
+			</function>
+			<function name="startParent">
+				<desc>Ajoute le lexème touvé à un nouveau parent devenant le parent courant.</desc>
+				<returnValue type="Mixte">
+					<desc>
+						<ul>
+							<li><code>true</code> si il est 'skipper'</li>
+							<li>sinon l'HTMLElement du nouveau parent.</li>
+						</ul>
+					</desc>
+				</returnValue>
+			</function>
+		</methods>
+	</group>
+</class>

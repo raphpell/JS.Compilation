@@ -1,6 +1,6 @@
 ﻿<html>
 	<head>
-		<title>Les Lexers</title>
+		<title>Mes Lexers</title>
 		<style>
 SECTION { margin-left: 1em; }
 UL {
@@ -29,30 +29,26 @@ H2, H3 {
 <a href="index.htm">Index</a>
 
 
-<h1>Les Lexers</h1>
+<h1>Mes Lexers</h1>
 
-<p>Il y a trois différents lexers testés  :</p>
+<p>Il y a trois différents lexers créés et testés  :</p>
 <ul>
-	<li><a href="#MultiRegExpLexer">Lexer à 'plusieurs ER'</a></li>
-	<li><a href="#OneRegExpLexer">Lexer à 'une ER'</a></li>
-	<li><a href="#AutomatonLexer">Lexer à DFA</a></li>
+	<li><a href="#MultiRegExpLexer">Lexer à une expression régulière par token</a></li>
+	<li><a href="#OneRegExpLexer">Lexer à une expression régulière</a></li>
+	<li><a href="#AutomatonLexer">Lexer à automates finis déterministes</a></li>
 </ul>
 
-<p>L'<a href="LexerAutomaton.incremental.htm">analyse partielle</a> est en attente de test pour les lexers à ER.</p>
 
 
 <h2>Principe de fonctionnement</h2><section>
-	<p>Il sont créés depuis une même base :</p>
+	<p>Il sont créés depuis une <a href="xml/fr/doc/LexerClass.xml">même base</a> :</p>
 	<ul>
-		<li>Ils réalisent tous une analyse à <a href="Lexers.result.comparaison.htm">plusieurs niveaux</a>: un <i>arbre lexicale</i> est créé.</li>
-		<li>Parcourent le texte une et une seule fois...</li>
-		<li>Permettent de:
-			<ol>
-				<li>réaliser un double scannage d'un token (à éviter si possible !): il en fait un token parent.</li>
-				<li>détecter le début et la fin d'un token parent.</li>
-			</ol>
-		</li>
-		<li>Utilisent une liste d'<i>objet</i> pour reconnaître des tokens.<br>
+		<li>Parcours du texte une et une seule fois.</li>
+		<li>Détection du début d'un token parent avec imbrication de token enfant.</li>
+		<li>Détection de fin d'un token parent.</li>
+		<li>Réalisation d'un double scannage d'un token (à éviter si possible!).</li>
+		<li>Incrémentation de ligne courante.</li>
+		<li>Utilisation d'une liste d'<i>objet</i> pour reconnaître des tokens.<br>
 			<small><b>ATTENTION</b></small>: Premier objet arrivé, premier objet trouvé.
 			<ol>
 				<li>Un ordre est requis (mots clés avant identifiant, ...)</li>
@@ -60,8 +56,13 @@ H2, H3 {
 					<i>amélioration des performances</i>.</li>
 			</ol>
 		</li>
+		<li><a href="Lexer.incremental.htm">Analyse partielle</a> suite à une modification.</li>
 	</ul>
-
+	<p>
+		Ils réalisent une analyse à <a href="Lexers.result.comparaison.htm">plusieurs niveaux</a>: 
+		un <i>arbre lexicale</i> est créé et non pas une liste.<br>
+		Je reste persuader qu'il est possible de le modifier pour obtenir une liste, mon objectif étant de limiter la taille des listes d'enfant.
+	</p>
 	<p>Si vous recherchez un lexer retournant une liste de tokens, consultez le site d'Eli Bendersky, il pourra vous être utile :</p>
 	<ul>
 		<li><a target="_blank" href="http://eli.thegreenplace.net/2013/06/25/regex-based-lexical-analysis-in-python-and-javascript">Regex-based lexical analysis in Python and Javascript</a></li>
@@ -82,7 +83,7 @@ H2, H3 {
 	<p>La performance est dependante de l'objet retourné par la fonction <a href="Lexeme.htm">Lexeme</a>.</p>
 </section>
 
-<h2>Description</h2><section>
+<h2>Observations</h2><section>
 	<a name="AutomatonLexer"></a>
 	<h3>Automaton Lexer</h3><section>
 		Utilise des AFD : Il reconnaisse 1 à plusieurs tokens.
@@ -90,7 +91,7 @@ H2, H3 {
 			<li style="color:orange;">Pas le plus rapide des lexer.</li>
 			<li style="color:red;">Modules énormes et abstraits...</li>
 			<li style="color:green;">Le plus long token trouvé est toujours retourné.</li>
-			<li><strike>Analyse partielle implémenté (<a href="LexerAutomaton.incremental.htm">aperçu</a>).</strike></li>
+			<li><strike>Analyse partielle implémenté (<a href="Lexer.incremental.htm">aperçu</a>).</strike></li>
 		</ul>
 		
 		<h4>Considérations techniques</h4><section>
@@ -120,7 +121,6 @@ H2, H3 {
 			<li style="color:red;">Lexer le plus lent.</li>
 			<li style="color:green;">Modules à taille modeste et compréhensibles...</li>
 			<li style="color:red;">Premier token arrivé, premier servi.</li>
-			<li><strike>Analyse partielle non implémentée.</strike></li>
 		</ul>
 		
 		<h4>Considérations techniques</h4><section>
@@ -139,8 +139,8 @@ H2, H3 {
 		<ul>
 			<li style="color:green;">Lexer le plus rapide.</li>
 			<li style="color:green;">Modules à taille modeste et compréhensibles...</li>
-			<li style="color:green;">Le plus long token trouvé est toujours retourné.</li>
-			<li><strike>Analyse partielle non implémentée.</strike></li>
+			<li style="color:green;">Le plus long token trouvé est toujours retourné en premier.</li>
+			<li style="color:green;">ou premier token arrivé, premier servi.</li>
 		</ul>
 		
 		<h4>Considérations techniques</h4><section>

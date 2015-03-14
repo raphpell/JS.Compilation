@@ -24,52 +24,6 @@ CODE { background: #eee; }
 	vertical-align: top;
 	}
 
-
-.text {
-	border: 1px solid #000;
-	box-sizing: border-box;
-	display: inline-block;
-	padding: 4px;
-	vertical-align: middle;
-	white-space: nowrap;
-	}
-.sentence {
-	border: 2px solid #000;
-	display: inline-block;
-	padding: 4px 2px;
-	white-space: nowrap;
-	vertical-align: middle;
-	}
-.sentence .word {
-	float: left;
-	}
-.word {
-	background-color: #FFF;
-	background-image: url(img/turing.png);
-	border: 1px solid #000;
-	box-sizing: border-box;
-	display: inline-block;
-	height: 20px;
-	margin: 0 2px;
-	vertical-align: middle;
-	}
-.caret {
-	background-color: blue;
-	box-shadow: 0 0 4px blue;
-	display: inline-block;
-	height: 20px;
-	margin: 0 2px;
-	width: 2px;
-	vertical-align: middle;
-	}
-.red { background-color: red; }
-.lime { background-color: lime; }
-.length1 { width:20px; }
-.length2 { width:40px; }
-.length3 { width:60px; }
-.length4 { width:80px; }
-.length5 { width:100px; }
-.length10 { width:200px; }
 		</style>
 	</head>
 	<body>
@@ -93,156 +47,22 @@ CODE { background: #eee; }
 	<div id="eResult">...</div>
 </section>
 <h2>Principes</h2><section>
-	<p>
-		Le lexer créé un arbre et non pas une liste de lexèmes.<br>
-		Un lexème racine est créé avant le début de l'analyse.
-	</p>
+	<p>Le lexer génère normalement une liste de lexèmes.</p>
 	<h3>Le lexème</h3><section>
 		<ul>
 			<li>il est défini par une <a href="src/regexp/syntax.htm">ER</a> ou un <a href="AFD.info.htm">AFD</a></li>
-			<li>il est créé avec la fonction <a href="Lexeme.htm">Lexeme</a></li>
 			<li>il est appelé token, bien qu'il soit une instance d'un token</li>
 		</ul>
 	</section>
 	<h3>Fonctionnement</h3><section>
 		<img src="img/scan.png">
-		<p>
-			La fonction <code>readToken</code> retourne par défaut le token trouvé.
-			Mais elle retourne  :
-		</p>
-		<ul>
-			<li><code>true</code>, si aucun token n'est trouvé et qu'un parent est dépilé sans vider la pile.</li>
-			<li><code>null</code>, sinon.</li>
-		</ul>
+		<p>La fonction <code>readToken</code> retourne par défaut le token trouvé.</p>
 		<p>
 			Il est impératif que la règle d'analyse de base puisse identifiée tous les tokens pouvant être trouvé, 
 			sinon l'analyse est stoppée prématurément. <br>
 			Pour cela il est possible d'utiliser un token nommé <code>NOT_WHITE_SPACES</code> détectant tout sauf un espace blanc. 
 			Il suffit de l'ajouter en fin de règle.
 		</p>
-	</section>
-	<h3>Environnement</h3><section>
-		<h4><code>Actions</code>: Les directives</h4><section>
-			
-			<p>
-				Par défaut, le token trouvé est ajouté au token parent courant.<br>
-				Cependant la machine peut réaliser certaines tâches décidées selon le <b>préfixe du nom du token trouvé</b>.
-			</p>
-			<p>
-				<div class="caret"></div> : Symbole représentant l'emplacement où sera ajouté le token suivant.
-			</p>
-			<ul>
-				<li><b>Le préfixe &laquo; L_ &raquo;</b>: 
-					incrémente la valeur de la ligne courante de 1.
-				</li>
-				<li><b>Le préfixe &laquo; R_ &raquo;</b>: 
-					effectue un double scannage du token : création de tokens enfants depuis la valeur du token trouvé.
-					<blockquote>
-						<div class="word length10 red"></div> <div class="caret"></div>
-						 &xrArr; 
-						<div class="sentence lime">
-							<div class="word length1 red"></div>
-							<div class="word length4 red"></div>
-							<div class="word length3 red"></div>
-							<div class="word length1 red"></div>
-							<div class="word length1 red"></div>
-						</div> <div class="caret"></div>
-					</blockquote>
-				</li>
-				<li><b>Le préfixe &laquo; S_ &raquo;</b>: 
-					créé un token parent.
-					<blockquote>
-						<div class="word length2 lime"></div> <div class="caret"></div>
-						 &xrArr; 
-						<div class="sentence">
-							<div class="word length2 lime"></div>
-							<div class="caret"></div>
-						</div>
-					</blockquote>
-				</li>
-				<li><b>Le préfixe &laquo; E_ &raquo;</b>: 
-					finalise un token parent.
-					<blockquote>
-						<div class="sentence">
-							<div class="word length2"></div>
-							<div class="word length2 lime"></div>
-							<div class="caret"></div>
-						</div>
-						 &xrArr; 
-						<div class="sentence">
-							<div class="word length2"></div>
-							<div class="word length2 lime"></div>
-						</div>
-						<div class="caret"></div>
-					</blockquote>
-					<b>NB:</b> Un token parent se termine automatiquement si aucun token n'est trouvé.
-				</li>
-			</ul>
-			<p>
-				Cette approche simplifie significativement la création des expressions régulière.<br>
-				On la retrouve dans <a href="src/wiz/syntax.htm">la syntaxe du générateur de module des lexers</a>.
-			</p>
-		</section>
-		<h4><code>Stack</code>: La pile des parents</h4><section>
-			<p>Elle contient la liste des ancêtres des futurs tokens trouvés.</p>
-			<p>
-				Le premier élément ajouté à la pile est la racine de l'arbre créée avant le lancement de l'analyse.<br>
-				Lorsqu'un token parent est créé il est ajouté au sommet de la pile; <br>
-				Lorsque la fin d'un token parent est détecté il est dépilé du sommet de pile. <br>
-				L'analyse est stoppée quand la pile est vide.
-			</p>
-			<p> Lors d'un changement de taille, elle défini:</p><ul>
-				<li>le parent courant</li>
-				<li>la syntaxe à utiliser</li>
-			</ul>
-			<p>Et lors d'un dépilage, elle définie la ligne finale du parent dépilé (dépendante du dernier enfant trouvé).</p>
-		</section>
-		<h4><code>Skip</code>: Les tokens ignorés</h4><section>
-			<p>Détermine les tokens devant être passés sans être ajoutés.</p>
-			<blockquote><cite>
-				Cette étape optionnelle est importante pour la phase analyse syntaxique lors de la compilation de code.
-			</cite></blockquote>
-			<p>Elle détermine aussi les tokens parents devant être retourné directement sans que la fonction <code>readToken</code> retourne ses enfants un par un.</p>
-		</section>
-		<h4><code>Previous</code>: Le token précédant</h4><section>
-			<p>
-				Détermine si le token trouvé peut suivre le token précédant.<br>
-				Si ce n'est pas le cas, le lexer en cherche un autre...
-			</p>
-			<p>
-				Il n'est jamais défini avec des tokens de type: espaces blancs, commentaires, ...
-			</p>
-			<blockquote><cite>
-				Il est parfois nécessaire de connaître le token précédant pour déterminer si le token trouvé est valide...<br>
-				Vrai pour les expressions régulières en JavaScript.
-			</cite></blockquote>
-		</section>
-		<h4>Les définitions des tokens (ER ou AFD)</h4><section>
-			<p>Une définition détermine un ou plusieurs types de lexème pouvant être trouvés (cas AFD).</p>
-			<blockquote><cite>
-				Elles peuvent être ajoutées une et une seule fois sous le nom du token associé.<br>
-				Si une tentative d'accès à une définition inexistante est réalisée, une erreur est lancée.
-			</cite></blockquote>
-		</section>
-		<h4><code>Rule</code>: Les règles d'analyse</h4><section>
-			<p>Un régle détermine la liste des définitions à tester pour une syntaxe.</p>
-			<blockquote><cite>
-				Elles peuvent être ajoutées une et une seule fois sous le nom de la règle associée.<br>
-				Si une tentative d'accès à une règle inexistante est réalisée, une erreur est lancée.
-			</cite></blockquote>
-		</section>
-		<h4><code>CSS</code>: La mise en forme</h4><section>
-			<p>
-				Il est possible d'affecter aux tokens une ou plusieurs classes css, 
-				pour mieux les visualiser lors de l'affichage du scannage.
-			</p>
-		</section>
-		<h4><code>Translation</code>: Le renommage des tokens</h4><section>
-			<p>
-				Le préfixe des tokens entrainant la création de nom de token pas très pratique, 
-				le lexer offre la possibilité de les renommer.
-			</p>
-		</section>
 	</section>
 </section>
 

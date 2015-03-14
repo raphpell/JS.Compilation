@@ -2,7 +2,19 @@
 <?xml-stylesheet type="text/xsl" href="Doc.xsl"?> 
 <class name="LexerRules" language="JavaScript">
 	<desc>
-	Régles d'analyse lexicale.
+		<h4>Définitions des tokens (ER ou AFD)</h4>
+		<p>Une définition détermine un ou plusieurs types de lexème pouvant être trouvés (cas AFD).</p>
+		<blockquote><cite>
+			Elles peuvent être ajoutées une et une seule fois sous un nom associé.<br/>
+			Si une tentative d'accès à une définition inexistante est réalisée, une erreur est lancée.
+		</cite></blockquote>
+		<h4>Règles d'analyse</h4>
+		<p>Une régle détermine la liste des définitions à tester pour une 'syntaxe'.</p>
+		<blockquote><cite>
+			Elles peuvent être ajoutées une et une seule fois sous un nom associé.<br/>
+			Si une tentative d'accès à une règle inexistante est réalisée, une erreur est lancée.
+		</cite></blockquote>
+
 	</desc>
 	<group name="Objet LexerRules">
 		<methods name="Méthode privée">
@@ -20,7 +32,11 @@
 		</methods>
 		<properties name="Attributs">
 			<variable name="CSS" type="Object">
-				<desc>Classes css des tokens.</desc>
+				<desc>
+					Classes css des tokens. 
+					Il est possible d'affecter aux tokens une ou plusieurs classes css, 
+					pour mieux les visualiser lors de l'affichage du scannage.
+				</desc>
 			</variable>
 			<variable name="Rules" type="Dictionary">
 				<desc>Dictionnaire des règles</desc>
@@ -29,7 +45,11 @@
 				<desc>Dictionnaire des tokens.</desc>
 			</variable>
 			<variable name="Translation" type="Object">
-				<desc>Traduction des tokens (renommage).</desc>
+				<desc>
+					Traduction des tokens. 
+					Les noms de token n'étant pas forcement explicite, 
+					le lexer offre la possibilité de les renommer.
+				</desc>
 			</variable>
 		</properties>
 		<methods name="Méthodes">

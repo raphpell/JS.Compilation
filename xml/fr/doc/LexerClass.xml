@@ -24,6 +24,9 @@
 			<variable name="ID" type="String" default="'LexerClass'">
 				<desc>Nom du lexer.</desc>
 			</variable>
+			<variable name="Actions" type="Function">
+				<desc>Voir spécification <a href="LexerClass.Actions.xml">Actions</a>.</desc>
+			</variable>
 			<variable name="Previous" type="Function">
 				<desc>Voir spécification <a href="LexerClass.Previous.xml">Previous</a>.</desc>
 			</variable>

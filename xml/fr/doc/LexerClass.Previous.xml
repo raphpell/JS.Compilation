@@ -2,11 +2,22 @@
 <?xml-stylesheet type="text/xsl" href="Doc.xsl"?> 
 <class name="Previous" language="JavaScript">
 	<desc>
-	Fonction retournant un objet gérant les actions vis à vis du token précédant...
-	<ul>
-		<li>affectation et récupération du nom token précédant.</li>
-		<li>détermination si un token peut suivre le token précédant.</li>
-	</ul>
+		Fonction retournant un objet gérant les actions vis à vis du token précédant...
+		<ul>
+			<li>affectation et récupération du nom token précédant.</li>
+			<li>détermination si un token peut suivre le token précédant.</li>
+		</ul>
+		<p>
+			Elle détermine si le token trouvé peut suivre le token précédant.<br/>
+			Si ce n'est pas le cas, le lexer en cherche un autre...
+		</p>
+		<p>
+			Le token précédant n'est jamais défini avec des tokens non significatif de type: espaces blancs, commentaires, ...
+		</p>
+		<blockquote><cite>
+			Il est parfois nécessaire de connaître le token précédant pour déterminer si le token trouvé est valide...<br/>
+			Vrai pour les expressions régulières en JavaScript.
+		</cite></blockquote>
 	</desc>
 	<group name="Fonction Previous">
 		<properties name="Attributs">

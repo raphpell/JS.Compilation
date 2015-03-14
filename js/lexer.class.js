@@ -92,7 +92,11 @@ var LexerClass =function(){
 			}
 		})()
 	, Actions =(function(){
-		var Actions={
+		var Do =function( oInstance ){
+			var s = oInstance.sToken
+			return Do[ s.charAt(1)=='_' && Do.directive[ s.charAt(0)] || 'add' ].call( oInstance )
+			}
+		Do.union({
 			add :function(){
 				this.previous.set( oLexeme.token )
 				return this.appendNode( Lexeme( oLexeme ))
@@ -149,13 +153,14 @@ var LexerClass =function(){
 					do{ this.readToken()}while( this.eParent==eNewParent )
 				return bSkip ? true : eNewParent
 				}
+			})
+		Do.directive={
+			E:'endParent',
+			L:'newLine',
+			R:'rescanToken',
+			S:'startParent'
 			}
-		var Char={E:'endParent',L:'newLine',R:'rescanToken',S:'startParent'}
-		return function( oInstance ){
-			return Actions[ oInstance.sToken.charAt(1)=='_'
-					? Char[ oInstance.sToken.charAt(0)] || 'add'
-					: 'add' ].call( oInstance )
-			}
+		return Do
 		})()
 	, Previous =(function(){
 		var o =function(){
@@ -248,6 +253,7 @@ var LexerClass =function(){
 		}
 	Lexer.ID = "LexerClass"
 	Lexer.union({
+		Actions: Actions,
 		Previous: Previous,
 		Rules: LexerRules,
 		Skip: Skip,
