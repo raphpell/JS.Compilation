@@ -11,7 +11,7 @@ Comparaison de Lexer à ER(expressions régulières) et d'un lexer à AFD(automa
 - [Performance: readToken](http://raphpell.github.io/JS.Compilation/Lexers.performance.readToken.htm)
 
 Analyse lexicale incrémentielle (AFD) :
-- [Performance](http://raphpell.github.io/JS.Compilation/Lexer.incremental.htm)
+- [Performance](http://raphpell.github.io/JS.Compilation/Lexers.performance.scan.incremental.htm)
 
 Divers :
 - [Transformation d'une ER en AFD](http://raphpell.github.io/JS.Compilation/AFD.generator.htm)
