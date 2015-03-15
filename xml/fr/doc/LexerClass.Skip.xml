@@ -6,25 +6,34 @@
 			document.getElementById('eTopLeftMenu').innerHTML +=
 			' - &lt;a href="../UnitTest/Skip.xml"&gt;Tests unitaires associés&lt;/a&gt;'
 		</script>
-		Fonction retournant une fonction pour gérer les tokens à ignorer...
-		elle prend en argument son lexer...
-	
-		<p>Elle détermine les tokens devant être passés sans être ajoutés.</p>
-		<blockquote><cite>
-			Cette étape optionnelle est importante pour la phase analyse syntaxique lors de la compilation de code.
-		</cite></blockquote>
-		<p>Elle détermine aussi les tokens parents devant être retourné directement sans que la fonction <code>readToken</code> retourne ses enfants un par un.</p>
+		Fonction retournant une fonction gérant les tokens à ignorer. Objectifs:
+		<ul>
+			<li>Déterminer si les tokens doivent être passés.
+				<blockquote><cite>
+					Cette action optionnelle est importante pour la phase analyse syntaxique lors de la compilation de code.
+				</cite></blockquote>
+			</li>
+			<li>Fixer les tokens parents devant être retourné directement sans que la fonction <code>readToken</code> 
+				retourne ses enfants un par un.
+				<blockquote><cite>
+					Ces tokens seront sans aucun doute les plus lents générer !
+				</cite></blockquote>
+			</li>
+		</ul>
 	</desc>
-	<syntax name="Création d'un objet Skip">
-		<code><![CDATA[ var fSkip = Skip( MyLexer ) ]]></code>
+	<syntax name="Création de la fonction fSkip">
+		<code><![CDATA[ var fSkip = Skip( oMyLexer ) ]]></code>
 		<arguments>
-			<arg name="MyLexer" type="Object">
-				<desc>Un lexer créé avec la méthode <code>LexerClass</code>.</desc>
+			<arg name="oMyLexer" type="Object">
+				<desc>Une instance d'un lexer créée avec la méthode <code>LexerClass</code>.</desc>
 			</arg>
 		</arguments>
 	</syntax>
 	<syntax name="Utilisation">
-		<desc>La fonction <code>fSkip</code> permet de déterminer si un token est non significatif.</desc>
+		<desc>
+			La fonction <code>fSkip</code> permet de déterminer si un token est non significatif.<br/>
+			Pour cela elle utilise l'objet <a href="LexerClass.Previous.xml"><code>Previous.excluded</code></a>.
+		</desc>
 		<code><![CDATA[ var bSkip = fSkip( sToken ) ]]></code>
 		<arguments>
 			<arg name="sToken" type="String">
@@ -33,18 +42,6 @@
 		</arguments>
 	</syntax>
 	<group name="fSkip">
-		<properties name="Attributs">
-			<variable name="stepOf" type="Object">
-				<desc>
-					Liste des parents devant être retourné en un coup lors d'un <code>readToken</code> : 
-					toutes les étapes des enfants sont passés.
-					<p>
-					Objet ayant comme attribut des noms de token parent.<br/>
-					La valeur des ces attributs est assigné à 1.
-					</p>
-				</desc>
-			</variable>
-		</properties>
 		<methods name="Méthodes">
 			<function name="set">
 				<desc>Défini si il faut ignorer les tokens non significatifs.</desc>
@@ -53,7 +50,24 @@
 						<desc>Ignorer ?</desc>
 					</arg>
 				</arguments>
+				<returnValue type="Function">
+					<desc>Elle retourne la nouvelle fonction <code>fSkip</code>...</desc>
+				</returnValue>
 			</function>
 		</methods>
+	</group>
+	<group name="Skip">
+		<properties name="Attributs">
+			<variable name="stepOf" type="Object">
+				<desc>
+					Liste des parents devant être retourné en un coup lors d'un <code>readToken</code> : 
+					toutes les étapes des enfants sont passés.
+					<p>
+					Objet ayant comme attribut des noms de token parent.<br/>
+					La valeur de ces attributs est assigné à 1.
+					</p>
+				</desc>
+			</variable>
+		</properties>
 	</group>
 </class>

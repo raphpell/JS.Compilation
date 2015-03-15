@@ -18,7 +18,6 @@
 			Elles peuvent être ajoutées une et une seule fois sous un nom associé.<br/>
 			Si une tentative d'accès à une règle inexistante est réalisée, une erreur est lancée.
 		</cite></blockquote>
-
 	</desc>
 	<group name="Objet LexerRules">
 		<methods name="Méthode privée">

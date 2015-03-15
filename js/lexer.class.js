@@ -1,4 +1,9 @@
-﻿// fonction 'Lexeme' requise
+﻿if( ! window.Lexeme )
+	Lexeme =function( o ){
+		var m = document.createElement( o.token )
+		m.oValue = o
+		return m
+		}
 
 var LexerClass =function(){
 	var oLexeme
@@ -239,11 +244,11 @@ var LexerClass =function(){
 	, Skip =(function(){
 		var o = function( that ){
 			var f = that.bSkip
-				? function( sToken ){ return Previous.excluded[sToken] }
+				? function( sToken ){ return Previous.excluded[sToken] || false }
 				: function( sToken ){ return false }
 			f.set =function( bSkip ){
 				that.bSkip = bSkip
-				that.skip = Skip(that)
+				return that.skip = Skip(that)
 				}
 			return f
 			}

@@ -14,16 +14,87 @@
 		<assertions>
 			<value><![CDATA[
 var Lexer = LexerClass() // Création d'un type de Lexer vide.
+var oLexer = new Lexer
+oLexer.init()
 			]]></value>
 		</assertions>
 	</test>
-	<test name="___">
+	<test name="fSkip">
+		<assertions>
+			<value><![CDATA[
+var fSkip1 = oLexer.skip.set( false )
+			]]></value>
+			<assert><![CDATA[ ! oLexer.bSkip ]]></assert>
+			<assert><![CDATA[ fSkip1( 'ELISION' ) === false ]]></assert>
+			<assert><![CDATA[ fSkip1( 'WHITE_SPACES' ) === false ]]></assert>
+			<assert><![CDATA[ fSkip1( 'SPACES' ) === false ]]></assert>
+			<assert><![CDATA[ fSkip1( 'SPACE' ) === false ]]></assert>
+			<assert><![CDATA[ fSkip1( 'TAB' ) === false ]]></assert>
+			<assert><![CDATA[ fSkip1( 'SLC' ) === false ]]></assert>
+			<assert><![CDATA[ fSkip1( 'S_SLC' ) === false ]]></assert>
+			<assert><![CDATA[ fSkip1( 'SLC_IN' ) === false ]]></assert>
+			<assert><![CDATA[ fSkip1( 'MLC' ) === false ]]></assert>
+			<assert><![CDATA[ fSkip1( 'S_MLC' ) === false ]]></assert>
+			<assert><![CDATA[ fSkip1( 'MLC_IN' ) === false ]]></assert>
+			<assert><![CDATA[ fSkip1( 'E_MLC' ) === false ]]></assert>
+			<assert><![CDATA[ fSkip1( 'COMMENT' ) === false ]]></assert>
+			<assert><![CDATA[ fSkip1( 'REGULAR_EXPRESSION_IN' ) === false ]]></assert>
+		</assertions>
+		<assertions>
+			<value><![CDATA[
+var fSkip2 = oLexer.skip.set( true )
+			]]></value>
+			<assert><![CDATA[ oLexer.bSkip ]]></assert>
+			<assert><![CDATA[ fSkip2( 'ELISION' ) === false ]]></assert>
+			<assert><![CDATA[ fSkip2( 'WHITE_SPACES' ) === 1 ]]></assert>
+			<assert><![CDATA[ fSkip2( 'SPACES' ) === 1 ]]></assert>
+			<assert><![CDATA[ fSkip2( 'SPACE' ) === 1 ]]></assert>
+			<assert><![CDATA[ fSkip2( 'TAB' ) === 1 ]]></assert>
+			<assert><![CDATA[ fSkip2( 'SLC' ) === 1 ]]></assert>
+			<assert><![CDATA[ fSkip2( 'S_SLC' ) === 1 ]]></assert>
+			<assert><![CDATA[ fSkip2( 'SLC_IN' ) === 1 ]]></assert>
+			<assert><![CDATA[ fSkip2( 'MLC' ) === 1 ]]></assert>
+			<assert><![CDATA[ fSkip2( 'S_MLC' ) === 1 ]]></assert>
+			<assert><![CDATA[ fSkip2( 'MLC_IN' ) === 1 ]]></assert>
+			<assert><![CDATA[ fSkip2( 'E_MLC' ) === 1 ]]></assert>
+			<assert><![CDATA[ fSkip2( 'COMMENT' ) === 1 ]]></assert>
+			<assert><![CDATA[ fSkip2( 'REGULAR_EXPRESSION_IN' ) === 1 ]]></assert>
+		</assertions>
+		<assertions>
+			<assert><![CDATA[ fSkip1 !== fSkip2 ]]></assert>
+		</assertions>
+	</test>
+	<test name="fSkip.set">
+		<assertions>
+			<value><![CDATA[
+fSkip1 = oLexer.skip
+			]]></value>
+			<assert><![CDATA[ fSkip2 = oLexer.skip.set( true ) ]]></assert>
+			<assert><![CDATA[ oLexer.bSkip === true ]]></assert>
+			<assert><![CDATA[ oLexer.skip === fSkip2 ]]></assert>
+			<assert><![CDATA[ fSkip1 !== fSkip2 ]]></assert>
+		</assertions>
+		<assertions>
+			<value><![CDATA[
+fSkip1 = oLexer.skip
+			]]></value>
+			<assert><![CDATA[ fSkip2 = oLexer.skip.set( false ) ]]></assert>
+			<assert><![CDATA[ oLexer.bSkip === false ]]></assert>
+			<assert><![CDATA[ oLexer.skip === fSkip2 ]]></assert>
+			<assert><![CDATA[ fSkip1 !== fSkip2 ]]></assert>
+		</assertions>
+	</test>
+	<test name="Skip.stepOf">
 		<assertions>
 			<desc>___</desc>
 			<value><![CDATA[
-true
+var Skip = Lexer.Skip
 			]]></value>
-			<assert><![CDATA[ true ]]></assert>
+			<assert><![CDATA[ Skip.stepOf.SSQ === 1 ]]></assert>
+			<assert><![CDATA[ Skip.stepOf.SDQ === 1 ]]></assert>
+			<assert><![CDATA[ Skip.stepOf.MLC === 1 ]]></assert>
+			<assert><![CDATA[ Skip.stepOf.SLC === 1 ]]></assert>
+			<assert><![CDATA[ Skip.stepOf.REGULAR_EXPRESSION === 1 ]]></assert>
 		</assertions>
 	</test>
 </truth>
