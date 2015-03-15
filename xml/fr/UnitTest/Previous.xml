@@ -1,0 +1,107 @@
+﻿<?xml version='1.0' encoding='UTF-8'?>
+<?xml-stylesheet type="text/xsl" href="UnitTest.xsl"?> 
+
+<truth name="Previous">
+	<script src="../../../js/framework.js"></script>
+	<script src="../../../js/lexer.class.js"></script>
+	<desc>
+		<script>
+			document.getElementById('eTopLeftMenu').innerHTML +=
+			' - &lt;a href="../doc/LexerClass.Previous.xml"&gt;Documentation associés&lt;/a&gt;'
+		</script>
+	</desc>
+	<test name="Préambule" class="preambule">
+		<assertions>
+			<value><![CDATA[
+var Lexer = LexerClass() // Création d'un type de Lexer vide.
+			]]></value>
+		</assertions>
+	</test>
+	<test name="Tokens non significatifs">
+		<assertions name="Lexer.Previous.excluded">
+			<desc>Tokens non significatifs</desc>
+			<value><![CDATA[
+var o = Lexer.Previous.excluded
+			]]></value>
+			<assert><![CDATA[ o.WHITE_SPACES === 1 ]]></assert>
+			<assert><![CDATA[ o.SPACES === 1 ]]></assert>
+			<assert><![CDATA[ o.SPACE === 1 ]]></assert>
+			<assert><![CDATA[ o.TAB === 1 ]]></assert>
+			<assert><![CDATA[ o.SLC === 1 ]]></assert>
+			<assert><![CDATA[ o.S_SLC === 1 ]]></assert>
+			<assert><![CDATA[ o.SLC_IN === 1 ]]></assert>
+			<assert><![CDATA[ o.MLC === 1 ]]></assert>
+			<assert><![CDATA[ o.S_MLC === 1 ]]></assert>
+			<assert><![CDATA[ o.MLC_IN === 1 ]]></assert>
+			<assert><![CDATA[ o.E_MLC === 1 ]]></assert>
+			<assert><![CDATA[ o.COMMENT === 1 ]]></assert>
+			<assert><![CDATA[ o.REGULAR_EXPRESSION_IN === 1 ]]></assert>
+		</assertions>
+	</test>
+	<test name="Tokens devant précédés">
+		<assertions name="Lexer.Previous.ofToken">
+			<desc>Noms des tokens devant précéder un autre.</desc>
+			<value><![CDATA[
+var o = Lexer.Previous.ofToken
+			]]></value>
+			<assert><![CDATA[ JSON.stringify( o ) === '{}' ]]></assert>
+		</assertions>
+		<assertions  name="Lexer.Previous.setPreviousTokenOf">
+			<assert><![CDATA[ Lexer.Previous.setPreviousTokenOf( 'NEW_TOKEN', 'TOKEN_BEFORE|AN_OTHER_TOKEN' ) ]]></assert>
+			<assert><![CDATA[ JSON.stringify( o ) === '{"NEW_TOKEN":{"TOKEN_BEFORE":true,"AN_OTHER_TOKEN":true}}' ]]></assert>
+			<assert><![CDATA[ o.NEW_TOKEN ]]></assert>
+			<assert><![CDATA[ o.NEW_TOKEN.TOKEN_BEFORE === true ]]></assert>
+			<assert><![CDATA[ o.NEW_TOKEN.AN_OTHER_TOKEN === true ]]></assert>
+		</assertions>
+	</test>
+	<test name="Initialisation" class="preambule">
+		<assertions>
+			<value><![CDATA[
+var previous = Lexer.Previous()
+			]]></value>
+			<assert><![CDATA[ previous.get ]]></assert>
+			<assert><![CDATA[ previous.set ]]></assert>
+			<assert><![CDATA[ previous.validFor ]]></assert>
+		</assertions>
+	</test>
+	<test name="previous.get">
+		<assertions>
+			<desc>Valeur à l'initialisation</desc>
+			<assert><![CDATA[ previous.get() === '' ]]></assert>
+		</assertions>
+		<assertions>
+			<desc>Valeur après affectation (hors tokens non significatifs)</desc>
+			<assert><![CDATA[ previous.set( 'TOKEN_NAME' ) ]]></assert>
+			<assert><![CDATA[ previous.get() === 'TOKEN_NAME' ]]></assert>
+		</assertions>
+	</test>
+	<test name="previous.set">
+		<assertions>
+			<desc>Valeur après affectation (hors tokens non significatifs)</desc>
+			<assert><![CDATA[ previous.set( 'TOKEN_NAME2' ) === 'TOKEN_NAME2' ]]></assert>
+			<assert><![CDATA[ previous.get() === 'TOKEN_NAME2' ]]></assert>
+		</assertions>
+		<assertions>
+			<desc>Valeur après affectation d'un token non significatif</desc>
+			<assert><![CDATA[ previous.set( 'SPACE' ) === false ]]></assert>
+			<assert><![CDATA[ previous.set( 'TAB' ) === false ]]></assert>
+			<assert><![CDATA[ previous.get() === 'TOKEN_NAME2' ]]></assert>
+		</assertions>
+	</test>
+	<test name="previous.validFor">
+		<assertions name="Vrai">
+			<assert><![CDATA[ previous.set( 'TOKEN_NAME2' ) ]]></assert>
+			<assert><![CDATA[ previous.validFor( 'NEW_TOKEN' ) === false ]]></assert>
+		</assertions>
+		<assertions name="Faux">
+			<assert><![CDATA[ previous.set( 'TOKEN_BEFORE' ) ]]></assert>
+			<assert><![CDATA[ previous.validFor( 'NEW_TOKEN' ) === true  ]]></assert>
+			<assert><![CDATA[ previous.set( 'AN_OTHER_TOKEN' ) ]]></assert>
+			<assert><![CDATA[ previous.validFor( 'NEW_TOKEN' ) === true  ]]></assert>
+			<assert><![CDATA[ previous.set( 'TOKEN' ) ]]></assert>
+			<assert><![CDATA[ previous.validFor( 'NEW_TOKEN' ) === false  ]]></assert>
+			<assert><![CDATA[ previous.set( 'BEFORE' ) ]]></assert>
+			<assert><![CDATA[ previous.validFor( 'NEW_TOKEN' ) === false  ]]></assert>
+		</assertions>
+	</test>
+</truth>

@@ -2,22 +2,25 @@
 <?xml-stylesheet type="text/xsl" href="Doc.xsl"?> 
 <class name="Previous" language="JavaScript">
 	<desc>
-		Fonction retournant un objet gérant les actions vis à vis du token précédant...
+		<script>
+			document.getElementById('eTopLeftMenu').innerHTML +=
+			' - &lt;a href="../UnitTest/Previous.xml"&gt;Tests unitaires associés&lt;/a&gt;'
+		</script>
+		Fonction retournant un objet gérant toutes les actions concernant le token précédant :
 		<ul>
-			<li>affectation et récupération du nom token précédant.</li>
-			<li>détermination si un token peut suivre le token précédant.</li>
+			<li>Affectation et récupération du nom token précédant.<br/>
+				<blockquote><cite>
+					Le token précédant n'est jamais défini avec des tokens non significatif de type: espaces blancs, commentaires, ...
+				</cite></blockquote>
+			</li>
+			<li>Détermination si un token peut suivre le token précédant... 
+				si ce n'est pas le cas, le lexer en cherche un autre.
+				<blockquote><cite>
+					Il est parfois nécessaire de connaître le token précédant pour déterminer si le token trouvé est valide...<br/>
+					Vrai pour les expressions régulières en JavaScript.
+				</cite></blockquote>
+			</li>
 		</ul>
-		<p>
-			Elle détermine si le token trouvé peut suivre le token précédant.<br/>
-			Si ce n'est pas le cas, le lexer en cherche un autre...
-		</p>
-		<p>
-			Le token précédant n'est jamais défini avec des tokens non significatif de type: espaces blancs, commentaires, ...
-		</p>
-		<blockquote><cite>
-			Il est parfois nécessaire de connaître le token précédant pour déterminer si le token trouvé est valide...<br/>
-			Vrai pour les expressions régulières en JavaScript.
-		</cite></blockquote>
 	</desc>
 	<group name="Fonction Previous">
 		<properties name="Attributs">
@@ -33,13 +36,27 @@
 			<variable name="ofToken" type="Object">
 				<desc>
 					Stockage des noms des tokens devant précéder un autre.
-					<p>
-					Objet ayant comme attribut les noms des tokens devant être précédés par d'autres.<br/>
-					La valeur des ces attributs est affecté avec une chaîne : liste de noms de token séparés avec le caractère '|' non représentatif.
-					</p>
 				</desc>
 			</variable>
 		</properties>
+		<methods name="Méthodes">
+			<function name="setPreviousTokenOf">
+				<desc>Défini la valeur du token précédant.</desc>
+				<arguments>
+					<arg type="String" name="sToken">
+						<desc>Nom d'un token.</desc>
+					</arg>
+					<arg type="String" name="sPreviousTokens">
+						<desc>Nom des tokens devant le précéder séparés par le caractère '|'.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="Object">
+					<desc>
+						Objet defini à l'attribut <code>Previous.ofToken[ sToken ]</code>.
+					</desc>
+				</returnValue>
+			</function>
+		</methods>
 	</group>
 	<group name="Objet retourné par la fonction Previous">
 		<properties name="Attribut privé">
@@ -48,18 +65,10 @@
 			</variable>
 		</properties>
 		<methods name="Méthodes">
-			<function name="invalidFor">
-				<desc>Détermine si un token peut suivre le token précédant.</desc>
-				<arguments>
-					<arg type="String" name="sToken">
-						<desc>Nom d'un token.</desc>
-					</arg>
-				</arguments>
-				<returnValue type="Boolean">
-					<desc>
-						<code>false</code> si le token peut suivre le token précédant.<br/>
-						<code>true</code> sinon.
-					</desc>
+			<function name="get">
+				<desc>Retourne le nom du token précédant.</desc>
+				<returnValue type="String">
+					<desc>Nom du token précédant.</desc>
 				</returnValue>
 			</function>
 			<function name="set">
@@ -76,10 +85,18 @@
 					</desc>
 				</returnValue>
 			</function>
-			<function name="get">
-				<desc>Retourne le nom du token précédant.</desc>
-				<returnValue type="String">
-					<desc>Nom du token précédant.</desc>
+			<function name="validFor">
+				<desc>Détermine si un token peut suivre le token précédant.</desc>
+				<arguments>
+					<arg type="String" name="sToken">
+						<desc>Nom d'un token.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="Boolean">
+					<desc>
+						<code>true</code> si le token peut suivre le token précédant.<br/>
+						<code>false</code> sinon.
+					</desc>
 				</returnValue>
 			</function>
 		</methods>

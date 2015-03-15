@@ -9,13 +9,15 @@ var MultiRegExpLexer =(function( Lexer ){
 		}
 	Lexer.prototype.searchToken =function( oRE ){
 		oRE.lastIndex = this.nPos
-		if( ! oRE.test( this.sText ) || this.previous.invalidFor( oRE.name )) return false;
-		oRE.lastIndex = this.nPos
-		var result = oRE.exec( this.sText )
-		if( result === null || result.index != this.nPos || ! result[0].length )
-			return null
-		this.sToken = oRE.name
-		return this.sValue = result[0]
+		if( oRE.test( this.sText ) && this.previous.validFor( oRE.name )){
+			oRE.lastIndex = this.nPos
+			var result = oRE.exec( this.sText )
+			if( result === null || result.index != this.nPos || ! result[0].length )
+				return null
+			this.sToken = oRE.name
+			return this.sValue = result[0]
+			}
+		return false;
 		}
 	
 	// Analyse par défaut

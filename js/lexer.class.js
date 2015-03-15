@@ -76,8 +76,7 @@ var LexerClass =function(){
 				return a
 				},
 			setPreviousTokenOf :function( sToken, sPreviousTokens ){
-				if( Previous.ofToken[sToken]) throw new Error ( 'Previous token of '+ sToken +' already defined !' )
-				Previous.ofToken[sToken] = sPreviousTokens
+				return Previous.setPreviousTokenOf( sToken, sPreviousTokens )
 				},
 			setTokensTranslation :function( m ){
 				var o = this.Translation
@@ -166,15 +165,15 @@ var LexerClass =function(){
 		var o =function(){
 			var s = ''
 			return {
-				invalidFor :function( sToken ){
-					return o.ofToken[sToken] && o.ofToken[sToken].indexOf(s)<0
-					},
+				get :function(){ return s },
 				set :function( sToken ){
 					return o.excluded[sToken]
 						? false // doit impérativement retourner cette valeur
 						: s = LexerRules.Translation[sToken]||sToken
 					},
-				get :function(){ return s }
+				validFor :function( sToken ){
+					return o.ofToken[sToken] ? o.ofToken[sToken][s] || false : true
+					}
 				}
 			}
 		o.union({
@@ -185,7 +184,13 @@ var LexerClass =function(){
 				COMMENT:1,
 				REGULAR_EXPRESSION_IN:1
 				},
-			ofToken :{}
+			ofToken :{},
+			setPreviousTokenOf :function( sToken, sPreviousTokens ){
+				if( Previous.ofToken[sToken]) throw new Error ( 'Previous token of '+ sToken +' already defined !' )
+				var o = Previous.ofToken[sToken] = {}
+				for(var i=0, a=sPreviousTokens.split('|'); a[i]; i++) o[ a[i]]= true
+				return o
+				}
 			})
 		return o
 		})()

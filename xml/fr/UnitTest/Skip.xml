@@ -1,0 +1,29 @@
+﻿<?xml version='1.0' encoding='UTF-8'?>
+<?xml-stylesheet type="text/xsl" href="UnitTest.xsl"?> 
+
+<truth name="Skip">
+	<script src="../../../js/framework.js"></script>
+	<script src="../../../js/lexer.class.js"></script>
+	<desc>
+		<script>
+			document.getElementById('eTopLeftMenu').innerHTML +=
+			' - &lt;a href="../doc/LexerClass.Skip.xml"&gt;Documentation associés&lt;/a&gt;'
+		</script>
+	</desc>
+	<test name="Préambule" class="preambule">
+		<assertions>
+			<value><![CDATA[
+var Lexer = LexerClass() // Création d'un type de Lexer vide.
+			]]></value>
+		</assertions>
+	</test>
+	<test name="___">
+		<assertions>
+			<desc>___</desc>
+			<value><![CDATA[
+true
+			]]></value>
+			<assert><![CDATA[ true ]]></assert>
+		</assertions>
+	</test>
+</truth>

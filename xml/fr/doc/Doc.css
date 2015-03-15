@@ -1,0 +1,48 @@
+#eTopLeftMenu { float: left; height: 2em; }
+#eTopRightMenu { float: right; }
+H1 { clear: both; }
+
+.block { background: #FFE; border: 1px solid #EEE; }
+.desc { margin: 0 1em ;}
+.arguments,
+.note,
+.syntaxe PRE,
+.returnValue { margin: .5em 1em ;}
+.syntaxe { margin: .5em 1em 1em ;}
+
+DL,
+SECTION { margin: .5em 0 1.5em 1em ;}
+DL SMALL { margin: 0 1em ;}
+H2, H3 { margin: 0; }
+CODE {	
+	background: #000;
+	color: yellow;
+	padding: 0 .5em;
+	}
+.type {
+	background: #FFF;
+	color: green;
+	margin: 0;
+	padding: 0 .5em;
+	}
+.arguments-inline {
+	background: #FF0;
+	color: #000;
+	margin: 0;
+	padding: 0;
+	}
+LABEL { cursor: pointer; display:block; }
+INPUT[type=checkbox] { float: left; display: none; }
+INPUT ~ DL,
+INPUT ~ DIV {
+	height: 0px;
+	margin: 0;
+	overflow: hidden;
+	padding: 0;
+	}
+INPUT:checked ~ DL,
+INPUT:checked ~ DIV {
+	height: auto;
+	margin: .5em;
+	padding: .25em 0;
+	}

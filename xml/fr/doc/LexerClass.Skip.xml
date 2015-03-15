@@ -2,6 +2,10 @@
 <?xml-stylesheet type="text/xsl" href="Doc.xsl"?> 
 <class name="Skip" language="JavaScript">
 	<desc>
+		<script>
+			document.getElementById('eTopLeftMenu').innerHTML +=
+			' - &lt;a href="../UnitTest/Skip.xml"&gt;Tests unitaires associés&lt;/a&gt;'
+		</script>
 		Fonction retournant une fonction pour gérer les tokens à ignorer...
 		elle prend en argument son lexer...
 	

@@ -2,6 +2,10 @@
 <?xml-stylesheet type="text/xsl" href="Doc.xsl"?> 
 <class name="LexerRules" language="JavaScript">
 	<desc>
+		<script>
+			document.getElementById('eTopLeftMenu').innerHTML +=
+			' - &lt;a href="../UnitTest/LexerRules.xml"&gt;Tests unitaires associés&lt;/a&gt;'
+		</script>
 		<h4>Définitions des tokens (ER ou AFD)</h4>
 		<p>Une définition détermine un ou plusieurs types de lexème pouvant être trouvés (cas AFD).</p>
 		<blockquote><cite>

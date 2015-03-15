@@ -59,15 +59,14 @@ var AutomatonLexer =(function( Lexer ){
 	// SCANNING
 	Lexer.prototype.searchToken =function( oDFA ){
 		var nEnd=this.nPos, sState=1, oFound=null
-		if( this.previous.invalidFor( oDFA.name )) return false;
-		while( ( sState = nextState( oDFA, sState, this.sText.charAt( nEnd++ ))) > 0 ){
-			if( oDFA.F[ sState ]){
-				sDFA = oDFA.TokensTable[ oDFA.F[ sState ]]
-				if( this.previous.invalidFor( sDFA )) continue;
-				oFound={ end:nEnd, token:sDFA }
+		if( this.previous.validFor( oDFA.name ))
+			while( ( sState = nextState( oDFA, sState, this.sText.charAt( nEnd++ ))) > 0 ){
+				if( oDFA.F[ sState ]){
+					sDFA = oDFA.TokensTable[ oDFA.F[ sState ]]
+					if( this.previous.validFor( sDFA )) oFound={ end:nEnd, token:sDFA }
+					}
 				}
-			}
-		if( ! oFound ) return null
+		if( ! oFound ) return false
 		this.sToken = oFound.token
 		return this.sValue = this.sText.substring(this.nPos,oFound.end)
 		}

@@ -16,9 +16,11 @@
 	<script>var aUnitTest = [], aEval = []</script>
 </head>
 <body>
-	<a href="../../../index.htm">Index</a>
-	 - <a href="../doc/index.htm">Documentation</a>
-
+	<div id="eTopLeftMenu">
+		<a href="../../../index.htm">Index</a>
+		- <a href="../doc/index.htm">Documentation</a>
+	</div>
+	
 	<h1><xsl:value-of select="@name"/></h1>
 	
 	<!-- Résultat des tests -->

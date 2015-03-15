@@ -1,3 +1,7 @@
+#eTopLeftMenu { float: left; height: 2em; }
+#eTopRightMenu { float: right; }
+H1 { clear: both; }
+
 DL { margin: 0; }
 
 /* legend */

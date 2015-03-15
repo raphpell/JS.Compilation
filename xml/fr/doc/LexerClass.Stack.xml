@@ -2,6 +2,10 @@
 <?xml-stylesheet type="text/xsl" href="Doc.xsl"?> 
 <class name="Stack" language="JavaScript">
 	<desc>
+		<script>
+			document.getElementById('eTopLeftMenu').innerHTML +=
+			' - &lt;a href="../UnitTest/Stack.xml"&gt;Tests unitaires associés&lt;/a&gt;'
+		</script>
 		Fonction retournant une pile gérant les parents courants...
 		elle prend en argument son lexer...
 

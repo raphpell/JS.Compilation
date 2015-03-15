@@ -1,7 +1,12 @@
 ﻿<?xml version='1.0' encoding='UTF-8'?>
 <?xml-stylesheet type="text/xsl" href="Doc.xsl"?> 
 <class name="Actions" language="JavaScript">
-	<desc>Fonction construisant l'arbre lexical depuis le lexème trouvé.
+	<desc>
+		<script>
+			document.getElementById('eTopLeftMenu').innerHTML +=
+			' - &lt;a href="../UnitTest/Actions.xml"&gt;Tests unitaires associés&lt;/a&gt;'
+		</script>
+		Fonction construisant l'arbre lexical depuis le lexème trouvé.
 		<p>
 			Par défaut, le token trouvé est ajouté au token parent courant.<br/>
 			Cependant la machine peut réaliser certaines tâches décidées selon le <b>préfixe du nom du token trouvé</b>.
