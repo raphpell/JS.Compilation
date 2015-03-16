@@ -64,7 +64,10 @@ var LexerClass =function(){
 						}
 				return aTokens
 				},
-			makeToken :function( sName, o ){ /* TODO */ },
+			makeToken :function( sName, o ){
+				o.name = sName
+				return o
+				},
 			makeRule :function( sName, sTokens ){
 				var aList = sTokens.split('|')
 				var a = []

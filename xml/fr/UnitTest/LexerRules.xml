@@ -14,16 +14,177 @@
 		<assertions>
 			<value><![CDATA[
 var Lexer = LexerClass() // Création d'un type de Lexer vide.
+var oLexer = new Lexer
+var LexerRules = Lexer.Rules
+var Previous = Lexer.Previous
 			]]></value>
 		</assertions>
 	</test>
-	<test name="___">
+
+	<test name="Attributs" class="preambule">
+		<assertions>
+			<value><![CDATA[
+var CSS = LexerRules.CSS
+var Rules = LexerRules.Rules
+var Tokens = LexerRules.Tokens
+var Translation = LexerRules.Translation
+			]]></value>
+		</assertions>
+	</test>
+	<test name="CSS">
+		<assertions>
+			<assert><![CDATA[ JSON.stringify( CSS ) === "{}" ]]></assert>
+		</assertions>
+	</test>
+	<test name="Rules">
+		<assertions>
+			<assert><![CDATA[ Rules.list ]]></assert>
+			<assert><![CDATA[ Rules.add ]]></assert>
+			<assert><![CDATA[ Rules.get ]]></assert>
+			<assert><![CDATA[ Rules.have ]]></assert>
+		</assertions>
+	</test>
+	<test name="Tokens">
+		<assertions>
+			<assert><![CDATA[ Tokens.list ]]></assert>
+			<assert><![CDATA[ Tokens.add ]]></assert>
+			<assert><![CDATA[ Tokens.get ]]></assert>
+			<assert><![CDATA[ Tokens.have ]]></assert>
+		</assertions>
+	</test>
+	<test name="Translation">
+		<assertions>
+			<assert><![CDATA[ JSON.stringify( Translation ) === "{}" ]]></assert>
+		</assertions>
+	</test>
+
+	<test name="Méthodes" class="preambule">
+	</test>
+	<test name="addCSSClass">
+		<assertions>
+			<value><![CDATA[
+LexerRules.addCSSClass(
+    'classC=TOKEN1&classD=TOKEN2'
+    )
+			]]></value>
+			<assert><![CDATA[ CSS.TOKEN1 === 'classC' ]]></assert>
+			<assert><![CDATA[ CSS.TOKEN2 === 'classD' ]]></assert>
+			<assert><![CDATA[ ! CSS.TOKEN3 ]]></assert>
+		</assertions>
+		<assertions>
+			<value><![CDATA[
+LexerRules.addCSSClass([
+    'classA=TOKEN1',
+    'classB=TOKEN2|TOKEN3'
+    ])
+			]]></value>
+			<assert><![CDATA[ CSS.TOKEN1 === 'classA classC' ]]></assert>
+			<assert><![CDATA[ CSS.TOKEN2 === 'classB classD' ]]></assert>
+			<assert><![CDATA[ CSS.TOKEN3 === 'classB' ]]></assert>
+		</assertions>
+		<assertions>
+			<value><![CDATA[
+LexerRules.addCSSClass([
+	'classA=TOKEN1',
+	'classC=TOKEN2'
+	])
+			]]></value>
+			<assert><![CDATA[ CSS.TOKEN1 === 'classA classC' ]]></assert>
+			<assert><![CDATA[ CSS.TOKEN2 === 'classB classC classD' ]]></assert>
+			<assert><![CDATA[ CSS.TOKEN3 === 'classB' ]]></assert>
+		</assertions>
+	</test>
+	<test name="addRule">
 		<assertions>
 			<desc>___</desc>
 			<value><![CDATA[
 true
 			]]></value>
 			<assert><![CDATA[ true ]]></assert>
+		</assertions>
+	</test>
+	<test name="addRules">
+		<assertions>
+			<desc>___</desc>
+			<value><![CDATA[
+true
+			]]></value>
+			<assert><![CDATA[ true ]]></assert>
+		</assertions>
+	</test>
+	<test name="addTokens">
+		<assertions>
+			<desc>___</desc>
+			<value><![CDATA[
+true
+			]]></value>
+			<assert><![CDATA[ true ]]></assert>
+		</assertions>
+	</test>
+	<test name="makeToken">
+		<assertions>
+			<desc>___</desc>
+			<value><![CDATA[
+true
+			]]></value>
+			<assert><![CDATA[ true ]]></assert>
+		</assertions>
+	</test>
+	<test name="makeRule">
+		<assertions>
+			<desc>___</desc>
+			<value><![CDATA[
+true
+			]]></value>
+			<assert><![CDATA[ true ]]></assert>
+		</assertions>
+	</test>
+	<test name="setPreviousTokenOf">
+		<assertions  name="">
+			<desc>Voir Lexer.Previous.setPreviousTokenOf</desc>
+		<!--
+			<assert><![CDATA[ LexerRules.setPreviousTokenOf( 'NEW_TOKEN', 'TOKEN_BEFORE|AN_OTHER_TOKEN' ) ]]></assert>
+			<assert><![CDATA[ JSON.stringify( Previous.ofToken ) === '{"NEW_TOKEN":{"TOKEN_BEFORE":true,"AN_OTHER_TOKEN":true}}' ]]></assert>
+			<assert><![CDATA[ Previous.ofToken ]]></assert>
+			<assert><![CDATA[ Previous.ofToken.NEW_TOKEN ]]></assert>
+			<assert><![CDATA[ Previous.ofToken.NEW_TOKEN.TOKEN_BEFORE === true ]]></assert>
+			<assert><![CDATA[ Previous.ofToken.NEW_TOKEN.AN_OTHER_TOKEN === true ]]></assert>
+		-->
+		</assertions>
+	</test>
+	<test name="setTokensTranslation">
+		<assertions>
+			<value><![CDATA[
+LexerRules.setTokensTranslation(
+    'TOKEN1=tokenA&TOKEN2=tokenB'
+    )
+			]]></value>
+			<assert><![CDATA[ Translation.TOKEN1 === 'tokenA' ]]></assert>
+			<assert><![CDATA[ Translation.TOKEN2 === 'tokenB' ]]></assert>
+		</assertions>
+		<assertions>
+			<value><![CDATA[
+LexerRules.setTokensTranslation([
+    'TOKEN3=tokenC',
+    'TOKEN4=tokenD'
+    ])
+			]]></value>
+			<assert><![CDATA[ Translation.TOKEN3 === 'tokenC' ]]></assert>
+			<assert><![CDATA[ Translation.TOKEN4 === 'tokenD' ]]></assert>
+		</assertions>
+		<assertions>
+			<value><![CDATA[
+var sError = false
+try{
+    LexerRules.setTokensTranslation(
+       'TOKEN3=tokenC'
+        )
+    }
+catch(e){
+    sError = e.message
+    }
+			]]></value>
+			<assert><![CDATA[ sError ]]></assert>
 		</assertions>
 	</test>
 </truth>

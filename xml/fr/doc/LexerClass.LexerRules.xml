@@ -6,18 +6,23 @@
 			document.getElementById('eTopLeftMenu').innerHTML +=
 			' - &lt;a href="../UnitTest/LexerRules.xml"&gt;Tests unitaires associés&lt;/a&gt;'
 		</script>
+		<p>Cet objet contient toutes les méthodes concernant les propriétés des tokens.</p>
 		<h4>Définitions des tokens (ER ou AFD)</h4>
-		<p>Une définition détermine un ou plusieurs types de lexème pouvant être trouvés (cas AFD).</p>
-		<blockquote><cite>
-			Elles peuvent être ajoutées une et une seule fois sous un nom associé.<br/>
-			Si une tentative d'accès à une définition inexistante est réalisée, une erreur est lancée.
-		</cite></blockquote>
+		<blockquote>
+			<p>Une définition détermine un ou plusieurs types de lexème pouvant être trouvés (cas AFD).</p>
+			<cite>
+				Elles peuvent être ajoutées une et une seule fois sous un nom associé.<br/>
+				Si une tentative d'accès à une définition inexistante est réalisée, une erreur est lancée.
+			</cite>
+		</blockquote>
 		<h4>Règles d'analyse</h4>
-		<p>Une régle détermine la liste des définitions à tester pour une 'syntaxe'.</p>
-		<blockquote><cite>
-			Elles peuvent être ajoutées une et une seule fois sous un nom associé.<br/>
-			Si une tentative d'accès à une règle inexistante est réalisée, une erreur est lancée.
-		</cite></blockquote>
+			<blockquote>
+			<p>Une régle détermine la liste des définitions à tester pour une 'syntaxe'.</p>
+			<cite>
+				Elles peuvent être ajoutées une et une seule fois sous un nom associé.<br/>
+				Si une tentative d'accès à une règle inexistante est réalisée, une erreur est lancée.
+			</cite>
+		</blockquote>
 	</desc>
 	<group name="Objet LexerRules">
 		<methods name="Méthode privée">

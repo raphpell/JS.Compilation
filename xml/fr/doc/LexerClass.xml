@@ -20,7 +20,8 @@
 	</syntax>
 	<group name="MyLexer">
 		<desc>
-			<code>MyLexer</code> est utilisée soit en fonction, soit en constructeur.
+			<code>MyLexer</code> est utilisée soit en constructeur, soit en fonction : il utilise alors un singleton.<br/>
+			L'instanciation permet d'observer étape par étape l'analyse lexicale.
 		</desc>
 	</group>
 	<group name="Objet MyLexer">

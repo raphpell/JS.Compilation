@@ -47,7 +47,6 @@ CODE { background: #eee; }
 	<div id="eResult">...</div>
 </section>
 <h2>Principes</h2><section>
-	<p>Le lexer génère normalement une liste de lexèmes.</p>
 	<h3>Le lexème</h3><section>
 		<ul>
 			<li>il est défini par une <a href="src/regexp/syntax.htm">ER</a> ou un <a href="AFD.info.htm">AFD</a></li>
@@ -66,6 +65,21 @@ CODE { background: #eee; }
 	</section>
 </section>
 
+<h2>Contraintes</h2><section>
+	<ul>
+		<li>
+			En JavaScript il faut savoir différencier la division '/' au délimitation d'une expression régulière : <br>
+			Pour cela, il nous faut connaître le token précédant.
+			Si le token précédant correspond à token pouvant être avant le token trouvé alors celui-ci est validé. <br>
+			Sinon il faut en trouver un autre !
+		</li>
+		<li>
+			Il nous faut parfois obtenir une liste de lexème plus simple:<br>
+			Les commentaires sont entre autres des lexèmes non significatifs pour l'analyse syntaxique, 
+			comme les espaces blancs... mais là, ce n'est pas forcément le cas.
+		</li>
+	</ul>
+</section>
 
 <script src="js/framework.js"></script>
 <script src="js/lexer.class.js"></script>

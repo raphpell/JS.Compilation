@@ -23,6 +23,16 @@ LI {
 H2, H3 {
 	clear: left;
 	}
+TD, TH {
+	border: 1px solid #999;
+	border-width: 0 1px 1px 0;
+	padding: .5em;
+	vertical-align: top;
+	}
+TD UL {
+	margin: 0;
+	padding: 0;
+	}
 		</style>
 	</head>
 	<body>
@@ -84,86 +94,97 @@ H2, H3 {
 </section>
 
 <h2>Observations</h2><section>
-	<a name="AutomatonLexer"></a>
-	<h3>Automaton Lexer</h3><section>
-		Utilise des AFD : Il reconnaisse 1 à plusieurs tokens.
-		<ul>
-			<li style="color:orange;">Pas le plus rapide des lexer.</li>
-			<li style="color:red;">Modules énormes et abstraits...</li>
-			<li style="color:green;">Le plus long token trouvé est toujours retourné.</li>
-			<li><strike>Analyse partielle implémenté (<a href="Lexers.performance.scan.incremental.htm">aperçu</a>).</strike></li>
-		</ul>
-		
-		<h4>Considérations techniques</h4><section>
-			<p>Les AFD doivent-être précalculés car leur calcul prend du temps.</p>
-			<ol>
-				<li>Chaque <a href="AFD.generator.htm">ER transformé en AFD</a></li>
-				<li>Les <a href="AFD.aggregator.htm">AFD sont ensuite aggrégés entre eux</a> afin d'en obtenir plus qu'un !</li>
-			</ol>
-			<p>Malheureusement il est parfois préférable d'utiliser plusieurs AFD au lieu d'un :</p>
-			<ul>
-				<li>La taille de l'automate résultat pouvant-être trop volumineuse, </li>
-				<li>ou sa création prennant beaucoup trop de temps.</li>
-			</ul>
-			<!-- <p>Vous pouvez <a href="LexerAutomaton.module.generator.htm">créer des modules pour le Lexer Automaton</a>.</p> -->
-			<p>L'analyse lexicale se fait ensuite avec un ou plusieurs AFD :</p>
-			<ul>
-				<li>Performance (calcul) = 1 AFD.</li>
-				<li>Maintenance / Evolution = Plusieurs AFDs.</li>
-				<li>Performance téléchargement = Fonction de la taille des AFDs.</li>
-			</ul>
-		</section>
-	</section>
-	<a name="MultiRegExpLexer"></a>
-	<h3>Multiple RegExp Lexer</h3><section>
-		Utilise des ER : Elle reconnaisse 1 et 1 seul token.
-		<ul>
-			<li style="color:red;">Lexer le plus lent.</li>
-			<li style="color:green;">Modules à taille modeste et compréhensibles...</li>
-			<li style="color:red;">Premier token arrivé, premier servi.</li>
-		</ul>
-		
-		<h4>Considérations techniques</h4><section>
-			<ul>
-				<li>L'ordre des ER est important.
-					<ul>
-						<li>Première arrivée, première trouvée !</li>
-						<li>[performance] Les ER les plus souvant rencontrés doivent être montée dans les premières position.</li>
-					</ul>
-				</li>
-			</ul>
-		</section>
-	</section>
-	<a name="OneRegExpLexer"></a>
-	<h3>One RegExp Lexer</h3><section>
-		<ul>
-			<li style="color:green;">Lexer le plus rapide.</li>
-			<li style="color:green;">Modules à taille modeste et compréhensibles...</li>
-			<li style="color:green;">Le plus long token trouvé est toujours retourné en premier.</li>
-			<li style="color:green;">ou premier token arrivé, premier servi.</li>
-		</ul>
-		
-		<h4>Considérations techniques</h4><section>
-			<ul>
-				<li>Une seule grande expression régulière est créée pour parcourir le texte.</li>
-				<li>Le défaut: quand un mot est trouvé il faut déterminé son type. 
-					Pour cela il faut réaliser une boucle !</li>
-				<li>En JavaScript il faut savoir différencier la division '/' au délimitation d'une expression régulière : 
-						pour cela, j'ai besoin de connaître le token précédant. <br>
-					Si le token précédant correspond à token pouvant être avant le token trouvé alors celui-ci est validé. <br>
-						...sinon il faut parcourir les ER utilisées pour créer la grande une par une... pour finalement déterminer un autre token.
-						<ul>
-							<li>L'ordre des ER est important.
-								<ul>
-									<li>Première arrivée, première trouvée !</li>
-									<li>[performance] Les ER les plus souvant rencontrés doivent être montée dans les premières position.</li>
-								</ul>
-							</li>
-						</ul>
-				</li>
-			</ul>
-		</section>
-	</section>
+	<table border="1">
+		<tr>
+			<th>Lexer</th>
+			<th title="Objet utilisé pour reconnaître les tokens">Tokens</th>
+			<th title="Nombre de tokens pouvant être reconnu par un objet">Portée</th>
+			<th>Vitesse</th>
+			<th>Observations</th>
+			<th>Considérations techniques</th>
+		</tr>
+		<tr>
+			<th><a name="AutomatonLexer"></a>AutomatonLexer</th>
+			<th>AFD</th>
+			<th>1..n</th>
+			<th style="color:orange;">moyenne</th>
+			<td>
+				<ul>
+					<li style="color:red;">Modules énormes.</li>
+					<li style="color:green;">Plus long token retourné.</li>
+				</ul>
+			</td>
+			<td>
+				<ul>
+					<li>Les AFD doivent-être précalculés car leurs calculent prennent du temps.
+						<ol>
+							<li>Chaque <a href="AFD.generator.htm">ER transformé en AFD</a></li>
+							<li>Les <a href="AFD.aggregator.htm">AFD sont ensuite aggrégés entre eux</a> afin d'en obtenir plus qu'un!</li>
+						</ol>
+					</li>
+					<li>Le défaut: il est parfois préférable d'utiliser plusieurs AFD au lieu d'un.
+						<ol>
+							<li>La taille de l'automate résultat étant trop volumineuse, </li>
+							<li>La <a href="LexerAutomaton.module.generator.htm">création de l'AFD</a> prennant beaucoup trop de temps.</li>
+						</ol>
+					</li>
+				</ul>
+			</td>
+		</tr>
+		<tr>
+			<th><a name="MultiRegExpLexer"></a>MultiRegExpLexer</th>
+			<th>ER</th>
+			<th>1..1</th>
+			<th style="color:red;">lente</th>
+			<td>
+				<ul>
+					<li style="color:green;">Modules courts.</li>
+					<li style="color:red;">Premier token arrivé, premier servi.</li>
+				</ul>
+			</td>
+			<td>
+				<ul>
+					<li>L'ordre des ER est important.
+						<ol>
+							<li>Première arrivée, première trouvée !</li>
+							<li>Les ER les plus souvant rencontrés doivent être montée dans les premières position pour une performance optimisée.</li>
+						</ol>
+					</li>
+				</ul>
+			</td>
+		</tr>
+		<tr>
+			<th><a name="OneRegExpLexer"></a>OneRegExpLexer</th>
+			<th>ER</th>
+			<th>1..n</th>
+			<th style="color:green;">rapide</th>
+			<td>
+				<ul>
+					<li style="color:green;">Modules courts.</li>
+					<li style="color:green;">Plus long token retourné, par défaut.</li>
+					<li style="color:green;">Puis premier token arrivé, premier servi.</li>
+				</ul>
+			</td>
+			<td>
+				<ul>
+					<li>Une seule grande ER est créée pour reconnaître tous les tokens.</li>
+					<li>Les défauts: 
+						<ol>
+							<li>Quand un mot est trouvé il faut déterminé son type.  Pour cela il faut réaliser une boucle!</li>
+							<li>Quand le token trouvé est incompatible avec le token précédant, il faut réaliser une boucle avec les definitions de chaque token pour trouver un autre résultat.
+						</ol>
+					</li>
+					<li>L'ordre des ER est important.
+						<ol>
+							<li>Première arrivée, première trouvée !</li>
+							<li>Les ER les plus souvant rencontrés doivent être montée dans les premières position pour une performance optimisée.</li>
+						</ol>
+					</li>
+				</ul>
+			</td>
+		</tr>
+	</table>
+
 </section>
 
 	</body>
