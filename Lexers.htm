@@ -11,27 +11,21 @@ UL {
 LI {
 	padding: 0 1em;
 	}
-.lexer {
-	background: #EEE;
-	border: 1px solid #666;
-	float: left;
-	list-style-type: none;
-	margin: 0 .5em 2em;
-	padding: .5em 1em;
-	white-space: nowrap;
-	}
 H2, H3 {
 	clear: left;
 	}
 TD, TH {
 	border: 1px solid #999;
 	border-width: 0 1px 1px 0;
+	box-shadow: .25em .25em .25em #ccc;
 	padding: .5em;
-	vertical-align: top;
 	}
 TD UL {
-	margin: 0;
+	margin: 0 0 1em;
 	padding: 0;
+	}
+.lexer {
+	background: #eee;
 	}
 		</style>
 	</head>
@@ -41,47 +35,15 @@ TD UL {
 
 <h1>Mes Lexers</h1>
 
-<p>Il y a trois différents lexers créés et testés  :</p>
+<p>J'ai créé trois différents lexers depuis une <a href="xml/fr/doc/LexerClass.xml" title="LexerClass">même base</a>, ils utilisent soit :</p>
 <ul>
-	<li><a href="#MultiRegExpLexer">Lexer à une expression régulière par token</a></li>
-	<li><a href="#OneRegExpLexer">Lexer à une expression régulière</a></li>
-	<li><a href="#AutomatonLexer">Lexer à automates finis déterministes</a></li>
+	<li>des automates finis déterministes.</li>
+	<li>une expression régulière par token.</li>
+	<li>une expression régulière pour tous les tokens d'une règle.</li>
 </ul>
 
-
-
-<h2>Principe de fonctionnement</h2><section>
-	<p>Il sont créés depuis une <a href="xml/fr/doc/LexerClass.xml">même base</a> :</p>
-	<ul>
-		<li>Parcours du texte une et une seule fois.</li>
-		<li>Détection du début d'un token parent avec imbrication de token enfant.</li>
-		<li>Détection de fin d'un token parent.</li>
-		<li>Réalisation d'un double scannage d'un token (à éviter si possible!).</li>
-		<li>Incrémentation de ligne courante.</li>
-		<li>Utilisation d'une liste d'<i>objet</i> pour reconnaître des tokens.<br>
-			<small><b>ATTENTION</b></small>: Premier objet arrivé, premier objet trouvé.
-			<ol>
-				<li>Un ordre est requis (mots clés avant identifiant, ...)</li>
-				<li>Les objets trouvés le plus souvant doivent être classés en tête :
-					<i>amélioration des performances</i>.</li>
-			</ol>
-		</li>
-		<li><a href="Lexers.performance.scan.incremental.htm">Analyse partielle</a> suite à une modification.</li>
-	</ul>
-	<p>
-		Ils réalisent une analyse à <a href="Lexers.result.comparaison.htm">plusieurs niveaux</a>: 
-		un <i>arbre lexicale</i> est créé et non pas une liste.<br>
-		Je reste persuader qu'il est possible de le modifier pour obtenir une liste, mon objectif étant de limiter la taille des listes d'enfant.
-	</p>
-	<p>Si vous recherchez un lexer retournant une liste de tokens, consultez le site d'Eli Bendersky, il pourra vous être utile :</p>
-	<ul>
-		<li><a target="_blank" href="http://eli.thegreenplace.net/2013/06/25/regex-based-lexical-analysis-in-python-and-javascript">Regex-based lexical analysis in Python and Javascript</a></li>
-		<li><a target="_blank" href="http://eli.thegreenplace.net/2013/07/16/hand-written-lexer-in-javascript-compared-to-the-regex-based-ones">Hand-written lexer in Javascript compared to the regex-based ones </a></li>
-	</ul>
-</section>
-
 <h2>Performance</h2><section>
-	<p>Elle est mesurée sur deux méthodes :</p>
+	<p>Elle est mesurée et comparée sur deux méthodes :</p>
 	<ul>
 		<li><b>readToken</b>: <a href="Lexers.performance.readToken.htm">vitesse de lecture des tokens</a> pour un lexer.</li>
 		<li><b>scan</b>: comparaison de la <a href="Lexers.performance.scan.htm">vitesse de lecture totale</a> des lexers.</li>
@@ -90,8 +52,46 @@ TD UL {
 		L'<a href="Lexers.result.comparaison.htm">équivalence des résultats</a> des analyses lexicales est comparée 
 		afin d'assurer des mesures dans des conditions identiques.
 	</p>
-	<p>La performance est dependante de l'objet retourné par la fonction <a href="Lexeme.htm">Lexeme</a>.</p>
+	<p>La performance est dépendante de l'objet retourné par la fonction <a href="Lexeme.htm">Lexeme</a>.</p>
 </section>
+
+<h2>Caractéristiques</h2><section>
+	<ul>
+		<li>Parcours du texte une et une seule fois.</li>
+		<li>Détection du début d'un token parent avec imbrication de token enfant.</li>
+		<li>Détection de fin d'un token parent et finalisation du parent.</li>
+		<li>Réalisation d'un double scannage d'un token, à éviter si possible.</li>
+		<li>Calcul des numéros de ligne des tokens (début et fin).</li>
+		<li>Utilisation d'une liste d'<i>objets</i> pour reconnaître les tokens.</li>
+		<li>Utilisation d'une liste de <i>règles</i> pour reconnaître les syntaxes.
+			<blockquote>
+				<small><b>ATTENTION</b></small>: Premier objet arrivé, premier objet trouvé.
+				<ol>
+					<li>Un ordre est requis (mots clés avant identifiant, ...)</li>
+					<li>Les objets trouvés le plus souvant doivent être classés en tête :
+						<i>amélioration des performances</i>.</li>
+				</ol>
+			</blockquote>
+		</li>
+		<li>Contrôle optionnel du token précédant.</li>
+		<li>Omission de certains tokens du résultat.</li>
+		<li>Affectation de classes css au tokens.</li>
+		<li>Renommage possible des noms de token.</li>
+		<li><a href="Lexers.performance.scan.incremental.htm">Analyse partielle</a> pour les éditeurs de texte.</li>
+	</ul>
+	<p>
+		Ils réalisent une analyse à <a href="Lexers.result.comparaison.htm">plusieurs niveaux</a>: 
+		un <i>arbre lexical</i> est créé et non pas une liste.<br>
+		L'avantage de cette approche est la simplification des grammaires de l'analyse syntaxique.
+		
+	</p>
+	<p>Si vous recherchez un lexer retournant une liste de tokens, consultez le site d'Eli Bendersky, il pourra vous être utile :</p>
+	<ul>
+		<li><a target="_blank" href="http://eli.thegreenplace.net/2013/06/25/regex-based-lexical-analysis-in-python-and-javascript">Regex-based lexical analysis in Python and Javascript</a></li>
+		<li><a target="_blank" href="http://eli.thegreenplace.net/2013/07/16/hand-written-lexer-in-javascript-compared-to-the-regex-based-ones">Hand-written lexer in Javascript compared to the regex-based ones </a></li>
+	</ul>
+</section>
+
 
 <h2>Observations</h2><section>
 	<table border="1">
@@ -100,23 +100,22 @@ TD UL {
 			<th title="Objet utilisé pour reconnaître les tokens">Tokens</th>
 			<th title="Nombre de tokens pouvant être reconnu par un objet">Portée</th>
 			<th>Vitesse</th>
+			<th>Taille modules</th>
 			<th>Observations</th>
-			<th>Considérations techniques</th>
 		</tr>
-		<tr>
-			<th><a name="AutomatonLexer"></a>AutomatonLexer</th>
+		<tr class="lexer"><th>AutomatonLexer</th>
 			<th>AFD</th>
 			<th>1..n</th>
 			<th style="color:orange;">moyenne</th>
-			<td>
-				<ul>
-					<li style="color:red;">Modules énormes.</li>
-					<li style="color:green;">Plus long token retourné.</li>
-				</ul>
+			<th style="color:red;">énormes</th>
+			<td style="color:green;">
+				Plus long token retourné.
 			</td>
-			<td>
+		</tr>
+		<tr>
+			<td colspan="6">
 				<ul>
-					<li>Les AFD doivent-être précalculés car leurs calculent prennent du temps.
+					<li>Les AFD doivent-être précalculés :
 						<ol>
 							<li>Chaque <a href="AFD.generator.htm">ER transformé en AFD</a></li>
 							<li>Les <a href="AFD.aggregator.htm">AFD sont ensuite aggrégés entre eux</a> afin d'en obtenir plus qu'un!</li>
@@ -131,18 +130,17 @@ TD UL {
 				</ul>
 			</td>
 		</tr>
-		<tr>
-			<th><a name="MultiRegExpLexer"></a>MultiRegExpLexer</th>
+		<tr class="lexer"><th>MultiRegExpLexer</th>
 			<th>ER</th>
 			<th>1..1</th>
 			<th style="color:red;">lente</th>
-			<td>
-				<ul>
-					<li style="color:green;">Modules courts.</li>
-					<li style="color:red;">Premier token arrivé, premier servi.</li>
-				</ul>
+			<th style="color:green;">normal</th>
+			<td style="color:red;">
+				Premier token arrivé, premier servi.
 			</td>
-			<td>
+		</tr>
+		<tr>
+			<td colspan="6">
 				<ul>
 					<li>L'ordre des ER est important.
 						<ol>
@@ -153,25 +151,24 @@ TD UL {
 				</ul>
 			</td>
 		</tr>
-		<tr>
-			<th><a name="OneRegExpLexer"></a>OneRegExpLexer</th>
+		<tr class="lexer"><th>OneRegExpLexer</th>
 			<th>ER</th>
 			<th>1..n</th>
 			<th style="color:green;">rapide</th>
-			<td>
-				<ul>
-					<li style="color:green;">Modules courts.</li>
-					<li style="color:green;">Plus long token retourné, par défaut.</li>
-					<li style="color:green;">Puis premier token arrivé, premier servi.</li>
-				</ul>
+			<th style="color:green;">normal</th>
+			<td style="color:green;">
+				Plus long token retourné, par défaut.<br>
+				Puis premier token arrivé, premier servi.
 			</td>
-			<td>
+		</tr>
+		<tr>
+			<td colspan="6">
 				<ul>
 					<li>Une seule grande ER est créée pour reconnaître tous les tokens.</li>
 					<li>Les défauts: 
 						<ol>
 							<li>Quand un mot est trouvé il faut déterminé son type.  Pour cela il faut réaliser une boucle!</li>
-							<li>Quand le token trouvé est incompatible avec le token précédant, il faut réaliser une boucle avec les definitions de chaque token pour trouver un autre résultat.
+							<li>Quand le token trouvé est incompatible avec le token précédant, il faut réaliser une boucle avec les definitions de chaque token pour trouver un autre résultat.</li>
 						</ol>
 					</li>
 					<li>L'ordre des ER est important.

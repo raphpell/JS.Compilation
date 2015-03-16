@@ -55,7 +55,7 @@ CODE { background: #eee; }
 	</section>
 	<h3>Fonctionnement</h3><section>
 		<img src="img/scan.png">
-		<p>La fonction <code>readToken</code> retourne par défaut le token trouvé.</p>
+		<p>La fonction <code>readToken</code> retourne par défaut le token suivant.</p>
 		<p>
 			Il est impératif que la règle d'analyse de base puisse identifiée tous les tokens pouvant être trouvé, 
 			sinon l'analyse est stoppée prématurément. <br>
@@ -74,7 +74,7 @@ CODE { background: #eee; }
 			Sinon il faut en trouver un autre !
 		</li>
 		<li>
-			Il nous faut parfois obtenir une liste de lexème plus simple:<br>
+			Il nous faut parfois obtenir une liste de lexème réduite en omettant certains tokens.<br>
 			Les commentaires sont entre autres des lexèmes non significatifs pour l'analyse syntaxique, 
 			comme les espaces blancs... mais là, ce n'est pas forcément le cas.
 		</li>
