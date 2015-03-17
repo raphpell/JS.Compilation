@@ -7,6 +7,13 @@
 			' - &lt;a href="../UnitTest/LexerRules.xml"&gt;Tests unitaires associés&lt;/a&gt;'
 		</script>
 		<p>Cet objet contient toutes les méthodes concernant les propriétés des tokens.</p>
+		<ul>
+			<li>classes css</li>
+			<li>classes css</li>
+			<li>noms de token devant le précéder</li>
+			<!-- <li>noms de token pouvant être passé</li> -->
+			<li>traduction des noms de token.</li>
+		</ul>
 		<h4>Définitions des tokens (ER ou AFD)</h4>
 		<blockquote>
 			<p>Une définition détermine un ou plusieurs types de lexème pouvant être trouvés (cas AFD).</p>
@@ -164,26 +171,43 @@ Si l'argument est de type:
 				</returnValue>
 			</function>
 			<function name="setPreviousTokenOf">
-				<desc>.</desc>
+				<desc>
+					Défini la valeur du token précédant.<br/>
+					Voir l'objet <a href="LexerClass.Previous.xml">Previous</a>.
+				</desc>
 				<arguments>
-					<arg type="___" name="___">
-						<desc>.</desc>
+					<arg type="String" name="sToken">
+						<desc>Nom d'un token.</desc>
+					</arg>
+					<arg type="String" name="sPreviousTokens">
+						<desc>Nom des tokens devant le précéder séparés par le caractère '|'.</desc>
 					</arg>
 				</arguments>
-				<returnValue type="___">
-					<desc>.</desc>
+				<returnValue type="Object">
+					<desc>
+						Objet defini à l'attribut <code>Previous.ofToken[ sToken ]</code>.
+					</desc>
 				</returnValue>
 			</function>
 			<function name="setTokensTranslation">
-				<desc>.</desc>
+				<desc>Ajoute une traduction au nom de token.</desc>
 				<arguments>
-					<arg type="___" name="___">
-						<desc>.</desc>
+					<arg type="Mixte" name="m">
+						<desc>
+Si l'argument est de type:
+<ul>
+	<li><code>Array</code> : Chaque élément doit être une chaîne de la forme:<br/>
+		NomDuToken + '=' + NouveauNom<br/>
+		<b>Exemple:</b>
+		<code>'MLC=COMMENT'</code>
+	</li>
+	<li><code>String</code> : Il doit être l'équivalent du tableau précédant regroupé avec le caractère '&amp;'.
+		
+	</li>
+</ul>
+						</desc>
 					</arg>
 				</arguments>
-				<returnValue type="___">
-					<desc>.</desc>
-				</returnValue>
 			</function>
 		</methods>
 	</group>
