@@ -1,36 +1,113 @@
 ﻿<?xml version='1.0' encoding='UTF-8'?>
 <?xml-stylesheet type="text/xsl" href="Doc.xsl"?> 
 <class name="AutomatonLexer" language="JavaScript">
-	<desc>.</desc>
-	<syntax>
-		<code><![CDATA[ var oLexer = new AutomatonLexer () ]]></code>
+	<desc>
+		<script>
+			document.getElementById('eTopLeftMenu').innerHTML +=
+			' - &lt;a href="../UnitTest/Lexer.Automaton.xml"&gt;Tests unitaires associés&lt;/a&gt;'
+		</script>
+		Classe étendue créée depuis la fonction <a href="LexerClass.xml">LexerClass</a>.
+	</desc>
+
+	<syntax name="Code interne">
+		<code><![CDATA[
+var AutomatonLexer =(function( Lexer ){
+	/* ... extensions de la classe ...*/
+	return Lexer
+	})( LexerClass()) 
+		]]></code>
 	</syntax>
-	<syntax>
-		<code><![CDATA[ var eScanResult = AutomatonLexer ( sText, sSyntax ) ]]></code>
-		<arguments>
-			<arg type="String" name="sText">
-				<desc>.</desc>
-			</arg>
-			<arg type="String" name="sSyntax">
-				<desc>.</desc>
-			</arg>
-		</arguments>
-	</syntax>
-	<group name="Instance(s)">
+
+	<group name="Extensions">
+		<desc>La syntaxe 'TXT' est définie par défaut.</desc>
 		<properties name="Attributs">
-			<variable name="type" type="String">
-				<desc>.</desc>
+			<variable name="Lexer.ID" type="String" default="'AutomatonLexer'">
+				<desc>Nom du lexer.</desc>
 			</variable>
 		</properties>
-		<methods name="Méthodes scanning">
-			<function name="searchToken">
-				<desc>.</desc>
+		<methods name="Méthodes">
+			<function name="Lexer.Rules.makeToken">
+				<desc>
+					Etend un AFD pour qu'il soit compatible au système.
+				</desc>
 				<arguments>
-					<arg type="Automate" name="oDFA">
-						<desc>.</desc>
+					<arg type="String" name="sName">
+						<desc>Nom de token.</desc>
+					</arg>
+					<arg type="DFA" name="oDFA">
+						<desc>Automate fini déterministe du token.</desc>
 					</arg>
 				</arguments>
-				<returnValue type="String"></returnValue>
+				<returnValue type="DFA">
+					<desc>
+						Le DFA compatible au système.<br/>
+						Il posséde un attribut <code>name</code> affecté avec la valeur <code>sName</code>.
+					</desc>
+				</returnValue>
+			</function>
+			<function name="Lexer.Rules.addTokenFromString">
+				<desc>
+					Ajoute un token depuis un DFA au format <code>String</code>.
+				</desc>
+				<arguments>
+					<arg type="String" name="sName">
+						<desc>Nom de token.</desc>
+					</arg>
+					<arg type="String" name="sDFA">
+						<desc>Automate fini déterministe du token.</desc>
+					</arg>
+				</arguments>
+			</function>
+			<function name="Lexer.prototype.searchToken">
+				<desc>
+					Cherche un token depuis l'AFD en argument : il peut reconnaître un ou plusieurs tokens.
+				</desc>
+				<arguments>
+					<arg type="DFA" name="oDFA">
+						<desc>AFD permettant de trouver un ou plusieurs tokens.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="Mixte">
+					<desc>
+						<ul>
+							<li><code>null</code> si aucun token n'a été trouvé à l'index voulu.</li>
+							<li><code>false</code> si le token précédant n'est pas compatible.</li>
+							<li>Sinon la valeur du token trouvé.</li>
+						</ul>
+					</desc>
+				</returnValue>
+			</function>
+			<function name="Lexer.insert">
+				<desc>
+					Ajoute un module... voir le code source pour plus d'info.
+				</desc>
+			</function>
+		</methods>
+		<methods name="Méthodes privées">
+			<desc>
+				Il y a parmis elles les <a href="../../../AFD.compression.htm">fonctions de compression</a>.
+			</desc>
+			<function name="nextState">
+				<desc>
+					Retourne l'état suivant d'un automate aprés la lecture d'un caractère.
+					<blockquote><cite>Elle utilise un système de cache pour améliorer les performances.</cite></blockquote>
+				</desc>
+				<arguments>
+					<arg type="DFA" name="oDFA">
+						<desc>Un automate fini déterministe.</desc>
+					</arg>
+					<arg type="Number" name="nState">
+						<desc>Etat de l'automate.</desc>
+					</arg>
+					<arg type="String" name="sChar">
+						<desc>Caractère à lire.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="Number">
+					<desc>
+						Elle retourne l'état suivant ou <code>-2</code> si il n'y en a pas.
+					</desc>
+				</returnValue>
 			</function>
 		</methods>
 	</group>

@@ -7,22 +7,55 @@
 			' - &lt;a href="../UnitTest/LexerClass.xml"&gt;Tests unitaires associés&lt;/a&gt;'
 		</script>
 		Fabrique de Lexer: elle retourne un nouveau constructeur prêt à être augmenté.
-		<br/>À implémenter:
-		<ul>
-			<li><code>MyLexer.ID</code>: nom du lexer</li>
-			<li><code>MyLexer.Rules.makeToken</code></li>
-			<li><code>MyLexer.Rules.makeRule</code></li>
-			<li><code>MyLexer.prototype.searchToken</code></li>
-		</ul>
 	</desc>
-	<syntax>
+	<syntax name="Création d'un nouveau type de lexer">
+		<desc>À implémenter:
+			<ul>
+				<li><code>MyLexer.ID</code>: nom du lexer</li>
+				<li><code>MyLexer.Rules.makeToken</code></li>
+				<li><code>MyLexer.Rules.makeRule</code></li>
+				<li><code>MyLexer.prototype.searchToken</code></li>
+			</ul>
+		</desc>
 		<code><![CDATA[ var MyLexer = LexerClass() ]]></code>
 	</syntax>
+	<syntax name="Décomposition des étapes du scanne">
+		<code><![CDATA[
+var oLexer = new MyLexer ()
+
+// utilisation 1
+oLexer.init( sText, sSyntax )
+while( oLexer.readToken()) ;
+eScanResult = oLexer.end()
+
+// utilisation 2
+eScanResult = oLexer.scan( sText, sSyntax )
+		]]></code>
+	</syntax>
+
 	<group name="MyLexer">
 		<desc>
 			<code>MyLexer</code> est utilisée soit en constructeur, soit en fonction : il utilise alors un singleton.<br/>
 			L'instanciation permet d'observer étape par étape l'analyse lexicale.
 		</desc>
+		
+		<methods>
+			<function name="MyLexer">
+				<desc>Récupération direct du résultat d'un scanne.</desc>
+				<code><![CDATA[ var eScanResult = MyLexer( sText [, sSyntax ]) ]]></code>
+				<arguments>
+					<arg name="sText" type="String">
+						<desc>Texte scanné.</desc>
+					</arg>
+					<arg name="sSyntax" type="String" opt="1" default="'TXT'">
+						<desc>Syntaxe utilisée.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="HTMLElement">
+					<desc>La racine de l'arbre lexical est retournée.</desc>
+				</returnValue>
+			</function>
+		</methods>
 	</group>
 	<group name="Objet MyLexer">
 		<properties name="Attributs">

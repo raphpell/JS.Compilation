@@ -1,0 +1,89 @@
+﻿<?xml version='1.0' encoding='UTF-8'?>
+<?xml-stylesheet type="text/xsl" href="Doc.xsl"?> 
+<class name="OneRegExpLexer" language="JavaScript">
+	<desc>
+		<script>
+			document.getElementById('eTopLeftMenu').innerHTML +=
+			' - &lt;a href="../UnitTest/Lexer.RegExp.One.xml"&gt;Tests unitaires associés&lt;/a&gt;'
+		</script>
+		Classe étendue créée depuis la fonction <a href="LexerClass.xml">LexerClass</a>.
+	</desc>
+
+	<syntax name="Code interne">
+		<code><![CDATA[
+var OneRegExpLexer =(function( Lexer ){
+	/* ... extensions de la classe ...*/
+	return Lexer
+	})( LexerClass()) 
+		]]></code>
+	</syntax>
+
+	<group name="Extensions">
+		<desc>La syntaxe 'TXT' est définie par défaut.</desc>
+		<properties name="Attributs">
+			<variable name="Lexer.ID" type="String" default="'OneRegExpLexer'">
+				<desc>Nom du lexer.</desc>
+			</variable>
+		</properties>
+		<methods name="Méthodes">
+			<function name="Lexer.Rules.makeToken">
+				<desc>
+					Créé une nouvelle ER pour le token depuis l'ER en argument.
+				</desc>
+				<arguments>
+					<arg type="String" name="sName">
+						<desc>Nom de token.</desc>
+					</arg>
+					<arg type="RegExp" name="reModele">
+						<desc>Expression règulière du token.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="RegExp">
+					<desc>
+						Une nouvelle expression règulière compatible au système (drapeau 'g' utilisé).<br/>
+						Elle posséde un attribut <code>name</code> affecté avec la valeur <code>sName</code>.
+					</desc>
+				</returnValue>
+			</function>
+			<function name="Lexer.Rules.makeRule">
+				<desc>Créé une règle d'analyse.<br/>
+					Elles sont un tableau d'ER contenant :
+						<ul>
+							<li>une grande ER créée depuis celles de tous les tokens</li>
+							<li>toutes les ER utilisées pour créer la grande</li>
+						</ul>
+				</desc>
+				<arguments>
+					<arg type="String" name="sName">
+						<desc>Nom de la règle.</desc>
+					</arg>
+					<arg type="String" name="sTokens">
+						<desc>Liste de noms de token de la règle séparés par le symbole '|'.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="Array">
+					<desc>La règle créée est retournée.</desc>
+				</returnValue>
+			</function>
+			<function name="Lexer.prototype.searchToken">
+				<desc>
+					Cherche un token depuis l'ER en argument : elle peut reconnaître un à plusieurs tokens.
+				</desc>
+				<arguments>
+					<arg type="RegExp" name="reTokenOrTokens">
+						<desc>RE permettant de trouver un ou plusieurs tokens.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="Mixte">
+					<desc>
+						<ul>
+							<li><code>null</code> si aucun token n'a été trouvé à l'index voulu.</li>
+							<li><code>false</code> si le token précédant n'est pas compatible.</li>
+							<li>Sinon la valeur du token trouvé.</li>
+						</ul>
+					</desc>
+				</returnValue>
+			</function>
+		</methods>
+	</group>
+</class>

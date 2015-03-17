@@ -3,7 +3,7 @@
 var OneRegExpLexer =(function( Lexer ){
 	Lexer.ID = "OneRegExpLexer"
 	Lexer.Rules.makeToken =function( sName, o ){
-		o = new RegExp ( o.source, 'gm' )
+		o = new RegExp ( o.source, 'g' )
 		o.name = sName
 		return o
 		}
@@ -15,20 +15,16 @@ var OneRegExpLexer =(function( Lexer ){
 			aRules[i] = oRule
 			aRegExp[i] = '('+ aRules[i].source +')'
 			}
-		var oRE = new RegExp ( aRegExp.join('|'), 'gm' )
+		var oRE = new RegExp ( aRegExp.join('|'), 'g' )
 		oRE.sId = sName
 		oRE.tokens = aRules
 		return Array.concat( [oRE], aRules )
 		}
 	Lexer.prototype.searchToken =function( oRE ){
-		// End of input?
-		// if( this.nPos==this.sText.length ) return null
-		
 		oRE.lastIndex = this.nPos
 		var result = oRE.exec( this.sText )
 		if( result === null || result.index != this.nPos || ! result[0].length )
 			return null
-		//	throw Error( 'Cannot match a token at position ' + oRE.lastIndex )
 
 		if( oRE.tokens ){
 			/* ONLY FOR DEBUGGING PURPOSES

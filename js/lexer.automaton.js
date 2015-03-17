@@ -3,7 +3,7 @@
 var AutomatonLexer =(function( Lexer ){
 	Lexer.ID = "AutomatonLexer"
 	var nextState =function( oFA, sStateI, sChar ){
-		var cache = oFA.cache || ( oFA.cache = [] )
+		var cache = oFA.cache
 		cache = cache[sStateI] || ( cache[sStateI] = {} )
 		if( cache[sChar]) return cache[sChar]
 		var o = oFA.M[sStateI], sStateF
@@ -39,10 +39,11 @@ var AutomatonLexer =(function( Lexer ){
 		}
 
 	Lexer.Rules.union({
-		makeToken :function( sName, o ){
-			o.name = sName
-			if( ! o.TokensTable ) o.TokensTable = [,sName]
-			return o
+		makeToken :function( sName, oDFA ){
+			oDFA.name = sName
+			oDFA.cache = []
+			if( ! oDFA.TokensTable ) oDFA.TokensTable = [,sName]
+			return oDFA
 			},
 		addTokenFromString :function( sName, sDFA ){
 			var o;

@@ -1,0 +1,30 @@
+﻿<?xml version='1.0' encoding='UTF-8'?>
+<?xml-stylesheet type="text/xsl" href="UnitTest.xsl"?> 
+
+<truth name="MultiRegExpLexer">
+	<script src="../../../js/framework.js"></script>
+	<script src="../../../js/lexer.class.js"></script>
+	<script src="../../../js/lexer.regexp.multi.js"></script>
+	<desc>
+		<script>
+			document.getElementById('eTopLeftMenu').innerHTML +=
+			' - &lt;a href="../doc/Lexer.RegExp.Multi.xml"&gt;Documentation associés&lt;/a&gt;'
+		</script>
+	</desc>
+	<test name="Préambule" class="preambule">
+		<assertions>
+			<value><![CDATA[
+var oLexer = new MultiRegExpLexer // Création d'un Lexer
+			]]></value>
+		</assertions>
+	</test>
+	<test name="___">
+		<assertions>
+			<desc>___</desc>
+			<value><![CDATA[
+true
+			]]></value>
+			<assert><![CDATA[ true ]]></assert>
+		</assertions>
+	</test>
+</truth>

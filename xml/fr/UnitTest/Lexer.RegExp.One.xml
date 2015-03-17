@@ -1,0 +1,30 @@
+﻿<?xml version='1.0' encoding='UTF-8'?>
+<?xml-stylesheet type="text/xsl" href="UnitTest.xsl"?> 
+
+<truth name="OneRegExpLexer">
+	<script src="../../../js/framework.js"></script>
+	<script src="../../../js/lexer.class.js"></script>
+	<script src="../../../js/lexer.regexp.one.js"></script>
+	<desc>
+		<script>
+			document.getElementById('eTopLeftMenu').innerHTML +=
+			' - &lt;a href="../doc/Lexer.RegExp.One.xml"&gt;Documentation associés&lt;/a&gt;'
+		</script>
+	</desc>
+	<test name="Préambule" class="preambule">
+		<assertions>
+			<value><![CDATA[
+var oLexer = new OneRegExpLexer // Création d'un Lexer
+			]]></value>
+		</assertions>
+	</test>
+	<test name="___">
+		<assertions>
+			<desc>___</desc>
+			<value><![CDATA[
+true
+			]]></value>
+			<assert><![CDATA[ true ]]></assert>
+		</assertions>
+	</test>
+</truth>

@@ -3,7 +3,7 @@
 var MultiRegExpLexer =(function( Lexer ){
 	Lexer.ID = "MultiRegExpLexer"
 	Lexer.Rules.makeToken =function( sName, o ){
-		o = new RegExp ( o.source, 'gm' )
+		o = new RegExp ( o.source, 'g' )
 		o.name = sName
 		return o
 		}
