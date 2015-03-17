@@ -5,15 +5,15 @@ Lexer et Parser en JavaScript.
 
 Lexers ( ER vs AFD )
 --------
-Comparaison de Lexer à ER(expressions régulières) et d'un lexer à AFD(automates finis déterministes) :
+Comparaison de Lexer à expressions régulières (ER) et d'un lexer à automates finis déterministes (AFD) :
 - [Comparaison du résultat](http://raphpell.github.io/JS.Compilation/Lexers.result.comparaison.htm)
 - [Performance: scan](http://raphpell.github.io/JS.Compilation/Lexers.performance.scan.htm)
 - [Performance: readToken](http://raphpell.github.io/JS.Compilation/Lexers.performance.readToken.htm)
 
-Analyse lexicale incrémentielle (AFD) :
+Analyse lexicale incrémentielle pour éditeur de texte :
 - [Performance](http://raphpell.github.io/JS.Compilation/Lexers.performance.scan.incremental.htm)
 
-Divers :
+Pour les automates :
 - [Transformation d'une ER en AFD](http://raphpell.github.io/JS.Compilation/AFD.generator.htm)
 - [Aggrégation d'automates finis déterministes](http://raphpell.github.io/JS.Compilation/AFD.aggregator.htm)
 - [Création de module pour les lexers](http://raphpell.github.io/JS.Compilation/LexerAutomaton.module.generator.htm)
