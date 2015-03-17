@@ -15,8 +15,8 @@ Analyse lexicale incrémentielle pour éditeur de texte :
 
 Pour les automates :
 - [Transformation d'une ER en AFD](http://raphpell.github.io/JS.Compilation/AFD.generator.htm)
-- [Aggrégation d'automates finis déterministes](http://raphpell.github.io/JS.Compilation/AFD.aggregator.htm)
-- [Création de module pour les lexers](http://raphpell.github.io/JS.Compilation/LexerAutomaton.module.generator.htm)
+- [Aggrégation d'AFDs](http://raphpell.github.io/JS.Compilation/AFD.aggregator.htm)
+- [Création de module](http://raphpell.github.io/JS.Compilation/LexerAutomaton.module.generator.htm)
 
 
 Parser
