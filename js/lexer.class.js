@@ -417,8 +417,8 @@ var LexerClass =function(){
 				} while ( nStart <= nEnd )
 			return null
 			},
-		removeDeletedNodes :function( eParent, nPos, nDeleted ){
-			var e = this.nodeAt( nPos, eParent )
+		removeDeletedNodes :function( nPos, nDeleted ){
+			var e = this.nodeAt( nPos, this.eRoot )
 			, ePrevious
 			, eNext 
 			, remove =CallBack( this, function( e ){
@@ -450,7 +450,7 @@ var LexerClass =function(){
 				throw Error( 'Pas le même parent ! final' )
 			*/
 			return {
-				before: ! e ? this.eRoot.lastChild: ePrevious,
+				before: ! e ? this.eRoot.lastChild : ePrevious,
 				after: eNext
 				}
 			},
@@ -475,7 +475,7 @@ var LexerClass =function(){
 			this.nShift = nAdded-nDeleted
 			this.nLineShift = this.nLineEnd = null // ! important
 
-			var oScanLimit = this.removeDeletedNodes( eRoot, nPos, nDeleted )
+			var oScanLimit = this.removeDeletedNodes( nPos, nDeleted )
 			, eBefore = oScanLimit.before
 			, eParent
 

@@ -9,15 +9,22 @@
 		Fabrique de Lexer: elle retourne un nouveau constructeur prêt à être augmenté.
 	</desc>
 	<syntax name="Création d'un nouveau type de lexer">
-		<desc>À implémenter:
+		<code></code>
+		<desc>
+			<pre>var MyLexer = LexerClass()</pre>
+			À implémenter:
 			<ul>
 				<li><code>MyLexer.ID</code>: nom du lexer</li>
 				<li><code>MyLexer.Rules.makeToken</code></li>
 				<li><code>MyLexer.Rules.makeRule</code></li>
 				<li><code>MyLexer.prototype.searchToken</code></li>
 			</ul>
+			<p>Voir les objets 
+				<a href="Lexer.automaton.xml">AutomatonLexer</a>, 
+				<a href="Lexer.RegExp.Multi.xml">MultiRegExpLexer</a> et  
+				<a href="Lexer.RegExp.One.xml">OneRegExpLexer</a>.
+			</p>
 		</desc>
-		<code><![CDATA[ var MyLexer = LexerClass() ]]></code>
 	</syntax>
 	<syntax name="Décomposition des étapes du scanne">
 		<code><![CDATA[
@@ -30,6 +37,9 @@ eScanResult = oLexer.end()
 
 // utilisation 2
 eScanResult = oLexer.scan( sText, sSyntax )
+
+// utilisation 3
+eScanResult = MyLexer( sText, sSyntax )
 		]]></code>
 	</syntax>
 
@@ -174,30 +184,215 @@ Elle doit
 		</methods>
 	</group>
 	<group name="MyLexer.prototype (scanne incrementiel)">
-		<desc>...à décrire...</desc>
 		<properties name="Attributs">
 			<variable name="eEndToken" type="HTMLElement" default="null">
-				<desc>.</desc>
+				<desc>Token de fin d'analyse, sa valeur peu changer pendant l'analyse</desc>
 			</variable>
 			<variable name="nShift" type="Number" default="null">
-				<desc>.</desc>
+				<desc>Décalage d'index à appliquer depuis le token <code>eEndToken</code>.</desc>
 			</variable>
 			<variable name="nLineShift" type="Number" default="null">
-				<desc>.</desc>
+				<desc>Décalage de ligne à appliquer depuis le token <code>eEndToken</code>.</desc>
 			</variable>
 		</properties>
 		<methods name="Méthodes">
-			<function name="getTokenAfter"></function>
-			<function name="getTokenBefore"></function>
-			<function name="getNextEndToken"></function>
-			<function name="haveLexeme"></function>
-			<function name="isPartOfRange"></function>
-			<function name="isWhiteSpace"></function>
-			<function name="nodeAt"></function>
-			<function name="removeDeletedNodes"></function>
-			<function name="removeToken"></function>
-			<function name="rescan"></function>
-			<function name="updateValues"></function>
+			<function name="getTokenAfter">
+				<desc>
+					Récupère dans l'arbre lexical le token suivant le token en argument.<br/>
+					Si il n'y en a pas la recherche se fait avec son parent, et cela jusqu'à la racine.
+				</desc>
+				<arguments>
+					<arg type="HTMLElement" name="eToken">
+						<desc>Un token de l'arbre lexical.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="Mixte">
+					<desc>
+						<ul>
+							<li><code>null</code> si il n'y en a pas</li>
+							<li><code>HTMLElement</code> sinon.</li>
+						</ul>
+					</desc>
+				</returnValue>
+			</function>
+			<function name="getTokenBefore">
+				<desc>
+					Récupère dans l'arbre lexical le token précédant le token en argument.<br/>
+					Si il n'y en a pas la recherche se fait avec son parent, et cela jusqu'à la racine.
+				</desc>
+				<arguments>
+					<arg type="HTMLElement" name="eToken">
+						<desc>Un token de l'arbre lexical.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="Mixte">
+					<desc>
+						<ul>
+							<li><code>null</code> si il n'y en a pas</li>
+							<li><code>HTMLElement</code> sinon.</li>
+						</ul>
+					</desc>
+				</returnValue>
+			</function>
+			<function name="getNextEndToken">
+				<desc>
+					Recherche et défini le prochain token fin d'analyse <code>eEndToken</code>.<br/>
+					L'ancien <code>eEndToken</code> est effacé.<br/>
+					Le nouveau <code>eEndToken</code> est en faite le token suivant obtenu avec <code>getTokenAfter</code>.
+				</desc>
+			</function>
+			<function name="haveLexeme">
+				<desc>
+					Recherche si le lexème en argument est déjà présent dans l'arbre.<br/>
+					Si le token <code>eEndToken</code> est dépassé, alors celui-ci est mise à jour.<br/>
+					Si le lexème est déjà présent, alors elle prépare la mise à jour de l'arbre lexical et retourne <code>true</code>.
+				</desc>
+				<arguments>
+					<arg type="Object" name="oLexeme">
+						<desc>Objet brut obtenu lors de l'analyse lexical : lexème.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="Boolean">
+					<desc>
+						<ul>
+							<li><code>true</code> si le lexème en argument est égale à celui stocké par <code>eEndToken</code>.</li>
+							<li><code>false</code> sinon.</li>
+						</ul>
+					</desc>
+				</returnValue>
+			</function>
+			<function name="isPartOfRange">
+				<desc>Recherche si la valeur d'un token fait parti d'une portion précise du texte source.</desc>
+				<arguments>
+					<arg type="HTMLElement" name="eToken">
+						<desc>Token de l'arbre lexical.</desc>
+					</arg>
+					<arg type="Number" name="nStart">
+						<desc>Index de départ de la portion.</desc>
+					</arg>
+					<arg type="Number" name="nLength">
+						<desc>Longueur de la portion.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="Boolean">
+					<desc>
+						<ul>
+							<li><code>true</code> si la valeur du token fait partie de la portion.</li>
+							<li><code>false</code> sinon.</li>
+						</ul>
+					</desc>
+				</returnValue>
+			</function>
+			<function name="isWhiteSpace">
+				<desc>Cherche à savoir si le token est un espace blanc.</desc>
+				<arguments>
+					<arg type="String" name="sToken">
+						<desc>Nom d'un token.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="Boolean">
+				</returnValue>
+			</function>
+			<function name="nodeAt">
+				<desc>
+					Recherche le token 'feuille' de l'arbre lexical à un index précis.<br/>
+					<small>Recherche dichotomique récursive.</small>
+				</desc>
+				<arguments>
+					<arg type="Number" name="nPos">
+						<desc>Un index de la source.</desc>
+					</arg>
+					<arg type="HTMLElement" name="eParent" opt="1" default="this.eRoot">
+						<desc>Parent où est réalisé la recherche.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="Mixte">
+					<desc>
+						<ul>
+							<li><code>null</code> si il n'y en a pas</li>
+							<li><code>HTMLElement</code> sinon.</li>
+						</ul>
+					</desc>
+				</returnValue>
+			</function>
+			<function name="removeDeletedNodes">
+				<desc>
+					Etape phare de l'analyse incrémentielle : supression des éléments effacés.<br/>
+					Efface les tokens de l'arbre lexical present dans un intervalle du texte source.<br/>
+					La suppression des tokens se fait au plus large afin de réaliser une analyse incrémentielle en toute sérénité...
+					<ul>
+						<li>Efface à gauche jusqu'au premier espace trouvé</li>
+						<li>Efface à droite jusqu'au premier espace trouvé</li>
+						<li>Si une limite de parent est effacé, le parent est effacé.</li>
+					</ul>
+				</desc>
+				<arguments>
+					<arg type="Number" name="nPos">
+						<desc>Index de départ de la portion effacée.</desc>
+					</arg>
+					<arg type="Number" name="nDeleted">
+						<desc>Longueur de la portion.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="Object">
+					<desc>
+						Elle retourne un objet contenant 2 tokens ayant le même parent.
+						<ul>
+							<li><code>before</code>: le token avant les éléments supprimés</li>
+							<li><code>after</code>: le token après les éléments supprimés</li>
+						</ul>
+					</desc>
+				</returnValue>
+			</function>
+			<function name="removeToken">
+				<desc>Efface un token de l'arbre lexical.</desc>
+				<arguments>
+					<arg type="HTMLElement" name="eToken">
+						<desc>Un token.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="HTMLElement">
+					<desc>Le token effacé.</desc>
+				</returnValue>
+			</function>
+			<function name="rescan">
+				<desc>
+					Lance une analyse lexical incrémentielle. <br/>
+					Il s'agit d'une mise à jour partielle de l'arbre lexical précédemment obtenu.
+				</desc>
+				<arguments>
+					<arg type="HTMLElement" name="eRoot">
+						<desc>Racine de l'arbre lexical.</desc>
+					</arg>
+					<arg type="String" name="sSource">
+						<desc>Nouvelle source après modification.</desc>
+					</arg>
+					<arg type="Number" name="nPos">
+						<desc>Index de la modification.</desc>
+					</arg>
+					<arg type="Number" name="nDeleted">
+						<desc>Nombre de caractère effacé.</desc>
+					</arg>
+					<arg type="Number" name="nAdded">
+						<desc>Nombre de caractère ajouté.</desc>
+					</arg>
+				</arguments>
+				<returnValue type="Object">
+					<desc>Attributs de l'objet retourné :
+						<ul>
+							<li><code>lineStart</code>: première ligne de la mise à jour.</li>
+							<li><code>lineEnd</code>: dernière ligne de la mise à jour.</li>
+							<li><code>lineShift</code>: décalage de ligne à réaliser.</li>
+						</ul>
+					</desc>
+				</returnValue>
+			</function>
+			<function name="updateValues">
+				<desc>
+					Cette fonction à usage privé met à jour la valeur des index et des lignes des tokens suivants la modification de l'arbre.<br/>
+					Elle est appelé évidemment à la fin de l'analyse.
+				</desc>
+			</function>
 		</methods>
 	</group>
 
