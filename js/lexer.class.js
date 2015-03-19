@@ -206,6 +206,7 @@ var LexerClass =function(){
 		var a =[0,0,0,0,0]
 		var n = 0 // StackLength
 		return {
+			getSize :function(){ return n },
 			pop :function(){
 				if( that.bIncremental ){
 					// Cas : Un parent est stoppé plus top
@@ -230,6 +231,9 @@ var LexerClass =function(){
 					that.eParent = a[n-1]
 					that.setSyntax( that.eParent.oValue.rule )
 					}
+				else {
+					that.eParent = that.aRules = that.sSyntax = null
+					}
 				return n
 				},
 			push :function( e ){
@@ -237,10 +241,11 @@ var LexerClass =function(){
 				that.setSyntax( e.oValue.rule )
 				return e
 				},
-			top :function(){ return a[n-1]},
+			top :function(){ return a[n-1] },
 			unshift :function( e ){
-				a.unshift(e)
 				n++
+				a.unshift(e)
+				return e
 				}
 			}
 		}

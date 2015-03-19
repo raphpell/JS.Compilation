@@ -17,13 +17,200 @@ var Lexer = LexerClass() // Création d'un type de Lexer vide.
 			]]></value>
 		</assertions>
 	</test>
-	<test name="___">
+	<test name="Attributs Lexer">
 		<assertions>
-			<desc>___</desc>
+			<desc>
+Tests unitaires associés		
+<ul>
+	<li><a href="Actions.xml">Lexer.Actions</a></li>
+	<li><a href="Previous.xml">Lexer.Previous</a></li>
+	<li><a href="LexerRules.xml">Lexer.Rules</a></li>
+	<li><a href="Skip.xml">Lexer.Skip</a></li>
+	<li><a href="Stack.xml">Lexer.Stack</a></li>
+</ul>
+			</desc>
+			<assert><![CDATA[ Lexer.ID === "LexerClass" ]]></assert>
+			<assert><![CDATA[ ! Lexer.SINGLETON ]]></assert>
+			<assert><![CDATA[ Lexer( 'une phrase' ) ]]></assert>
+			<assert><![CDATA[ Lexer.SINGLETON ]]></assert>
+		</assertions>
+	</test>
+	
+	<test name="Instance(s) Lexer (scanne)" class="preambule"></test>
+	<test name="Avant initialisation">
+		<assertions>
 			<value><![CDATA[
-true
+var oLexer = new Lexer
+			]]></value>
+			<assert><![CDATA[ oLexer.bSkip === 0 ]]></assert>
+			<assert><![CDATA[ oLexer.eRoot === undefined ]]></assert>
+			<assert><![CDATA[ oLexer.nLine === undefined ]]></assert>
+			<assert><![CDATA[ oLexer.nPos === undefined ]]></assert>
+			<assert><![CDATA[ oLexer.sText === undefined ]]></assert>
+			<assert><![CDATA[ oLexer.sToken === null ]]></assert>
+			<assert><![CDATA[ oLexer.sValue === null ]]></assert>
+			<assert><![CDATA[ oLexer.appendNode === null ]]></assert>
+			<assert><![CDATA[ oLexer.skip === undefined ]]></assert>
+			<assert><![CDATA[ oLexer.stack === undefined ]]></assert>
+			<assert><![CDATA[ oLexer.previous === undefined ]]></assert>
+		</assertions>
+	</test>
+	<test name="Lexer.prototype.init">
+		<assertions>
+			<value><![CDATA[
+oLexer.init( 'Ma phrase teste.' )
+			]]></value>
+			<assert><![CDATA[ oLexer.bSkip === 0 ]]></assert>
+			<assert><![CDATA[ oLexer.eRoot.oValue ]]></assert>
+			<assert><![CDATA[ oLexer.nLine === 1 ]]></assert>
+			<assert><![CDATA[ oLexer.nPos === 0 ]]></assert>
+			<assert><![CDATA[ oLexer.sText === 'Ma phrase teste.' ]]></assert>
+			<assert><![CDATA[ oLexer.sToken === null ]]></assert>
+			<assert><![CDATA[ oLexer.sValue === null ]]></assert>
+			<assert><![CDATA[ oLexer.appendNode ]]></assert>
+			<assert><![CDATA[ oLexer.skip ]]></assert>
+			<assert><![CDATA[ oLexer.stack ]]></assert>
+			<assert><![CDATA[ oLexer.previous ]]></assert>
+		</assertions>
+	</test>
+	<test name="Lexer.prototype.readToken">
+		<assertions>
+			<value><![CDATA[
+
 			]]></value>
 			<assert><![CDATA[ true ]]></assert>
 		</assertions>
 	</test>
+	<test name="Lexer.prototype.end">
+		<assertions>
+			<value><![CDATA[
+
+			]]></value>
+			<assert><![CDATA[ true ]]></assert>
+		</assertions>
+	</test>
+	<test name="Lexer.prototype.scan">
+		<assertions>
+			<value><![CDATA[
+
+			]]></value>
+			<assert><![CDATA[ true ]]></assert>
+		</assertions>
+	</test>
+	<test name="Lexer.prototype.searchToken">
+		<assertions>
+			<desc></desc>
+		</assertions>
+	</test>
+	<test name="Lexer.prototype.setSyntax">
+		<assertions>
+			<desc></desc>
+		</assertions>
+	</test>
+	
+	
+	<test name="Instance(s) Lexer (scanne incrémentielle)" class="preambule"></test>
+	<test name="Avant">
+		<assertions>
+			<assert><![CDATA[ oLexer.eEndToken === null ]]></assert>
+			<assert><![CDATA[ oLexer.nLineShift === null ]]></assert>
+			<assert><![CDATA[ oLexer.nShift === null ]]></assert>
+		</assertions>
+	</test>
+	<test name="Lexer.prototype.getTokenAfter">
+		<assertions>
+			<desc></desc>
+			<value><![CDATA[
+
+			]]></value>
+			<assert><![CDATA[ true ]]></assert>
+		</assertions>
+	</test>
+	<test name="Lexer.prototype.getTokenBefore">
+		<assertions>
+			<desc></desc>
+			<value><![CDATA[
+
+			]]></value>
+			<assert><![CDATA[ true ]]></assert>
+		</assertions>
+	</test>
+	<test name="Lexer.prototype.getNextEndToken">
+		<assertions>
+			<desc></desc>
+			<value><![CDATA[
+
+			]]></value>
+			<assert><![CDATA[ true ]]></assert>
+		</assertions>
+	</test>
+	<test name="Lexer.prototype.haveLexeme">
+		<assertions>
+			<desc></desc>
+			<value><![CDATA[
+
+			]]></value>
+			<assert><![CDATA[ true ]]></assert>
+		</assertions>
+	</test>
+	<test name="Lexer.prototype.isPartOfRange">
+		<assertions>
+			<desc></desc>
+			<value><![CDATA[
+
+			]]></value>
+			<assert><![CDATA[ true ]]></assert>
+		</assertions>
+	</test>
+	<test name="Lexer.prototype.isWhiteSpace">
+		<assertions>
+			<desc></desc>
+			<value><![CDATA[
+
+			]]></value>
+			<assert><![CDATA[ true ]]></assert>
+		</assertions>
+	</test>
+	<test name="Lexer.prototype.nodeAt">
+		<assertions>
+			<desc></desc>
+			<value><![CDATA[
+
+			]]></value>
+			<assert><![CDATA[ true ]]></assert>
+		</assertions>
+	</test>
+	<test name="Lexer.prototype.removeDeletedNodes">
+		<assertions>
+			<desc></desc>
+			<value><![CDATA[
+
+			]]></value>
+			<assert><![CDATA[ true ]]></assert>
+		</assertions>
+	</test>
+	<test name="Lexer.prototype.removeToken">
+		<assertions>
+			<desc></desc>
+			<value><![CDATA[
+
+			]]></value>
+			<assert><![CDATA[ true ]]></assert>
+		</assertions>
+	</test>
+	<test name="Lexer.prototype.rescan">
+		<assertions>
+			<desc></desc>
+			<value><![CDATA[
+
+			]]></value>
+			<assert><![CDATA[ true ]]></assert>
+		</assertions>
+	</test>
+	<test name="Lexer.prototype.updateValues">
+		<assertions>
+			<desc></desc>
+		</assertions>
+	</test>
+
 </truth>

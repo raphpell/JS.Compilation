@@ -11,19 +11,205 @@
 		</script>
 	</desc>
 	<test name="Préambule" class="preambule">
-		<assertions>
+		<assertions name="Lexer">
 			<value><![CDATA[
 var Lexer = LexerClass() // Création d'un type de Lexer vide.
+var oLexer = new Lexer
+var stack = Lexer.Stack( oLexer )
+			]]></value>
+		</assertions>
+		<assertions name="Règles">
+			<value><![CDATA[
+Lexer.Rules.addTokens([
+    ['TOKEN11', 'definition1'],
+    ['TOKEN12', 'definition2'],
+    ['TOKEN21', 'definition3'],
+    ['TOKEN22', 'definition4'],
+    ['TOKEN31', 'definition5'],
+    ['TOKEN32', 'definition6']
+    ])
+var aRule1 = Lexer.Rules.addRule( 'RULE1', 'TOKEN11|TOKEN12' )
+var aRule2 = Lexer.Rules.addRule( 'RULE2', 'TOKEN21|TOKEN22' )
+var aRule3 = Lexer.Rules.addRule( 'RULE3', 'TOKEN31|TOKEN32' )
+			]]></value>
+			<assert><![CDATA[ aRule1 ]]></assert>
+			<assert><![CDATA[ aRule2 ]]></assert>
+			<assert><![CDATA[ aRule3 ]]></assert>
+		</assertions>
+		<assertions name="Lexème">
+			<value><![CDATA[
+var nLexemeID = 1
+var f =function( sRule ){
+	return Lexeme({
+		rule:sRule,
+		id:nLexemeID++
+		})
+	}
+var eParent1 = f( 'RULE1' )
+var eParent2 = f( 'RULE2' )
+			]]></value>
+			<assert><![CDATA[ eParent1 ]]></assert>
+			<assert><![CDATA[ eParent2 ]]></assert>
+		</assertions>
+		<assertions name="Scanne">
+			<value><![CDATA[
+ScanRuleUndefined =function(){
+    return ! oLexer.eParent
+        && ! oLexer.aRules
+        && ! oLexer.sSyntax
+	}
+			]]></value>
+			<assert><![CDATA[ ScanRuleUndefined() ]]></assert>
+		</assertions>
+	</test>
+	<test name="Pile vide">
+		<assertions>
+			<value><![CDATA[
+var isEmptyStack =function(){
+    return ! stack.top()
+        && ScanRuleUndefined()
+    }
+			]]></value>
+			<assert><![CDATA[ isEmptyStack() ]]></assert>
+		</assertions>
+	</test>
+	<test name="Sommet de pile">
+		<assertions>
+			<value><![CDATA[
+var isTopOfStack =function( eNode ){
+    var sRule = eNode.oValue.rule
+	return stack.top() === eNode
+        && oLexer.eParent === eNode
+        && oLexer.sSyntax === sRule
+        && oLexer.aRules === Lexer.Rules.Rules.list[ sRule ]
+        && eNode
+    }
+			]]></value>
+			<assert><![CDATA[ ! isTopOfStack( f( 'RULE1' ) ) ]]></assert>
+		</assertions>
+	</test>
+	<test name="Ajout">
+		<assertions name="Sur la pile">
+			<value><![CDATA[
+var push =function( eNode ){
+    var n1 = stack.getSize()
+    var pushed = stack.push( eNode )
+    var n2 = stack.getSize()
+    return pushed === eNode
+        && n1 + 1 === n2
+        && isTopOfStack( eNode )
+        && n2
+    }
+			]]></value>
+			<assert><![CDATA[ push( eParent2 ) ]]></assert>
+			<assert><![CDATA[ isTopOfStack( eParent2 ) ]]></assert>
+		</assertions>
+		<assertions name="Sous la pile...">
+			<value><![CDATA[
+var unshift =function( eNode ){
+    var n1 = stack.getSize()
+    var unshifted = stack.unshift( eNode )
+    var n2 = stack.getSize()
+    var eToS = stack.top()
+    return unshifted === eNode
+        && n1 + 1 === n2
+        && ( ! n1 ? eToS===eNode : eToS!==eNode )
+        && n2
+    }
+			]]></value>
+			<assert><![CDATA[ unshift( eParent1 ) ]]></assert>
+			<assert><![CDATA[ isTopOfStack( eParent2 ) ]]></assert>
+		</assertions>
+	</test>
+	<test name="Retrait">
+		<assertions name="Sommet de pile...">
+			<value><![CDATA[
+var pop =function(){
+    var n1 = stack.getSize()
+    var m = stack.pop()
+    var n2 = stack.getSize()
+    return n2 === m
+        && n2 === n1 - 1
+    }
+			]]></value>
+			<assert><![CDATA[ pop() ]]></assert>
+			<assert><![CDATA[ isTopOfStack( eParent1 ) ]]></assert>
+			<assert><![CDATA[ pop() ]]></assert>
+			<assert><![CDATA[ isEmptyStack() ]]></assert>
+		</assertions>
+	</test>
+	<test name="Tests" class="preambule">
+		<assertions name="...">
+			<value><![CDATA[
+
+var currentRuleIs =function( sRule ){
+    var eToS = stack.top()
+    return sRule === eToS.oValue.rule
+    //  && oLexer.eParent === eToS
+    //  && oLexer.sSyntax === sRule
+    //  && oLexer.aRules === Lexer.Rules.Rules.list[ sRule ]
+        && eToS
+    }
+	
+var correctPush =function( sRule ){ return push( f( sRule )) && currentRuleIs( sRule )}
+var correctPop =function( sRule ){ return pop() && currentRuleIs( sRule )}
+var correctUnshift =function( eLexeme ){ return unshift( eLexeme ) && eLexeme }
 			]]></value>
 		</assertions>
 	</test>
-	<test name="___">
-		<assertions>
-			<desc>___</desc>
+	<test name="scanne">
+		<assertions name="Création de pile">
+			<assert><![CDATA[ isEmptyStack() ]]></assert>
+			<assert><![CDATA[ correctPush('RULE1') ]]></assert>
+			<assert><![CDATA[ correctPush('RULE2') ]]></assert>
+			<assert><![CDATA[ correctPush('RULE3') ]]></assert>
+			<assert><![CDATA[ correctPush('RULE2') ]]></assert>
+			<assert><![CDATA[ correctPush('RULE3') ]]></assert>
+			<assert><![CDATA[ correctPush('RULE1') ]]></assert>
+			<assert><![CDATA[ stack.getSize() === 6 ]]></assert>
+		</assertions>
+		<assertions name="Dépilage">
+			<assert><![CDATA[ currentRuleIs('RULE1') ]]></assert>
+			<assert><![CDATA[ correctPop('RULE3') ]]></assert>
+			<assert><![CDATA[ correctPop('RULE2') ]]></assert>
+			<assert><![CDATA[ correctPop('RULE3') ]]></assert>
+			<assert><![CDATA[ correctPop('RULE2') ]]></assert>
+			<assert><![CDATA[ correctPop('RULE1') ]]></assert>
+			<assert><![CDATA[ pop() ]]></assert>
+			<assert><![CDATA[ isEmptyStack() ]]></assert>
+		</assertions>
+	</test>
+	<test name="scanne incrémentielle">
+		<assertions name="Création de pile">
 			<value><![CDATA[
-true
+var ToS = f( 'RULE1' )
 			]]></value>
-			<assert><![CDATA[ true ]]></assert>
+			<assert><![CDATA[ isEmptyStack() ]]></assert>
+			<assert><![CDATA[ correctUnshift( ToS ) ]]></assert>
+			<assert><![CDATA[ correctUnshift( f( 'RULE2' )) ]]></assert>
+			<assert><![CDATA[ correctUnshift( f( 'RULE3' )) ]]></assert>
+			<assert><![CDATA[ correctUnshift( f( 'RULE2' )) ]]></assert>
+			<assert><![CDATA[ correctUnshift( f( 'RULE1' )) ]]></assert>
+			<assert><![CDATA[ correctUnshift( f( 'RULE3' )) ]]></assert>
+			<assert><![CDATA[ stack.getSize() === 6 ]]></assert>
+			<assert><![CDATA[ ScanRuleUndefined() ]]></assert>
+		</assertions>
+		<assertions name="Initialisation de pile">
+			<value><![CDATA[
+oLexer.setSyntax( 'RULE1' )
+oLexer.eParent = ToS
+			]]></value>
+			<assert><![CDATA[ ! ScanRuleUndefined() ]]></assert>
+		</assertions>
+		<assertions name="Dépilage">
+			<assert><![CDATA[ currentRuleIs('RULE1') ]]></assert>
+			<assert><![CDATA[ correctPop('RULE2') ]]></assert>
+			<assert><![CDATA[ correctPop('RULE3') ]]></assert>
+			<assert><![CDATA[ correctPop('RULE2') ]]></assert>
+			<assert><![CDATA[ correctPop('RULE1') ]]></assert>
+			<assert><![CDATA[ correctPop('RULE3') ]]></assert>
+			<assert><![CDATA[ pop() ]]></assert>
+			<assert><![CDATA[ isEmptyStack() ]]></assert>
 		</assertions>
 	</test>
 </truth>
