@@ -11,15 +11,63 @@
 		</script>
 	</desc>
 	<test name="Préambule" class="preambule">
-		<assertions>
+		<assertions name="Lexer vide">
 			<value><![CDATA[
-var Lexer = LexerClass() // Création d'un type de Lexer vide.
+var Lexer = LexerClass()
 var oLexer = new Lexer
-var Actions = Lexer.Actions
+oLexer.init( '' )
 			]]></value>
-			<assert><![CDATA[ Actions ]]></assert>
 		</assertions>
-		<assertions name="Méthodes">
+		<assertions name="Assertions">
+			<value><![CDATA[
+var PreviousEqual =function( s ){
+	return oLexer.previous.get() === s
+    }
+var LastElementEqual =function( e ){
+	return oLexer.stack.top().lastChild === e
+    }
+var LineEqual =function( n ){
+	return oLexer.nLine === n
+    }
+			]]></value>
+		</assertions>
+		<assertions name="Lexème du système">
+			<value><![CDATA[
+var TRANSLATION = {
+	COUCOU: 'SALUTATION',
+	L_NEW_LINE: 'NEW_LINE',
+	}			
+var makeLexeme =function( s, tokenname, i, l ){
+	i = i || 45
+	l = l || 5
+    var sRule = 'TXT'
+    oLexer.sSyntax = sRule
+    oLexer.sValue = s
+    oLexer.sToken = tokenname
+    oLexer.nPos = i + s.length
+    oLexer.nLine = l
+    return {
+        value: s,
+        token: TRANSLATION[tokenname] || tokenname,
+        css: '',
+        rule: sRule,
+        index: i,
+        lineStart: l,
+        lineEnd: l
+        }
+    }
+			]]></value>
+		</assertions>
+	</test>
+	
+	<test name="L'objet Action">
+		<assertions name="Objet Action">
+			<value><![CDATA[
+var Actions = Lexer.Actions
+var test =function( sAction, oLexeme ){
+    return Actions[ sAction ].call( oLexer, oLexeme )
+    }
+			]]></value>
 			<assert><![CDATA[ Actions ]]></assert>
 			<assert><![CDATA[ Actions.constructor === Function ]]></assert>
 			<assert><![CDATA[ Actions.add ]]></assert>
@@ -28,7 +76,7 @@ var Actions = Lexer.Actions
 			<assert><![CDATA[ Actions.rescanToken ]]></assert>
 			<assert><![CDATA[ Actions.startParent ]]></assert>
 		</assertions>
-		<assertions name="Attributs">
+		<assertions name="Directives">
 			<value><![CDATA[ var o = Actions.directive ]]></value>
 			<assert><![CDATA[ o ]]></assert>
 			<assert><![CDATA[ o.E === 'endParent' ]]></assert>
@@ -37,14 +85,59 @@ var Actions = Lexer.Actions
 			<assert><![CDATA[ o.S === 'startParent' ]]></assert>
 		</assertions>
 	</test>
+	
 	<test name="Méthodes de l'objet" class="preambule"></test>
 	<test name="add">
-		<assertions>
-			<desc>___</desc>
+		<assertions name="Token simple">
 			<value><![CDATA[
-
+var oLexeme = makeLexeme( 'coucou', 'COUCOU' )
+var e = test( 'add', oLexeme )
 			]]></value>
-			<assert><![CDATA[ true ]]></assert>
+			<assert><![CDATA[ e ]]></assert>
+			<assert><![CDATA[ LastElementEqual( e ) ]]></assert>
+			<assert><![CDATA[ PreviousEqual( 'SALUTATION' ) ]]></assert>
+		</assertions>
+		<assertions name="Token non significatif">
+			<value><![CDATA[
+var oLexeme = makeLexeme( '\t', 'TAB' )
+var e = test( 'add', oLexeme )
+			]]></value>
+			<assert><![CDATA[ e ]]></assert>
+			<assert><![CDATA[ LastElementEqual( e ) ]]></assert>
+			<assert><![CDATA[ PreviousEqual( 'SALUTATION' ) ]]></assert>
+		</assertions>
+		<assertions name="Token non significatif passé">
+			<value><![CDATA[
+oLexer.skip.set( true )
+var oLexeme = makeLexeme( '\t', 'TAB' )
+var e = test( 'add', oLexeme )
+oLexer.skip.set( false )
+			]]></value>
+			<assert><![CDATA[ e === true ]]></assert>
+			<assert><![CDATA[ ! LastElementEqual( e ) ]]></assert>
+			<assert><![CDATA[ PreviousEqual( 'SALUTATION' ) ]]></assert>
+		</assertions>
+	</test>
+	<test name="newLine">
+		<assertions>
+			<value><![CDATA[
+var oLexeme = makeLexeme( '\r\n', 'L_NEW_LINE', 1, 2 )
+var e = test( 'newLine', oLexeme )
+			]]></value>
+			<assert><![CDATA[ e ]]></assert>
+			<assert><![CDATA[ LastElementEqual( e ) ]]></assert>
+			<assert><![CDATA[ PreviousEqual( 'NEW_LINE' ) ]]></assert>
+			<assert><![CDATA[ LineEqual( 3 ) ]]></assert>
+		</assertions>
+		<assertions>
+			<value><![CDATA[
+var oLexeme = makeLexeme( 'arrh', 'BIDON', 1, 2 )
+var e = test( 'newLine', oLexeme )
+			]]></value>
+			<assert><![CDATA[ e ]]></assert>
+			<assert><![CDATA[ LastElementEqual( e ) ]]></assert>
+			<assert><![CDATA[ PreviousEqual( 'BIDON' ) ]]></assert>
+			<assert><![CDATA[ LineEqual( 3 ) ]]></assert>
 		</assertions>
 	</test>
 	<test name="startParent">
@@ -57,15 +150,6 @@ var Actions = Lexer.Actions
 		</assertions>
 	</test>
 	<test name="endParent">
-		<assertions>
-			<desc>___</desc>
-			<value><![CDATA[
-
-			]]></value>
-			<assert><![CDATA[ true ]]></assert>
-		</assertions>
-	</test>
-	<test name="newLine">
 		<assertions>
 			<desc>___</desc>
 			<value><![CDATA[
