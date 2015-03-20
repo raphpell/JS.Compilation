@@ -114,10 +114,24 @@ vertical-align: middle;
 		</p>
 	</desc>
 	<syntax>
-		<code><![CDATA[ var mLexemeNode = Action( MyLexer ) ]]></code>
+		<code><![CDATA[ var mLexemeNode = Action( MyLexer, oLexeme ) ]]></code>
 		<arguments>
 			<arg name="MyLexer" type="Object">
 				<desc>Un lexer créé avec la méthode <code>LexerClass</code>.</desc>
+			</arg>
+			<arg name="oLexeme" type="Object">
+				<desc>Un objet lexème issu de l'analyse lexicale.<br/>
+				Il a les attributs :
+				<ul>
+					<li><code>value</code>: texte du lexème.</li>
+					<li><code>token</code>: nom du token.</li>
+					<li><code>css</code>: classes css associées au token.</li>
+					<li><code>rule</code>: nom de la règle qui à généré ce lexème.</li>
+					<li><code>index</code>: position du texte dans la source.</li>
+					<li><code>lineStart</code>: ligne du début du texte.</li>
+					<li><code>lineEnd</code>: ligne de la fin texte.</li>
+				</ul>
+				</desc>
 			</arg>
 		</arguments>
 	</syntax>
@@ -134,7 +148,12 @@ vertical-align: middle;
 		</properties>
 		<methods name="Méthodes">
 			<function name="add">
-				<desc>Ajoute le lexème touvé au parent courant.</desc>
+				<desc>Ajoute le lexème au parent courant.</desc>
+				<arguments>
+					<arg type="Object" name="oLexeme">
+						<desc>Un lexème.</desc>
+					</arg>
+				</arguments>
 				<returnValue type="Mixte">
 					<desc>
 						<ul>
@@ -145,25 +164,45 @@ vertical-align: middle;
 				</returnValue>
 			</function>
 			<function name="endParent">
-				<desc>Finalise un parent.</desc>
+				<desc>Finalise un parent en ajoutant son dernier enfant.</desc>
+				<arguments>
+					<arg type="Object" name="oLexeme">
+						<desc>Un lexème (dernier enfant).</desc>
+					</arg>
+				</arguments>
 				<returnValue type="HTMLElement">
 					<desc>Le dernier HTMLElement du parent.</desc>
 				</returnValue>
 			</function>
 			<function name="newLine">
-				<desc>Ajoute un lexème newLine au parent courant et incrémente de un la ligne courante dans la machine.</desc>
+				<desc>Ajoute le lexème au parent courant et incrémente de "1" la ligne courante dans la machine.</desc>
+				<arguments>
+					<arg type="Object" name="oLexeme">
+						<desc>Un lexème nouvelle ligne.</desc>
+					</arg>
+				</arguments>
 				<returnValue type="HTMLElement">
 					<desc>L'HTMLElement ajouté.</desc>
 				</returnValue>
 			</function>
 			<function name="rescanToken">
-				<desc>Lance un deuxième scannage sur le dernier lexème trouvé.</desc>
+				<desc>Lance un deuxième scannage sur le lexème.</desc>
+				<arguments>
+					<arg type="Object" name="oLexeme">
+						<desc>Un lexème (futur nouveau parent).</desc>
+					</arg>
+				</arguments>
 				<returnValue type="HTMLElement">
 					<desc>Le nouveau parent.</desc>
 				</returnValue>
 			</function>
 			<function name="startParent">
-				<desc>Ajoute le lexème touvé à un nouveau parent devenant le parent courant.</desc>
+				<desc>Ajoute le lexème à un nouveau parent devenant le parent courant.</desc>
+				<arguments>
+					<arg type="Object" name="oLexeme">
+						<desc>Un lexème (premier enfant).</desc>
+					</arg>
+				</arguments>
 				<returnValue type="Mixte">
 					<desc>
 						<ul>

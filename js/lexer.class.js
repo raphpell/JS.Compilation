@@ -6,7 +6,12 @@
 		}
 
 var LexerClass =function(){
-	var oLexeme
+	var Lexer =function( sText, sSyntax ){
+		if( sText!=undefined ){
+			if( !Lexer.SINGLETON ) Lexer.SINGLETON = new Lexer
+			return Lexer.SINGLETON.scan( sText, sSyntax )
+			}
+		}
 	, LexerRules =(function(){
 		var Dictionary =function( sId ){
 			var sGetError = '"$1" is not a lexer '+ sId
@@ -99,28 +104,28 @@ var LexerClass =function(){
 			}
 		})()
 	, Actions =(function(){
-		var Do =function( oInstance ){
+		var Do =function( oInstance, oLexeme ){
 			var s = oInstance.sToken
-			return Do[ s.charAt(1)=='_' && Do.directive[ s.charAt(0)] || 'add' ].call( oInstance )
+			return Do[ s.charAt(1)=='_' && Do.directive[ s.charAt(0)] || 'add' ].call( oInstance, oLexeme )
 			}
 		Do.union({
-			add :function(){
+			add :function( oLexeme ){
 				this.previous.set( oLexeme.token )
 				return this.appendNode( Lexeme( oLexeme ))
 				},
-			endParent :function(){
+			endParent :function( oLexeme ){
 				oLexeme.bParentLimit = true
 				this.previous.set( this.eParent.oValue.token )
 				var eNode = this.appendNode( Lexeme( oLexeme ))
 				this.stack.pop()
 				return eNode
 				},
-			newLine :function(){
+			newLine :function( oLexeme ){
 				this.previous.set( oLexeme.token )
 				this.nLine++
 				return this.appendNode( Lexeme( oLexeme ))
 				},
-			rescanToken :function(){
+			rescanToken :function( oLexeme ){
 				this.nPos = oLexeme.index
 				this.nLine = oLexeme.lineStart
 				var sRule = this.sToken.slice(2)
@@ -139,7 +144,7 @@ var LexerClass =function(){
 				this.stack.pop()
 				return eParent
 				},
-			startParent :function(){
+			startParent :function( oLexeme ){
 				this.sToken = this.sToken.slice(2)
 				var eNewParent = Lexeme({
 					token: LexerRules.Translation[this.sToken]||this.sToken,
@@ -263,12 +268,7 @@ var LexerClass =function(){
 		o.stepOf={SSQ:1,SDQ:1,MLC:1,SLC:1,REGULAR_EXPRESSION:1}
 		return o
 		})()
-	, Lexer =function( sText, sSyntax ){
-		if( sText!=undefined ){
-			if( !Lexer.SINGLETON ) Lexer.SINGLETON = new Lexer
-			return Lexer.SINGLETON.scan( sText, sSyntax )
-			}
-		}
+
 	Lexer.ID = "LexerClass"
 	Lexer.union({
 		Actions: Actions,
@@ -314,7 +314,7 @@ var LexerClass =function(){
 				}
 			},
 		readToken :function(){
-			for(var i=0; this.aRules[i]; i++ ){
+			for(var i=0, oLexeme; this.aRules[i]; i++ ){
 				if( this.searchToken( this.aRules[i])){
 					if( this.haveLexeme( oLexeme={
 						value: this.sValue,
@@ -326,7 +326,7 @@ var LexerClass =function(){
 						lineEnd:this.nLine
 						})) return false
 					this.nPos += this.sValue.length
-					return Actions(this)
+					return Actions( this, oLexeme )
 					}
 				}
 			return this.stack.pop() ? true : null

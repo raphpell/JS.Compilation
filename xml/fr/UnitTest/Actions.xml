@@ -14,14 +14,71 @@
 		<assertions>
 			<value><![CDATA[
 var Lexer = LexerClass() // Création d'un type de Lexer vide.
+var oLexer = new Lexer
+var Actions = Lexer.Actions
 			]]></value>
+			<assert><![CDATA[ Actions ]]></assert>
+		</assertions>
+		<assertions name="Méthodes">
+			<assert><![CDATA[ Actions ]]></assert>
+			<assert><![CDATA[ Actions.constructor === Function ]]></assert>
+			<assert><![CDATA[ Actions.add ]]></assert>
+			<assert><![CDATA[ Actions.endParent ]]></assert>
+			<assert><![CDATA[ Actions.newLine ]]></assert>
+			<assert><![CDATA[ Actions.rescanToken ]]></assert>
+			<assert><![CDATA[ Actions.startParent ]]></assert>
+		</assertions>
+		<assertions name="Attributs">
+			<value><![CDATA[ var o = Actions.directive ]]></value>
+			<assert><![CDATA[ o ]]></assert>
+			<assert><![CDATA[ o.E === 'endParent' ]]></assert>
+			<assert><![CDATA[ o.L === 'newLine' ]]></assert>
+			<assert><![CDATA[ o.R === 'rescanToken' ]]></assert>
+			<assert><![CDATA[ o.S === 'startParent' ]]></assert>
 		</assertions>
 	</test>
-	<test name="___">
+	<test name="Méthodes de l'objet" class="preambule"></test>
+	<test name="add">
 		<assertions>
 			<desc>___</desc>
 			<value><![CDATA[
-true
+
+			]]></value>
+			<assert><![CDATA[ true ]]></assert>
+		</assertions>
+	</test>
+	<test name="startParent">
+		<assertions>
+			<desc>___</desc>
+			<value><![CDATA[
+
+			]]></value>
+			<assert><![CDATA[ true ]]></assert>
+		</assertions>
+	</test>
+	<test name="endParent">
+		<assertions>
+			<desc>___</desc>
+			<value><![CDATA[
+
+			]]></value>
+			<assert><![CDATA[ true ]]></assert>
+		</assertions>
+	</test>
+	<test name="newLine">
+		<assertions>
+			<desc>___</desc>
+			<value><![CDATA[
+
+			]]></value>
+			<assert><![CDATA[ true ]]></assert>
+		</assertions>
+	</test>
+	<test name="rescanToken">
+		<assertions>
+			<desc>___</desc>
+			<value><![CDATA[
+
 			]]></value>
 			<assert><![CDATA[ true ]]></assert>
 		</assertions>
