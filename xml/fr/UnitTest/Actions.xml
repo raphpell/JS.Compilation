@@ -20,14 +20,24 @@ oLexer.init( '' )
 		</assertions>
 		<assertions name="Assertions">
 			<value><![CDATA[
-var PreviousEqual =function( s ){
-	return oLexer.previous.get() === s
+var _PreviousEqual =function( s ){
+    return s
+        ? oLexer.previous.get() === s
+        : oLexer.previous.get()
     }
-var LastElementEqual =function( e ){
-	return oLexer.stack.top().lastChild === e
+var _LastElementEqual =function( e ){
+    return oLexer.stack.top().lastChild === e
     }
-var LineEqual =function( n ){
-	return oLexer.nLine === n
+var _LineEqual =function( n ){
+    return oLexer.nLine === n
+    }
+var _CurrentRuleEqual =function( sRule ){
+    return sRule
+        ? oLexer.stack.top().oValue.rule === sRule
+        : oLexer.stack.top().oValue.rule
+    }
+var _TOSEqual =function( e ){
+    return oLexer.stack.top() === e
     }
 			]]></value>
 		</assertions>
@@ -64,7 +74,7 @@ var makeLexeme =function( s, tokenname, i, l ){
 		<assertions name="Objet Action">
 			<value><![CDATA[
 var Actions = Lexer.Actions
-var test =function( sAction, oLexeme ){
+var Do =function( sAction, oLexeme ){
     return Actions[ sAction ].call( oLexer, oLexeme )
     }
 			]]></value>
@@ -91,71 +101,97 @@ var test =function( sAction, oLexeme ){
 		<assertions name="Token simple">
 			<value><![CDATA[
 var oLexeme = makeLexeme( 'coucou', 'COUCOU' )
-var e = test( 'add', oLexeme )
 			]]></value>
-			<assert><![CDATA[ e ]]></assert>
-			<assert><![CDATA[ LastElementEqual( e ) ]]></assert>
-			<assert><![CDATA[ PreviousEqual( 'SALUTATION' ) ]]></assert>
+			<assert><![CDATA[ e = Do( 'add', oLexeme ) ]]></assert>
+			<assert><![CDATA[ _LastElementEqual( e ) ]]></assert>
+			<assert><![CDATA[ _PreviousEqual( 'SALUTATION' ) ]]></assert>
 		</assertions>
 		<assertions name="Token non significatif">
 			<value><![CDATA[
 var oLexeme = makeLexeme( '\t', 'TAB' )
-var e = test( 'add', oLexeme )
 			]]></value>
-			<assert><![CDATA[ e ]]></assert>
-			<assert><![CDATA[ LastElementEqual( e ) ]]></assert>
-			<assert><![CDATA[ PreviousEqual( 'SALUTATION' ) ]]></assert>
+			<assert><![CDATA[ e = Do( 'add', oLexeme ) ]]></assert>
+			<assert><![CDATA[ _LastElementEqual( e ) ]]></assert>
+			<assert><![CDATA[ _PreviousEqual( 'SALUTATION' ) ]]></assert>
 		</assertions>
 		<assertions name="Token non significatif passé">
 			<value><![CDATA[
 oLexer.skip.set( true )
 var oLexeme = makeLexeme( '\t', 'TAB' )
-var e = test( 'add', oLexeme )
+var e = Do( 'add', oLexeme )
 oLexer.skip.set( false )
 			]]></value>
 			<assert><![CDATA[ e === true ]]></assert>
-			<assert><![CDATA[ ! LastElementEqual( e ) ]]></assert>
-			<assert><![CDATA[ PreviousEqual( 'SALUTATION' ) ]]></assert>
+			<assert><![CDATA[ ! _LastElementEqual( e ) ]]></assert>
+			<assert><![CDATA[ _PreviousEqual( 'SALUTATION' ) ]]></assert>
 		</assertions>
 	</test>
 	<test name="newLine">
 		<assertions>
 			<value><![CDATA[
 var oLexeme = makeLexeme( '\r\n', 'L_NEW_LINE', 1, 2 )
-var e = test( 'newLine', oLexeme )
 			]]></value>
-			<assert><![CDATA[ e ]]></assert>
-			<assert><![CDATA[ LastElementEqual( e ) ]]></assert>
-			<assert><![CDATA[ PreviousEqual( 'NEW_LINE' ) ]]></assert>
-			<assert><![CDATA[ LineEqual( 3 ) ]]></assert>
+			<assert><![CDATA[ _LineEqual( 2 ) ]]></assert>
+			<assert><![CDATA[ e = Do( 'newLine', oLexeme ) ]]></assert>
+			<assert><![CDATA[ _LastElementEqual( e ) ]]></assert>
+			<assert><![CDATA[ _PreviousEqual( 'NEW_LINE' ) ]]></assert>
+			<assert><![CDATA[ _LineEqual( 3 ) ]]></assert>
 		</assertions>
-		<assertions>
+		<assertions name="Comportement par défaut">
 			<value><![CDATA[
 var oLexeme = makeLexeme( 'arrh', 'BIDON', 1, 2 )
-var e = test( 'newLine', oLexeme )
 			]]></value>
-			<assert><![CDATA[ e ]]></assert>
-			<assert><![CDATA[ LastElementEqual( e ) ]]></assert>
-			<assert><![CDATA[ PreviousEqual( 'BIDON' ) ]]></assert>
-			<assert><![CDATA[ LineEqual( 3 ) ]]></assert>
+			<assert><![CDATA[ _LineEqual( 2 ) ]]></assert>
+			<assert><![CDATA[ e = Do( 'newLine', oLexeme ) ]]></assert>
+			<assert><![CDATA[ _LastElementEqual( e ) ]]></assert>
+			<assert><![CDATA[ _PreviousEqual( 'BIDON' ) ]]></assert>
+			<assert><![CDATA[ _LineEqual( 3 ) ]]></assert>
 		</assertions>
 	</test>
-	<test name="startParent">
-		<assertions>
-			<desc>___</desc>
+	<test name="Parent">
+		<assertions name="Token significatif">
 			<value><![CDATA[
+var eTokenBefore = Do(
+    'add',
+    makeLexeme( '=', 'TOKEN_BEFORE', 9, 2 )
+    )
 
+var _ =function( sRule, eElement, sPrevious, eParent ){
+    return _CurrentRuleEqual( sRule )
+        && _LastElementEqual( eElement )
+        && _PreviousEqual( sPrevious )
+        && _TOSEqual( eParent )
+    }
 			]]></value>
-			<assert><![CDATA[ true ]]></assert>
+			<assert><![CDATA[ _( 'TXT', eTokenBefore, 'TOKEN_BEFORE', oLexer.eRoot ) ]]></assert>
+			<assert><![CDATA[ eParent = Do( 'startParent', makeLexeme( '"', 'S_STRING', 10, 2 )) ]]></assert>
+			<assert><![CDATA[ eParent.firstChild.nodeName === 'S_STRING'  ]]></assert>
+			<assert><![CDATA[ _( 'STRING', eParent.firstChild, 'S_STRING', eParent ) ]]></assert>
+			<assert><![CDATA[ eLastChild = Do( 'endParent', makeLexeme( '"', 'E_STRING', 11, 2 )) ]]></assert>
+			<assert><![CDATA[ eParent.lastChild.nodeName === 'E_STRING'  ]]></assert>
+			<assert><![CDATA[ _( 'TXT', eParent, 'STRING', oLexer.eRoot ) ]]></assert>
 		</assertions>
-	</test>
-	<test name="endParent">
-		<assertions>
-			<desc>___</desc>
+		<assertions name="Token non significatif">
 			<value><![CDATA[
+var eTokenBefore = Do(
+    'add',
+    makeLexeme( '=', 'TOKEN_BEFORE', 9, 2 )
+    )
 
+var _ =function( sRule, eElement, sPrevious, eParent ){
+    return _CurrentRuleEqual( sRule )
+        && _LastElementEqual( eElement )
+        && _PreviousEqual( sPrevious )
+        && _TOSEqual( eParent )
+    }
 			]]></value>
-			<assert><![CDATA[ true ]]></assert>
+			<assert><![CDATA[ _( 'TXT', eTokenBefore, 'TOKEN_BEFORE', oLexer.eRoot ) ]]></assert>
+			<assert><![CDATA[ eParent = Do( 'startParent', makeLexeme( '"', 'S_MLC', 10, 2 )) ]]></assert>
+			<assert><![CDATA[ eParent.firstChild.nodeName === 'S_MLC'  ]]></assert>
+			<assert><![CDATA[ _( 'MLC', eParent.firstChild, 'S_MLC', eParent ) ]]></assert>
+			<assert><![CDATA[ eLastChild = Do( 'endParent', makeLexeme( '"', 'E_MLC', 11, 2 )) ]]></assert>
+			<assert><![CDATA[ eParent.lastChild.nodeName === 'E_MLC'  ]]></assert>
+			<assert><![CDATA[ _( 'TXT', eParent, 'STRING', oLexer.eRoot ) ]]></assert>
 		</assertions>
 	</test>
 	<test name="rescanToken">
