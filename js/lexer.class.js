@@ -1,9 +1,8 @@
-﻿if( ! window.Lexeme )
-	Lexeme =function( o ){
-		var m = document.createElement( o.token )
-		m.oValue = o
-		return m
-		}
+﻿if( ! window.Lexeme ) Lexeme =function( o ){
+	var m = document.createElement( o.token )
+	m.oValue = o
+	return m
+	}
 
 var LexerClass =function(){
 	var Lexer =function( sText, sSyntax ){
