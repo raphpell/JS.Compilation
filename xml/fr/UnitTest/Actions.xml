@@ -162,20 +162,33 @@ var _ =function( sRule, eElement, sPrevious, eParent ){
     }
 			]]></value>
 		</assertions>
-		<assertions name="Token significatif">
+		<assertions name="Parent étape/étape">
 			<value><![CDATA[
 var eTokenBefore = Do(
     'add',
     makeLexeme( '=', 'TOKEN_BEFORE', 9, 2 )
     )
-
+, oFirstChild = makeLexeme( '{', 'S_BLOCK', 10, 2 )
+, oLastChild = makeLexeme( '}', 'E_BLOCK', 11, 2 )
 			]]></value>
+			<assert><![CDATA[ Lexer.Skip.stepOf.BLOCK === undefined ]]></assert>
 			<assert><![CDATA[ _( 'TXT', eTokenBefore, 'TOKEN_BEFORE', oLexer.eRoot ) ]]></assert>
-			<assert><![CDATA[ eParent = Do( 'startParent', makeLexeme( '{', 'S_BLOCK', 10, 2 )) ]]></assert>
-			<assert><![CDATA[ eParent.firstChild.nodeName === 'S_BLOCK'  ]]></assert>
+			<assert><![CDATA[ oFirstChild.bParentLimit === undefined ]]></assert>
+			<assert><![CDATA[ oLastChild.bParentLimit === undefined ]]></assert>
+			<assert><![CDATA[ eParent = Do( 'startParent', oFirstChild ) ]]></assert>
+			<assert><![CDATA[ eParent.oValue.bParent === true  ]]></assert>
+			<assert><![CDATA[ eParent.childNodes.length === 1  ]]></assert>
+			<assert><![CDATA[ e = eParent.firstChild  ]]></assert>
+			<assert><![CDATA[ e.nodeName === 'S_BLOCK' ]]></assert>
+			<assert><![CDATA[ e.oValue === oFirstChild ]]></assert>
+			<assert><![CDATA[ e.oValue.bParentLimit === true ]]></assert>
 			<assert><![CDATA[ _( 'BLOCK', eParent.firstChild, 'S_BLOCK', eParent ) ]]></assert>
-			<assert><![CDATA[ eLastChild = Do( 'endParent', makeLexeme( '}', 'E_BLOCK', 11, 2 )) ]]></assert>
-			<assert><![CDATA[ eParent.lastChild.nodeName === 'E_BLOCK'  ]]></assert>
+			<assert><![CDATA[ eLastChild = Do( 'endParent', oLastChild ) ]]></assert>
+			<assert><![CDATA[ eParent.childNodes.length === 2  ]]></assert>
+			<assert><![CDATA[ e = eParent.lastChild  ]]></assert>
+			<assert><![CDATA[ e.nodeName === 'E_BLOCK' ]]></assert>
+			<assert><![CDATA[ e.oValue === oLastChild ]]></assert>
+			<assert><![CDATA[ e.oValue.bParentLimit === true ]]></assert>
 			<assert><![CDATA[ _( 'TXT', eParent, 'BLOCK', oLexer.eRoot ) ]]></assert>
 		</assertions>
 		<assertions name="Token non significatif">
@@ -186,13 +199,19 @@ var eTokenBefore = Do(
     'add',
     makeLexeme( 'oops', 'TOKEN_BEFORE', 0, 1 )
     )
-
+, oFirstChild = makeLexeme( '/*', 'S_MLC', 4, 1 )
 			]]></value>
+			<assert><![CDATA[ Lexer.Skip.stepOf.MLC ]]></assert>
 			<assert><![CDATA[ _( 'TXT', eTokenBefore, 'TOKEN_BEFORE', oLexer.eRoot ) ]]></assert>
-			<assert><![CDATA[ eParent = Do( 'startParent', makeLexeme( '/*', 'S_MLC', 4, 1 )) ]]></assert>
-			<assert><![CDATA[ eParent.firstChild.nodeName === 'S_MLC'  ]]></assert>
-			<assert><![CDATA[ eParent.lastChild.nodeName === 'E_MLC'  ]]></assert>
+			<assert><![CDATA[ eParent = Do( 'startParent', oFirstChild ) ]]></assert>
+			<assert><![CDATA[ eParent.oValue.bParent === true  ]]></assert>
 			<assert><![CDATA[ eParent.childNodes.length === 5  ]]></assert>
+			<assert><![CDATA[ e = eParent.firstChild  ]]></assert>
+			<assert><![CDATA[ e.nodeName === 'S_MLC'  ]]></assert>
+			<assert><![CDATA[ e.oValue.bParentLimit ]]></assert>
+			<assert><![CDATA[ e = eParent.lastChild  ]]></assert>
+			<assert><![CDATA[ e.nodeName === 'E_MLC'  ]]></assert>
+			<assert><![CDATA[ e.oValue.bParentLimit ]]></assert>
 			<assert><![CDATA[ _( 'TXT', eParent, 'TOKEN_BEFORE', oLexer.eRoot ) ]]></assert>
 		</assertions>
 		<assertions name="Token non significatif passé">
@@ -204,10 +223,12 @@ var eTokenBefore = Do(
     'add',
     makeLexeme( 'oops', 'TOKEN_BEFORE', 0, 1 )
     )
-
+, oFirstChild = makeLexeme( '/*', 'S_MLC', 4, 1 )
 			]]></value>
 			<assert><![CDATA[ _( 'TXT', eTokenBefore, 'TOKEN_BEFORE', oLexer.eRoot ) ]]></assert>
-			<assert><![CDATA[ eParent = Do( 'startParent', makeLexeme( '/*', 'S_MLC', 4, 1 )) ]]></assert>
+			<assert><![CDATA[ ! oFirstChild.bParentLimit ]]></assert>
+			<assert><![CDATA[ eParent = Do( 'startParent', oFirstChild ) ]]></assert>
+			<assert><![CDATA[ oFirstChild.bParentLimit ]]></assert>
 			<assert><![CDATA[ eParent === true ]]></assert>
 			<assert><![CDATA[ _( 'TXT', eTokenBefore, 'TOKEN_BEFORE', oLexer.eRoot ) ]]></assert>
 		</assertions>
