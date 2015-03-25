@@ -160,14 +160,29 @@ var _ =function( sRule, eElement, sPrevious, eParent ){
         && _PreviousEqual( sPrevious )
         && _TOSEqual( eParent )
     }
+var add =function( sValue, sToken, nIndex, nLine ){
+    return Do(
+        'add',
+        makeLexeme( sValue, sToken, nIndex, nLine )
+        )
+    }
+, _IsParentLimit =function( e, sToken, oValue ){
+    return ( e.nodeName === sToken )
+        && ( oValue ? e.oValue === oValue : true )
+        && ( e.oValue.bParentLimit === true )
+        && e
+    }
+, _IsParent =function( e, sToken, nChildNodes ){
+    return e.nodeName === sToken
+        && e.childNodes.length === nChildNodes
+        && e.oValue.bParent === true
+        && e
+    }
 			]]></value>
 		</assertions>
-		<assertions name="Parent étape/étape">
+		<assertions name="Étape/étape">
 			<value><![CDATA[
-var eTokenBefore = Do(
-    'add',
-    makeLexeme( '=', 'TOKEN_BEFORE', 9, 2 )
-    )
+var eTokenBefore = add( '=', 'TOKEN_BEFORE', 9, 2 )
 , oFirstChild = makeLexeme( '{', 'S_BLOCK', 10, 2 )
 , oLastChild = makeLexeme( '}', 'E_BLOCK', 11, 2 )
 			]]></value>
@@ -176,60 +191,61 @@ var eTokenBefore = Do(
 			<assert><![CDATA[ oFirstChild.bParentLimit === undefined ]]></assert>
 			<assert><![CDATA[ oLastChild.bParentLimit === undefined ]]></assert>
 			<assert><![CDATA[ eParent = Do( 'startParent', oFirstChild ) ]]></assert>
-			<assert><![CDATA[ eParent.oValue.bParent === true  ]]></assert>
-			<assert><![CDATA[ eParent.childNodes.length === 1  ]]></assert>
-			<assert><![CDATA[ e = eParent.firstChild  ]]></assert>
-			<assert><![CDATA[ e.nodeName === 'S_BLOCK' ]]></assert>
-			<assert><![CDATA[ e.oValue === oFirstChild ]]></assert>
-			<assert><![CDATA[ e.oValue.bParentLimit === true ]]></assert>
+			<assert><![CDATA[ _IsParent( eParent, 'BLOCK', 1 ) ]]></assert>
+			<assert><![CDATA[ _IsParentLimit( eParent.firstChild, 'S_BLOCK', oFirstChild ) ]]></assert>
 			<assert><![CDATA[ _( 'BLOCK', eParent.firstChild, 'S_BLOCK', eParent ) ]]></assert>
 			<assert><![CDATA[ eLastChild = Do( 'endParent', oLastChild ) ]]></assert>
-			<assert><![CDATA[ eParent.childNodes.length === 2  ]]></assert>
-			<assert><![CDATA[ e = eParent.lastChild  ]]></assert>
-			<assert><![CDATA[ e.nodeName === 'E_BLOCK' ]]></assert>
-			<assert><![CDATA[ e.oValue === oLastChild ]]></assert>
-			<assert><![CDATA[ e.oValue.bParentLimit === true ]]></assert>
+			<assert><![CDATA[ _IsParent( eParent, 'BLOCK', 2 ) ]]></assert>
+			<assert><![CDATA[ eParent.lastChild === eLastChild  ]]></assert>
+			<assert><![CDATA[ _IsParentLimit( eParent.lastChild, 'E_BLOCK', oLastChild ) ]]></assert>
 			<assert><![CDATA[ _( 'TXT', eParent, 'BLOCK', oLexer.eRoot ) ]]></assert>
 		</assertions>
-		<assertions name="Token non significatif">
+		<assertions name="En 1 coup">
+			<value><![CDATA[
+oLexer.sText = 'var s="string";';
+
+var eTokenBefore = add( '=', 'AFFECTATION', 5, 1 )
+, oFirstChild = makeLexeme( '"', 'S_SDQ', 6, 1 )
+			]]></value>
+			<assert><![CDATA[ Lexer.Skip.stepOf.SDQ ]]></assert>
+			<assert><![CDATA[ Lexer.Rules.Translation.SDQ === 'STRING'  ]]></assert>
+			<assert><![CDATA[ Lexer.Rules.Translation.S_SDQ === 'DOUBLE_QUOTE'  ]]></assert>
+			<assert><![CDATA[ Lexer.Rules.Translation.E_SDQ === 'DOUBLE_QUOTE'  ]]></assert>
+			<assert><![CDATA[ _( 'TXT', eTokenBefore, 'AFFECTATION', oLexer.eRoot ) ]]></assert>
+			<assert><![CDATA[ eParent = Do( 'startParent', oFirstChild ) ]]></assert>
+			<assert><![CDATA[ _IsParent( eParent, 'STRING', 3 ) ]]></assert>
+			<assert><![CDATA[ _IsParentLimit( eParent.firstChild, 'S_SDQ', oFirstChild ) ]]></assert>
+			<assert><![CDATA[ _IsParentLimit( eParent.lastChild, 'DOUBLE_QUOTE' ) ]]></assert>
+			<assert><![CDATA[ _( 'TXT', eParent, 'STRING', oLexer.eRoot ) ]]></assert>
+		</assertions>
+		<assertions name="En 1 coup (Token non significatif)">
 			<value><![CDATA[
 oLexer.sText = 'oops/* test */';
 
-var eTokenBefore = Do(
-    'add',
-    makeLexeme( 'oops', 'TOKEN_BEFORE', 0, 1 )
-    )
+var eTokenBefore = add( 'oops', 'TOKEN_BEFORE', 0, 1 )
 , oFirstChild = makeLexeme( '/*', 'S_MLC', 4, 1 )
 			]]></value>
 			<assert><![CDATA[ Lexer.Skip.stepOf.MLC ]]></assert>
+			<assert><![CDATA[ Lexer.Rules.Translation.MLC === 'COMMENT'  ]]></assert>
 			<assert><![CDATA[ _( 'TXT', eTokenBefore, 'TOKEN_BEFORE', oLexer.eRoot ) ]]></assert>
 			<assert><![CDATA[ eParent = Do( 'startParent', oFirstChild ) ]]></assert>
-			<assert><![CDATA[ eParent.oValue.bParent === true  ]]></assert>
-			<assert><![CDATA[ eParent.childNodes.length === 5  ]]></assert>
-			<assert><![CDATA[ e = eParent.firstChild  ]]></assert>
-			<assert><![CDATA[ e.nodeName === 'S_MLC'  ]]></assert>
-			<assert><![CDATA[ e.oValue.bParentLimit ]]></assert>
-			<assert><![CDATA[ e = eParent.lastChild  ]]></assert>
-			<assert><![CDATA[ e.nodeName === 'E_MLC'  ]]></assert>
-			<assert><![CDATA[ e.oValue.bParentLimit ]]></assert>
+			<assert><![CDATA[ _IsParent( eParent, 'COMMENT', 5 )  ]]></assert>
+			<assert><![CDATA[ _IsParentLimit( eParent.firstChild, 'S_MLC', oFirstChild ) ]]></assert>
+			<assert><![CDATA[ _IsParentLimit( eParent.lastChild, 'E_MLC' ) ]]></assert>
 			<assert><![CDATA[ _( 'TXT', eParent, 'TOKEN_BEFORE', oLexer.eRoot ) ]]></assert>
 		</assertions>
-		<assertions name="Token non significatif passé">
+		<assertions name="Passé, en 1 coup (Token non significatif)">
 			<value><![CDATA[
 oLexer.sText = 'oops/* test */';
 oLexer.skip.set( true )
 
-var eTokenBefore = Do(
-    'add',
-    makeLexeme( 'oops', 'TOKEN_BEFORE', 0, 1 )
-    )
+var eTokenBefore = add( 'oops', 'TOKEN_BEFORE', 0, 1 )
 , oFirstChild = makeLexeme( '/*', 'S_MLC', 4, 1 )
 			]]></value>
 			<assert><![CDATA[ _( 'TXT', eTokenBefore, 'TOKEN_BEFORE', oLexer.eRoot ) ]]></assert>
 			<assert><![CDATA[ ! oFirstChild.bParentLimit ]]></assert>
-			<assert><![CDATA[ eParent = Do( 'startParent', oFirstChild ) ]]></assert>
+			<assert><![CDATA[ Do( 'startParent', oFirstChild ) === true ]]></assert>
 			<assert><![CDATA[ oFirstChild.bParentLimit ]]></assert>
-			<assert><![CDATA[ eParent === true ]]></assert>
 			<assert><![CDATA[ _( 'TXT', eTokenBefore, 'TOKEN_BEFORE', oLexer.eRoot ) ]]></assert>
 		</assertions>
 	</test>

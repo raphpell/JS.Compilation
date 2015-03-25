@@ -13,7 +13,7 @@
 	<!-- Import des fichiers requis -->
 	<xsl:for-each select="link"><xsl:copy-of select="current()"/></xsl:for-each>
 	<xsl:for-each select="script"><xsl:copy-of select="current()"/></xsl:for-each>
-	<script>var aUnitTest = [], aEval = []</script>
+	<script>var aUnitTest = [], aEval = [], result</script>
 </head>
 <body>
 	<div id="eTopLeftMenu">
@@ -75,12 +75,13 @@
 			</xsl:if>
 			<xsl:if test="value">
 				<pre class="value"><xsl:value-of select="value" /></pre>
-				<script>try{
-					<xsl:value-of select="value"/>
-					}catch( e){
-						aEval.push( e )
+				<script>
+					try{
+						<xsl:value-of select="value"/>
+					}catch(e){
+						aEval[<xsl:number format="0" level="any" />] = e
 					}finally{
-						aEval.push( 0 )
+						aEval[<xsl:number format="0" level="any" />] = 0
 						}
 				</script>
 			</xsl:if>
@@ -89,10 +90,11 @@
 				<dt><xsl:value-of select="current()"/></dt>
 				<script>
 					try{
-						var result = (<xsl:value-of select="current()"/>)
-						aUnitTest.push([result?2:1,result.charAt ? result : JSON.stringify(result, null, '    ') || '' ])
+						result = (<xsl:value-of select="current()"/>);
+						aUnitTest[<xsl:number format="0" level="any" />] =
+							[result?2:1,result.charAt ? result : JSON.stringify(result, null, '    ') || '' ];
 					}catch(e){
-						aUnitTest.push([0,e])
+						aUnitTest[<xsl:number format="0" level="any" />] = [0,e];
 						}
 				</script>
 				</xsl:for-each>
@@ -108,10 +110,10 @@
 		var oColor = { 0:'red', 1:'orange', 2:'green' }
 		for(var i=0; aDD[i]; i++ ) aDD[i].count = 0
 		for(var i=0; aDT[i]; i++ ){
-			var n = aUnitTest[i][0]
+			var n = aUnitTest[i+1][0]
 			aDD[n].count++
 			aDT[i].className = oColor[n]
-			aDT[i].title = aUnitTest[i][1]
+			aDT[i].title = aUnitTest[i+1][1]
 			}
 		for(var i=0; i<3; i++ ){
 			if( aDD[i].count !== undefined )
@@ -119,9 +121,9 @@
 			}
 		var aPRE = document.getElementsByTagName('PRE')
 		for(var i=0; aPRE[i]; i++ ){
-			if( aEval[i]){
+			if( aEval[i+1]){
 				aPRE[i].className += ' red'
-				aPRE[i].title = aEval[i]
+				aPRE[i].title = aEval[i+1]
 				}
 			}
 	]]></script>
