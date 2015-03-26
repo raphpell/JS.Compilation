@@ -8,12 +8,20 @@ var OneRegExpLexer =(function( Lexer ){
 		return o
 		}
 	Lexer.Rules.makeRule =function( sName, sTokens ){
-		var aRules = sTokens.split('|')
-		for( var aRegExp=[], i=0, ni=aRules.length, oRule; i<ni; i++ ){
-			oRule = this.Tokens.get( aRules[i])
-			if( ! oRule ) throw new Error ( 'Lexer: "'+ aRules[i] +'" is not a rule name.' )
-			aRules[i] = oRule
-			aRegExp[i] = '('+ aRules[i].source +')'
+		var aList = sTokens.split('|')
+		for( var aRegExp=[], aRules=[], i=0, ni=aList.length, oToken; i<ni; i++ ){
+			var ID = aList[i]
+			oToken = this.Tokens.list[ ID ]
+			if( oToken ){
+				aRules.push( oToken )
+				aRegExp.push( '('+ oToken.source +')' )
+				}
+			else{
+				var aRule = this.Rules.list[ID]
+				if( ! aRule ) throw Error ('Rule "'+ ID +'" Not Found !' )
+				aRules = aRules.concat( aRule[0].tokens )
+				aRegExp.push( aRule[0].source )
+				}
 			}
 		var oRE = new RegExp ( aRegExp.join('|'), 'g' )
 		oRE.sId = sName

@@ -65,6 +65,8 @@ INPUT[type=button]{
 	</dt>
 	<dt><label for="eRules">Régle : </label>
 		<select id="eRules"></select>
+		<label for="eLexers">Lexer : </label>
+		<select id="eLexers"></select>
 	</dt>
 	<dt><label for="eInput">Source : </label><br>
 		<textarea id="eInput"></textarea>
@@ -74,6 +76,7 @@ INPUT[type=button]{
 		<input type="checkbox" id="eWhiteSpaces"><label for="eWhiteSpaces">Espaces blancs.</label>
 	</dt>
 </dl>
+<label>Temps: </label><code id="eTime"></code>
 <pre id="eResult"></pre>
 
 <!-- FRAMEWORK... -->
@@ -82,16 +85,21 @@ INPUT[type=button]{
 <script src="js/lexer.class.js"></script>
 <script src="js/lexer.automaton.js"></script>
 <script src="js/lexer.automaton.modules.js"></script>
+<script src="js/lexer.regexp.one.js"></script>
+<script src="js/lexer.regexp.one.modules.js"></script>
+<script src="js/lexer.regexp.multi.js"></script>
+<script src="js/lexer.regexp.multi.modules.js"></script>
 
-
+<!-- Module Parenthesis
 <hr>
-<script><!-- Module Parenthesis -->
+<script>
 AutomatonLexer.insert(function(o,f,g,h){
 	o.addTokens([["Parenthesis",{A:g("\n","[^\t\n\f\r ()]","\t","\f","\r","(",")","[ ]"),R:[[1,f("\t\n\f\r ()")],[7,f(" ",1)]],M:[[],[8,2,3,8,4,5,6,7],[,2],[],[8],[],[],[],[]],F:[,,7,2,3,4,5,6,3],TokensTable:',,TAB,L_NEW_LINE,S_Parenthesis,E_Parenthesis,SPACE,WORD'.split(',')}]])
 	o.addCSSClass("punctuator=S_Parenthesis|E_Parenthesis&space=SPACE&tab=TAB&linefeed=L_NEW_LINE")
 	o.setTokensTranslation('S_Parenthesis=LPAREN&E_Parenthesis=RPAREN')
 	});
 </script>
+
 <p>
 	Le module Parenthesis est un exemple simple d'une analyse lexicale créant des lexèmes parents.<br>
 	Définition du module:
@@ -112,7 +120,7 @@ AutomatonLexer.insert(function(o,f,g,h){
 	L_NEW_LINE	=	\r\n|[\n\r\f]
 		{css:linefeed}
 </pre>
-
+-->
 
 <script>
 var valueToString =function(o){
@@ -130,14 +138,17 @@ var Lexeme =function( o ){
 	if( o.css ) e.className += ' '+ o.css
 	return e
 	}
-	
+
+var eLexer
 var match =function(){
 	eResult.innerHTML = ''
-	if( ! eRules.value ) return;
+	var sRule = eRules.value
+	if( ! sRule ) return;
 	try{
 		var sText = eInput.value
-	//	if( sText.substr(0,9)=='<![CDATA[' ) sText = eInput.value = sText.slice( 9, -3 )
-		var eLexer = AutomatonLexer( sText, eRules.value )
+		var oChrono = new Chrono ()
+		eLexer = window[ eLexers.value ]( sText, sRule )
+		eTime.innerHTML = oChrono.stop()
 		eResult.appendChild( eLexer )
 	}catch(e){
 		eResult.innerHTML = e.message + '<br>'
@@ -148,12 +159,13 @@ var match =function(){
 </script>
 
 <script>
-_('eExamples,eInput,eRules')
+_('eExamples,eInput,eRules,eLexers,eTime')
 _( 'eInput,eBtnMatch,eRelief,eWhiteSpaces,eResult' )
 
-var aRules = '|CSS|HTML|INI|JS|Parenthesis|PHP|TXT'.split('|')
+var aRules = '|CSS|HTML|INI|JS|PHP|TXT'.split('|') // Parenthesis|
 Tag.addChildNodes( eExamples, 'OPTION', aRules )
 Tag.addChildNodes( eRules, 'OPTION', aRules )
+Tag.addChildNodes( eLexers, 'OPTION', ['AutomatonLexer','MultiRegExpLexer','OneRegExpLexer'], eLexers.value )
 
 var changeClassList =function( b, sClass ){
 	if( eResult.classList ) eResult.classList[ b?'add':'remove']( sClass )
@@ -172,7 +184,8 @@ Events.add(
 				match()
 				})
 			},
-		eRules, match
+		eRules, match,
+		eLexers, match
 	)
 eRelief.onclick()
 eWhiteSpaces.onclick()

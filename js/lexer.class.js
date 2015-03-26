@@ -18,12 +18,12 @@ var LexerClass =function(){
 			return {
 				list: {},
 				add :function( ID, m ){
-					if( this.list[ID]) throw new Error ( sAddError.replace( '$1', ID ))
+					if( this.list[ID]) throw new Error ( sAddError.replace( '$1', ID ) +' ('+ Lexer.ID +')')
 					return this.list[ID] = m
 					},
 				get :function( ID ){
 					if( this.list[ID]) return this.list[ID]
-					throw new Error ( sGetError.replace( '$1', ID ))
+					throw new Error ( sGetError.replace( '$1', ID ) +' ('+ Lexer.ID +')')
 					},
 				have :function( ID ){
 					return this.list[ID]
@@ -236,7 +236,7 @@ var LexerClass =function(){
 					that.setSyntax( that.eParent.oValue.rule )
 					}
 				else {
-					that.eParent = that.aRules = that.sSyntax = null
+					that.eParent = this.sSyntax = this.aRules = null
 					}
 				return n
 				},
@@ -339,6 +339,18 @@ var LexerClass =function(){
 		setSyntax :function( sSyntax ){
 			this.aRules = LexerRules.Rules.list[ this.sSyntax = sSyntax ]
 							|| [ LexerRules.Tokens.list[sSyntax] ]
+			},
+		getInfo :function(){
+			console.info([
+				'Lexer.ID :'+ Lexer.ID,
+				'this.nPos :'+ this.nPos,
+				'this.nLine :'+ this.nLine,
+				'this.sSyntax :'+ this.sSyntax,
+				'this.stack.getSize() :'+ this.stack.getSize(),
+				'this.sToken :'+ this.sToken,
+				'this.sValue :'+ this.sValue
+				].join("\n"))
+			
 			}
 		}
 
