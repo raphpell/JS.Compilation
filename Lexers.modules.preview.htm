@@ -1,6 +1,6 @@
 ﻿<html>
 <head>
-	<title>module.preview</title>
+	<title>Modules existants</title>
 	<link rel="stylesheet" type="text/css" href="css/syntaxes.css">
 	<style>
 INPUT[type=button]{
@@ -56,14 +56,12 @@ INPUT[type=button]{
 <body spellcheck="false">
 <a href="index.htm">Index</a>
 
-<h1>module.preview</h1>
+<h1>Modules existants</h1>
 
 <dl>
 	<dt><label for="eExamples">Exemples : </label>
 		<select id="eExamples"></select>
-		<hr>
-	</dt>
-	<dt><label for="eRules">Régle : </label>
+		<label for="eRules">Module : </label>
 		<select id="eRules"></select>
 		<label for="eLexers">Lexer : </label>
 		<select id="eLexers"></select>
@@ -72,11 +70,13 @@ INPUT[type=button]{
 		<textarea id="eInput"></textarea>
 	</dt>
 	<dt><input type="button" id="eBtnMatch" value="Analyser">
-		<input type="checkbox" id="eRelief"><label for="eRelief">Relief.</label>
-		<input type="checkbox" id="eWhiteSpaces"><label for="eWhiteSpaces">Espaces blancs.</label>
+		<dl style="float:left; margin: 0 1em 0 0">
+			<dt><input type="checkbox" id="eRelief"><label for="eRelief">Relief.</label></dt>
+			<dt><input type="checkbox" id="eWhiteSpaces"><label for="eWhiteSpaces">Espaces blancs.</label></dt>
+		</dl>
+		<label>Temps: </label><code id="eTime"></code>
 	</dt>
 </dl>
-<label>Temps: </label><code id="eTime"></code>
 <pre id="eResult"></pre>
 
 <!-- FRAMEWORK... -->
