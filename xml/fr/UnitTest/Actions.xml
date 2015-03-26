@@ -151,7 +151,7 @@ var oLexeme = makeLexeme( 'arrh', 'BIDON', 1, 2 )
 			<assert><![CDATA[ _LineEqual( 3 ) ]]></assert>
 		</assertions>
 	</test>
-	<test name="Parent">
+	<test name="Parent à 2 délimiteurs">
 		<assertions name="...">
 			<value><![CDATA[
 var _ =function( sRule, eElement, sPrevious, eParent ){
@@ -251,11 +251,25 @@ var eTokenBefore = add( 'oops', 'TOKEN_BEFORE', 0, 1 )
 	</test>
 	<test name="rescanToken">
 		<assertions>
-			<desc>___</desc>
 			<value><![CDATA[
+oLexer.sText = 'var re=/[abcd]/'
+oLexer.skip.set( false )
 
+var eTokenBefore = add( '=', 'AFFECTATION',6, 1 )
+, oRescaned = makeLexeme( '/[abcd]/', 'R_REGULAR_EXPRESSION', 7, 1 )
 			]]></value>
-			<assert><![CDATA[ true ]]></assert>
+			<assert><![CDATA[ oRescaned ]]></assert>
+			<assert><![CDATA[ oRescaned.value ===  '/[abcd]/' ]]></assert>
+			<assert><![CDATA[ oRescaned.bParent === undefined ]]></assert>
+			<assert><![CDATA[ oRescaned.bRescan === undefined ]]></assert>
+			<assert><![CDATA[ _( 'TXT', eTokenBefore, 'AFFECTATION', oLexer.eRoot ) ]]></assert>
+			<assert><![CDATA[ eParent = Do( 'rescanToken', oRescaned ) ]]></assert>
+			<assert><![CDATA[ eParent.oValue === oRescaned ]]></assert>
+			<assert><![CDATA[ oRescaned ]]></assert>
+			<assert><![CDATA[ oRescaned.value ===  '' ]]></assert>
+			<assert><![CDATA[ oRescaned.bParent === true ]]></assert>
+			<assert><![CDATA[ oRescaned.bRescan === true ]]></assert>
+			<assert><![CDATA[ _( 'TXT', eParent, 'REGULAR_EXPRESSION', oLexer.eRoot ) ]]></assert>
 		</assertions>
 	</test>
 </truth>
