@@ -3,7 +3,7 @@
  / [Documentation](http://raphpell.github.io/JS.Compilation/xml/fr/doc/index.htm)
 
 ## Lexers ( ER vs AFD )
-Comparaison de Lexer à expressions régulières (ER) et d'un lexer à automates finis déterministes (AFD) :
+Comparaison de lexers à expressions régulières (ER) et d'un lexer à automates finis déterministes (AFD) :
 - [Comparaison du résultat](http://raphpell.github.io/JS.Compilation/Lexers.result.comparaison.htm)
 - [Performance: scan](http://raphpell.github.io/JS.Compilation/Lexers.performance.scan.htm)
 - [Performance: readToken](http://raphpell.github.io/JS.Compilation/Lexers.performance.readToken.htm)
