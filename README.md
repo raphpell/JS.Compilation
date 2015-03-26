@@ -1,26 +1,16 @@
-Lexer et Parser en JavaScript.
-===========
+# Lexer et Parser en JavaScript.
 [Site du projet](http://raphpell.github.io/JS.Compilation/index.htm)
  / [Documentation](http://raphpell.github.io/JS.Compilation/xml/fr/doc/index.htm)
 
-Lexers ( ER vs AFD )
---------
+## Lexers ( ER vs AFD )
 Comparaison de Lexer à expressions régulières (ER) et d'un lexer à automates finis déterministes (AFD) :
 - [Comparaison du résultat](http://raphpell.github.io/JS.Compilation/Lexers.result.comparaison.htm)
 - [Performance: scan](http://raphpell.github.io/JS.Compilation/Lexers.performance.scan.htm)
 - [Performance: readToken](http://raphpell.github.io/JS.Compilation/Lexers.performance.readToken.htm)
-
-Analyse lexicale incrémentielle pour éditeur de texte :
-- [Performance](http://raphpell.github.io/JS.Compilation/Lexers.performance.scan.incremental.htm)
-
-Pour les automates :
-- [Transformation d'une ER en AFD](http://raphpell.github.io/JS.Compilation/AFD.generator.htm)
-- [Aggrégation d'AFDs](http://raphpell.github.io/JS.Compilation/AFD.aggregator.htm)
+- [Performance: Analyse incrémentielle](http://raphpell.github.io/JS.Compilation/Lexers.performance.scan.incremental.htm)
 - [Création de module](http://raphpell.github.io/JS.Compilation/LexerAutomaton.module.generator.htm)
 
-
-Parser
---------
+## Parser
 - [Compilation de grammaires LL, LR(0), SLR, LR(1)](http://raphpell.github.io/JS.Compilation/Parser.htm)
 - [Parser LR : readToken](http://raphpell.github.io/JS.Compilation/Parser.byStep.htm)
 
