@@ -236,7 +236,7 @@ var LexerClass =function(){
 					that.setSyntax( that.eParent.oValue.rule )
 					}
 				else {
-					that.eParent = this.sSyntax = this.aRules = null
+					that.eParent = that.sSyntax = that.aRules = null
 					}
 				return n
 				},
