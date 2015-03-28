@@ -125,21 +125,5 @@
 	</table>
 </section>
 
-<iframe id="eIFrame" src="../UnitTest/Automate.object.xml"></iframe>
-<script>
-var eIFrame = document.getElementById( 'eIFrame' )
-
-eIFrame.src = '../UnitTest/Automate.instance.xml'
-
-window.onstorage =function(e) {
-	alert( "onstorage"+ e.couleur )
-	Storage.clear() 
-	}
-eIFrame.onload =function(){
-	alert( "onload"+ localStorage.getItem("couleur") )
-	Storage.clear() 
-	}
-</script>
-
 </body>
 </html>

@@ -141,7 +141,6 @@
 					}
 				}
 			}
-	localStorage.setItem("couleur","vert")
 	]]></script>
 
 </body>
