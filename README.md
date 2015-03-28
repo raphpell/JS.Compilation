@@ -8,7 +8,7 @@ Comparaison de lexers à expressions régulières (ER) et d'un lexer à automate
 - [Performance: scan](http://raphpell.github.io/JS.Compilation/Lexers.performance.scan.htm)
 - [Performance: readToken](http://raphpell.github.io/JS.Compilation/Lexers.performance.readToken.htm)
 - [Performance: Analyse incrémentielle](http://raphpell.github.io/JS.Compilation/Lexers.performance.scan.incremental.htm)
-- [Création de module](http://raphpell.github.io/JS.Compilation/LexerAutomaton.module.generator.htm)
+- [Création de module](http://raphpell.github.io/JS.Compilation/Lexers.modules.generator.htm)
 
 ## Parser
 - [Compilation de grammaires LL, LR(0), SLR, LR(1)](http://raphpell.github.io/JS.Compilation/Parser.htm)

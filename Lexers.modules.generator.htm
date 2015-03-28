@@ -5,6 +5,7 @@
 	<link rel="stylesheet" type="text/css" href="widget/ProgressBar/css/styles.css">
 	<script src="widget/ProgressBar/js/scripts.js"></script>
 	<style>
+		SECTION { margin: 0 0 0 1em; }
 		.result {
 			background: #FFF;
 			color: #111;
@@ -34,7 +35,7 @@
 		TEXTAREA {
 			width: 100%;
 			}
-		H2 {
+		.tableTitle {
 			background: lightskyblue;
 			margin:0;
 			padding:0.25em;
@@ -92,6 +93,24 @@
 <label for="eExport">Résultat: </label>
 <textarea id="eExport" spellcheck="false" wrap="off"></textarea>
 <div><label>Nombre de caractères : </label><b id="eExportSize"></b></div>
+
+<h2>Les étapes</h2><section>
+	<h3>La 1<sup>ère</sup> étape : Module pour les lexers à ER</h3><section>
+		<p>Les expressions régulières obtenues ne sont pas parfaites :</p>
+		<ul>
+			<li>Il faut parfois ajouter le caractère spécial "\b" 
+				(limite d'un mot = position entre un mot et un espace) 
+				à la fin de l'expression régulière.<br>
+				Vrai pour les mots clés et tous les mots composés des caractères [a-zA-Z_] en général.
+			</li>
+			<li>Les délimiteurs "(" et ")" sont à remplacer par "(?:" et ")", 
+				ou voir même être effacé.
+			</li>
+		</ul>
+		<p>...se sont des choses à résoudre à l'analyse réalisé par la <a href="src/wiz/syntax.htm">syntaxe WIZ</a>.</p>
+		</section>
+	<h3>La dernière étape : Module pour le lexers à automate</h3><section></section>
+	</section>
 
 <script src="js/shared.js"></script>
 <script src="js/framework.js"></script>
@@ -458,7 +477,7 @@ function display (){
 	var bDisplayAnnotation = eDisplayAnnotation.checked
 	var fFunction =function( e, a, sTitle ){
 		if( e.checked && a.length ){
-			aResult.push( '<tr><th colspan="2"><h2>'+ sTitle +'</h2></th></tr>' )
+			aResult.push( '<tr><th colspan="2" class="tableTitle">'+ sTitle +'</th></tr>' )
 			for(var i=0, ni=a.length; i<ni; i++ ){
 				var s = a[i][0]
 				var aOk = oOK[s]||[]
