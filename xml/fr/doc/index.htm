@@ -131,11 +131,12 @@ var eIFrame = document.getElementById( 'eIFrame' )
 
 eIFrame.src = '../UnitTest/Automate.instance.xml'
 
-window.addEventListener('storage', function(e) {
-	alert( e.couleur )
-	})
+window.onstorage =function(e) {
+	alert( "onstorage"+ e.couleur )
+	Storage.clear() 
+	}
 eIFrame.onload =function(){
-	alert( localStorage.getItem("couleur") )
+	alert( "onload"+ localStorage.getItem("couleur") )
 	Storage.clear() 
 	}
 </script>
