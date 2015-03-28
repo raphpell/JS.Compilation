@@ -141,7 +141,7 @@
 					}
 				}
 			}
-	localStorage.setItem("couleur","vert")
+	sessionStorage.setItem("couleur","vert")
 	]]></script>
 
 </body>
