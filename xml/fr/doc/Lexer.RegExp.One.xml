@@ -47,9 +47,9 @@ var OneRegExpLexer =(function( Lexer ){
 			</function>
 			<function name="Lexer.Rules.makeRule">
 				<desc>Créé une règle d'analyse.<br/>
-					Elles sont un tableau d'ER contenant :
+					Elle est un tableau d'ER contenant :
 						<ul>
-							<li>une grande ER créée depuis celles de tous les tokens</li>
+							<li>une grande ER créée depuis celles de tous les tokens (et des règles) en paramètre.</li>
 							<li>toutes les ER utilisées pour créer la grande</li>
 						</ul>
 				</desc>
@@ -58,7 +58,7 @@ var OneRegExpLexer =(function( Lexer ){
 						<desc>Nom de la règle.</desc>
 					</arg>
 					<arg type="String" name="sTokens">
-						<desc>Liste de noms de token de la règle séparés par le symbole '|'.</desc>
+						<desc>Liste de noms de token (ou règle) séparés par le symbole '|'.</desc>
 					</arg>
 				</arguments>
 				<returnValue type="Array">

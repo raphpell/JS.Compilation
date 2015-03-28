@@ -24,10 +24,10 @@
 	<h1><xsl:value-of select="@name"/></h1>
 	
 	<!-- Résultat des tests -->
-	<dl class="legend">
-		<dd class="red"><code>erreur</code></dd>
-		<dd class="orange"><code>échec</code></dd>
-		<dd class="green"><code>réussi</code></dd>
+	<dl class="legend" id="eLegend">
+		<dd class="red" title="erreur"></dd>
+		<dd class="orange" title="échec"></dd>
+		<dd class="green" title="réussi"></dd>
 	</dl>
 	<!-- Description du fichier test -->
 	<xsl:if test="desc">
@@ -106,8 +106,10 @@
 	</xsl:for-each>
 	
 	<script><![CDATA[
+		var aResult = []
+		var eLegend = document.getElementById('eLegend')
+		var aDD = eLegend.getElementsByTagName('DD')
 		var aDT = document.getElementsByTagName('DT')
-		var aDD = document.getElementsByTagName('DD')
 		var oColor = { 0:'red', 1:'orange', 2:'green' }
 		for(var i=0; aDD[i]; i++ ) aDD[i].count = 0
 		for(var i=0; aDT[i]; i++ ){
@@ -124,8 +126,8 @@
 				}
 			}
 		for(var i=0; i<3; i++ ){
-			if( aDD[i].count !== undefined )
-				aDD[i].innerHTML += ' <b>'+ aDD[i].count +'</b>'
+			aResult[i] = aDD[i].count
+			aDD[i].innerHTML += ' <b>'+ aDD[i].count +'</b>'
 			}
 		var aPRE = document.getElementsByTagName('PRE')
 		for(var i=0; aPRE[i]; i++ ){
@@ -139,6 +141,7 @@
 					}
 				}
 			}
+	localStorage.setItem("couleur","vert")
 	]]></script>
 
 </body>
