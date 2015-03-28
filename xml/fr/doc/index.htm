@@ -134,6 +134,9 @@ eIFrame.src = '../UnitTest/Automate.instance.xml'
 window.addEventListener('storage', function(e) {
 	console.info( localStorage.getItem("couleur") )
 	})
+eIFrame.onload =function(){
+	alert( localStorage.getItem("couleur") )
+	}
 </script>
 
 </body>
