@@ -1,4 +1,4 @@
-##Composants utilisés dans les pages
+Composants utilisés dans les pages
 
 Widget | Description
 ------------ | -------------
