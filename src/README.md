@@ -1,4 +1,4 @@
-﻿Source des différents parsers créé avec leur lexer.
+﻿Source des différents parsers créés avec leur lexer.
 
 Syntaxe | Description | Aperçu
 ------------ | ------------- | -------------
