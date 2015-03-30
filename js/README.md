@@ -1,4 +1,4 @@
-﻿## Framework
+## Framework
 L'environnement JavaScript à été augmenté pour développer plus facilement le programme.
 
 Fichier | Description
@@ -10,7 +10,7 @@ Les lexèmes sont stockés par défaut dans des éléments html.
 
 Fichier | Description
 ------ | -----------
-lexer.node.object.js | Premier objet utilisé pour remplacer les éléments HTML
+lexer.node.object.js | Objet pouvant être utilisé pour remplacer les éléments HTML
 lexer.node.simple.js | Objet le plus performant pour remplacer les éléments HTML
 
 ## Lexers
