@@ -1,6 +1,6 @@
 ﻿Seul le fichier **syntaxes.js** est utilisé pour l'analyse lexicale.
 
-Ficher | Description
+Fichier | Description
 ------ | -----------
 fa.css | Légende des graphiques des automates
 sets.css | Images des symboles mathématiques utilisés à la page validation de l'alphabet
