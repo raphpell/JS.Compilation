@@ -59,8 +59,8 @@ CODE { background: #eee; }
 		<p>
 			Il est impératif que la règle d'analyse de base puisse identifier tous les tokens pouvant être trouvé, 
 			sinon l'analyse risque d'être stoppé prématurément. <br>
-			Pour cela il est possible d'utiliser un token nommé <code>NOT_WHITE_SPACES</code> détectant tout sauf un espace blanc.  <br>
-			Il suffit de l'ajouter en fin de règle et de détecter tous les espaces blancs !
+			Pour cela il est possible d'utiliser un token nommé <code>NOT_WHITE_SPACES</code> détectant tout sauf un espace blanc. 
+			Il suffit de l'ajouter en fin de règle et de surtout détecter tous les espaces blancs !
 		</p>
 	</section>
 </section>
@@ -76,9 +76,8 @@ CODE { background: #eee; }
 	</section>
 	<h3>Passer des tokens</h3><section>
 		<p>
-			Il nous faut parfois obtenir une liste de lexème réduite en omettant certains tokens.<br>
-			Les commentaires sont entre autres des lexèmes non significatifs pour l'analyse syntaxique, 
-			comme les espaces blancs... mais là, ce n'est pas forcément le cas.
+			Il nous faut parfois obtenir une liste de lexème réduite en omettant certains tokens non significatifs.<br>
+			Les commentaires en font partie, comme les espaces blancs... mais là, ce n'est pas forcément le cas (sauts de ligne en JavaScript).
 		</p>
 	</section>
 </section>

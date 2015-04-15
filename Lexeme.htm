@@ -26,11 +26,11 @@ SECTION {
 <p>Les lexèmes sont des unités lexicales ou syntaxiques (mots, phrases...).</p>
 <p>
 	Il faut pouvoir former avec les lexèmes un <b>arbre de données</b>.<br>
-	Pour cela, la fonction globale <code>Lexeme</code>  nous retourne un objet pouvant réaliser cette tâche.
+	Pour cela, la fonction globale <code>Lexeme</code>  nous retourne un objet <b>noeud</b> pouvant réaliser cette tâche.
 </p>
 
 <p><b>NB</b>: <cite>
-	La création des lexèmes et les opérations réalisées dessus <a href="Lexeme.comparaison.htm">prennent du temps</a> !
+	La création de ces noeuds et les opérations réalisées dessus <a href="Lexeme.comparaison.htm">prennent du temps</a> !
 </cite></p>
 
 <section><h2>Syntaxe</h2>
@@ -38,30 +38,28 @@ SECTION {
 </section>
 <section><h2>Argument</h2>
 	<p>Elle prend en argument l'objet <code>oLexeme</code> issu d'une analyse.</p>
-	<section><h3>Exemple</h3>
-		<p>Pour l'analyse lexicale, il est de la forme :</p>
+	<p>Pour l'analyse lexicale, il est de la forme :</p>
 <pre>
 oLexeme={
-	token:'INCREMENT_OPERATOR', // nom du token (renommé si défini)
-	value:'++',	// valeur du token, NB: un parent n'a pas de valeur
-	css:'operator',	// classe css...
-	rule:'JS',	// Syntaxe qui à créé le lexème
+	token:'INCREMENT_OPE', 	// nom du token (renommé si défini)
+	value:'++',		// valeur du token, NB: la valeur d'un parent est égale à ''
+	css:'operator numeric',	// classes css associées
+	rule:'JS',		// Syntaxe qui à créé le lexème
     // Position dans la source
-	index:12, 	// index du premier caractère
-	lineStart:2,	// ligne du premier caractère
-	lineEnd:2, 	// ligne du dernier caractère
-    // Propriétés parfois présentent
-	bParent:true,		// Indique si il s'agit d'un lexème parent
-	bParentLimit:true,	// Indique si il s'agit d'une limite d'un parent
-	bRescan:true		// Indique si il s'agit d'un lexème parent issu d'un double scannage
+	index:12, 		// index du premier caractère
+	lineStart:2,		// ligne du premier caractère
+	lineEnd:2, 		// ligne du dernier caractère
+    // Propriétés avancées
+	bParent:false,		// Indique si il s'agit d'un lexème parent
+	bParentLimit:false,	// Indique si il s'agit d'une limite d'un parent
+	bRescan:false		// Indique si il s'agit d'un lexème parent issu d'un double scannage
 	}
 </pre>
-		<p>Pour l'analyse syntaxique il est à définir...</p>
-	</section>
+	<p>Pour l'analyse syntaxique il est à définir...</p>
 </section>
 <section><h2>Valeur retournée</h2>
 	<p>
-		Elle retourne un objet devant pouvoir former une structure arborescente.<br>
+		Elle retourne un objet noeud pouvant former une structure arborescente.<br>
 		A cet objet est ajouté l'attribut <code>oValue</code>, affecté avec la valeur <code>oLexeme</code>: <code>oNode.oValue === oLexeme</code>.
 	</p>
 	<p>L'objet retourné est au choix :</p>
@@ -88,7 +86,7 @@ oLexeme={
 			<li>nextSibling</li>
 			<li>parentNode</li>
 			<li>previousSibling</li>
-			<li>... voir getElementsByTagName ( sTagName )</li>
+			<li>... voir aussi getElementsByTagName ( sTagName )</li>
 		</ul>
 	</section>
 </section>
@@ -97,10 +95,16 @@ oLexeme={
 var Lexeme =function( o ){
 	var m = document.createElement( o.token )
 	m.oValue = o
+
+	// Stylisation de l'élément
 	m.className = o.css
-	m.title = o.token
+	
+	// Affichage en info bulle du lexème
+	m.title = JSON.stringify( o, null, '\n' )
+
+	// Contenu texte de l'élément
 	if( o.value ) m.innerHTML = o.value
-	// ou if( ! o.bParent ) m.innerHTML = o.value
+	
 	return m
 	}
 </pre>
