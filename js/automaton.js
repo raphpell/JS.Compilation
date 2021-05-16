@@ -12,18 +12,18 @@ Automate =(function(){
 	var getUniqueID =function(){ return ID++ } // Fonction retournant un identifiant unique ( état nouveau ! )
 
 	// INSTANCES AUTOMATES
-	var Automate =function( I, F, A, S, T, aTokensID ){
-		this.union({
-			I: I,	// Etat initial
-			F: F,	// Etats finaux
-			A: A,	// Alphabet
-			S: S,	// Etats
-			T: T,	// Transitions
-			aTokensID: aTokensID || []
-			})
-		}
-	Automate.prototype ={
-		buildTable :function(){
+	class Automate {
+		constructor ( I, F, A, S, T, aTokensID ){
+			Object.assign( this, {
+				I: I,	// Etat initial
+				F: F,	// Etats finaux
+				A: A,	// Alphabet
+				S: S,	// Etats
+				T: T,	// Transitions
+				aTokensID: aTokensID || []
+				})
+			}
+		buildTable (){
 			var oFA = this
 			var M = oFA.M = {}
 			
@@ -77,8 +77,8 @@ Automate =(function(){
 					}
 				}
 			return oFA
-			},
-		clone :function(){
+			}
+		clone (){
 			var NEW_ID = {}
 			var F=[], S=[], T=[]
 			for(var i=0, a=this.S, ni=a.length; i<ni; i++)
@@ -99,8 +99,8 @@ Automate =(function(){
 				T,
 				this.aTokensID.concat([])
 				)
-			},
-		epsilonClosures :function(){
+			}
+		epsilonClosures (){
 			var E={}
 			for(var i=0, a=this.S, ni=a.length; i<ni; i++) E[a[i]]=[a[i]]
 			var bChanged = true
@@ -116,8 +116,8 @@ Automate =(function(){
 					}
 				}
 			return E
-			},
-		renameStates :function( nStateIDCounter, bAll, aOrder ){
+			}
+		renameStates ( nStateIDCounter, bAll, aOrder ){
 			var oFA = this
 			var NEW_ID = {} // NEW STATES ID
 			, S = []
@@ -187,13 +187,13 @@ Automate =(function(){
 			oFA.T = T
 			oFA.buildTable()
 			return oFA
-			},
-		setTokenName :function( sToken, aFinalStates ){
+			}
+		setTokenName ( sToken, aFinalStates ){
 			this.aTokensID = this.aTokensID || []
 			this.aTokensID.push([ sToken, aFinalStates || this.F ])
 			return this
-			},
-		validateAlphabet :function(){
+			}
+		validateAlphabet (){
 			var oNFA = this
 			, aAtoms=[], aGroups=[], aNegativeGroups=[]
 			, bAnyIn = false
@@ -480,7 +480,7 @@ Automate =(function(){
 			oNFA.T = Transitions.get()
 			return oNFA
 			}
-		}	
+		}
 
 	// OBJET AUTOMATE
 	Automate.union({

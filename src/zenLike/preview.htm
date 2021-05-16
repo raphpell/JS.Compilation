@@ -361,9 +361,7 @@ for(var i=0, aLanguages=['JS','CSS','HTML','PHP'], ni=aLanguages.length; i<ni; i
 				}
 			}
 		else {
-			console.info( oLanguage )
 			for( sSnippet in oLanguage ){
-				console.info( sSnippet )
 				var aj = oCheatSheet[ sLanguage ][sSnippet]
 				if( ! aj ) pushResult( sSnippet )
 				else for(var j=0, nj=aj.length; j<nj; j++ ) pushResult( sSnippet + ( aj[j] ? ':'+ aj[j] : '' ))
