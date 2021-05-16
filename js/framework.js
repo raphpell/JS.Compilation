@@ -197,7 +197,7 @@ LoadFile =(function(){
 
 // Fenêtre 'modale' de l'application
 SubWindow =function( sUrl, sName, sWidth, sHeight, sFunctionName ){
-	var oWindow
+	let oWindow
 	sWidth = sWidth || 600  
 	sHeight = sHeight || 400 
 	var Cotes =(function(){

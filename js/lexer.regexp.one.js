@@ -26,7 +26,7 @@ var OneRegExpLexer =(function( Lexer ){
 		var oRE = new RegExp ( aRegExp.join('|'), 'g' )
 		oRE.sId = sName
 		oRE.tokens = aRules
-		return Array.concat( [oRE], aRules )
+		return [oRE].concat( aRules )
 		}
 	Lexer.prototype.searchToken =function( oRE ){
 		oRE.lastIndex = this.nPos
