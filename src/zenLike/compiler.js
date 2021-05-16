@@ -588,9 +588,8 @@ var oSnippets =(function(){
 			return {
 				getValueOf :function( sName ){
 					return this.abbreviations[ sName ] || sName
-					},
+					},/*
 				'abbreviations':{
-				/*
 					"class" : "if( ! class_exists( '$1' )){\n\n\tclass $1 {\n\n\t\tfunction $1 (){}\n\n\t}}",
 					fun: "function $1 ($2){\n\t$3\n\t}",
 					"fun-": "function( $1 ){\n\t$2\n\t}",
@@ -598,8 +597,8 @@ var oSnippets =(function(){
 					"for" : "for( $i=0, $ni=|; $i<$ni; $i++){\n\t\n\t}",
 					"for-" : "for( $$1; $$2; $$3 ){\n\t\n\t}",
 					"for+" : "for(var $$1=0, $n$1=$a$1.length; $$1<$n$1; $$1++ ){\n\t|\n\t}"
-				*/
-					}
+				
+					}*/
 				}})()
 		}
 	})()

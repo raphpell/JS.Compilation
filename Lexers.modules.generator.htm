@@ -245,7 +245,7 @@ Calcul =(function(){
 			nTokenChild++
 			if( sChildToken ){
 				var oAutomata = oAutomates[ sChildToken ]
-				if( ! oAutomata ) throwError( sChildToken +' is undefined.' )
+				if( ! oAutomata ) throwError( sChildToken +" n'est pas défini, il faut créer son module d'abord !" )
 				try{
 					var f=function(){
 						iframe.style.display = eSteps.checked ? '' : 'none'

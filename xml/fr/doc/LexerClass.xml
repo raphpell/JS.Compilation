@@ -20,7 +20,7 @@
 				<li><code>MyLexer.prototype.searchToken</code></li>
 			</ul>
 			<p>Voir les objets 
-				<a href="Lexer.automaton.xml">AutomatonLexer</a>, 
+				<a href="Lexer.Automaton.xml">AutomatonLexer</a>, 
 				<a href="Lexer.RegExp.Multi.xml">MultiRegExpLexer</a> et  
 				<a href="Lexer.RegExp.One.xml">OneRegExpLexer</a>.
 			</p>
