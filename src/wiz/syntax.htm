@@ -45,8 +45,8 @@
 
 <p>Lors de la <a href="../../Lexers.modules.generator.htm">création de module pour le lexer</a></p>
 <ul>
-	<li>les valeurs résultantes sont stockées même si elles ne sont pas exportées.</li>
-	<li>elles sont réutilisables pour le calcul des modules suivant.</li>
+	<li>les résultats sont stockés jusqu'au rechargement de la page.</li>
+	<li>Ils sont utilisables pour le calcul des modules suivants.</li>
 </ul>
 
 
@@ -64,7 +64,7 @@
 </p>
 <ul>
 	<li> leur déclaration se fait en tête de fichier</li>
-	<li> le symbole '¤' préfixe la suite de nom de module</li>
+	<li> le symbole '¤' préfixe les modules requis</li>
 	<li> ils sont séparés avec le symbole ','</li>
 </ul>
 <p>Exemple: <code>	¤ superscript, whitespaces, strings&amp;comments</code></p>
@@ -75,7 +75,7 @@
 
 <p>Nous identifions :</p>
 <ul>
-	<li>Les <b>tokens</b> : expression régulière (à transformer en AFD)</li>
+	<li>Les <b>tokens</b> : expression régulière (transformer ultérieurement en AFD)</li>
 	<dd><code>!	REGULAR_EXPRESSION	=	\/<i>{reBody}</i>\/<i>{reFlags}</i></code></dd>
 	<li>Les <b>règles d'analyse</b> (liste de tokens à tester lors de l'analyse)</li>
 	<dd><code>!#	JS		=	BIG_JS|NOT_WHITE_SPACES	</code></dd>
@@ -158,7 +158,7 @@
 <a name="toc225"></a>
 <h4>Affectation d'attributs</h4>
 <p>
-	Les attributs sont définis la ligne suivant l'affectation, entre des parenthèses '()' et sont séparés par une virgule ','. <br>
+	Les attributs sont définis entre des parenthèses '()' et sont séparés par une virgule ',' à la suite de l''affectation. <br>
 	Nom d'attributs implémentés :
 </p>
 <ul>
@@ -167,7 +167,7 @@
 	<li><b>translation</b> : nom final du token.</li>
 </ul>
 <p>La valeur de ces attributs est présente après le caractère ':' suivant le nom.</p>
-<p>Les aggrégations ne possède pas d'attribut puisqu'elles ne sont pas un token.</p>
+<p>Les aggrégations ne possèdent pas d'attribut puisqu'elles ne sont pas un token.</p>
 
 
 <a name="toc23"></a>
