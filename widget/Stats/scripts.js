@@ -92,7 +92,7 @@ var Stats =(function(){
 			if( o && o.tot && s!='print' ) delete Stats[s]
 			}
 		}
-	
+
 	aStats.getTime =function( n ){
 		return n.toFixed(2) +' ms'
 		}
